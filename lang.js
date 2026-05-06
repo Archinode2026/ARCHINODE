@@ -11,9 +11,40 @@
 
   // Apply language on load
   document.addEventListener('DOMContentLoaded', function() {
+    ensureLangButton();
     applyLanguage(currentLang);
     updateLangButton(currentLang);
   });
+
+  // Auto-inject a floating language toggle if the page has no .lang-switch
+  // (covers minimal-header pages: auth/*, brand-portal/*, admin/*, etc.)
+  function ensureLangButton() {
+    if (document.querySelector('.lang-switch')) return;
+    var btn = document.createElement('a');
+    btn.href = '#';
+    btn.className = 'lang-switch lang-switch-floating';
+    btn.setAttribute('onclick', 'toggleLang(event); return false;');
+    btn.textContent = 'KR / EN';
+    btn.style.cssText = [
+      'position:fixed',
+      'top:14px',
+      'right:16px',
+      'z-index:9999',
+      'font-size:0.75rem',
+      'font-weight:500',
+      'color:#666',
+      'background:#fff',
+      'border:1px solid #ddd',
+      'padding:4px 10px',
+      'border-radius:3px',
+      'text-decoration:none',
+      'font-family:Inter,"Noto Sans KR",sans-serif',
+      'transition:all 0.2s',
+      'cursor:pointer',
+      'box-shadow:0 1px 3px rgba(0,0,0,0.08)'
+    ].join(';') + ';';
+    document.body.appendChild(btn);
+  }
 
   // Toggle language function (global)
   window.toggleLang = function(e) {
