@@ -1,40 +1,29 @@
-/* ═══════════════════════════════════════════════════════════
-   List Your Brand — Extra Styles
-   카테고리 체크박스 custom UI + 성공 화면 친화적 디자인
-   ═══════════════════════════════════════════════════════════ */
+/* List Your Brand — Extra Styles */
 
-/* ── Category Checkbox (Custom UI, no default border) ── */
-.cat-checkbox {
-  border: 1px solid #ddd !important;
-  border-radius: 6px !important;
-  transition: all 0.2s !important;
-}
-.cat-checkbox:hover {
-  border-color: #C8A96E !important;
-}
-.cat-checkbox:has(input:checked) {
-  background: #FAF6EC;
-  border-color: #C8A96E !important;
-}
+/* Category Checkbox (Custom UI) */
+.cat-checkbox { border: 1px solid #ddd !important; border-radius: 6px !important; transition: all 0.2s !important; }
+.cat-checkbox:hover { border-color: #C8A96E !important; }
+.cat-checkbox:has(input:checked) { background: #FAF6EC; border-color: #C8A96E !important; }
 .cat-checkbox input[type="checkbox"] {
   appearance: none !important;
   -webkit-appearance: none !important;
-  width: 18px !important;
-  height: 18px !important;
-  background: #f0f0f0;
-  border-radius: 3px;
+  width: 9px !important;
+  height: 9px !important;
+  background: #fff;
+  border: 1px solid #ddd !important;
+  border-radius: 2px;
   cursor: pointer;
   position: relative;
   display: inline-block !important;
-  border: none !important;
 }
 .cat-checkbox input[type="checkbox"]:checked {
   background: #C8A96E;
+  border-color: #C8A96E !important;
 }
 .cat-checkbox input[type="checkbox"]:checked::after {
-  content: '✓';
+  content: '\2713';
   color: #fff;
-  font-size: 12px;
+  font-size: 7px;
   font-weight: 900;
   position: absolute;
   top: 50%;
@@ -42,7 +31,8 @@
   transform: translate(-50%, -50%);
 }
 
-/* ── Success Screen — Friendly Credential Card ── */
+/* Success Card */
+.form-success { max-width: 800px !important; }
 .form-success .credentials {
   background: #FAF6EC !important;
   color: #333 !important;
@@ -63,9 +53,7 @@
   gap: 12px;
   flex-wrap: wrap;
 }
-.form-success .credentials p:last-child {
-  margin-bottom: 0;
-}
+.form-success .credentials p:last-child { margin-bottom: 0; }
 .form-success .credentials strong {
   color: #111 !important;
   font-weight: 600;
@@ -75,8 +63,15 @@
   border-radius: 4px;
   border: 1px solid #e5e5e5;
   flex: 1;
-  word-break: break-all;
   min-width: 0;
+}
+@media (min-width: 768px) {
+  .form-success .credentials p { flex-wrap: nowrap !important; }
+  .form-success .credentials strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 .form-success .copy-btn {
   background: #C8A96E;
@@ -90,9 +85,22 @@
   white-space: nowrap;
   transition: background 0.2s;
 }
-.form-success .copy-btn:hover {
-  background: #b8994e;
+.form-success .copy-btn:hover { background: #b8994e; }
+.form-success .copy-btn.copied { background: #10b981; }
+
+/* Warning icon — 30% size */
+.form-success .fa-exclamation-triangle {
+  font-size: 0.3rem !important;
+  margin-right: 6px;
+  vertical-align: middle;
 }
-.form-success .copy-btn.copied {
-  background: #10b981;
+
+/* Go to Brand Portal — centered, 50% size */
+.form-success .portal-btn {
+  display: block !important;
+  width: fit-content;
+  margin: 16px auto !important;
+  padding: 7px 18px !important;
+  font-size: 0.85rem !important;
+  text-align: center;
 }
