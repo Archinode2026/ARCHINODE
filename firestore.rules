@@ -1,0 +1,171 @@
+rules_version = '2';
+
+// ========================================================================
+// ARCHINODE — Firestore 보안 규칙 (프로덕션)
+// 작성: 2026-05-07
+// 기반: docs/firestore-schema.md 권장안 + 프로덕션 강화
+// 게시 방법: Firebase Console → Firestore Database → Rules 탭에 전체 복사
+// ========================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ────────────────────────────────────────────────────────────────────
+    // 헬퍼 함수
+    // ────────────────────────────────────────────────────────────────────
+
+    // 어드민 식별 (이메일 화이트리스트)
+    function isAdmin() {
+      return request.auth != null &&
+        (request.auth.token.email == 'office@archinode.org' ||
+         request.auth.token.email == 'wool21wool@gmail.com');
+    }
+
+    // 인증된 사용자
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // 본인 확인
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // 신규 생성 시 status를 'pending'으로 강제
+    // (사용자가 자기 문서를 자동 approved로 만드는 것 차단)
+    function isNewStatusPending() {
+      return request.resource.data.status == 'pending';
+    }
+
+    // 업데이트 시 immutable 필드 변경 방지
+    function notChanging(field) {
+      return request.resource.data[field] == resource.data[field];
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // brands 컬렉션
+    // 문서 ID = Firebase Auth UID
+    // ────────────────────────────────────────────────────────────────────
+    match /brands/{brandId} {
+      // 읽기: approved 문서는 누구나, 본인/어드민은 모든 상태 가능
+      allow read: if resource.data.status == 'approved'
+                  || isOwner(brandId)
+                  || isAdmin();
+
+      // 생성: 인증된 사용자가 본인 UID 문서만, status는 'pending' 강제
+      allow create: if isOwner(brandId)
+                    && isNewStatusPending()
+                    && request.resource.data.brandName is string
+                    && request.resource.data.email is string;
+
+      // 수정: 본인 또는 어드민. status·createdAt·brandName은 어드민만 변경 가능
+      allow update: if isAdmin()
+                    || (isOwner(brandId)
+                        && notChanging('status')
+                        && notChanging('createdAt')
+                        && notChanging('brandName')
+                        && notChanging('approvedAt'));
+
+      // 삭제: 어드민만
+      allow delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // products 컬렉션
+    // 문서 ID = 자동 생성
+    // ────────────────────────────────────────────────────────────────────
+    match /products/{productId} {
+      // 읽기: approved는 누구나, 소유 브랜드/어드민은 모든 상태
+      allow read: if resource.data.status == 'approved'
+                  || (isSignedIn() && request.auth.uid == resource.data.brandId)
+                  || isAdmin();
+
+      // 생성: 인증된 사용자가 본인 brandId로만, status는 'pending' 강제
+      allow create: if isSignedIn()
+                    && request.resource.data.brandId == request.auth.uid
+                    && isNewStatusPending()
+                    && request.resource.data.name is string
+                    && request.resource.data.category is string;
+
+      // 수정: 소유 브랜드 또는 어드민. status·brandId·createdAt 보호
+      allow update: if isAdmin()
+                    || (isSignedIn()
+                        && request.auth.uid == resource.data.brandId
+                        && notChanging('status')
+                        && notChanging('brandId')
+                        && notChanging('createdAt')
+                        && notChanging('approvedAt'));
+
+      // 삭제: 어드민만
+      allow delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // articles 컬렉션 (매거진)
+    // 문서 ID = 자동 생성
+    // ────────────────────────────────────────────────────────────────────
+    match /articles/{articleId} {
+      // 읽기: approved는 누구나, 소유 브랜드/어드민은 모든 상태
+      allow read: if resource.data.status == 'approved'
+                  || (isSignedIn() && request.auth.uid == resource.data.brandId)
+                  || isAdmin();
+
+      // 생성: 인증된 사용자가 본인 brandId로만, status는 'pending'
+      // (어드민이 직접 발행 시에는 별도로 approved 가능 — 어드민은 update로 status 변경)
+      allow create: if isSignedIn()
+                    && request.resource.data.brandId == request.auth.uid
+                    && isNewStatusPending()
+                    && request.resource.data.title is string;
+
+      // 수정: 소유 브랜드 또는 어드민. status·brandId·createdAt 보호
+      allow update: if isAdmin()
+                    || (isSignedIn()
+                        && request.auth.uid == resource.data.brandId
+                        && notChanging('status')
+                        && notChanging('brandId')
+                        && notChanging('createdAt')
+                        && notChanging('publishedAt'));
+
+      // 삭제: 어드민만
+      allow delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // users 컬렉션 (Phase 2B — 국내 전문가 계정)
+    // 문서 ID = Firebase Auth UID
+    // ────────────────────────────────────────────────────────────────────
+    match /users/{userId} {
+      // 읽기·쓰기: 본인만. 어드민은 별도로 모두 가능
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId)
+                    && request.resource.data.role == 'professional'
+                    && request.resource.data.email is string;
+      allow update: if isOwner(userId)
+                    && notChanging('email')
+                    && notChanging('createdAt')
+                    && notChanging('role');
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // leads 컬렉션 (향후 사용 — 브랜드 리드 생성)
+    // 문서 ID = 자동 생성
+    // 현재는 contact 폼이 Formspree로 가지만, 향후 직접 수집 시 사용
+    // ────────────────────────────────────────────────────────────────────
+    match /leads/{leadId} {
+      // 생성: 누구나 (방문자 폼 제출). 단, 필수 필드 검증.
+      allow create: if request.resource.data.email is string
+                    && request.resource.data.email.size() > 5
+                    && request.resource.data.createdAt == request.time;
+      // 읽기·수정·삭제: 어드민만 (개인정보 보호)
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // 기본 정책: 위에 매칭되지 않는 모든 경로 차단
+    // ────────────────────────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,28 @@
+# 모든 텍스트 파일을 LF로 정규화 (GitHub Pages 표준 + 저장소 일관성)
+# Windows GitHub Desktop이 CRLF로 체크아웃해도 인덱스에는 LF로 저장됨
+* text=auto eol=lf
+
+# 명시적으로 텍스트 처리할 확장자
+*.html      text eol=lf
+*.css       text eol=lf
+*.js        text eol=lf
+*.json      text eol=lf
+*.md        text eol=lf
+*.txt       text eol=lf
+*.xml       text eol=lf
+*.svg       text eol=lf
+*.gitignore text eol=lf
+
+# 바이너리 파일 (변환 금지)
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.zip   binary
