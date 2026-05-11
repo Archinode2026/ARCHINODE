@@ -358,13 +358,17 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
             </select>
           </div>
           <div class="form-group">
-            <label for="language" data-en="Submission Language" data-ko="제출 언어">Submission Language <span class="req">*</span></label>
+            <label for="language" data-en="Original Language" data-ko="원본 언어">Original Language <span class="req">*</span> <span class="hint" data-en="the language your body text is written in" data-ko="본문이 작성된 언어">the language your body text is written in</span></label>
             <select id="language" required>
               <option value="">— Select —</option>
               <option value="en">English</option>
               <option value="it">Italiano</option>
+              <option value="de">Deutsch</option>
+              <option value="fr">Français</option>
+              <option value="es">Español</option>
+              <option value="nl">Nederlands</option>
+              <option value="da">Dansk</option>
               <option value="ko">한국어</option>
-              <option value="en+ko">English + Korean</option>
             </select>
           </div>
         </div>
@@ -375,8 +379,13 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         </div>
 
         <div class="form-group">
-          <label for="body" data-en="Body" data-ko="본문">Body <span class="req">*</span> <span class="hint" data-en="600 words minimum recommended" data-ko="권장 600단어 이상">600 words minimum recommended</span></label>
+          <label for="body" data-en="Body (in your original language)" data-ko="본문 (원본 언어로)">Body (in your original language) <span class="req">*</span> <span class="hint" data-en="600 words minimum recommended — write in the language you selected above" data-ko="권장 600단어 이상 — 위에서 선택한 원본 언어로 작성">600 words minimum recommended — write in the language you selected above</span></label>
           <textarea id="body" required placeholder="Tell the story. What did you show, why, and what does it mean for designers and architects?" data-en-placeholder="Tell the story. What did you show, why, and what does it mean for designers and architects?" data-ko-placeholder="이야기를 들려주세요. 무엇을 어떻게 선보이셨고, 왜, 그리고 이것이 디자이너·건축가에게 어떤 의미인지."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="englishBody" data-en="English Translation" data-ko="영어 번역">English Translation <span class="hint" data-en="optional — leave blank if your Body is already in English or to have ARCHINODE editorial translate it" data-ko="선택 — 위 본문이 이미 영어이거나 ARCHINODE 편집부가 번역해도 되면 비워두세요">optional — leave blank if your Body is already in English or to have ARCHINODE editorial translate it</span></label>
+          <textarea id="englishBody" placeholder="English version of your body text (optional)" data-en-placeholder="English version of your body text (optional)" data-ko-placeholder="본문의 영어 버전 (선택)"></textarea>
         </div>
 
         <div class="form-group">
@@ -477,9 +486,10 @@ async function submitTrend(e) {
   const country = document.getElementById('country').value.trim();
   const title = document.getElementById('title').value.trim();
   const category = document.getElementById('category').value;
-  const language = document.getElementById('language').value;
+  const originalLang = document.getElementById('language').value;
   const source = document.getElementById('source').value.trim();
-  const body = document.getElementById('body').value.trim();
+  const originalBody = document.getElementById('body').value.trim();
+  const englishBody = document.getElementById('englishBody').value.trim();
   const imageUrl = document.getElementById('imageUrl').value.trim();
   const extraImages = document.getElementById('extraImages').value.trim();
   const agreeRights = document.getElementById('agreeRights').checked;
@@ -490,7 +500,7 @@ async function submitTrend(e) {
     return false;
   }
 
-  if (body.length < 200) {
+  if (originalBody.length < 200) {
     errorDiv.textContent = 'Body is too short. Please provide a substantive editorial piece (recommended 600+ words).';
     errorDiv.style.display = 'block';
     return false;
@@ -508,9 +518,10 @@ async function submitTrend(e) {
       country: escapeHtml(country),
       title: escapeHtml(title),
       category: category,
-      language: language,
+      originalLang: originalLang,
       source: escapeHtml(source),
-      body: body,
+      originalBody: originalBody,
+      englishBody: englishBody,
       imageUrl: imageUrl,
       extraImages: extraImages.split('\n').map(s => s.trim()).filter(Boolean),
       status: 'pending',

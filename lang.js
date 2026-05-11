@@ -1,109 +1,184 @@
-/* ===== ARCHINODE Language Toggle (KR / EN) ===== */
+/* ===== ARCHINODE Language Toggle (Multi-language, dropdown) =====
+   Available languages per page: set <body data-langs="ko,en,it"> or
+   <html data-langs="..."> attribute. Default: "en,ko".
+   Each element uses data-en="..." data-ko="..." data-it="..." with ISO 639-1 codes.
+   HTML content: data-{lang}-html. Placeholder: data-{lang}-placeholder.
+*/
 (function() {
-  // Detect language: saved preference > browser/location > default 'en'
-  let currentLang = localStorage.getItem('archinode-lang');
+  var LANG_LABELS = {
+    en: { native: 'English',    short: 'EN', label: 'English' },
+    ko: { native: '한국어',     short: 'KR', label: 'Korean' },
+    it: { native: 'Italiano',   short: 'IT', label: 'Italian' },
+    de: { native: 'Deutsch',    short: 'DE', label: 'German' },
+    fr: { native: 'Français',   short: 'FR', label: 'French' },
+    es: { native: 'Español',    short: 'ES', label: 'Spanish' },
+    nl: { native: 'Nederlands', short: 'NL', label: 'Dutch' },
+    da: { native: 'Dansk',      short: 'DA', label: 'Danish' }
+  };
 
-  if (!currentLang) {
-    // Auto-detect: Korean browser or Korean locale → 'ko', else 'en'
-    var browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-    currentLang = (browserLang === 'ko' || browserLang.startsWith('ko-')) ? 'ko' : 'en';
+  var availableLangs = ['en', 'ko'];
+  var currentLang = 'en';
+
+  function getAvailableLangs() {
+    var body = document.body;
+    var attr = (body && body.getAttribute('data-langs')) || document.documentElement.getAttribute('data-langs');
+    if (!attr) return ['en', 'ko'];
+    return attr.split(',')
+      .map(function(s) { return s.trim().toLowerCase(); })
+      .filter(function(l) { return LANG_LABELS[l]; });
   }
 
-  // Apply language on load
+  function pickInitialLang() {
+    var saved = null;
+    try { saved = localStorage.getItem('archinode-lang'); } catch(e){}
+    if (saved && availableLangs.indexOf(saved) !== -1) return saved;
+    var browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase().split('-')[0];
+    if (availableLangs.indexOf(browserLang) !== -1) return browserLang;
+    if (availableLangs.indexOf('en') !== -1) return 'en';
+    return availableLangs[0] || 'en';
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
-    ensureLangButton();
+    availableLangs = getAvailableLangs();
+    currentLang = pickInitialLang();
+    initSwitcher();
     applyLanguage(currentLang);
     updateLangButton(currentLang);
   });
 
-  // Auto-inject a floating language toggle if the page has no .lang-switch
-  // (covers minimal-header pages: auth/*, brand-portal/*, admin/*, etc.)
-  function ensureLangButton() {
-    if (document.querySelector('.lang-switch')) return;
-    var btn = document.createElement('a');
-    btn.href = '#';
-    btn.className = 'lang-switch lang-switch-floating';
-    btn.setAttribute('onclick', 'toggleLang(event); return false;');
-    btn.textContent = 'KR / EN';
-    btn.style.cssText = [
-      'position:fixed',
-      'top:14px',
-      'right:16px',
-      'z-index:9999',
-      'font-size:0.75rem',
-      'font-weight:500',
-      'color:#666',
-      'background:#fff',
-      'border:1px solid #ddd',
-      'padding:4px 10px',
-      'border-radius:3px',
-      'text-decoration:none',
-      'font-family:Inter,"Noto Sans KR",sans-serif',
-      'transition:all 0.2s',
-      'cursor:pointer',
-      'box-shadow:0 1px 3px rgba(0,0,0,0.08)'
-    ].join(';') + ';';
-    document.body.appendChild(btn);
+  function initSwitcher() {
+    document.querySelectorAll('.lang-switcher').forEach(function(sw) {
+      sw.innerHTML = buildSwitcherInner();
+    });
+    document.querySelectorAll('.lang-switch:not(.lang-switcher)').forEach(function(el) {
+      var wrapper = document.createElement('div');
+      wrapper.className = 'lang-switcher';
+      if (el.classList.contains('lang-switch-floating')) {
+        wrapper.classList.add('lang-switcher-floating');
+      }
+      wrapper.innerHTML = buildSwitcherInner();
+      el.parentNode.replaceChild(wrapper, el);
+    });
+    if (!document.querySelector('.lang-switcher')) {
+      var floater = document.createElement('div');
+      floater.className = 'lang-switcher lang-switcher-floating';
+      floater.innerHTML = buildSwitcherInner();
+      document.body.appendChild(floater);
+    }
   }
 
-  // Toggle language function (global)
+  function buildSwitcherInner() {
+    var menuItems = availableLangs.map(function(l) {
+      return '<a href="#" data-lang="' + l + '" onclick="setLang(\'' + l + '\', event)">'
+        + LANG_LABELS[l].native
+        + '<small>' + LANG_LABELS[l].short + '</small></a>';
+    }).join('');
+    var curShort = LANG_LABELS[currentLang] ? LANG_LABELS[currentLang].short : 'EN';
+    return '<button class="lang-switch-btn" type="button" onclick="toggleLangMenu(event)" aria-label="Language">'
+      + '<span class="lang-current">' + curShort + '</span>'
+      + ' <i class="fas fa-chevron-down"></i>'
+      + '</button>'
+      + '<div class="lang-menu" style="display:none;">' + menuItems + '</div>';
+  }
+
+  window.toggleLangMenu = function(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    document.querySelectorAll('.lang-menu').forEach(function(m) {
+      m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+    });
+  };
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.lang-switcher')) {
+      document.querySelectorAll('.lang-menu').forEach(function(m) {
+        m.style.display = 'none';
+      });
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.lang-menu').forEach(function(m) {
+        m.style.display = 'none';
+      });
+    }
+  });
+
+  window.setLang = function(lang, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    if (availableLangs.indexOf(lang) === -1) return;
+    currentLang = lang;
+    try { localStorage.setItem('archinode-lang', lang); } catch(err){}
+    applyLanguage(lang);
+    updateLangButton(lang);
+    document.querySelectorAll('.lang-menu').forEach(function(m) {
+      m.style.display = 'none';
+    });
+  };
+
   window.toggleLang = function(e) {
     if (e) e.preventDefault();
-    currentLang = currentLang === 'en' ? 'ko' : 'en';
-    localStorage.setItem('archinode-lang', currentLang);
-    applyLanguage(currentLang);
-    updateLangButton(currentLang);
+    if (availableLangs.length > 2) {
+      window.toggleLangMenu(e);
+      return;
+    }
+    var next = currentLang === 'en' ? 'ko' : 'en';
+    if (availableLangs.indexOf(next) !== -1) {
+      window.setLang(next);
+    }
   };
 
   function applyLanguage(lang) {
-    // Update all elements with data-en and data-ko attributes
-    document.querySelectorAll('[data-en][data-ko]').forEach(function(el) {
+    document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
       var text = el.getAttribute('data-' + lang);
-      if (text !== null) {
-        // Check if element has child elements we should preserve
-        if (el.querySelector('i, svg, img, span.logo-sub')) {
-          // Replace only the first text node
-          var nodes = el.childNodes;
-          for (var i = 0; i < nodes.length; i++) {
-            if (nodes[i].nodeType === Node.TEXT_NODE && nodes[i].textContent.trim()) {
-              nodes[i].textContent = text;
-              break;
-            }
+      if (text === null) return;
+      if (el.querySelector('i, svg, img, span.logo-sub')) {
+        var nodes = el.childNodes;
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i].nodeType === Node.TEXT_NODE && nodes[i].textContent.trim()) {
+            nodes[i].textContent = text;
+            break;
           }
-        } else {
-          el.textContent = text;
         }
+      } else {
+        el.textContent = text;
       }
     });
 
-    // Update elements with data-en-html and data-ko-html (for innerHTML)
-    document.querySelectorAll('[data-en-html][data-ko-html]').forEach(function(el) {
+    document.querySelectorAll('[data-' + lang + '-html]').forEach(function(el) {
       var html = el.getAttribute('data-' + lang + '-html');
-      if (html !== null) {
-        el.innerHTML = html;
-      }
+      if (html !== null) el.innerHTML = html;
     });
 
-    // Update placeholder attributes
-    document.querySelectorAll('[data-en-placeholder][data-ko-placeholder]').forEach(function(el) {
+    document.querySelectorAll('[data-' + lang + '-placeholder]').forEach(function(el) {
       var ph = el.getAttribute('data-' + lang + '-placeholder');
-      if (ph !== null) {
-        el.placeholder = ph;
-      }
+      if (ph !== null) el.placeholder = ph;
     });
 
-    // Update html lang attribute
-    document.documentElement.lang = lang === 'ko' ? 'ko' : 'en';
+    document.querySelectorAll('[data-lang-only]').forEach(function(el) {
+      var only = el.getAttribute('data-lang-only').split(',').map(function(s){ return s.trim().toLowerCase(); });
+      el.style.display = (only.indexOf(lang) !== -1) ? '' : 'none';
+    });
+
+    document.querySelectorAll('[data-lang-not]').forEach(function(el) {
+      var not = el.getAttribute('data-lang-not').split(',').map(function(s){ return s.trim().toLowerCase(); });
+      el.style.display = (not.indexOf(lang) === -1) ? '' : 'none';
+    });
+
+    document.documentElement.lang = lang;
   }
 
   function updateLangButton(lang) {
-    var btns = document.querySelectorAll('.lang-switch');
-    btns.forEach(function(btn) {
-      if (lang === 'ko') {
-        btn.innerHTML = '<strong>KR</strong> / EN';
-      } else {
-        btn.innerHTML = 'KR / <strong>EN</strong>';
-      }
+    document.querySelectorAll('.lang-switcher').forEach(function(sw) {
+      var cur = sw.querySelector('.lang-current');
+      if (cur) cur.textContent = LANG_LABELS[lang] ? LANG_LABELS[lang].short : lang.toUpperCase();
+      sw.querySelectorAll('.lang-menu a').forEach(function(a) {
+        if (a.getAttribute('data-lang') === lang) {
+          a.classList.add('active');
+        } else {
+          a.classList.remove('active');
+        }
+      });
     });
   }
 })();

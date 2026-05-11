@@ -168,12 +168,16 @@ service cloud.firestore {
     // ────────────────────────────────────────────────────────────────────
     match /trend-submissions/{submissionId} {
       // 생성: 누구나 (방문자 폼 제출). 필수 필드 검증 + status 'pending' 강제
+      // 2026-05-11 업데이트: body → originalBody/englishBody로 분리, originalLang 추가 (3국어 토글 지원)
       allow create: if request.resource.data.brandName is string
                     && request.resource.data.email is string
                     && request.resource.data.email.size() > 5
                     && request.resource.data.title is string
-                    && request.resource.data.body is string
-                    && request.resource.data.body.size() >= 200
+                    && request.resource.data.originalLang is string
+                    && request.resource.data.originalLang in ['en','it','de','fr','es','nl','da','ko']
+                    && request.resource.data.originalBody is string
+                    && request.resource.data.originalBody.size() >= 200
+                    && request.resource.data.englishBody is string
                     && request.resource.data.status == 'pending'
                     && request.resource.data.createdAt == request.time;
 
