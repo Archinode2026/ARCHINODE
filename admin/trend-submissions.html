@@ -240,7 +240,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; co
 
 <script src="../firebase-config.js"></script>
 <script>
-const ADMIN_EMAILS = ['office@archinode.org', 'wool21wool@gmail.com'];
+// ADMIN_EMAILS, isAdmin() 는 firebase-config.js 에서 제공
 let currentStatus = 'pending';
 let allDocs = []; // 전체 캐시
 let currentDoc = null; // 모달 열린 문서
@@ -251,7 +251,7 @@ auth.onAuthStateChanged(function(user) {
     location.replace('../auth/login.html?next=/admin/trend-submissions.html');
     return;
   }
-  if (ADMIN_EMAILS.indexOf(user.email) === -1) {
+  if (!isAdmin(user.email)) {
     document.body.innerHTML = '<div style="text-align:center;padding:80px 24px;font-family:Inter,sans-serif;"><h1 style="font-size:1.5rem;margin-bottom:12px;">Access Denied</h1><p style="color:#888;">This page is restricted to ARCHINODE editorial team.</p><p style="margin-top:18px;"><a href="/" style="color:#C8A96E;">Return to homepage</a></p></div>';
     return;
   }
