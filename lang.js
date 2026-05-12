@@ -132,13 +132,21 @@
     document.querySelectorAll('[data-' + lang + ']').forEach(function(el) {
       var text = el.getAttribute('data-' + lang);
       if (text === null) return;
-      if (el.querySelector('i, svg, img, span.logo-sub')) {
+      // 자식 요소(텍스트 노드 외)가 하나라도 있으면 자식 보존 + 첫 텍스트 노드만 교체.
+      // 자식 요소가 없으면 textContent 전체 갱신.
+      if (el.children.length > 0) {
         var nodes = el.childNodes;
+        var replaced = false;
         for (var i = 0; i < nodes.length; i++) {
           if (nodes[i].nodeType === Node.TEXT_NODE && nodes[i].textContent.trim()) {
             nodes[i].textContent = text;
+            replaced = true;
             break;
           }
+        }
+        if (!replaced) {
+          // 텍스트 노드가 없으면 맨 앞에 삽입 (자식 보존)
+          el.insertBefore(document.createTextNode(text + ' '), el.firstChild);
         }
       } else {
         el.textContent = text;
