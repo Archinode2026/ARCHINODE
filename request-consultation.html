@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request Consultation | ARCHINODE — 한국 건축자재 시장 진출 자문</title>
+<meta name="description" content="ARCHINODE 컨설팅 — 12년 유럽 디자인 파트너십 기반의 한국 시장 진출 자문. 시장 진출 / 파트너십 매칭 / 자재 소싱.">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a1a;
+  background: #ffffff;
+  line-height: 1.6;
+}
+a { text-decoration: none; color: inherit; transition: color 0.3s; }
+img { max-width: 100%; height: auto; display: block; }
+ul { list-style: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+:root {
+  --black: #000000;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #e5e5e5;
+  --gray-300: #d4d4d4;
+  --gray-400: #a3a3a3;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-700: #404040;
+  --gray-800: #262626;
+  --gray-900: #171717;
+  --max-width: 1440px;
+  --header-height: 64px;
+  --accent-gold: #C8A96E;
+}
+
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 40px; }
+@media (max-width: 768px) { .container { padding: 0 20px; } }
+
+.consult-hero {
+  background: var(--gray-900);
+  color: var(--white);
+  padding: 100px 0 60px;
+  text-align: center;
+}
+.consult-hero .hero-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 20px;
+}
+.consult-hero h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+.consult-hero p {
+  font-size: 1rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.7);
+  max-width: 640px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+.consult-hero .price-tag {
+  display: inline-block;
+  background: rgba(200,169,110,0.15);
+  color: var(--accent-gold);
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(200,169,110,0.3);
+}
+
+.services {
+  padding: 56px 0 24px;
+  background: var(--gray-50);
+}
+.services h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+@media (max-width: 768px) { .services-grid { grid-template-columns: 1fr; } }
+.service-card {
+  padding: 22px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+}
+.service-card i { font-size: 1.4rem; color: var(--accent-gold); margin-bottom: 12px; }
+.service-card h3 { font-size: 0.92rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.01em; }
+.service-card p { font-size: 0.82rem; color: var(--gray-600); line-height: 1.55; }
+
+.form-section { padding: 56px 0 80px; background: var(--white); }
+.form-section h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+.form-section .form-intro { color: var(--gray-600); font-size: 0.95rem; margin-bottom: 32px; max-width: 720px; }
+
+.form-wrapper { max-width: 720px; }
+.form-error {
+  display: none;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 5px;
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+}
+.form-success {
+  display: none;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 32px;
+  border-radius: 8px;
+  text-align: center;
+}
+.form-success i { font-size: 2.5rem; color: #22c55e; margin-bottom: 12px; }
+.form-success h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
+.form-success p { font-size: 0.95rem; line-height: 1.6; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--gray-800);
+}
+.form-group .req { color: #dc2626; }
+.form-group .hint { font-size: 0.72rem; font-weight: 400; color: var(--gray-400); margin-left: 6px; }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--gray-300);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--white);
+  transition: border-color 0.2s;
+}
+.form-group textarea { resize: vertical; min-height: 140px; line-height: 1.55; }
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { outline: none; border-color: var(--accent-gold); }
+
+.submit-btn {
+  display: inline-block;
+  background: var(--gray-900);
+  color: var(--white);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 14px 36px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+.submit-btn:hover { background: var(--accent-gold); }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="announcement-bar">
+  <span data-en="ARCHINODE Consulting —" data-ko="ARCHINODE 컨설팅 —">ARCHINODE Consulting —</span> <strong data-en="12 years of European partnership, applied to your Korea move." data-ko="12년의 유럽 파트너십, 한국 진출에 직접 적용.">12 years of European partnership, applied to your Korea move.</strong>
+</div>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container">
+    <a href="index.html" class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger" onclick="toggleCatMenu()" data-en="Categories" data-ko="카테고리">Categories <i class="fas fa-chevron-down"></i></button>
+        <div class="nav-dropdown-menu" id="catMenu">
+          <a href="categories/furniture.html"><span>Furniture</span><small>가구</small></a>
+          <a href="categories/bathroom.html"><span>Bathroom</span><small>욕실</small></a>
+          <a href="categories/outdoor.html"><span>Outdoor</span><small>아웃도어</small></a>
+          <a href="categories/lighting.html"><span>Lighting</span><small>조명</small></a>
+          <a href="categories/kitchen.html"><span>Kitchen</span><small>주방</small></a>
+          <a href="categories/office.html"><span>Office</span><small>오피스</small></a>
+          <a href="categories/finishes.html"><span>Finishes</span><small>마감재</small></a>
+          <a href="categories/wellness.html"><span>Wellness</span><small>웰니스</small></a>
+          <a href="categories/decor.html"><span>Decor</span><small>데코</small></a>
+          <a href="categories/construction.html"><span>Construction</span><small>건축자재</small></a>
+        </div>
+      </div>
+      <a href="brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="trend-report.html" data-en="Trend Report" data-ko="트렌드 리포트">Trend Report</a>
+      <a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
+      <a href="about.html" data-en="About" data-ko="소개">About</a>
+      <a href="list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+    </nav>
+    <div class="header-actions">
+      <a href="brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
+      <button class="search-toggle" onclick="toggleSearch()" aria-label="Search"><i class="fas fa-search"></i></button>
+      <a href="auth/profile.html" aria-label="Saved"><i class="far fa-bookmark"></i></a>
+      <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
+      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="consult-hero">
+  <div class="container">
+    <div class="hero-tag" data-en="ARCHINODE Consulting" data-ko="ARCHINODE 컨설팅">ARCHINODE Consulting</div>
+    <h1 data-en="Korea, Decoded" data-ko="한국 시장을 정확하게 읽어드립니다">Korea, Decoded</h1>
+    <p data-en="Twelve years of European design partnership, translated into actionable Korean market strategy. We work with brands, designers, and architects who want to enter Korea — without burning a year on trial and error." data-ko="12년의 유럽 디자인 파트너십을 한국 시장 전략으로 직접 옮깁니다. 시행착오로 1년을 태우지 않고 한국에 진출하려는 브랜드·디자이너·건축가를 위한 자문.">Twelve years of European design partnership, translated into actionable Korean market strategy. We work with brands, designers, and architects who want to enter Korea — without burning a year on trial and error.</p>
+    <div class="price-tag" data-en="Starting from $300 USD per session" data-ko="1회 $300 USD부터">Starting from $300 USD per session</div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services">
+  <div class="container">
+    <h2 data-en="Four ways we work with you" data-ko="네 가지 자문 방식">Four ways we work with you</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <i class="fas fa-compass"></i>
+        <h3 data-en="Korean Market Entry" data-ko="한국 시장 진출 자문">Korean Market Entry</h3>
+        <p data-en="Market positioning, distributor strategy, pricing for Korea, regulatory and KS-standard basics." data-ko="시장 포지셔닝, 유통 전략, 한국 시장 가격 설계, KS규격·인허가 기본.">Market positioning, distributor strategy, pricing for Korea, regulatory and KS-standard basics.</p>
+      </div>
+      <div class="service-card">
+        <i class="fas fa-handshake"></i>
+        <h3 data-en="Partnership Match" data-ko="브랜드 파트너십 매칭">Partnership Match</h3>
+        <p data-en="Curated introductions to Korean architects, interior studios, contractors, and distributors that fit your brand." data-ko="브랜드와 어울리는 한국 건축가·인테리어 스튜디오·시공사·유통사를 직접 큐레이션하여 연결.">Curated introductions to Korean architects, interior studios, contractors, and distributors that fit your brand.</p>
+      </div>
+      <div class="service-card">
+        <i class="fas fa-cubes"></i>
+        <h3 data-en="Material Sourcing" data-ko="자재 소싱">Material Sourcing</h3>
+        <p data-en="For Korean buyers — sourcing specific European materials, brands, or product specs. Spec sheets, lead times, MOQs." data-ko="한국 발주자용 — 유럽 특정 자재·브랜드·스펙 소싱. 스펙시트, 리드타임, 최소발주 안내.">For Korean buyers — sourcing specific European materials, brands, or product specs. Spec sheets, lead times, MOQs.</p>
+      </div>
+      <div class="service-card">
+        <i class="fas fa-question-circle"></i>
+        <h3 data-en="Other / Custom" data-ko="기타 · 맞춤형">Other / Custom</h3>
+        <p data-en="Strategic advisory, due diligence on Korean partners, exhibition prep (KOREA BUILD, SLDF), or anything that doesn't fit the boxes above." data-ko="전략 자문, 한국 파트너 실사, 전시회 준비 (KOREA BUILD, SLDF), 또는 위 카테고리 외 맞춤형 요청.">Strategic advisory, due diligence on Korean partners, exhibition prep (KOREA BUILD, SLDF), or anything that doesn't fit the boxes above.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section">
+  <div class="container">
+    <div class="form-wrapper">
+      <h2 data-en="Request a consultation" data-ko="자문 요청">Request a consultation</h2>
+      <p class="form-intro" data-en="Tell us about your situation. We'll review and respond within 2 business days — either with a sent-and-paid Stripe link to schedule a session, or a brief written answer if we can handle your question without a paid meeting." data-ko="현재 상황을 알려주세요. 2영업일 이내에 회신드립니다 — 결제 링크와 함께 세션 일정을 잡거나, 유료 미팅 없이도 답이 되는 질문이면 짧은 서면 답변을 드립니다.">Tell us about your situation. We'll review and respond within 2 business days — either with a sent-and-paid Stripe link to schedule a session, or a brief written answer if we can handle your question without a paid meeting.</p>
+
+      <div class="form-error" id="formError"></div>
+
+      <form id="consultForm" onsubmit="return submitConsult(event)">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="companyName" data-en="Company / Studio Name" data-ko="회사 · 스튜디오 명">Company / Studio Name <span class="req">*</span></label>
+            <input type="text" id="companyName" required>
+          </div>
+          <div class="form-group">
+            <label for="contactName" data-en="Your Name" data-ko="담당자">Your Name <span class="req">*</span></label>
+            <input type="text" id="contactName" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email" data-en="Email" data-ko="이메일">Email <span class="req">*</span></label>
+            <input type="email" id="email" required>
+          </div>
+          <div class="form-group">
+            <label for="phone" data-en="Phone" data-ko="연락처">Phone <span class="hint" data-en="optional" data-ko="선택">optional</span></label>
+            <input type="tel" id="phone">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="website" data-en="Company Website" data-ko="회사 웹사이트">Company Website <span class="hint" data-en="optional" data-ko="선택">optional</span></label>
+            <input type="url" id="website" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label for="country" data-en="Country" data-ko="국가">Country <span class="req">*</span></label>
+            <input type="text" id="country" required placeholder="e.g. Italy / Germany / Korea" data-en-placeholder="e.g. Italy / Germany / Korea" data-ko-placeholder="예: 이탈리아 / 독일 / 한국">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category" data-en="Consultation Category" data-ko="자문 카테고리">Consultation Category <span class="req">*</span></label>
+          <select id="category" required>
+            <option value="">— Select —</option>
+            <option value="market-entry">Korean Market Entry — 한국 시장 진출</option>
+            <option value="partnership-match">Partnership Match — 브랜드 파트너십 매칭</option>
+            <option value="material-sourcing">Material Sourcing — 자재 소싱</option>
+            <option value="other">Other / Custom — 기타</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description" data-en="What do you need help with?" data-ko="어떤 부분에 자문이 필요하신가요?">What do you need help with? <span class="req">*</span> <span class="hint" data-en="100 words minimum — context helps us prepare" data-ko="100단어 이상 — 사전 준비를 위해 필요">100 words minimum — context helps us prepare</span></label>
+          <textarea id="description" required placeholder="Brief on your situation, goal, and what you've tried so far. The more specific, the better we can prepare for the session." data-en-placeholder="Brief on your situation, goal, and what you've tried so far. The more specific, the better we can prepare for the session." data-ko-placeholder="현재 상황, 목표, 지금까지 시도한 것. 구체적일수록 사전 준비가 더 정확해집니다."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="timing" data-en="Preferred Meeting Time" data-ko="미팅 희망 시기">Preferred Meeting Time <span class="hint" data-en="optional" data-ko="선택">optional</span></label>
+            <input type="text" id="timing" placeholder="e.g. Next week / Within 2 weeks / Flexible" data-en-placeholder="e.g. Next week / Within 2 weeks / Flexible" data-ko-placeholder="예: 다음 주 / 2주 내 / 유동적">
+          </div>
+          <div class="form-group">
+            <label for="budget" data-en="Budget Range" data-ko="예산 범위">Budget Range <span class="hint" data-en="for scope alignment" data-ko="작업 범위 조율용">for scope alignment</span></label>
+            <select id="budget">
+              <option value="">— Select —</option>
+              <option value="single-300">Starting from $300 (single session)</option>
+              <option value="package-1000">$1,000+ (multi-session package)</option>
+              <option value="custom">Custom — let's discuss</option>
+              <option value="not-sure">Not sure yet</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:24px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;color:var(--gray-600);">
+            <input type="checkbox" id="agreeContact" required style="width:auto;margin-top:4px;">
+            <span data-en="I agree to be contacted by ARCHINODE regarding this consultation request. My information will not be shared with third parties without my consent." data-ko="이 자문 요청과 관련하여 ARCHINODE의 연락을 수신하는 데 동의합니다. 본인 동의 없이 제3자에게 정보가 공유되지 않습니다.">I agree to be contacted by ARCHINODE regarding this consultation request. My information will not be shared with third parties without my consent.</span>
+          </label>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn" data-en="Send Request" data-ko="요청 보내기">Send Request</button>
+
+      </form>
+
+      <div class="form-success" id="formSuccess">
+        <i class="fas fa-check-circle"></i>
+        <h3 data-en="Request received" data-ko="요청 접수 완료">Request received</h3>
+        <p data-en="ARCHINODE will review your consultation request within 2 business days. You'll receive an email — either with a Stripe payment link to schedule a session, or a brief answer if we can resolve your question without a paid meeting." data-ko="ARCHINODE가 2영업일 이내에 검토합니다. 결제 링크와 함께 미팅 일정을 잡거나, 유료 미팅 없이 답이 되는 질문이면 서면 답변을 이메일로 보내드립니다.">ARCHINODE will review your consultation request within 2 business days. You'll receive an email — either with a Stripe payment link to schedule a session, or a brief answer if we can resolve your question without a paid meeting.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></div>
+        <p data-en="Connecting global architecture &amp; design brands with the Korean market. Discover, connect, and grow with ARCHINODE." data-ko="글로벌 건축·디자인 브랜드를 한국 시장과 연결합니다. ARCHINODE와 함께 발견하고, 연결하고, 성장하세요.">Connecting global architecture &amp; design brands with the Korean market.</p>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Editorial" data-ko="에디토리얼">Editorial</h4>
+        <ul>
+          <li><a href="trend-report.html" data-en="Trend Report" data-ko="트렌드 리포트">Trend Report</a></li>
+          <li><a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a></li>
+          <li><a href="submit-trend.html" data-en="Submit Trend Report" data-ko="트렌드 리포트 제출">Submit Trend Report</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Services" data-ko="서비스">Services</h4>
+        <ul>
+          <li><a href="request-consultation.html" data-en="Consulting" data-ko="컨설팅">Consulting</a></li>
+          <li><a href="list-your-brand.html" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Company" data-ko="회사">Company</h4>
+        <ul>
+          <li><a href="about.html" data-en="About ARCHINODE" data-ko="ARCHINODE 소개">About ARCHINODE</a></li>
+          <li><a href="about.html" data-en="Contact" data-ko="문의">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business-info" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;margin-top:40px;margin-bottom:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
+      상호: 비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
+      주소: 경기도 의왕시 내손로 13, 103동 804호 &nbsp;|&nbsp; 이메일: office@archinode.org
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 ARCHINODE. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="terms.html" data-en="Terms" data-ko="이용약관">Terms</a>
+        <a href="privacy.html" data-en="Privacy Policy" data-ko="개인정보처리방침">Privacy Policy</a>
+        <a href="privacy.html" data-en="Cookie Policy" data-ko="쿠키 정책">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="firebase-config.js"></script>
+<script src="search.js"></script>
+<script src="lang.js"></script>
+<script src="auth-ui.js"></script>
+<script>
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+async function submitConsult(e) {
+  e.preventDefault();
+  const submitBtn = document.getElementById('submitBtn');
+  const errorDiv = document.getElementById('formError');
+  errorDiv.style.display = 'none';
+
+  const companyName = document.getElementById('companyName').value.trim();
+  const contactName = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const website = document.getElementById('website').value.trim();
+  const country = document.getElementById('country').value.trim();
+  const category = document.getElementById('category').value;
+  const description = document.getElementById('description').value.trim();
+  const timing = document.getElementById('timing').value.trim();
+  const budget = document.getElementById('budget').value;
+  const agreeContact = document.getElementById('agreeContact').checked;
+
+  if (!agreeContact) {
+    errorDiv.textContent = 'Please confirm the contact consent to submit.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  if (description.length < 100) {
+    errorDiv.textContent = 'Please provide at least 100 characters in the description so we can prepare properly.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+
+  try {
+    const dbRef = firebase.firestore();
+    await dbRef.collection('consultations').add({
+      companyName: escapeHtml(companyName),
+      contactName: escapeHtml(contactName),
+      email: email,
+      phone: escapeHtml(phone),
+      website: website,
+      country: escapeHtml(country),
+      category: category,
+      description: description,
+      timing: escapeHtml(timing),
+      budget: budget,
+      status: 'pending',
+      reviewerNote: null,
+      triageNote: null,
+      reviewedAt: null,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    document.getElementById('consultForm').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+    document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth' });
+  } catch (err) {
+    console.error(err);
+    errorDiv.textContent = 'Failed to submit: ' + (err.message || 'Unknown error') + '. Please try again or email office@archinode.org directly.';
+    errorDiv.style.display = 'block';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send Request';
+  }
+  return false;
+}
+</script>
+</body>
+</html>

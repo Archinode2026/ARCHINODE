@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consultations | ARCHINODE Admin</title>
+<link rel="icon" type="image/x-icon" href="../favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; color: #333; }
+
+.topbar { background: #111; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.topbar .logo { color: #fff; font-size: 1.1rem; font-weight: 800; text-decoration: none; }
+.topbar .logo span { color: #ff6b6b; font-size: 0.7rem; font-weight: 600; margin-left: 8px; background: rgba(255,107,107,0.15); padding: 2px 8px; border-radius: 3px; }
+.topbar .right { display: flex; align-items: center; gap: 16px; }
+.topbar .admin-email { color: #888; font-size: 0.8rem; }
+.topbar .nav-link { color: #aaa; font-size: 0.82rem; font-weight: 500; text-decoration: none; padding: 6px 10px; border-radius: 3px; transition: all 0.2s; }
+.topbar .nav-link:hover { color: #C8A96E; }
+.topbar .nav-link.active { color: #C8A96E; }
+.topbar .logout-btn { background: none; border: 1px solid #444; color: #aaa; padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+.topbar .logout-btn:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+.admin { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
+.page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.page-head h1 { font-size: 1.4rem; font-weight: 800; }
+.page-head .sub { font-size: 0.82rem; color: #888; margin-top: 4px; }
+.refresh-btn { background: #111; color: #fff; border: none; padding: 8px 16px; border-radius: 5px; font-size: 0.82rem; cursor: pointer; font-family: inherit; font-weight: 600; }
+.refresh-btn:hover { background: #C8A96E; }
+
+.stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+.stat-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.stat-card .number { font-size: 1.8rem; font-weight: 800; color: #111; }
+.stat-card .label { font-size: 0.75rem; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-card.pending { border-left: 4px solid #f59e0b; }
+.stat-card.triaged { border-left: 4px solid #3b82f6; }
+.stat-card.scheduled { border-left: 4px solid #8b5cf6; }
+.stat-card.completed { border-left: 4px solid #10b981; }
+.stat-card.rejected { border-left: 4px solid #ef4444; }
+
+.tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid #ddd; background: #fff; border-radius: 10px 10px 0 0; padding: 0 8px; overflow-x: auto; }
+.tab { padding: 14px 20px; font-size: 0.85rem; font-weight: 600; color: #999; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s; white-space: nowrap; background: none; border-left: none; border-right: none; border-top: none; font-family: inherit; }
+.tab:hover { color: #666; }
+.tab.active { color: #111; border-bottom-color: #C8A96E; }
+.tab .count { background: #fee2e2; color: #dc2626; font-size: 0.68rem; padding: 2px 7px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+.card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; transition: all 0.2s; border: 1px solid transparent; padding: 20px 22px; }
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-color: #C8A96E; }
+.card-cat { font-size: 0.7rem; color: #C8A96E; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+.card-company { font-size: 1.05rem; font-weight: 700; color: #111; margin-bottom: 4px; }
+.card-contact { font-size: 0.8rem; color: #666; margin-bottom: 12px; }
+.card-preview { font-size: 0.85rem; color: #555; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 14px; }
+.card-meta { display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: #999; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+.flag { font-size: 0.65rem; padding: 2px 7px; border-radius: 3px; font-weight: 700; }
+.flag-budget-300 { background: #d1fae5; color: #065f46; }
+.flag-budget-1000 { background: #ede9fe; color: #5b21b6; }
+.flag-budget-custom { background: #dbeafe; color: #1e40af; }
+.flag-budget-unknown { background: #f5f5f5; color: #737373; }
+.flag-triaged { background: #dbeafe; color: #1e40af; }
+
+.empty-state { background: #fff; border-radius: 10px; padding: 60px 24px; text-align: center; color: #999; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.empty-state i { font-size: 3rem; color: #e5e5e5; margin-bottom: 16px; }
+.empty-state p { font-size: 0.95rem; }
+
+.loading { text-align: center; padding: 60px; color: #999; }
+
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 12px; max-width: 880px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-head { padding: 24px 32px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.modal-head h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; line-height: 1.4; }
+.modal-head .meta { font-size: 0.82rem; color: #888; }
+.modal-head .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; padding: 0; line-height: 1; }
+.modal-body { padding: 24px 32px; }
+.modal-section { margin-bottom: 28px; }
+.modal-section h3 { font-size: 0.85rem; font-weight: 700; color: #111; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.detail-grid { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 0.88rem; }
+.detail-grid dt { color: #888; font-weight: 600; }
+.detail-grid dd { color: #333; word-break: break-word; }
+.detail-grid dd a { color: #3b82f6; text-decoration: none; }
+.body-content { background: #f9f9f9; border-radius: 6px; padding: 16px; max-height: 320px; overflow-y: auto; font-size: 0.88rem; line-height: 1.7; color: #333; white-space: pre-wrap; }
+.editor-input { width: 100%; min-height: 120px; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.88rem; line-height: 1.6; resize: vertical; }
+.editor-input:focus { outline: none; border-color: #C8A96E; }
+.editor-hint { font-size: 0.72rem; color: #999; margin-top: 4px; }
+.editor-input.short { min-height: 70px; }
+
+.triage-box { background: #FAF6EC; border-left: 3px solid #C8A96E; padding: 14px 18px; border-radius: 0 6px 6px 0; font-size: 0.85rem; line-height: 1.65; color: #555; }
+.triage-box.empty { color: #999; font-style: italic; }
+
+.payment-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px 16px; border-radius: 6px; font-size: 0.85rem; }
+.payment-box .label { font-weight: 700; color: #065f46; }
+.payment-box a { color: #065f46; word-break: break-all; }
+
+.modal-foot { padding: 20px 32px; border-top: 1px solid #eee; background: #fafafa; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; border-radius: 0 0 12px 12px; }
+.act-btn { padding: 9px 18px; border: none; border-radius: 5px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
+.act-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.act-triage { background: #3b82f6; color: #fff; }
+.act-written { background: #06b6d4; color: #fff; }
+.act-schedule { background: #8b5cf6; color: #fff; }
+.act-complete { background: #10b981; color: #fff; }
+.act-reject { background: #ef4444; color: #fff; }
+.act-btn:hover:not(:disabled) { opacity: 0.9; }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 22px; border-radius: 6px; font-size: 0.88rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 2000; }
+.toast.show { opacity: 1; }
+.toast.error { background: #ef4444; }
+.toast.success { background: #10b981; }
+
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .cards { grid-template-columns: 1fr; }
+  .modal-head, .modal-body, .modal-foot { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../index.html" class="logo">ARCHINODE <span>ADMIN</span></a>
+  <div class="right">
+    <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a href="trend-submissions.html" class="nav-link"><i class="fas fa-inbox"></i> Trend Submissions</a>
+    <a href="consultations.html" class="nav-link active"><i class="fas fa-comments"></i> Consultations</a>
+    <span class="admin-email" id="adminEmail"></span>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+  </div>
+</div>
+
+<div class="loading" id="loadingScreen">
+  <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#C8A96E;"></i>
+  <p style="margin-top:12px;">Authenticating...</p>
+</div>
+
+<div class="admin" id="adminContent" style="display:none;">
+
+  <div class="page-head">
+    <div>
+      <h1>Consultation Requests</h1>
+      <div class="sub">한국 시장 진출·파트너십·자재 소싱 자문 요청을 검토합니다. ARCHI 사전 진단 후 한울님이 미팅 가치 판단.</div>
+    </div>
+    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card pending"><div class="number" id="statPending">0</div><div class="label">Pending</div></div>
+    <div class="stat-card triaged"><div class="number" id="statTriaged">0</div><div class="label">Triaged</div></div>
+    <div class="stat-card scheduled"><div class="number" id="statScheduled">0</div><div class="label">Scheduled</div></div>
+    <div class="stat-card completed"><div class="number" id="statCompleted">0</div><div class="label">Completed</div></div>
+    <div class="stat-card rejected"><div class="number" id="statRejected">0</div><div class="label">Rejected</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-status="pending">Pending <span class="count" id="cntPending">0</span></button>
+    <button class="tab" data-status="triaged">Triaged <span class="count" id="cntTriaged">0</span></button>
+    <button class="tab" data-status="scheduled">Scheduled <span class="count" id="cntScheduled">0</span></button>
+    <button class="tab" data-status="completed">Completed <span class="count" id="cntCompleted">0</span></button>
+    <button class="tab" data-status="rejected">Rejected <span class="count" id="cntRejected">0</span></button>
+  </div>
+
+  <div id="cardsContainer">
+    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#C8A96E;"></i><p style="margin-top:12px;">Loading consultations...</p></div>
+  </div>
+
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="mCompany">—</h2>
+        <div class="meta" id="mMeta">—</div>
+      </div>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <h3>Request Details</h3>
+        <dl class="detail-grid">
+          <dt>Contact</dt><dd id="mContact">—</dd>
+          <dt>Email</dt><dd id="mEmail">—</dd>
+          <dt>Phone</dt><dd id="mPhone">—</dd>
+          <dt>Website</dt><dd id="mWebsite">—</dd>
+          <dt>Country</dt><dd id="mCountry">—</dd>
+          <dt>Category</dt><dd id="mCategory">—</dd>
+          <dt>Preferred Timing</dt><dd id="mTiming">—</dd>
+          <dt>Budget</dt><dd id="mBudget">—</dd>
+          <dt>Submitted</dt><dd id="mCreatedAt">—</dd>
+          <dt>Status</dt><dd id="mStatus">—</dd>
+        </dl>
+      </div>
+
+      <div class="modal-section">
+        <h3>What they need</h3>
+        <div class="body-content" id="mDescription">—</div>
+      </div>
+
+      <div class="modal-section">
+        <h3>ARCHI Triage Note (사전 진단)</h3>
+        <div class="triage-box empty" id="mTriageBox">archi-gold 에이전트 호출하면 사전 진단이 여기에 채워집니다. 회사 신뢰도, 진짜 needs, 미팅 가치 판단, 사전 답변 가능 부분.</div>
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Edit Triage Note</label>
+        <textarea class="editor-input" id="inTriage" placeholder="ARCHI 사전 진단 결과 또는 한울님 자체 메모..."></textarea>
+      </div>
+
+      <div class="modal-section">
+        <h3>Reviewer Action</h3>
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Reviewer Note (내부 메모 / 거절·수정 사유)</label>
+        <textarea class="editor-input short" id="inNote" placeholder="내부 메모 — 거절 사유, 사전 답변 본문, 미팅 결과 요약 등"></textarea>
+
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Stripe Payment Link (결제 링크)</label>
+        <input type="url" class="editor-input short" id="inPaymentLink" placeholder="https://buy.stripe.com/..." style="min-height:unset;padding:11px 14px;">
+        <div class="editor-hint">Stripe 대시보드에서 Payment Link 생성 후 여기에 붙여넣기. "Send Payment Link" 버튼 누르면 자동으로 client 이메일에 발송 (브랜드에서 직접 처리 — 지금은 수동 발송 기록만).</div>
+
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Meeting Schedule (미팅 일정)</label>
+        <input type="datetime-local" class="editor-input short" id="inMeetingAt" style="min-height:unset;padding:11px 14px;">
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="act-btn act-triage" id="btnTriage"><i class="fas fa-search"></i> Triage 완료</button>
+      <button class="act-btn act-written" id="btnWritten"><i class="fas fa-pen"></i> 사전 답변으로 종료</button>
+      <button class="act-btn act-schedule" id="btnSchedule"><i class="fas fa-calendar"></i> 결제 + 미팅 잡기</button>
+      <button class="act-btn act-complete" id="btnComplete"><i class="fas fa-check"></i> 미팅 완료</button>
+      <button class="act-btn act-reject" id="btnReject"><i class="fas fa-xmark"></i> 거절</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../firebase-config.js"></script>
+<script>
+let currentStatus = 'pending';
+let allDocs = [];
+let currentDoc = null;
+
+const CATEGORY_LABEL = {
+  'market-entry': 'Korean Market Entry',
+  'partnership-match': 'Partnership Match',
+  'material-sourcing': 'Material Sourcing',
+  'other': 'Other / Custom'
+};
+const BUDGET_LABEL = {
+  'single-300': '$300 (single session)',
+  'package-1000': '$1,000+ (multi-session)',
+  'custom': 'Custom — discuss',
+  'not-sure': 'Not sure yet'
+};
+const BUDGET_FLAG_CLASS = {
+  'single-300': 'flag-budget-300',
+  'package-1000': 'flag-budget-1000',
+  'custom': 'flag-budget-custom'
+};
+
+auth.onAuthStateChanged(function(user) {
+  if (!user) {
+    location.replace('../auth/login.html?next=/admin/consultations.html');
+    return;
+  }
+  if (!isAdmin(user.email)) {
+    document.body.innerHTML = '<div style="text-align:center;padding:80px 24px;font-family:Inter,sans-serif;"><h1 style="font-size:1.5rem;margin-bottom:12px;">Access Denied</h1><p style="color:#888;">This page is restricted to ARCHINODE editorial team.</p><p style="margin-top:18px;"><a href="/" style="color:#C8A96E;">Return to homepage</a></p></div>';
+    return;
+  }
+  document.getElementById('adminEmail').textContent = user.email;
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('adminContent').style.display = 'block';
+  loadConsultations();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  auth.signOut().then(function() { location.replace('../auth/login.html'); });
+});
+
+document.getElementById('refreshBtn').addEventListener('click', loadConsultations);
+
+document.querySelectorAll('.tab').forEach(function(t) {
+  t.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+    t.classList.add('active');
+    currentStatus = t.getAttribute('data-status');
+    renderCards();
+  });
+});
+
+function loadConsultations() {
+  const container = document.getElementById('cardsContainer');
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#C8A96E;"></i><p style="margin-top:12px;">Loading consultations...</p></div>';
+
+  db.collection('consultations').orderBy('createdAt', 'desc').get()
+    .then(function(snap) {
+      allDocs = [];
+      snap.forEach(function(doc) {
+        allDocs.push(Object.assign({ id: doc.id }, doc.data()));
+      });
+      updateStats();
+      renderCards();
+    })
+    .catch(function(err) {
+      console.error(err);
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-circle-exclamation"></i><p>Failed to load: ' + escapeHtml(err.message) + '</p></div>';
+    });
+}
+
+function updateStats() {
+  var counts = { pending: 0, triaged: 0, scheduled: 0, completed: 0, rejected: 0 };
+  allDocs.forEach(function(d) { if (counts[d.status] !== undefined) counts[d.status]++; });
+  document.getElementById('statPending').textContent = counts.pending;
+  document.getElementById('statTriaged').textContent = counts.triaged;
+  document.getElementById('statScheduled').textContent = counts.scheduled;
+  document.getElementById('statCompleted').textContent = counts.completed;
+  document.getElementById('statRejected').textContent = counts.rejected;
+  document.getElementById('cntPending').textContent = counts.pending;
+  document.getElementById('cntTriaged').textContent = counts.triaged;
+  document.getElementById('cntScheduled').textContent = counts.scheduled;
+  document.getElementById('cntCompleted').textContent = counts.completed;
+  document.getElementById('cntRejected').textContent = counts.rejected;
+}
+
+function renderCards() {
+  var container = document.getElementById('cardsContainer');
+  var filtered = allDocs.filter(function(d){ return d.status === currentStatus; });
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No consultations in <strong>' + currentStatus + '</strong> status.</p></div>';
+    return;
+  }
+  var grid = '<div class="cards">';
+  filtered.forEach(function(d) {
+    var budgetFlag = '';
+    if (d.budget && BUDGET_FLAG_CLASS[d.budget]) {
+      budgetFlag = '<span class="flag ' + BUDGET_FLAG_CLASS[d.budget] + '">' + BUDGET_LABEL[d.budget] + '</span>';
+    } else {
+      budgetFlag = '<span class="flag flag-budget-unknown">' + (BUDGET_LABEL[d.budget] || 'Unknown') + '</span>';
+    }
+    var triagedFlag = d.triageNote ? '<span class="flag flag-triaged">Triaged</span>' : '';
+    var preview = escapeHtml((d.description || '').substring(0, 220));
+    grid += '<div class="card" onclick="openModal(\'' + d.id + '\')">'
+      + '<div class="card-cat">' + (CATEGORY_LABEL[d.category] || d.category || '—') + '</div>'
+      + '<div class="card-company">' + escapeHtml(d.companyName || '—') + '</div>'
+      + '<div class="card-contact">' + escapeHtml(d.contactName || '—') + ' · ' + escapeHtml(d.country || '—') + '</div>'
+      + '<div class="card-preview">' + preview + '</div>'
+      + '<div class="card-meta"><span>' + formatDate(d.createdAt) + '</span><div style="display:flex;gap:6px;">' + triagedFlag + budgetFlag + '</div></div>'
+      + '</div>';
+  });
+  grid += '</div>';
+  container.innerHTML = grid;
+}
+
+window.openModal = function(id) {
+  var d = allDocs.find(function(x){ return x.id === id; });
+  if (!d) return;
+  currentDoc = d;
+  document.getElementById('mCompany').textContent = d.companyName || '—';
+  document.getElementById('mMeta').textContent = (CATEGORY_LABEL[d.category] || d.category || '—') + ' · ' + (d.country || '—');
+  document.getElementById('mContact').textContent = d.contactName || '—';
+  document.getElementById('mEmail').innerHTML = d.email ? '<a href="mailto:' + escapeAttr(d.email) + '">' + escapeHtml(d.email) + '</a>' : '—';
+  document.getElementById('mPhone').textContent = d.phone || '—';
+  document.getElementById('mWebsite').innerHTML = d.website ? '<a href="' + escapeAttr(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : '—';
+  document.getElementById('mCountry').textContent = d.country || '—';
+  document.getElementById('mCategory').textContent = CATEGORY_LABEL[d.category] || d.category || '—';
+  document.getElementById('mTiming').textContent = d.timing || '—';
+  document.getElementById('mBudget').textContent = BUDGET_LABEL[d.budget] || d.budget || '—';
+  document.getElementById('mCreatedAt').textContent = formatDate(d.createdAt);
+  document.getElementById('mStatus').textContent = d.status || '—';
+  document.getElementById('mDescription').textContent = d.description || '(none)';
+
+  var triageBox = document.getElementById('mTriageBox');
+  if (d.triageNote) {
+    triageBox.classList.remove('empty');
+    triageBox.textContent = d.triageNote;
+  } else {
+    triageBox.classList.add('empty');
+    triageBox.textContent = 'archi-gold 에이전트 호출하면 사전 진단이 여기에 채워집니다. 회사 신뢰도, 진짜 needs, 미팅 가치 판단, 사전 답변 가능 부분.';
+  }
+
+  document.getElementById('inTriage').value = d.triageNote || '';
+  document.getElementById('inNote').value = d.reviewerNote || '';
+  document.getElementById('inPaymentLink').value = d.paymentLink || '';
+  document.getElementById('inMeetingAt').value = d.meetingAt ? new Date(d.meetingAt.toDate ? d.meetingAt.toDate() : d.meetingAt).toISOString().slice(0,16) : '';
+
+  updateActionButtons(d.status);
+  document.getElementById('modalOverlay').classList.add('show');
+};
+
+window.closeModal = function() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  currentDoc = null;
+};
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function updateActionButtons(status) {
+  document.getElementById('btnTriage').disabled = (status === 'completed' || status === 'rejected');
+  document.getElementById('btnWritten').disabled = (status === 'completed' || status === 'rejected');
+  document.getElementById('btnSchedule').disabled = (status === 'completed' || status === 'rejected');
+  document.getElementById('btnComplete').disabled = (status !== 'scheduled');
+  document.getElementById('btnReject').disabled = (status === 'completed' || status === 'rejected');
+}
+
+document.getElementById('btnTriage').addEventListener('click', function() {
+  var triage = document.getElementById('inTriage').value.trim();
+  if (!triage) { showToast('Triage Note를 입력하세요.', 'error'); return; }
+  doAction('triaged', { triageNote: triage });
+});
+document.getElementById('btnWritten').addEventListener('click', function() {
+  var note = document.getElementById('inNote').value.trim();
+  if (!note) { showToast('Reviewer Note에 사전 답변 본문을 입력하세요.', 'error'); return; }
+  if (!confirm('사전 답변으로 처리하시겠습니까? (유료 미팅 없이 종료)')) return;
+  doAction('completed', { reviewerNote: note, resolutionType: 'written-answer' });
+});
+document.getElementById('btnSchedule').addEventListener('click', function() {
+  var link = document.getElementById('inPaymentLink').value.trim();
+  var meetingAt = document.getElementById('inMeetingAt').value;
+  if (!link) { showToast('Stripe Payment Link를 입력하세요.', 'error'); return; }
+  doAction('scheduled', { paymentLink: link, meetingAt: meetingAt ? new Date(meetingAt) : null });
+});
+document.getElementById('btnComplete').addEventListener('click', function() {
+  var note = document.getElementById('inNote').value.trim();
+  doAction('completed', { reviewerNote: note || null, resolutionType: 'meeting-completed' });
+});
+document.getElementById('btnReject').addEventListener('click', function() {
+  var note = document.getElementById('inNote').value.trim();
+  if (!note) { showToast('거절 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
+  if (!confirm('정말 거절하시겠습니까?')) return;
+  doAction('rejected', { reviewerNote: note });
+});
+
+function doAction(newStatus, extras) {
+  if (!currentDoc) return;
+  var updates = Object.assign({
+    status: newStatus,
+    reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, extras || {});
+  db.collection('consultations').doc(currentDoc.id).update(updates)
+    .then(function() {
+      showToast('업데이트 완료', 'success');
+      closeModal();
+      loadConsultations();
+    })
+    .catch(function(err) {
+      console.error(err);
+      showToast('실패: ' + err.message, 'error');
+    });
+}
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+function escapeAttr(s) { return escapeHtml(s).replace(/\n/g, ' '); }
+function formatDate(ts) {
+  if (!ts) return '—';
+  var d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('modalOverlay').classList.contains('show')) {
+    closeModal();
+  }
+});
+</script>
+</body>
+</html>
