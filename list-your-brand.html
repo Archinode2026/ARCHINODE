@@ -440,16 +440,16 @@
     <!-- SUCCESS SCREEN -->
     <div class="form-success" id="formSuccess">
         <i class="fas fa-check-circle"></i>
-        <h3>Application Submitted!</h3>
-        <p>Your Brand Portal account has been created. Here are your login credentials:</p>
+        <h3 data-en="Application Submitted!" data-ko="신청이 완료되었습니다!">Application Submitted!</h3>
+        <p data-en="Your Brand Portal account has been created. Here are your login credentials:" data-ko="브랜드 포털 계정이 생성되었습니다. 로그인 정보는 아래와 같습니다:">Your Brand Portal account has been created. Here are your login credentials:</p>
         <div class="credentials">
-<p>Portal URL: <strong id="credUrl"></strong> <button type="button" class="copy-btn" onclick="copyCred('credUrl', this)">Copy</button></p>
-            <p>Login Email: <strong id="credEmail"></strong> <button type="button" class="copy-btn" onclick="copyCred('credEmail', this)">Copy</button></p>
-            <p>Temp Password: <strong id="credPassword"></strong> <button type="button" class="copy-btn" onclick="copyCred('credPassword', this)">Copy</button></p>
+<p><span data-en="Portal URL: " data-ko="포털 주소: ">Portal URL: </span><strong id="credUrl"></strong> <button type="button" class="copy-btn" onclick="copyCred('credUrl', this)" data-en="Copy" data-ko="복사">Copy</button></p>
+            <p><span data-en="Login Email: " data-ko="로그인 이메일: ">Login Email: </span><strong id="credEmail"></strong> <button type="button" class="copy-btn" onclick="copyCred('credEmail', this)" data-en="Copy" data-ko="복사">Copy</button></p>
+            <p><span data-en="Temp Password: " data-ko="임시 비밀번호: ">Temp Password: </span><strong id="credPassword"></strong> <button type="button" class="copy-btn" onclick="copyCred('credPassword', this)" data-en="Copy" data-ko="복사">Copy</button></p>
         </div>
-        <p style="color:#dc2626;font-weight:600;"><i class="fas fa-exclamation-triangle"></i> Please save these credentials. You will also receive them by email.</p>
-        <p>Our team will review your application within 1–3 business days. Once approved, your brand page will go live on ARCHINODE.</p>
-        <a href="brand-portal/login.html" class="portal-btn">Go to Brand Portal <i class="fas fa-arrow-right"></i></a>
+        <p style="color:#dc2626;font-weight:600;"><i class="fas fa-exclamation-triangle"></i> <span data-en="Please save these credentials. You will also receive them by email." data-ko="이 정보를 안전한 곳에 저장해 주세요. 이메일로도 발송됩니다.">Please save these credentials. You will also receive them by email.</span></p>
+        <p data-en="Our team will review your application within 1–3 business days. Once approved, your brand page will go live on ARCHINODE." data-ko="저희 팀이 1~3 영업일 내에 신청을 검토합니다. 승인되면 브랜드 페이지가 ARCHINODE에 공개됩니다.">Our team will review your application within 1–3 business days. Once approved, your brand page will go live on ARCHINODE.</p>
+        <a href="brand-portal/login.html" class="portal-btn" data-en="Go to Brand Portal " data-ko="브랜드 포털 바로가기 ">Go to Brand Portal <i class="fas fa-arrow-right"></i></a>
     </div>
 </section>
 
@@ -613,33 +613,4 @@ form.addEventListener('submit', async function(e) {
         document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth' });
 
     } catch (error) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Application';
-        errorDiv.style.display = 'block';
-
-        if (error.code === 'auth/email-already-in-use') {
-            errorDiv.textContent = 'This email is already registered. If you already have an account, please log in at the Brand Portal.';
-        } else if (error.code === 'auth/invalid-email') {
-            errorDiv.textContent = 'Please enter a valid email address.';
-        } else if (error.code === 'auth/weak-password') {
-            errorDiv.textContent = 'Password is too weak. Please try again.';
-        } else {
-            errorDiv.textContent = 'An error occurred: ' + error.message;
-        }
-    }
-});
-
-function copyCred(elId, btn) {
-    const text = document.getElementById(elId).textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        btn.textContent = '✓ Copy됨';
-        btn.classList.add('copied');
-        setTimeout(() => {
-            btn.textContent = 'Copy';
-            btn.classList.remove('copied');
-        }, 2000);
-    });
-}
-</script>
-</body>
-</html>
+ 
