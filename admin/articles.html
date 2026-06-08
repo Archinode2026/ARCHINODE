@@ -463,6 +463,7 @@ function doAction(newStatus, label) {
   if (!currentDoc) return;
   var updates = {
     status: newStatus,
+    publishedAt: (newStatus === "approved" ? firebase.firestore.FieldValue.serverTimestamp() : null),
     reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
     reviewerNote: document.getElementById('inNote').value.trim() || null,
     englishBodyEdited: document.getElementById('inEnglish').value.trim() || null,
