@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="metaTitle">Brand Magazine | ARCHINODE</title>
+<meta name="description" content="ARCHINODE Brand Magazine — 유럽 디자인 브랜드가 직접 발행하는 글.">
+<link rel="icon" type="image/x-icon" href="../favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="../style.css">
+<style>
+body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#1a1a1a; background:#fff; line-height:1.6; margin:0; }
+.article-hero { padding: 60px 24px 30px; max-width: 880px; margin: 0 auto; }
+.article-hero .breadcrumb { font-size: 0.78rem; color: #888; margin-bottom: 28px; }
+.article-hero .breadcrumb a { color: #666; text-decoration: none; }
+.article-hero .breadcrumb a:hover { color: #111; }
+.article-hero .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #C8A96E; margin-bottom: 16px; display: inline-block; }
+.article-hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 18px; line-height: 1.2; }
+.article-hero .meta { font-size: 0.85rem; color: #888; }
+.cover-image { max-width: 1200px; margin: 20px auto 40px; padding: 0 24px; }
+.cover-image img { width: 100%; border-radius: 6px; display: block; }
+.article-body { max-width: 720px; margin: 0 auto; padding: 0 24px 60px; font-size: 1.02rem; }
+.article-body p { margin: 0 0 20px; line-height: 1.85; white-space: pre-wrap; }
+.article-body figure { margin: 32px 0; }
+.article-body figure img { width: 100%; border-radius: 4px; display: block; }
+.article-body figcaption { font-size: 0.82rem; color: #888; margin-top: 8px; text-align: center; }
+.back-link { text-align: center; padding: 30px 24px 80px; }
+.back-link a { color: #C8A96E; font-weight: 600; text-decoration: none; }
+.state { text-align: center; padding: 120px 24px; color: #999; }
+.state i { font-size: 2.4rem; margin-bottom: 14px; }
+@media (max-width: 768px) {
+  .article-hero h1 { font-size: 1.7rem; }
+  .article-hero { padding: 40px 20px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container">
+    <a href="../index.html" class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></a>
+    <nav class="main-nav" id="mainNav">
+      <a href="../brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="../magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
+      <a href="../trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a>
+      <a href="../about.html" data-en="About" data-ko="소개">About</a>
+      <a href="../list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+    </nav>
+    <div class="header-actions">
+      <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
+    </div>
+  </div>
+</header>
+
+<!-- LOADING -->
+<div id="loadingState" class="state">
+  <i class="fas fa-spinner fa-spin"></i>
+  <p>Loading article…</p>
+</div>
+
+<!-- ERROR -->
+<div id="errorState" class="state" style="display:none;">
+  <i class="fas fa-exclamation-triangle" style="color:#c00;"></i>
+  <p data-en="Article not found." data-ko="글을 찾을 수 없습니다.">Article not found.</p>
+  <p style="margin-top:14px;"><a href="../trend-report.html" style="color:#C8A96E;" data-en="← Back to Brand Magazine" data-ko="← 브랜드 매거진으로">← Back to Brand Magazine</a></p>
+</div>
+
+<!-- ARTICLE -->
+<article id="articleContent" style="display:none;">
+  <section class="article-hero">
+    <div class="breadcrumb">
+      <a href="../index.html" data-en="Home" data-ko="홈">Home</a> &nbsp;/&nbsp;
+      <a href="../trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a> &nbsp;/&nbsp;
+      <span id="bcTitle">—</span>
+    </div>
+    <span class="tag" id="aTag"></span>
+    <h1 id="aTitle">—</h1>
+    <div class="meta" id="aMeta"></div>
+  </section>
+  <div class="cover-image" id="aCover" style="display:none;"><img id="aCoverImg" alt=""></div>
+  <div class="article-body" id="aBody"></div>
+  <div class="back-link">
+    <a href="../trend-report.html" data-en="← Back to Brand Magazine" data-ko="← 브랜드 매거진으로">← Back to Brand Magazine</a>
+  </div>
+</article>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom" style="text-align:center; padding:30px 0; color:#888; font-size:0.8rem; border-top:1px solid #eee;">
+      &copy; 2026 ARCHINODE. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- Firebase + Article Loader -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="../firebase-config.js"></script>
+<script src="../lang.js"></script>
+<script>
+(function(){
+  function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function showError(){
+    document.getElementById('loadingState').style.display='none';
+    document.getElementById('errorState').style.display='block';
+  }
+  function showArticle(){
+    document.getElementById('loadingState').style.display='none';
+    document.getElementById('articleContent').style.display='block';
+  }
+  function renderBlocks(blocks){
+    if (!Array.isArray(blocks)) return '';
+    return blocks.map(function(b){
+      if (b.type==='text') return '<p>' + esc(b.content||'') + '</p>';
+      if (b.type==='image') {
+        var cap = b.caption ? '<figcaption>' + esc(b.caption) + '</figcaption>' : '';
+        return '<figure><img src="' + esc(b.url||'') + '" alt="' + esc(b.alt||'') + '" loading="lazy">' + cap + '</figure>';
+      }
+      return '';
+    }).join('');
+  }
+
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  if (!id || typeof db === 'undefined') { showError(); return; }
+
+  db.collection('articles').doc(id).get().then(function(doc){
+    if (!doc.exists) { showError(); return; }
+    var a = doc.data();
+    if (a.status !== 'approved') { showError(); return; }
+
+    document.getElementById('metaTitle').textContent = (a.title || 'Article') + ' | ARCHINODE Brand Magazine';
+    document.getElementById('bcTitle').textContent = a.title || '—';
+    document.getElementById('aTag').textContent = a.tag || '';
+    document.getElementById('aTitle').textContent = a.title || '—';
+    var date = a.publishedAt && a.publishedAt.toDate ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : '';
+    document.getElementById('aMeta').textContent = (a.brandName||'') + (date ? ' · ' + date : '');
+
+    if (a.coverImage) {
+      document.getElementById('aCoverImg').src = a.coverImage;
+      document.getElementById('aCoverImg').alt = a.title || '';
+      document.getElementById('aCover').style.display = 'block';
+    }
+    document.getElementById('aBody').innerHTML = renderBlocks(a.blocks);
+    showArticle();
+  }).catch(function(err){
+    console.warn('article load failed', err);
+    showError();
+  });
+})();
+</script>
+</body>
+</html>
