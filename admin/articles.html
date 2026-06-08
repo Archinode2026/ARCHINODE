@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Articles | ARCHINODE Admin</title>
+<link rel="icon" type="image/x-icon" href="../favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; color: #333; }
+
+.topbar { background: #111; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.topbar .logo { color: #fff; font-size: 1.1rem; font-weight: 800; text-decoration: none; }
+.topbar .logo span { color: #ff6b6b; font-size: 0.7rem; font-weight: 600; margin-left: 8px; background: rgba(255,107,107,0.15); padding: 2px 8px; border-radius: 3px; }
+.topbar .right { display: flex; align-items: center; gap: 16px; }
+.topbar .admin-email { color: #888; font-size: 0.8rem; }
+.topbar .nav-link { color: #aaa; font-size: 0.82rem; font-weight: 500; text-decoration: none; padding: 6px 10px; border-radius: 3px; transition: all 0.2s; }
+.topbar .nav-link:hover { color: #C8A96E; }
+.topbar .logout-btn { background: none; border: 1px solid #444; color: #aaa; padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+.topbar .logout-btn:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+.admin { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
+.page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.page-head h1 { font-size: 1.4rem; font-weight: 800; }
+.page-head .sub { font-size: 0.82rem; color: #888; margin-top: 4px; }
+.refresh-btn { background: #111; color: #fff; border: none; padding: 8px 16px; border-radius: 5px; font-size: 0.82rem; cursor: pointer; font-family: inherit; font-weight: 600; }
+.refresh-btn:hover { background: #C8A96E; }
+
+.stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+.stat-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.stat-card .number { font-size: 1.8rem; font-weight: 800; color: #111; }
+.stat-card .label { font-size: 0.75rem; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-card.pending { border-left: 4px solid #f59e0b; }
+.stat-card.reviewing { border-left: 4px solid #3b82f6; }
+.stat-card.approved { border-left: 4px solid #10b981; }
+.stat-card.rejected { border-left: 4px solid #ef4444; }
+.stat-card.revision { border-left: 4px solid #8b5cf6; }
+
+.tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid #ddd; background: #fff; border-radius: 10px 10px 0 0; padding: 0 8px; overflow-x: auto; }
+.tab { padding: 14px 20px; font-size: 0.85rem; font-weight: 600; color: #999; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s; white-space: nowrap; background: none; border-left: none; border-right: none; border-top: none; font-family: inherit; }
+.tab:hover { color: #666; }
+.tab.active { color: #111; border-bottom-color: #C8A96E; }
+.tab .count { background: #fee2e2; color: #dc2626; font-size: 0.68rem; padding: 2px 7px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+.card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-color: #C8A96E; }
+.card-thumb { width: 100%; height: 160px; background: #f5f5f5; background-size: cover; background-position: center; position: relative; }
+.card-thumb.no-img { display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 2rem; }
+.card-thumb .lang-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; font-size: 0.68rem; padding: 3px 8px; border-radius: 3px; font-weight: 700; letter-spacing: 0.5px; }
+.card-body { padding: 18px 20px; }
+.card-brand { font-size: 0.78rem; color: #C8A96E; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.card-title { font-size: 1.05rem; font-weight: 700; color: #111; margin-bottom: 8px; line-height: 1.4; }
+.card-preview { font-size: 0.85rem; color: #666; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px; }
+.card-meta { display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: #999; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+.card-meta .meta-flags { display: flex; gap: 6px; }
+.flag { font-size: 0.65rem; padding: 2px 7px; border-radius: 3px; font-weight: 700; }
+.flag-en-present { background: #d1fae5; color: #065f46; }
+.flag-en-missing { background: #fef3c7; color: #92400e; }
+
+.empty-state { background: #fff; border-radius: 10px; padding: 60px 24px; text-align: center; color: #999; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.empty-state i { font-size: 3rem; color: #e5e5e5; margin-bottom: 16px; }
+.empty-state p { font-size: 0.95rem; }
+
+.loading { text-align: center; padding: 60px; color: #999; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 12px; max-width: 880px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-head { padding: 24px 32px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.modal-head h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; line-height: 1.4; }
+.modal-head .brand-meta { font-size: 0.82rem; color: #888; }
+.modal-head .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; padding: 0; line-height: 1; }
+.modal-body { padding: 24px 32px; }
+.modal-section { margin-bottom: 28px; }
+.modal-section h3 { font-size: 0.85rem; font-weight: 700; color: #111; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.detail-grid { display: grid; grid-template-columns: 120px 1fr; gap: 6px 16px; font-size: 0.88rem; }
+.detail-grid dt { color: #888; font-weight: 600; }
+.detail-grid dd { color: #333; }
+.detail-grid dd a { color: #3b82f6; text-decoration: none; word-break: break-all; }
+.body-tabs { display: flex; gap: 0; border-bottom: 1px solid #ddd; margin-bottom: 14px; }
+.body-tab { padding: 8px 14px; font-size: 0.78rem; font-weight: 600; color: #999; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; border-left: none; border-right: none; border-top: none; font-family: inherit; }
+.body-tab.active { color: #111; border-bottom-color: #C8A96E; }
+.body-content { display: none; background: #f9f9f9; border-radius: 6px; padding: 16px; max-height: 280px; overflow-y: auto; font-size: 0.85rem; line-height: 1.7; color: #333; white-space: pre-wrap; }
+.body-content.active { display: block; }
+.editor-input { width: 100%; min-height: 140px; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.88rem; line-height: 1.6; resize: vertical; }
+.editor-input:focus { outline: none; border-color: #C8A96E; }
+.editor-hint { font-size: 0.72rem; color: #999; margin-top: 4px; }
+.images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.images-grid img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; background: #f5f5f5; }
+
+.modal-foot { padding: 20px 32px; border-top: 1px solid #eee; background: #fafafa; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; border-radius: 0 0 12px 12px; }
+.act-btn { padding: 9px 18px; border: none; border-radius: 5px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
+.act-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.act-review { background: #3b82f6; color: #fff; }
+.act-revise { background: #8b5cf6; color: #fff; }
+.act-reject { background: #ef4444; color: #fff; }
+.act-approve { background: #10b981; color: #fff; }
+.act-btn:hover:not(:disabled) { opacity: 0.9; }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 22px; border-radius: 6px; font-size: 0.88rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 2000; }
+.toast.show { opacity: 1; }
+.toast.error { background: #ef4444; }
+.toast.success { background: #10b981; }
+
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .cards { grid-template-columns: 1fr; }
+  .modal-head, .modal-body, .modal-foot { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../index.html" class="logo">ARCHINODE <span>ADMIN</span></a>
+  <div class="right">
+    <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a href="articles.html" class="nav-link" style="color:#C8A96E;"><i class="fas fa-inbox"></i> Articles</a>
+    <a href="consultations.html" class="nav-link"><i class="fas fa-comments"></i> Consultations</a>
+    <a href="notify-subscribers.html" class="nav-link"><i class="fas fa-bell"></i> Notify Subscribers</a>
+    <span class="admin-email" id="adminEmail"></span>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+  </div>
+</div>
+
+<div class="loading" id="loadingScreen">
+  <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#C8A96E;"></i>
+  <p style="margin-top:12px;">Authenticating...</p>
+</div>
+
+<div class="admin" id="adminContent" style="display:none;">
+
+  <div class="page-head">
+    <div>
+      <h1>Brand Magazine Submissions</h1>
+      <div class="sub">유럽 브랜드가 제출한 브랜드 매거진 원고를 검토·번역·게시합니다.</div>
+    </div>
+    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card pending"><div class="number" id="statPending">0</div><div class="label">Pending</div></div>
+    <div class="stat-card reviewing"><div class="number" id="statReviewing">0</div><div class="label">Reviewing</div></div>
+    <div class="stat-card revision"><div class="number" id="statRevision">0</div><div class="label">Revision Req</div></div>
+    <div class="stat-card approved"><div class="number" id="statApproved">0</div><div class="label">Approved</div></div>
+    <div class="stat-card rejected"><div class="number" id="statRejected">0</div><div class="label">Rejected</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-status="pending">Pending <span class="count" id="cntPending">0</span></button>
+    <button class="tab" data-status="reviewing">Reviewing <span class="count" id="cntReviewing">0</span></button>
+    <button class="tab" data-status="revision-requested">Revision Req <span class="count" id="cntRevision">0</span></button>
+    <button class="tab" data-status="approved">Approved <span class="count" id="cntApproved">0</span></button>
+    <button class="tab" data-status="rejected">Rejected <span class="count" id="cntRejected">0</span></button>
+  </div>
+
+  <div id="cardsContainer">
+    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#C8A96E;"></i><p style="margin-top:12px;">Loading submissions...</p></div>
+  </div>
+
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-head">
+      <div>
+        <h2 id="mTitle">—</h2>
+        <div class="brand-meta" id="mBrandMeta">—</div>
+      </div>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <h3>Submission Details</h3>
+        <dl class="detail-grid">
+          <dt>Contact</dt><dd id="mContact">—</dd>
+          <dt>Email</dt><dd id="mEmail">—</dd>
+          <dt>Country</dt><dd id="mCountry">—</dd>
+          <dt>Category</dt><dd id="mCategory">—</dd>
+          <dt>Original Lang</dt><dd id="mOriginalLang">—</dd>
+          <dt>Source</dt><dd id="mSource">—</dd>
+          <dt>Submitted</dt><dd id="mCreatedAt">—</dd>
+          <dt>Current Status</dt><dd id="mStatus">—</dd>
+        </dl>
+      </div>
+
+      <div class="modal-section">
+        <h3>Body</h3>
+        <div class="body-tabs">
+          <button class="body-tab active" data-body="orig">Original (<span id="bOrigLang">—</span>)</button>
+          <button class="body-tab" data-body="en">English</button>
+          <button class="body-tab" data-body="ko">한국어 (편집부)</button>
+        </div>
+        <div class="body-content active" data-body="orig" id="bOrigContent">—</div>
+        <div class="body-content" data-body="en" id="bEnContent">—</div>
+        <div class="body-content" data-body="ko" id="bKoContent">—</div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Editor Inputs</h3>
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">English Translation (수정/생성)</label>
+        <textarea class="editor-input" id="inEnglish" placeholder="If brand didn't provide English translation, write/paste it here..."></textarea>
+        <div class="editor-hint">브랜드가 제공한 영어 번역이 있으면 자동으로 채워집니다. 수정하거나 새로 작성 가능.</div>
+
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Korean Translation (편집부)</label>
+        <textarea class="editor-input" id="inKorean" placeholder="한국어 번역을 입력하세요. 한국 디자이너 어휘 우선."></textarea>
+        <div class="editor-hint">게시 시 trend-editor 에이전트와 함께 사용. 어휘는 한국 건축·디자인 업계 어휘 우선.</div>
+
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Reviewer Note (사유 / 메모)</label>
+        <textarea class="editor-input" id="inNote" placeholder="거절·수정 요청 시 사유. 게시 시 내부 메모로도 사용." style="min-height:80px;"></textarea>
+      </div>
+
+      <div class="modal-section">
+        <h3>Images</h3>
+        <div class="images-grid" id="mImagesGrid"></div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="act-btn act-review" id="btnReview"><i class="fas fa-magnifying-glass"></i> 검토 시작</button>
+      <button class="act-btn act-revise" id="btnRevise"><i class="fas fa-pen"></i> 수정 요청</button>
+      <button class="act-btn act-reject" id="btnReject"><i class="fas fa-xmark"></i> 거절</button>
+      <button class="act-btn act-approve" id="btnApprove"><i class="fas fa-check"></i> 게시 승인</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../firebase-config.js"></script>
+<script>
+// ADMIN_EMAILS, isAdmin() 는 firebase-config.js 에서 제공
+let currentStatus = 'pending';
+let allDocs = []; // 전체 캐시
+let currentDoc = null; // 모달 열린 문서
+
+// ─────────────── 인증 가드 ───────────────
+auth.onAuthStateChanged(function(user) {
+  if (!user) {
+    location.replace('../auth/login.html?next=/admin/articles.html');
+    return;
+  }
+  if (!isAdmin(user.email)) {
+    document.body.innerHTML = '<div style="text-align:center;padding:80px 24px;font-family:Inter,sans-serif;"><h1 style="font-size:1.5rem;margin-bottom:12px;">Access Denied</h1><p style="color:#888;">This page is restricted to ARCHINODE editorial team.</p><p style="margin-top:18px;"><a href="/" style="color:#C8A96E;">Return to homepage</a></p></div>';
+    return;
+  }
+  document.getElementById('adminEmail').textContent = user.email;
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('adminContent').style.display = 'block';
+  loadSubmissions();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  auth.signOut().then(function() { location.replace('../auth/login.html'); });
+});
+
+document.getElementById('refreshBtn').addEventListener('click', loadSubmissions);
+
+// 탭 클릭
+document.querySelectorAll('.tab').forEach(function(t) {
+  t.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+    t.classList.add('active');
+    currentStatus = t.getAttribute('data-status');
+    renderCards();
+  });
+});
+
+// 본문 탭 (모달 내부)
+document.querySelectorAll('.body-tab').forEach(function(t) {
+  t.addEventListener('click', function() {
+    document.querySelectorAll('.body-tab').forEach(function(x){ x.classList.remove('active'); });
+    t.classList.add('active');
+    var which = t.getAttribute('data-body');
+    document.querySelectorAll('.body-content').forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-body') === which);
+    });
+  });
+});
+
+// ─────────────── 데이터 로딩 ───────────────
+function loadSubmissions() {
+  const container = document.getElementById('cardsContainer');
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#C8A96E;"></i><p style="margin-top:12px;">Loading submissions...</p></div>';
+
+  db.collection('articles').orderBy('createdAt', 'desc').get()
+    .then(function(snap) {
+      allDocs = [];
+      snap.forEach(function(doc) {
+        allDocs.push(Object.assign({ id: doc.id }, doc.data()));
+      });
+      updateStats();
+      renderCards();
+    })
+    .catch(function(err) {
+      console.error(err);
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-circle-exclamation"></i><p>Failed to load: ' + escapeHtml(err.message) + '</p></div>';
+    });
+}
+
+function updateStats() {
+  var counts = { pending: 0, reviewing: 0, 'revision-requested': 0, approved: 0, rejected: 0 };
+  allDocs.forEach(function(d) {
+    if (counts[d.status] !== undefined) counts[d.status]++;
+  });
+  document.getElementById('statPending').textContent = counts.pending;
+  document.getElementById('statReviewing').textContent = counts.reviewing;
+  document.getElementById('statRevision').textContent = counts['revision-requested'];
+  document.getElementById('statApproved').textContent = counts.approved;
+  document.getElementById('statRejected').textContent = counts.rejected;
+  document.getElementById('cntPending').textContent = counts.pending;
+  document.getElementById('cntReviewing').textContent = counts.reviewing;
+  document.getElementById('cntRevision').textContent = counts['revision-requested'];
+  document.getElementById('cntApproved').textContent = counts.approved;
+  document.getElementById('cntRejected').textContent = counts.rejected;
+}
+
+function renderCards() {
+  var container = document.getElementById('cardsContainer');
+  var filtered = allDocs.filter(function(d) { return d.status === currentStatus; });
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No submissions in <strong>' + currentStatus + '</strong> status.</p></div>';
+    return;
+  }
+  var grid = '<div class="cards">';
+  filtered.forEach(function(d) {
+    var thumb = d.imageUrl
+      ? '<div class="card-thumb" style="background-image:url(\'' + escapeAttr(d.coverImage || d.imageUrl) + '\');"><span class="lang-badge">' + (d.originalLang || '?').toUpperCase() + '</span></div>'
+      : '<div class="card-thumb no-img"><i class="fas fa-image"></i><span class="lang-badge">' + (d.originalLang || '?').toUpperCase() + '</span></div>';
+    var enFlag = (d.englishBody && d.englishBody.trim()) || d.originalLang === 'en'
+      ? '<span class="flag flag-en-present">EN ✓</span>'
+      : '<span class="flag flag-en-missing">EN missing</span>';
+    var preview = escapeHtml((d.excerpt || (d.blocks && d.blocks.find(function(b){return b.type==='text';})||{}).content || d.originalBody || '').substring(0, 200));
+    grid += '<div class="card" onclick="openModal(\'' + d.id + '\')">' + thumb
+      + '<div class="card-body">'
+      + '<div class="card-brand">' + escapeHtml(d.brandName || '—') + '</div>'
+      + '<div class="card-title">' + escapeHtml(d.title || '—') + '</div>'
+      + '<div class="card-preview">' + preview + '</div>'
+      + '<div class="card-meta"><span>' + formatDate(d.createdAt) + '</span><div class="meta-flags">' + enFlag + '</div></div>'
+      + '</div></div>';
+  });
+  grid += '</div>';
+  container.innerHTML = grid;
+}
+
+// ─────────────── 모달 ───────────────
+window.openModal = function(id) {
+  var d = allDocs.find(function(x){ return x.id === id; });
+  if (!d) return;
+  currentDoc = d;
+  document.getElementById('mTitle').textContent = d.title || '—';
+  document.getElementById('mBrandMeta').textContent = (d.brandName || '—') + ' · ' + (d.country || '—');
+  document.getElementById('mContact').textContent = d.contactName || '—';
+  document.getElementById('mEmail').innerHTML = d.email ? '<a href="mailto:' + escapeAttr(d.email) + '">' + escapeHtml(d.email) + '</a>' : '—';
+  document.getElementById('mCountry').textContent = d.country || '—';
+  document.getElementById('mCategory').textContent = d.category || '—';
+  document.getElementById('mOriginalLang').textContent = (d.originalLang || '—').toUpperCase();
+  document.getElementById('mSource').textContent = d.source || '—';
+  document.getElementById('mCreatedAt').textContent = formatDate(d.createdAt);
+  document.getElementById('mStatus').textContent = d.status || '—';
+  document.getElementById('bOrigLang').textContent = (d.originalLang || '?').toUpperCase();
+  document.getElementById('bOrigContent').innerHTML = renderBlocks(d.blocks) || escapeHtml(d.originalBody || '(none)');
+  document.getElementById('bEnContent').textContent = d.englishBody || d.englishBodyEdited || '(not provided)';
+  document.getElementById('bKoContent').textContent = d.koreanBody || '(not yet translated)';
+  document.getElementById('inEnglish').value = d.englishBodyEdited || d.englishBody || '';
+  document.getElementById('inKorean').value = d.koreanBody || '';
+  document.getElementById('inNote').value = d.reviewerNote || '';
+  // 이미지
+  var imgs = [];
+  if (d.imageUrl) imgs.push(d.imageUrl);
+  if (Array.isArray(d.extraImages)) imgs = imgs.concat(d.extraImages);
+  var imgGrid = document.getElementById('mImagesGrid');
+  if (imgs.length === 0) {
+    imgGrid.innerHTML = '<div style="color:#999;font-size:0.85rem;grid-column:1/-1;">(no images submitted)</div>';
+  } else {
+    imgGrid.innerHTML = imgs.map(function(u){
+      return '<a href="' + escapeAttr(u) + '" target="_blank" rel="noopener"><img src="' + escapeAttr(u) + '" loading="lazy" onerror="this.style.opacity=0.3"></a>';
+    }).join('');
+  }
+  // 첫 탭 활성화
+  document.querySelectorAll('.body-tab').forEach(function(x){ x.classList.remove('active'); });
+  document.querySelector('.body-tab[data-body="orig"]').classList.add('active');
+  document.querySelectorAll('.body-content').forEach(function(c){ c.classList.toggle('active', c.getAttribute('data-body') === 'orig'); });
+  // 액션 버튼 활성/비활성 (status에 따라)
+  updateActionButtons(d.status);
+  document.getElementById('modalOverlay').classList.add('show');
+};
+
+
+function renderBlocks(blocks) {
+  if (!Array.isArray(blocks) || blocks.length === 0) return '';
+  return blocks.map(function(b) {
+    if (b.type === 'text') {
+      return '<p style="margin:0 0 14px;line-height:1.7;white-space:pre-wrap;">' + escapeHtml(b.content || '') + '</p>';
+    }
+    if (b.type === 'image') {
+      var cap = b.caption ? '<figcaption style="font-size:0.78rem;color:#888;margin-top:6px;">' + escapeHtml(b.caption) + '</figcaption>' : '';
+      return '<figure style="margin:14px 0;"><img src="' + escapeAttr(b.url || '') + '" alt="' + escapeAttr(b.alt || '') + '" style="max-width:100%;border-radius:6px;">' + cap + '</figure>';
+    }
+    return '';
+  }).join('');
+}
+
+window.closeModal = function() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  currentDoc = null;
+};
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function updateActionButtons(status) {
+  var btnReview = document.getElementById('btnReview');
+  var btnRevise = document.getElementById('btnRevise');
+  var btnReject = document.getElementById('btnReject');
+  var btnApprove = document.getElementById('btnApprove');
+  // pending: 모두 가능
+  // reviewing: revise/reject/approve 가능. review는 비활성
+  // revision-requested: review/reject/approve. revise는 이미.
+  // approved/rejected: 모두 비활성 (재오픈은 별도)
+  btnReview.disabled = (status === 'reviewing' || status === 'approved' || status === 'rejected');
+  btnRevise.disabled = (status === 'approved' || status === 'rejected');
+  btnReject.disabled = (status === 'approved' || status === 'rejected');
+  btnApprove.disabled = (status === 'approved' || status === 'rejected');
+}
+
+// ─────────────── 액션 ───────────────
+document.getElementById('btnReview').addEventListener('click', function() { doAction('reviewing', '검토 시작'); });
+document.getElementById('btnRevise').addEventListener('click', function() {
+  var note = document.getElementById('inNote').value.trim();
+  if (!note) { showToast('수정 요청 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
+  doAction('revision-requested', '수정 요청');
+});
+document.getElementById('btnReject').addEventListener('click', function() {
+  var note = document.getElementById('inNote').value.trim();
+  if (!note) { showToast('거절 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
+  if (!confirm('정말 거절하시겠습니까? 브랜드에게 거절 메일을 보내야 합니다.')) return;
+  doAction('rejected', '거절');
+});
+document.getElementById('btnApprove').addEventListener('click', function() {
+  var ko = document.getElementById('inKorean').value.trim();
+  if (!ko) {
+    if (!confirm('한국어 번역이 비어 있습니다. 그래도 승인하시겠습니까? (trend-editor 에이전트가 게시 단계에서 번역 가능)')) return;
+  }
+  doAction('approved', '게시 승인');
+});
+
+function doAction(newStatus, label) {
+  if (!currentDoc) return;
+  var updates = {
+    status: newStatus,
+    reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    reviewerNote: document.getElementById('inNote').value.trim() || null,
+    englishBodyEdited: document.getElementById('inEnglish').value.trim() || null,
+    koreanBody: document.getElementById('inKorean').value.trim() || null
+  };
+  db.collection('articles').doc(currentDoc.id).update(updates)
+    .then(function() {
+      showToast(label + ' 완료', 'success');
+      closeModal();
+      loadSubmissions();
+    })
+    .catch(function(err) {
+      console.error(err);
+      showToast('실패: ' + err.message, 'error');
+    });
+}
+
+// ─────────────── 헬퍼 ───────────────
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/\n/g, ' ');
+}
+function formatDate(ts) {
+  if (!ts) return '—';
+  var d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+// ESC로 모달 닫기
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('modalOverlay').classList.contains('show')) {
+    closeModal();
+  }
+});
+</script>
+</body>
+</html>
