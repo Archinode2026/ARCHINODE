@@ -172,6 +172,9 @@
 <section class="lyb-hero">
     <h1><span data-en="List Your Brand on " data-ko=""></span><span class="gold">ARCHINODE</span><span data-en="" data-ko="에 브랜드를 등록하세요"></span></h1>
     <p data-en="Register below and get your own brand page, login portal, and direct access to Korean architects and designers." data-ko="아래 양식을 작성하시면 브랜드 페이지, 로그인 포털, 한국 건축가·디자이너 접근권을 받으실 수 있습니다."></p>
+    <div style="margin-top:28px; text-align:center;">
+      <a href="downloads/ARCHINODE_Brand_Proposal_2026.pdf" download style="display:inline-block; padding:14px 28px; background:transparent; color:#C8A96E; border:1px solid #C8A96E; border-radius:6px; font-size:0.95rem; font-weight:600; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='rgba(200,169,110,0.1)'" onmouseout="this.style.background='transparent'" data-en="↓ Download Brand Proposal (PDF)" data-ko="↓ 브랜드 제안서 다운로드 (PDF)">↓ Download Brand Proposal (PDF)</a>
+    </div>
 </section>
 
 <!-- BENEFITS -->
@@ -621,25 +624,4 @@ form.addEventListener('submit', async function(e) {
             errorDiv.textContent = 'This email is already registered. If you already have an account, please log in at the Brand Portal.';
         } else if (error.code === 'auth/invalid-email') {
             errorDiv.textContent = 'Please enter a valid email address.';
-        } else if (error.code === 'auth/weak-password') {
-            errorDiv.textContent = 'Password is too weak. Please try again.';
-        } else {
-            errorDiv.textContent = 'An error occurred: ' + error.message;
-        }
-    }
-});
-
-function copyCred(elId, btn) {
-    const text = document.getElementById(elId).textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        btn.textContent = '✓ Copy됨';
-        btn.classList.add('copied');
-        setTimeout(() => {
-            btn.textContent = 'Copy';
-            btn.classList.remove('copied');
-        }, 2000);
-    });
-}
-</script>
-</body>
-</html>
+        } else if (error.code === 'a
