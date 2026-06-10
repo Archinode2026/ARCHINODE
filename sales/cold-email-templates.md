@@ -1,6 +1,6 @@
 # ARCHINODE — Cold Email Templates (EN)
 
-> Silvia Mariano · EU Director · ARCHINODE  
+> Silvia Vandone · EU Director · ARCHINODE  
 > 작성: 아키-골드 · 2026-06-09
 
 이탈리아·EU 브랜드 컨택용 영문 콜드 메일 3종.  
@@ -26,7 +26,7 @@
 ```
 Dear [First Name],
 
-I'm Silvia Mariano, EU Director at ARCHINODE — a Korea-based platform 
+I'm Silvia Vandone, EU Director at ARCHINODE — a Korea-based platform 
 connecting European design brands directly with Korean architects, 
 interior designers, and developers in a $48B market.
 
@@ -47,9 +47,9 @@ A brief overview is attached for reference.
 
 Warm regards,
 
-Silvia Mariano
+Silvia Vandone
 EU Director — ARCHINODE
-silvia@archinodekr.com  |  www.archinodekr.com
+silviavandone@hotmail.com  |  www.archinodekr.com
 ```
 
 ### 변형 — 가구 브랜드용 (3번째 문단 교체)
@@ -100,9 +100,9 @@ Brochure attached again for convenience.
 
 Warm regards,
 
-Silvia Mariano
+Silvia Vandone
 EU Director — ARCHINODE
-silvia@archinodekr.com
+silviavandone@hotmail.com
 ```
 
 ---
@@ -123,7 +123,7 @@ silvia@archinodekr.com
 ```
 Dear [First Name],
 
-I'm Silvia Mariano, EU Director at ARCHINODE — a Korean platform built 
+I'm Silvia Vandone, EU Director at ARCHINODE — a Korean platform built 
 to bring European design brands directly to Korean architects, designers, 
 and developers.
 
@@ -151,9 +151,9 @@ Full proposal attached.
 
 Warm regards,
 
-Silvia Mariano
+Silvia Vandone
 EU Director — ARCHINODE
-silvia@archinodekr.com  |  www.archinodekr.com
+silviavandone@hotmail.com  |  www.archinodekr.com
 ```
 
 ---
@@ -186,7 +186,7 @@ silvia@archinodekr.com  |  www.archinodekr.com
 
 ## 검증 항목 (실제 발송 전 한울님 확인)
 
-- [ ] `silvia@archinodekr.com` 이메일 주소가 실제로 발급·작동 중인가?
+- [ ] `silviavandone@hotmail.com` 이메일 주소가 실제로 발급·작동 중인가?
 - [ ] 회신이 한울님(Gwen)에게도 동시에 들어오는 BCC 또는 별도 inbox 설정 필요한가?
 - [ ] Template C의 "€10/month after December 2026" 가격은 이미 사이트·브로슈어와 일치 (OK)
 - [ ] Subject line A/B 테스트할 의향 있는가? (예: 첫 20개는 Subject 1, 다음 20개는 Subject 2 → 답장률 비교)
