@@ -438,19 +438,38 @@ a { text-decoration: none; color: inherit; }
 </div>
 
 <!-- HEADER -->
-<header class="header" id="header" style="background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:1000;">
-  <div style="max-width:1440px;margin:0 auto;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;">
-    <a href="index.html" class="logo" style="font-size:1.3rem;font-weight:800;letter-spacing:-0.5px;">ARCHINODE <span style="font-size:0.6rem;font-weight:400;color:#999;margin-left:4px;">건축을 잇다</span></a>
-    <nav style="display:flex;align-items:center;gap:28px;font-size:0.85rem;font-weight:500;">
-      <a href="brands.html">Brands</a>
-      <a href="categories/furniture.html">Categories</a>
-      <a href="magazine.html">Magazine</a>
-      <a href="about.html">About</a>
-      <a href="for-brands.html" style="color:#C8A96E;font-weight:700;">For Brands</a>
-      <a href="brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
-      <a href="list-your-brand.html" style="background:#111;color:#fff;padding:8px 20px;border-radius:5px;font-weight:600;">List Your Brand</a>
-      <a href="#" class="lang-switch" onclick="toggleLang(event)" style="color:#888;cursor:pointer;">KR / EN</a>
+<header class="header" id="header">
+  <div class="container">
+    <a href="index.html" class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger" onclick="toggleCatMenu()" data-en="Categories" data-ko="카테고리">Categories <i class="fas fa-chevron-down"></i></button>
+        <div class="nav-dropdown-menu" id="catMenu">
+            <a href="categories/furniture.html"><span>Furniture</span><small>가구</small></a>
+            <a href="categories/bathroom.html"><span>Bathroom</span><small>욕실</small></a>
+            <a href="categories/outdoor.html"><span>Outdoor</span><small>아웃도어</small></a>
+            <a href="categories/lighting.html"><span>Lighting</span><small>조명</small></a>
+            <a href="categories/kitchen.html"><span>Kitchen</span><small>주방</small></a>
+            <a href="categories/office.html"><span>Office</span><small>오피스</small></a>
+            <a href="categories/finishes.html"><span>Finishes</span><small>마감재</small></a>
+            <a href="categories/wellness.html"><span>Wellness</span><small>웰니스</small></a>
+            <a href="categories/decor.html"><span>Decor</span><small>데코</small></a>
+            <a href="categories/construction.html"><span>Construction</span><small>건축자재</small></a>
+        </div>
+      </div>
+      <a href="brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
+      <a href="trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a>
+      <a href="about.html" data-en="About" data-ko="소개">About</a>
+      <a href="list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
     </nav>
+    <div class="header-actions">
+      <a href="brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
+      <button class="search-toggle" onclick="toggleSearch()" aria-label="Search"><i class="fas fa-search"></i></button>
+      <a href="auth/profile.html" aria-label="Saved"><i class="far fa-bookmark"></i></a>
+      <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
+      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    </div>
   </div>
 </header>
 
@@ -756,14 +775,4 @@ a { text-decoration: none; color: inherit; }
         <h4 style="color:#fff;font-size:0.8rem;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">For Brands</h4>
         <a href="for-brands.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;">Why ARCHINODE</a>
         <a href="list-your-brand.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;">Apply Now</a>
-        <a href="magazine.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;">Magazine</a>
-        <a href="contact.html" style="display:block;color:#888;font-size:0.85rem;">Contact</a>
-      </div>
-      <div>
-        <h4 style="color:#fff;font-size:0.8rem;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;">Company</h4>
-        <a href="about.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;">About</a>
-        <a href="terms.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;">Terms</a>
-        <a href="privacy.html" style="display:block;color:#888;font-size:0.85rem;">Privacy</a>
-      </div>
-    </div>
-    <div style="border-top:1px solid rgba(255,255,2
+        <a href="magazine.html" style="display:block;color:#888;font-size:0.85rem;margin-bo

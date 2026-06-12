@@ -156,7 +156,7 @@
     <a href="index.html" class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></a>
     <nav class="main-nav" id="mainNav">
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger" onclick="toggleCatMenu()">Categories <i class="fas fa-chevron-down"></i></button>
+        <button class="nav-dropdown-trigger" onclick="toggleCatMenu()" data-en="Categories" data-ko="카테고리">Categories <i class="fas fa-chevron-down"></i></button>
         <div class="nav-dropdown-menu" id="catMenu">
             <a href="categories/furniture.html"><span>Furniture</span><small>가구</small></a>
             <a href="categories/bathroom.html"><span>Bathroom</span><small>욕실</small></a>
@@ -170,10 +170,11 @@
             <a href="categories/construction.html"><span>Construction</span><small>건축자재</small></a>
         </div>
       </div>
-      <a href="brands.html" class="active-nav">Brands</a>
-      <a href="magazine.html">Magazine</a>
-      <a href="about.html">About</a>
-      <a href="list-your-brand.html" class="nav-cta">List Your Brand</a>
+      <a href="brands.html" class="active-nav" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
+      <a href="trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a>
+      <a href="about.html" data-en="About" data-ko="소개">About</a>
+      <a href="list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
     </nav>
     <div class="header-actions">
       <a href="brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
@@ -451,17 +452,4 @@ async function loadRegisteredBrands() {
 
     } catch (error) {
         console.error('Error loading registered brands:', error);
-        grid.innerHTML = '<div class="reg-empty-state"><i class="fas fa-exclamation-triangle"></i><h3>브랜드 정보를 불러올 수 없습니다.</h3></div>';
-        countEl.textContent = '';
-    }
-}
-
-loadRegisteredBrands();
-</script>
-
-<!-- Lang Script -->
-<script src="search.js"></script>
-<script src="lang.js"></script>
-<script src="auth-ui.js"></script>
-</body>
-</html>
+        grid.innerHTML = '<div class="reg-empty-state"><i class="
