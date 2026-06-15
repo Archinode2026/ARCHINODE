@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -624,4 +624,25 @@ form.addEventListener('submit', async function(e) {
             errorDiv.textContent = 'This email is already registered. If you already have an account, please log in at the Brand Portal.';
         } else if (error.code === 'auth/invalid-email') {
             errorDiv.textContent = 'Please enter a valid email address.';
-  
+        } else if (error.code === 'auth/weak-password') {
+            errorDiv.textContent = 'Password is too weak. Please try again.';
+        } else {
+            errorDiv.textContent = 'An error occurred: ' + error.message;
+        }
+    }
+});
+
+function copyCred(elId, btn) {
+    const text = document.getElementById(elId).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '✓ Copy됨';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+        }, 2000);
+    });
+}
+</script>
+</body>
+</html>

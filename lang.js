@@ -34,8 +34,9 @@
     if (saved && availableLangs.indexOf(saved) !== -1) return saved;
     var browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase().split('-')[0];
     if (availableLangs.indexOf(browserLang) !== -1) return browserLang;
+    if (availableLangs.indexOf('ko') !== -1) return 'ko';
     if (availableLangs.indexOf('en') !== -1) return 'en';
-    return availableLangs[0] || 'en';
+    return availableLangs[0] || 'ko';
   }
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -184,9 +185,4 @@
         if (a.getAttribute('data-lang') === lang) {
           a.classList.add('active');
         } else {
-          a.classList.remove('active');
-        }
-      });
-    });
-  }
-})();
+          a.classLis
