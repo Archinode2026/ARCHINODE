@@ -434,4 +434,33 @@ window.addEventListener('scroll', () => {
   scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
 });
 function toggleSearch() {
-  const 
+  const o = document.getElementById('searchOverlay');
+  o.classList.toggle('active');
+  if (o.classList.contains('active')) o.querySelector('input').focus();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('searchOverlay').classList.remove('active'); });
+
+function toggleCatMenu() {
+  const menu = document.getElementById('catMenu');
+  menu.classList.toggle('active');
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.querySelector('.nav-dropdown');
+  if (dropdown && !dropdown.contains(e.target)) {
+    document.getElementById('catMenu').classList.remove('active');
+  }
+});
+function toggleMobile() { document.getElementById('mainNav').classList.toggle('active'); }
+const fadeEls = document.querySelectorAll('.fade-in');
+const fadeObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); fadeObs.unobserve(e.target); }});
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+fadeEls.forEach(el => fadeObs.observe(el));
+</script>
+
+<script src="search.js"></script>
+<script src="lang.js?v=20260618"></script>
+<script src="auth-ui.js"></script>
+</body>
+</html>

@@ -452,4 +452,17 @@ async function loadRegisteredBrands() {
 
     } catch (error) {
         console.error('Error loading registered brands:', error);
-        grid.innerHTML = '<div class="reg-empty-state"><i class="
+        grid.innerHTML = '<div class="reg-empty-state"><i class="fas fa-exclamation-triangle"></i><h3>브랜드 정보를 불러올 수 없습니다.</h3></div>';
+        countEl.textContent = '';
+    }
+}
+
+loadRegisteredBrands();
+</script>
+
+<!-- Lang Script -->
+<script src="search.js"></script>
+<script src="lang.js?v=20260618"></script>
+<script src="auth-ui.js"></script>
+</body>
+</html>
