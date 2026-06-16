@@ -32,8 +32,8 @@
     var saved = null;
     try { saved = localStorage.getItem('archinode-lang'); } catch(e){}
     if (saved && availableLangs.indexOf(saved) !== -1) return saved;
-    var browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase().split('-')[0];
-    if (availableLangs.indexOf(browserLang) !== -1) return browserLang;
+    // 한국 사이트(archinodekr.com) — 첫 방문 무조건 한국어 디폴트.
+    // EN 토글 1회 누르면 localStorage에 'en' 저장되어 다음부터 영어 유지.
     if (availableLangs.indexOf('ko') !== -1) return 'ko';
     if (availableLangs.indexOf('en') !== -1) return 'en';
     return availableLangs[0] || 'ko';
@@ -185,4 +185,9 @@
         if (a.getAttribute('data-lang') === lang) {
           a.classList.add('active');
         } else {
-          a.classLis
+          a.classList.remove('active');
+        }
+      });
+    });
+  }
+}
