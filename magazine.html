@@ -1299,4 +1299,140 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
           <li><a href="list-your-brand.html" data-en="Dealership Screening" data-ko="딜러십 검증">Dealership Screening</a></li>
           <li><a href="list-your-brand.html" data-en="Dealer Monitoring" data-ko="딜러 모니터링">Dealer Monitoring</a></li>
           <li><a href="list-your-brand.html" data-en="Exhibition Support" data-ko="박람회 지원">Exhibition Support</a></li>
-          <li><a href="about.html" data-en="ARCHINODE Awards" data-ko="ARCHINODE 어워드">A
+          <li><a href="about.html" data-en="ARCHINODE Awards" data-ko="ARCHINODE 어워드">ARCHINODE Awards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Company" data-ko="회사">Company</h4>
+        <ul>
+          <li><a href="about.html" data-en="About ARCHINODE" data-ko="ARCHINODE 소개">About ARCHINODE</a></li>
+          <li><a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a></li><li><a href="trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a></li>
+          <li><a href="contact.html" data-en="Contact" data-ko="문의">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="For Brands" data-ko="브랜드를 위한">For Brands</h4>
+        <ul>
+          <li><a href="list-your-brand.html" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a></li>
+          <li><a href="list-your-brand.html#pricing" data-en="Pricing" data-ko="요금 안내">Pricing</a></li>
+          <li><a href="list-your-brand.html" data-en="How It Works" data-ko="이용 방법">How It Works</a></li>
+          <li><a href="for-brands.html" data-en="For Brands Info" data-ko="브랜드용 안내">For Brands Info</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business-info" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;margin-top:40px;margin-bottom:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
+      상호: 비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
+      주소: 경기도 의왕시 내손로 13, 103동 804호 &nbsp;|&nbsp; 이메일: office@archinode.org
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 ARCHINODE. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="terms.html" data-en="Terms" data-ko="이용약관">Terms</a>
+        <a href="privacy.html" data-en="Privacy Policy" data-ko="개인정보처리방침">Privacy Policy</a>
+        <a href="privacy.html" data-en="Cookie Policy" data-ko="쿠키 정책">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Top">
+  <i class="fas fa-chevron-up"></i>
+</button>
+
+<script>
+/* ===== HERO SLIDER ===== */
+const slides = document.querySelectorAll('.hero-slide');
+const dots = document.querySelectorAll('.hero-dot');
+const heroData = [
+  { tag: 'Europe meets Korea', title: 'Connecting Global<br>Architecture & Design', desc: 'Seamlessly connecting European design brands with the Korean market. Founding brands joining now.' },
+  { tag: 'Brand Directory', title: 'Every Brand,<br>One Platform', desc: 'From furniture to finishes, explore the world\'s leading design brands all in one place.' },
+  { tag: 'For Professionals', title: 'Designed for<br>Architects & Designers', desc: 'Find products, connect with brands, and source materials for your next project.' }
+];
+let currentSlide = 0;
+let slideInterval;
+
+function goSlide(n) {
+  slides[currentSlide].classList.remove('active');
+  dots[currentSlide].classList.remove('active');
+  currentSlide = n;
+  slides[currentSlide].classList.add('active');
+  dots[currentSlide].classList.add('active');
+  document.getElementById('heroTag').textContent = heroData[n].tag;
+  document.getElementById('heroTitle').innerHTML = heroData[n].title;
+  document.getElementById('heroDesc').textContent = heroData[n].desc;
+}
+
+function nextSlide() { goSlide((currentSlide + 1) % slides.length); }
+function startSlider() { slideInterval = setInterval(nextSlide, 5000); }
+function stopSlider() { clearInterval(slideInterval); }
+startSlider();
+document.querySelector('.hero').addEventListener('mouseenter', stopSlider);
+document.querySelector('.hero').addEventListener('mouseleave', startSlider);
+
+/* ===== HEADER SCROLL ===== */
+const header = document.getElementById('header');
+const scrollTopBtn = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 50);
+  scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+});
+
+/* ===== SEARCH ===== */
+function toggleSearch() {
+  const overlay = document.getElementById('searchOverlay');
+  overlay.classList.toggle('active');
+  if (overlay.classList.contains('active')) overlay.querySelector('input').focus();
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('searchOverlay').classList.remove('active');
+});
+
+/* ===== MOBILE NAV ===== */
+
+function toggleCatMenu() {
+  const menu = document.getElementById('catMenu');
+  menu.classList.toggle('active');
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.querySelector('.nav-dropdown');
+  if (dropdown && !dropdown.contains(e.target)) {
+    document.getElementById('catMenu').classList.remove('active');
+  }
+});
+function toggleMobile() {
+  document.getElementById('mainNav').classList.toggle('active');
+}
+
+/* Language handled by lang.js */
+
+/* ===== SCROLL ANIMATIONS ===== */
+const fadeEls = document.querySelectorAll('.fade-in');
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+fadeEls.forEach(el => fadeObserver.observe(el));
+
+/* ===== WISHLIST TOGGLE ===== */
+document.querySelectorAll('.product-wish').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const icon = this.querySelector('i');
+    icon.classList.toggle('far');
+    icon.classList.toggle('fas');
+    this.style.color = icon.classList.contains('fas') ? 'var(--black)' : 'var(--gray-500)';
+  });
+});
+</script>
+<script src="search.js"></script>
+<script src="lang.js"></script>
+<script src="auth-ui.js"></script>
+
+</body>
+</html>
