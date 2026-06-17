@@ -1209,8 +1209,7 @@ window.subscribeNewsletter = async function(e, source) {
   btn.textContent = '...';
   try {
     if (typeof firebase === 'undefined') throw new Error('Firebase SDK not loaded');
-    if (typeof db === 'undefined') throw new Error('Firestore not initialized');
-    await db.collection('newsletter-subscribers').add({
+    await firebase.firestore().collection('newsletter-subscribers').add({
       email: email,
       source: source || 'unknown',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
