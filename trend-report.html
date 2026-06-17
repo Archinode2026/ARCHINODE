@@ -464,7 +464,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   <div class="container">
     <h2 class="fade-in" data-en="Get European trends in your inbox" data-ko="유럽 트렌드를 이메일로 받아보세요">Get European trends in your inbox</h2>
     <p class="fade-in" data-en="New trend reports from European brands, delivered as they publish. No noise — only reports that pass our editorial review." data-ko="유럽 브랜드가 발행하는 새 브랜드 매거진를 메일로 보내드립니다. 편집부 검수를 통과한 글만.">New trend reports from European brands, delivered as they publish. No noise — only reports that pass our editorial review.</p>
-    <form class="newsletter-form fade-in" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+    <form class="newsletter-form fade-in" >
       <input type="email" placeholder="Enter your email address" required data-en-placeholder="Enter your email address" data-ko-placeholder="이메일 주소를 입력하세요">
       <button type="submit" data-en="Subscribe" data-ko="구독">Subscribe</button>
     </form>
@@ -635,6 +635,40 @@ fadeEls.forEach(el => fadeObserver.observe(el));
         '</div></a>';
     }).join('');
   }, function(err){ console.warn('articles load failed', err); });
+})();
+</script>
+
+
+<!-- Newsletter Subscribe handler -->
+<script>
+(function() {
+  var form = document.querySelector('.newsletter-form');
+  if (!form || typeof db === 'undefined') return;
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var input = form.querySelector('input[type="email"]');
+    var btn = form.querySelector('button[type="submit"]');
+    var email = input.value.trim();
+    if (!email || email.length < 5) { alert('Please enter a valid email.'); return; }
+    var origText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+      await db.collection('newsletter-subscribers').add({
+        email: email,
+        source: 'trend-report',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('Thank you for subscribing!');
+      input.value = '';
+    } catch (err) {
+      console.error('subscribe failed', err);
+      alert('Subscription failed. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+  });
 })();
 </script>
 

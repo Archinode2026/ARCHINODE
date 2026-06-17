@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notify Subscribers | ARCHINODE Admin</title>
+<title>Newsletter Subscribers | ARCHINODE Admin</title>
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,8 +84,7 @@ td a:hover { text-decoration: underline; }
     <a href="trend-submissions.html" class="nav-link"><i class="fas fa-inbox"></i> Trend Submissions</a>
     <a href="articles.html" class="nav-link"><i class="fas fa-newspaper"></i> Articles</a>
     <a href="consultations.html" class="nav-link"><i class="fas fa-comments"></i> Consultations</a>
-    <a href="notify-subscribers.html" class="nav-link active"><i class="fas fa-bell"></i> Notify Subscribers</a>
-    <a href="newsletter-subscribers.html" class="nav-link"><i class="fas fa-envelope-open-text"></i> Newsletter</a>
+    <a href="notify-subscribers.html" class="nav-link active"><i class="fas fa-bell"></i> Newsletter Subscribers</a>
     <span class="admin-email" id="adminEmail"></span>
     <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
   </div>
@@ -100,7 +99,7 @@ td a:hover { text-decoration: underline; }
 
   <div class="page-head">
     <div>
-      <h1>Digital Products Notify Subscribers</h1>
+      <h1>Newsletter Newsletter Subscribers</h1>
       <div class="sub">디지털 상품 출시 알림을 신청한 이메일 목록입니다. 첫 상품(M1 Flagship 플레이북) 출시 시 일괄 알림 메일 발송 대상.</div>
     </div>
     <div class="head-actions">
@@ -154,7 +153,7 @@ function loadSubscribers() {
   const container = document.getElementById('contentArea');
   container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#C8A96E;"></i><p style="margin-top:12px;">Loading subscribers...</p></div>';
 
-  db.collection('digital-products-notify').orderBy('createdAt', 'desc').get()
+  db.collection('newsletter-subscribers').orderBy('createdAt', 'desc').get()
     .then(function(snap) {
       allDocs = [];
       snap.forEach(function(doc) {
@@ -207,7 +206,7 @@ function render() {
 
 window.deleteSubscriber = function(id, email) {
   if (!confirm('정말 ' + email + ' 를 목록에서 삭제하시겠습니까?')) return;
-  db.collection('digital-products-notify').doc(id).delete()
+  db.collection('newsletter-subscribers').doc(id).delete()
     .then(function() {
       showToast('삭제 완료', 'success');
       loadSubscribers();

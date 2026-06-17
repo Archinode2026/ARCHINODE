@@ -1008,7 +1008,7 @@ input, select, textarea { font-family: inherit; }
   <div class="container">
     <h2 class="fade-in" data-en="Stay Updated" data-ko="소식 받기">Stay Updated</h2>
     <p class="fade-in" data-en="Subscribe to receive the latest from global design brands entering Korea." data-ko="한국에 진출하는 글로벌 디자인 브랜드의 최신 소식을 받아보세요.">Subscribe to receive the latest from global design brands entering Korea.</p>
-    <form class="newsletter-form fade-in" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+    <form class="newsletter-form fade-in" >
       <input type="email" placeholder="Your email address" required>
       <button type="submit">Subscribe</button>
     </form>
@@ -1185,8 +1185,47 @@ document.querySelectorAll('.product-wish').forEach(btn => {
 });
 </script>
 <script src="search.js"></script>
+
+<!-- Firebase SDK (Newsletter Subscribe) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script src="lang.js?v=20260618"></script>
 <script src="auth-ui.js"></script>
+
+
+<!-- Newsletter Subscribe handler -->
+<script>
+(function() {
+  var form = document.querySelector('.newsletter-form');
+  if (!form || typeof db === 'undefined') return;
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var input = form.querySelector('input[type="email"]');
+    var btn = form.querySelector('button[type="submit"]');
+    var email = input.value.trim();
+    if (!email || email.length < 5) { alert('Please enter a valid email.'); return; }
+    var origText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+      await db.collection('newsletter-subscribers').add({
+        email: email,
+        source: 'home',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('Thank you for subscribing!');
+      input.value = '';
+    } catch (err) {
+      console.error('subscribe failed', err);
+      alert('Subscription failed. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
