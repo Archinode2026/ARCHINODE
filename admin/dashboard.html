@@ -58,6 +58,7 @@ tr:hover { background: #fafafa; }
 .status { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
 .status-pending { background: #fef3c7; color: #92400e; }
 .status-approved { background: #d1fae5; color: #065f46; }
+.status-suspended { background: #fed7aa; color: #9a3412; }
 .status-rejected { background: #fee2e2; color: #991b1b; }
 
 /* ACTION BUTTONS */
@@ -65,7 +66,19 @@ tr:hover { background: #fafafa; }
 .act-btn:hover { opacity: 0.8; }
 .act-approve { background: #d1fae5; color: #065f46; }
 .act-reject { background: #fee2e2; color: #991b1b; }
+.act-suspend { background: #fed7aa; color: #9a3412; }
+.act-restore { background: #dbeafe; color: #1e40af; }
 .act-view { background: #e0e7ff; color: #3730a3; }
+
+/* REASON MODAL */
+.reason-modal-content { padding: 8px 0; }
+.reason-modal-content label { display: block; font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 8px; }
+.reason-modal-content textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.88rem; resize: vertical; }
+.reason-modal-content textarea:focus { outline: none; border-color: #C8A96E; }
+.reason-modal-content .char-count { font-size: 0.72rem; color: #999; margin-top: 6px; text-align: right; }
+.reason-modal-content .reason-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
+.reason-modal-content .btn-cancel { background: #f3f4f6; color: #555; padding: 8px 16px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.82rem; }
+.reason-modal-content .btn-confirm { padding: 8px 16px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.82rem; }
 
 /* DETAIL MODAL */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
@@ -231,6 +244,44 @@ async function loadAll() {
     await Promise.all([loadBrands(), loadProducts(), loadArticles()]);
 }
 
+// ── 브랜드 상태별 액션 버튼 ──
+function brandActionButtons(b, docId) {
+    const viewBtn = `<button class="act-btn act-view" onclick="viewBrand('${docId}')">View</button>`;
+    const pageBtn = (b.status === 'approved' && b.slug)
+        ? `<a class="act-btn" href="../brands/view.html?id=${b.slug}" target="_blank" style="text-decoration:none;background:#e0f2fe;color:#0369a1;">Page</a>`
+        : '';
+
+    if (b.status === 'pending') {
+        return `
+            ${viewBtn}
+            <button class="act-btn act-approve" onclick="updateBrand('${docId}','approved')">Approve</button>
+            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')">Reject</button>
+        `;
+    }
+    if (b.status === 'approved') {
+        return `
+            ${viewBtn}
+            ${pageBtn}
+            <button class="act-btn act-suspend" onclick="updateBrand('${docId}','suspended')">Suspend</button>
+            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')">Reject</button>
+        `;
+    }
+    if (b.status === 'suspended') {
+        return `
+            ${viewBtn}
+            <button class="act-btn act-restore" onclick="updateBrand('${docId}','approved')">Restore</button>
+            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')">Reject</button>
+        `;
+    }
+    if (b.status === 'rejected') {
+        return `
+            ${viewBtn}
+            <button class="act-btn act-restore" onclick="updateBrand('${docId}','approved')">Restore</button>
+        `;
+    }
+    return viewBtn;
+}
+
 // ── 브랜드 목록 ──
 async function loadBrands() {
     const snap = await db.collection('brands').orderBy('createdAt', 'desc').get();
@@ -250,15 +301,7 @@ async function loadBrands() {
                 <td>${b.contactName || '-'}<br><small style="color:#999;">${b.email}</small></td>
                 <td>${b.koreanDealer && b.koreanDealer.name ? `<strong>${b.koreanDealer.name}</strong><br><small style="color:#999;">${b.koreanDealer.contact || ''}</small>` : '<span style="color:#ccc;">—</span>'}</td>
                 <td><span class="status status-${b.status}">${b.status}</span></td>
-                <td>
-                    ${b.status === 'pending' ? `
-                        <button class="act-btn act-approve" onclick="updateBrand('${doc.id}','approved')">Approve</button>
-                        <button class="act-btn act-reject" onclick="updateBrand('${doc.id}','rejected')">Reject</button>
-                    ` : `
-                        <button class="act-btn act-view" onclick="viewBrand('${doc.id}')">View</button>
-                        ${b.status === 'approved' && b.slug ? `<a class="act-btn" href="../brands/view.html?id=${b.slug}" target="_blank" style="text-decoration:none;background:#e0f2fe;color:#0369a1;">Page</a>` : ''}
-                    `}
-                </td>
+                <td>${brandActionButtons(b, doc.id)}</td>
             </tr>`;
     });
 
@@ -268,25 +311,133 @@ async function loadBrands() {
     document.getElementById('brandCount').style.display = pending > 0 ? 'inline' : 'none';
 }
 
-// ── 브랜드 상태 변경 ──
-async function updateBrand(docId, status) {
-    const confirmMsg = status === 'approved' ? 'Approve this brand?' : 'Reject this brand?';
-    if (!confirm(confirmMsg)) return;
+// ── 브랜드 상태 변경 (사유 입력 모달) ──
+async function updateBrand(docId, newStatus) {
+    let brandName = '';
+    try {
+        const doc = await db.collection('brands').doc(docId).get();
+        brandName = (doc.data() && doc.data().brandName) || '';
+    } catch (e) {}
 
-    const updateData = { status: status };
-    if (status === 'approved') updateData.approvedAt = firebase.firestore.FieldValue.serverTimestamp();
+    const reasonRequired = (newStatus !== 'approved');
+    const titleMap = {
+        approved:  'Approve / Restore Brand',
+        suspended: 'Suspend Brand',
+        rejected:  'Reject Brand'
+    };
+    const colorMap = { approved: '#065f46', suspended: '#9a3412', rejected: '#991b1b' };
+    const bgMap    = { approved: '#d1fae5', suspended: '#fed7aa', rejected: '#fee2e2' };
 
-    await db.collection('brands').doc(docId).update(updateData);
-    await loadBrands();
+    const reason = await openReasonModal({
+        title: titleMap[newStatus] || 'Update Brand',
+        brandName: brandName,
+        newStatus: newStatus,
+        required: reasonRequired,
+        confirmColor: colorMap[newStatus],
+        confirmBg: bgMap[newStatus]
+    });
+    if (reason === null) return;
+
+    const updateData = {
+        status: newStatus,
+        statusReason: reason || '',
+        statusChangedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        statusChangedBy: (auth.currentUser && auth.currentUser.uid) || ''
+    };
+    if (newStatus === 'approved') {
+        updateData.approvedAt = firebase.firestore.FieldValue.serverTimestamp();
+    }
+
+    try {
+        await db.collection('brands').doc(docId).update(updateData);
+        await loadBrands();
+    } catch (e) {
+        alert('Failed to update brand status: ' + e.message);
+    }
+}
+
+// ── 사유 입력 모달 (Promise) ──
+function openReasonModal(opts) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('modal');
+        const content = document.getElementById('modalContent');
+        const placeholderText = opts.required
+            ? 'Required — describe the reason (max 200 chars)'
+            : 'Optional — note for internal record (max 200 chars)';
+        content.innerHTML = `
+            <h2>${opts.title}</h2>
+            ${opts.brandName ? `<p style="color:#888;font-size:0.85rem;margin-bottom:16px;">${opts.brandName} → <strong>${opts.newStatus}</strong></p>` : ''}
+            <div class="reason-modal-content">
+                <label for="reasonInput">Reason ${opts.required ? '<span style="color:#dc2626;">*</span>' : '<span style="color:#999;font-weight:400;">(optional)</span>'}</label>
+                <textarea id="reasonInput" maxlength="200" placeholder="${placeholderText}"></textarea>
+                <div class="char-count"><span id="reasonCount">0</span>/200</div>
+                <div class="reason-actions">
+                    <button class="btn-cancel" id="reasonCancelBtn">Cancel</button>
+                    <button class="btn-confirm" id="reasonConfirmBtn" style="background:${opts.confirmBg};color:${opts.confirmColor};">Confirm</button>
+                </div>
+            </div>
+        `;
+        modal.classList.add('show');
+
+        const ta = document.getElementById('reasonInput');
+        const cnt = document.getElementById('reasonCount');
+        ta.addEventListener('input', () => { cnt.textContent = ta.value.length; });
+        ta.focus();
+
+        // W2 fix: overlay 클릭 / Esc 키도 resolve(null) 처리
+        let resolved = false;
+        const safeResolve = (val) => {
+            if (resolved) return;
+            resolved = true;
+            modal.classList.remove('show');
+            modal.removeEventListener('click', onOverlayClick, true);
+            document.removeEventListener('keydown', onKeydown, true);
+            resolve(val);
+        };
+        const onOverlayClick = (e) => {
+            if (e.target === modal) { safeResolve(null); }
+        };
+        const onKeydown = (e) => {
+            if (e.key === 'Escape') { safeResolve(null); }
+        };
+        modal.addEventListener('click', onOverlayClick, true);
+        document.addEventListener('keydown', onKeydown, true);
+
+        document.getElementById('reasonCancelBtn').onclick = () => { safeResolve(null); };
+        document.getElementById('reasonConfirmBtn').onclick = () => {
+            const v = ta.value.trim();
+            if (opts.required && v.length === 0) {
+                alert('A reason is required for this action.');
+                ta.focus();
+                return;
+            }
+            safeResolve(v);
+        };
+    });
 }
 
 // ── 브랜드 상세 보기 ──
 async function viewBrand(docId) {
     const doc = await db.collection('brands').doc(docId).get();
     const b = doc.data();
+
+    let statusHistoryHtml = '';
+    if (b.statusReason) {
+        statusHistoryHtml += `<div class="detail-row"><div class="detail-label">Last Reason</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(b.statusReason)}</div></div>`;
+    }
+    if (b.statusChangedAt) {
+        try {
+            const dt = b.statusChangedAt.toDate ? b.statusChangedAt.toDate() : new Date(b.statusChangedAt);
+            statusHistoryHtml += `<div class="detail-row"><div class="detail-label">Changed At</div><div class="detail-value">${dt.toLocaleString()}</div></div>`;
+        } catch (e) {}
+    }
+
+    const actionsHtml = brandActionButtonsForModal(b, docId);
+
     document.getElementById('modalContent').innerHTML = `
         <h2>${b.brandName}</h2>
         <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value"><span class="status status-${b.status}">${b.status}</span></div></div>
+        ${statusHistoryHtml}
         <div class="detail-row"><div class="detail-label">Country</div><div class="detail-value">${b.country || '-'}</div></div>
         <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${b.category || '-'}</div></div>
         <div class="detail-row"><div class="detail-label">Website</div><div class="detail-value"><a href="${b.website}" target="_blank">${b.website || '-'}</a></div></div>
@@ -295,11 +446,44 @@ async function viewBrand(docId) {
         <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-value">${b.phone || '-'}</div></div>
         <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value">${b.description || '-'}</div></div>
         <div class="detail-row"><div class="detail-label">Referral</div><div class="detail-value">${b.referral || '-'}</div></div>
-        <div style="margin-top:20px;">
-            <button class="act-btn act-approve" onclick="updateBrand('${docId}','approved');closeModal();">Approve</button>
-            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected');closeModal();">Reject</button>
-        </div>`;
+        <div style="margin-top:20px;">${actionsHtml}</div>`;
     document.getElementById('modal').classList.add('show');
+}
+
+// ── 상세 모달용 액션 버튼 ──
+function brandActionButtonsForModal(b, docId) {
+    const close = ';closeModal();';
+    if (b.status === 'pending') {
+        return `
+            <button class="act-btn act-approve" onclick="updateBrand('${docId}','approved')${close}">Approve</button>
+            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')${close}">Reject</button>
+        `;
+    }
+    if (b.status === 'approved') {
+        return `
+            <button class="act-btn act-suspend" onclick="updateBrand('${docId}','suspended')${close}">Suspend</button>
+            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')${close}">Reject</button>
+        `;
+    }
+    if (b.status === 'suspended') {
+        return `
+            <button class="act-btn act-restore" onclick="updateBrand('${docId}','approved')${close}">Restore</button>
+            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')${close}">Reject</button>
+        `;
+    }
+    if (b.status === 'rejected') {
+        return `
+            <button class="act-btn act-restore" onclick="updateBrand('${docId}','approved')${close}">Restore</button>
+        `;
+    }
+    return '';
+}
+
+// ── XSS 방어 — 사유 문자열 출력용 ──
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = String(text == null ? '' : text);
+    return div.innerHTML;
 }
 
 // ── 제품 목록 ──
