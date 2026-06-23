@@ -141,7 +141,7 @@
 }
 </style>
 </head>
-<body>
+<body data-langs="en">
 
 <!-- ANNOUNCEMENT BAR -->
 <div class="announcement-bar">
@@ -163,7 +163,7 @@
     </nav>
     <div class="header-actions">
       <a href="brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
-      <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
+      <!-- 영어 전용 페이지 — 외국 고객 전용. 언어 토글 숨김 -->
     </div>
   </div>
 </header>
@@ -643,6 +643,4 @@ function copyCred(elId, btn) {
         }, 2000);
     });
 }
-</script>
-</body>
-</html>
+</
