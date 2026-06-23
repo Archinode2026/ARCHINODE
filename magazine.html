@@ -1375,33 +1375,39 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 <script>
 /* ===== HERO SLIDER ===== */
+// Hero slider — 페이지에 .hero-slide 요소 있을 때만 작동 (null 안전)
 const slides = document.querySelectorAll('.hero-slide');
 const dots = document.querySelectorAll('.hero-dot');
-const heroData = [
-  { tag: 'Europe meets Korea', title: 'Connecting Global<br>Architecture & Design', desc: 'Seamlessly connecting European design brands with the Korean market. Founding brands joining now.' },
-  { tag: 'Brand Directory', title: 'Every Brand,<br>One Platform', desc: 'From furniture to finishes, explore the world\'s leading design brands all in one place.' },
-  { tag: 'For Professionals', title: 'Designed for<br>Architects & Designers', desc: 'Find products, connect with brands, and source materials for your next project.' }
-];
-let currentSlide = 0;
-let slideInterval;
-
-function goSlide(n) {
-  slides[currentSlide].classList.remove('active');
-  dots[currentSlide].classList.remove('active');
-  currentSlide = n;
-  slides[currentSlide].classList.add('active');
-  dots[currentSlide].classList.add('active');
-  document.getElementById('heroTag').textContent = heroData[n].tag;
-  document.getElementById('heroTitle').innerHTML = heroData[n].title;
-  document.getElementById('heroDesc').textContent = heroData[n].desc;
+const heroEl = document.querySelector('.hero');
+if (slides.length > 0 && heroEl) {
+  const heroData = [
+    { tag: 'Europe meets Korea', title: 'Connecting Global<br>Architecture & Design', desc: 'Seamlessly connecting European design brands with the Korean market. Founding brands joining now.' },
+    { tag: 'Brand Directory', title: 'Every Brand,<br>One Platform', desc: 'From furniture to finishes, explore the world\'s leading design brands all in one place.' },
+    { tag: 'For Professionals', title: 'Designed for<br>Architects & Designers', desc: 'Find products, connect with brands, and source materials for your next project.' }
+  ];
+  let currentSlide = 0;
+  let slideInterval;
+  window.goSlide = function(n) {
+    if (!slides[currentSlide] || !slides[n]) return;
+    slides[currentSlide].classList.remove('active');
+    if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+    currentSlide = n;
+    slides[currentSlide].classList.add('active');
+    if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+    var tagEl = document.getElementById('heroTag');
+    var titleEl = document.getElementById('heroTitle');
+    var descEl = document.getElementById('heroDesc');
+    if (tagEl) tagEl.textContent = heroData[n].tag;
+    if (titleEl) titleEl.innerHTML = heroData[n].title;
+    if (descEl) descEl.textContent = heroData[n].desc;
+  };
+  function nextSlide() { window.goSlide((currentSlide + 1) % slides.length); }
+  function startSlider() { slideInterval = setInterval(nextSlide, 5000); }
+  function stopSlider() { clearInterval(slideInterval); }
+  startSlider();
+  heroEl.addEventListener('mouseenter', stopSlider);
+  heroEl.addEventListener('mouseleave', startSlider);
 }
-
-function nextSlide() { goSlide((currentSlide + 1) % slides.length); }
-function startSlider() { slideInterval = setInterval(nextSlide, 5000); }
-function stopSlider() { clearInterval(slideInterval); }
-startSlider();
-document.querySelector('.hero').addEventListener('mouseenter', stopSlider);
-document.querySelector('.hero').addEventListener('mouseleave', startSlider);
 
 /* ===== HEADER SCROLL ===== */
 const header = document.getElementById('header');
@@ -1467,6 +1473,7 @@ document.querySelectorAll('.product-wish').forEach(btn => {
 
 <!-- Firebase SDK (Newsletter Subscribe) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="lang.js?v=20260618"></script>
@@ -1488,6 +1495,7 @@ window.subscribeNewsletter = async function(e, source) {
   btn.textContent = '...';
   try {
     if (typeof firebase === 'undefined') throw new Error('Firebase SDK not loaded');
+
     await firebase.firestore().collection('newsletter-subscribers').add({
       email: email,
       source: source || 'unknown',
