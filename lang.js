@@ -29,14 +29,41 @@
   }
 
   function pickInitialLang() {
+    // 1. 사용자가 명시적으로 토글한 선택 — 항상 최우선
     var saved = null;
     try { saved = localStorage.getItem('archinode-lang'); } catch(e){}
     if (saved && availableLangs.indexOf(saved) !== -1) return saved;
-    // 한국 사이트(archinodekr.com) — 첫 방문 무조건 한국어 디폴트.
-    // EN 토글 1회 누르면 localStorage에 'en' 저장되어 다음부터 영어 유지.
+    // 2. IP 자동 감지 캐시 — 첫 IP 조회 후 캐시된 값
+    var autoLang = null;
+    try { autoLang = localStorage.getItem('archinode-lang-auto'); } catch(e){}
+    if (autoLang && availableLangs.indexOf(autoLang) !== -1) return autoLang;
+    // 3. 디폴트 — 한국 사이트라 ko 우선 (IP 조회 결과 받기 전 임시)
     if (availableLangs.indexOf('ko') !== -1) return 'ko';
     if (availableLangs.indexOf('en') !== -1) return 'en';
     return availableLangs[0] || 'ko';
+  }
+
+  // IP 기반 국가 감지 → 자동 언어 적용
+  // 한국 IP → ko, 외국 IP → en. 사용자가 명시적으로 토글한 선택('archinode-lang')은 항상 우선.
+  function detectCountryAndApply() {
+    try {
+      if (localStorage.getItem('archinode-lang')) return;
+    } catch(e){ return; }
+    if (availableLangs.length < 2) return;
+    fetch('https://api.country.is/', { method: 'GET', cache: 'no-store' })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(data) {
+        if (!data || !data.country) return;
+        var autoLang = (data.country === 'KR') ? 'ko' : 'en';
+        if (availableLangs.indexOf(autoLang) === -1) return;
+        try { localStorage.setItem('archinode-lang-auto', autoLang); } catch(e){}
+        if (currentLang !== autoLang) {
+          currentLang = autoLang;
+          applyLanguage(autoLang);
+          updateLangButton(autoLang);
+        }
+      })
+      .catch(function(){});
   }
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -45,6 +72,7 @@
     initSwitcher();
     applyLanguage(currentLang);
     updateLangButton(currentLang);
+    detectCountryAndApply();
   });
 
   function initSwitcher() {
