@@ -428,6 +428,23 @@ a { text-decoration: none; color: inherit; }
     .fb-compare table { font-size: 0.8rem; }
     .fb-compare th, .fb-compare td { padding: 10px 12px; }
 }
+
+/* Pricing Transparency Box */
+.pricing-transparency { margin-top: 48px; background: #fafafa; border-left: 4px solid #C8A96E; border-radius: 6px; padding: 32px; }
+.pricing-transparency .pt-label { font-size: 0.72rem; font-weight: 700; color: #C8A96E; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+.pricing-transparency h3 { font-size: 1.35rem; font-weight: 800; color: #111; margin-bottom: 24px; line-height: 1.3; }
+.pt-table { display: flex; flex-direction: column; gap: 0; border-top: 1px solid #e0e0e0; }
+.pt-row { display: grid; grid-template-columns: 1fr 1.6fr 1.6fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid #e0e0e0; align-items: center; font-size: 0.92rem; }
+.pt-row.pt-head { font-size: 0.72rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 0; }
+.pt-row > div:first-child { font-weight: 600; color: #444; }
+.pt-row > div:nth-child(2) { color: #777; }
+.pt-row > div.pt-highlight { color: #111; font-weight: 600; }
+.pt-note { font-size: 0.78rem; color: #999; line-height: 1.6; margin-top: 18px; font-style: italic; }
+@media (max-width: 700px) {
+    .pt-row { grid-template-columns: 1fr; gap: 4px; padding: 12px 0; }
+    .pt-row.pt-head { display: none; }
+    .pt-row > div { padding: 2px 0; }
+}
 </style>
 </head>
 <body>
@@ -718,6 +735,35 @@ a { text-decoration: none; color: inherit; }
                 </tr>
             </tbody>
         </table>
+
+        <!-- PRICING TRANSPARENCY BOX -->
+        <div class="pricing-transparency">
+            <div class="pt-label" data-en="Pricing Transparency" data-ko="가격 투명성">Pricing Transparency</div>
+            <h3 data-en="What European design platforms cost — versus ARCHINODE" data-ko="유럽 디자인 플랫폼 비용 — ARCHINODE와 비교">What European design platforms cost — versus ARCHINODE</h3>
+            <div class="pt-table">
+                <div class="pt-row pt-head">
+                    <div data-en="Tier" data-ko="구분">Tier</div>
+                    <div data-en="Established European directories" data-ko="기존 유럽 디렉토리">Established European directories</div>
+                    <div data-en="ARCHINODE" data-ko="ARCHINODE">ARCHINODE</div>
+                </div>
+                <div class="pt-row">
+                    <div data-en="Basic listing" data-ko="기본 입점">Basic listing</div>
+                    <div>EUR 2,000-5,000 / year</div>
+                    <div class="pt-highlight" data-en="Free until Dec 2026, then EUR 10 / month" data-ko="2026년 12월까지 무료, 이후 월 EUR 10">Free until Dec 2026, then EUR 10 / month</div>
+                </div>
+                <div class="pt-row">
+                    <div data-en="Enhanced visibility" data-ko="강화 노출">Enhanced visibility</div>
+                    <div>EUR 5,000-20,000+ / year</div>
+                    <div class="pt-highlight" data-en="Same EUR 10 / month, no upsell" data-ko="동일 월 EUR 10, 추가 요금 없음">Same EUR 10 / month, no upsell</div>
+                </div>
+                <div class="pt-row">
+                    <div data-en="Pricing model" data-ko="가격 모델">Pricing model</div>
+                    <div data-en="Private, negotiated, revenue-based" data-ko="비공개, 협상형, 매출 기반">Private, negotiated, revenue-based</div>
+                    <div class="pt-highlight" data-en="Public, flat, identical for everyone" data-ko="공개, 균일, 모든 브랜드 동일">Public, flat, identical for everyone</div>
+                </div>
+            </div>
+            <p class="pt-note" data-en="Source: pricing benchmarks gathered from Italian industry feedback, June 2026. European directories do not publish rates - figures above are estimated ranges reported by participating brands." data-ko="출처: 2026년 6월 이탈리아 업계 피드백 기반 추정치. 유럽 디렉토리는 요금을 공개하지 않으며, 위 수치는 참여 브랜드 보고 기반 추정 범위입니다.">Source: pricing benchmarks gathered from Italian industry feedback, June 2026. European directories do not publish rates - figures above are estimated ranges reported by participating brands.</p>
+        </div>
     </div>
 </section>
 

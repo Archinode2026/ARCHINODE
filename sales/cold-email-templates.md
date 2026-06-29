@@ -140,8 +140,13 @@ ARCHINODE addresses this without requiring brands to set up a Korean
 office or distributor relationship — we handle localization, specifier 
 outreach, and qualified lead delivery.
 
-Listings are free through December 2026. After that, listings will start 
-at €10/month — but brands who join now retain priority placement.
+A note on pricing transparency: established European design directories 
+typically charge €2,000–€20,000 per year through private, revenue-based 
+negotiations. ARCHINODE is fully transparent — listings are free through 
+December 2026, then €10/month flat for everyone. No negotiation, no 
+hidden tiers, no surprises tied to your revenue.
+
+Brands who join now retain priority placement after the free period ends.
 
 If [Brand Name] is open to exploring this, I'd welcome a 20-minute 
 introduction. I'm also available to meet in person should you visit 
