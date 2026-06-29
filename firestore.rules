@@ -238,6 +238,20 @@ service cloud.firestore {
     }
 
     // ────────────────────────────────────────────────────────────────────
+    // newsletter-subscribers 컬렉션 (Newsletter 구독 — 2026-06-15 신설)
+    // index.html, magazine.html, trend-report.html 폼에서 비로그인 제출.
+    // 필드: email, source ('home'|'magazine'|'trend-report'|기타), createdAt
+    // 한울님이 6/15에 Firebase Console에 직접 게시한 룰을 이 파일에 동기화 (2026-06-23).
+    // ────────────────────────────────────────────────────────────────────
+    match /newsletter-subscribers/{docId} {
+      allow create: if request.resource.data.email is string
+                    && request.resource.data.email.size() > 5
+                    && request.resource.data.source is string
+                    && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
     // 기본 정책: 위에 매칭되지 않는 모든 경로 차단
     // ────────────────────────────────────────────────────────────────────
     match /{document=**} {
