@@ -252,6 +252,20 @@ service cloud.firestore {
     }
 
     // ────────────────────────────────────────────────────────────────────
+    // mail 컬렉션 (어드민 이메일 알림 — Firebase Extensions "Trigger Email" — 2026-06-30 신설)
+    // 사이트 폼이 create만 함. Extension이 문서 감지 후 이메일 발송.
+    // ────────────────────────────────────────────────────────────────────
+    match /mail/{docId} {
+      // 생성: 누구나 (사이트 폼 제출 시). Firebase Extension가 발송용으로 소비.
+      // 필드 최소 검증: to, message.subject, message.text
+      allow create: if request.resource.data.to is string
+                    && request.resource.data.message.subject is string
+                    && request.resource.data.message.subject.size() < 200;
+      // 읽기/수정/삭제: 어드민만
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
     // 기본 정책: 위에 매칭되지 않는 모든 경로 차단
     // ────────────────────────────────────────────────────────────────────
     match /{document=**} {

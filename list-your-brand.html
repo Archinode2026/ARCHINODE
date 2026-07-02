@@ -605,7 +605,31 @@ form.addEventListener('submit', async function(e) {
         // 3. 로그아웃 (관리자 세션 방지)
         await auth.signOut();
 
-        // 4. 성공 화면 표시
+        // 4. 어드민 알림 (Firebase Extensions "Trigger Email")
+        try {
+            await db.collection('mail').add({
+                to: 'office@archinode.org',
+                message: {
+                    subject: '[ARCHINODE] 신규 브랜드 입점 신청 - ' + brandName,
+                    text: [
+                        '새 브랜드가 입점 신청했습니다.',
+                        '',
+                        'Brand: ' + brandName,
+                        'Country: ' + (document.getElementById('country').value.trim() || '-'),
+                        'Category: ' + Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value).join(', '),
+                        'Contact: ' + document.getElementById('contactName').value.trim() + ' (' + document.getElementById('position').value.trim() + ')',
+                        'Email: ' + email,
+                        'Phone: ' + document.getElementById('phone').value.trim(),
+                        'Website: ' + document.getElementById('website').value.trim(),
+                        'Referral: ' + document.getElementById('referral').value,
+                        '',
+                        'Admin dashboard: https://archinodekr.com/admin/dashboard.html'
+                    ].join('\n')
+                }
+            });
+        } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
+
+        // 5. 성공 화면 표시
         document.getElementById('formContainer').style.display = 'none';
         document.getElementById('credUrl').textContent = window.location.origin + '/brand-portal/login.html';
         document.getElementById('credEmail').textContent = email;

@@ -478,6 +478,32 @@ async function submitConsult(e) {
       reviewedAt: null,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    try {
+        await dbRef.collection('mail').add({
+            to: 'office@archinode.org',
+            message: {
+                subject: '[ARCHINODE] 컨설팅 요청 - ' + (data.companyName || 'Unknown'),
+                text: [
+                    '컨설팅 요청이 접수되었습니다.',
+                    '',
+                    'Company: ' + (data.companyName || '-'),
+                    'Contact: ' + (data.contactName || '-'),
+                    'Email: ' + (data.email || '-'),
+                    'Phone: ' + (data.phone || '-'),
+                    'Country: ' + (data.country || '-'),
+                    'Category: ' + (data.category || '-'),
+                    'Timing: ' + (data.timing || '-'),
+                    'Budget: ' + (data.budget || '-'),
+                    '',
+                    'Description:',
+                    (data.description || '-').substring(0, 800),
+                    '',
+                    'Admin inbox: https://archinodekr.com/admin/consultations.html'
+                ].join('\n')
+            }
+        });
+    } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
+
 
     document.getElementById('consultForm').style.display = 'none';
     document.getElementById('formSuccess').style.display = 'block';

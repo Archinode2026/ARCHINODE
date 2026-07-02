@@ -244,6 +244,26 @@
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
+        try {
+          await db.collection('mail').add({
+            to: 'office@archinode.org',
+            message: {
+              subject: '[ARCHINODE] 매거진 원고 - ' + (brandData.brandName || 'Unknown') + ': ' + title,
+              text: [
+                '브랜드가 매거진 원고를 제출했습니다.',
+                '',
+                'Brand: ' + (brandData.brandName || '-'),
+                'Title: ' + title,
+                'Tag: ' + ($('artTag') ? $('artTag').value : '-'),
+                'Lang: ' + ($('artLang') ? $('artLang').value : 'en'),
+                'Blocks: ' + cleanBlocks.length + ' (' + cleanBlocks.filter(function(b){return b.type==='text';}).length + ' text, ' + cleanBlocks.filter(function(b){return b.type==='image';}).length + ' image)',
+                '',
+                'Admin review: https://archinodekr.com/admin/articles.html'
+              ].join('\n')
+            }
+          });
+        } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
+
         msg.textContent = '✓ Submitted for review';
         msg.style.color = '#0a0';
         resetForm();

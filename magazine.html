@@ -1601,6 +1601,23 @@ window.subscribeNewsletter = async function(e, source) {
       source: source || 'unknown',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    try {
+        await firebase.firestore().collection('mail').add({
+            to: 'office@archinode.org',
+            message: {
+                subject: '[ARCHINODE] Newsletter 구독 - ' + email,
+                text: [
+                    '뉴스레터 신규 구독자',
+                    '',
+                    'Email: ' + email,
+                    'Source: ' + (source || 'unknown'),
+                    '',
+                    'Admin inbox: https://archinodekr.com/admin/newsletter-subscribers.html'
+                ].join('\n')
+            }
+        });
+    } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
+
     alert('Thank you for subscribing!');
     form.reset();
   } catch (err) {
