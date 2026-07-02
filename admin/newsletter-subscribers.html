@@ -84,7 +84,7 @@ td a:hover { text-decoration: underline; }
     <a href="trend-submissions.html" class="nav-link"><i class="fas fa-inbox"></i> Trend Submissions</a>
     <a href="articles.html" class="nav-link"><i class="fas fa-newspaper"></i> Articles</a>
     <a href="consultations.html" class="nav-link"><i class="fas fa-comments"></i> Consultations</a>
-    <a href="notify-subscribers.html" class="nav-link active"><i class="fas fa-bell"></i> Newsletter Subscribers</a>
+    <a href="newsletter-subscribers.html" class="nav-link active"><i class="fas fa-bell"></i> Newsletter Subscribers</a>
     <span class="admin-email" id="adminEmail"></span>
     <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
   </div>
@@ -129,7 +129,7 @@ let allDocs = [];
 
 auth.onAuthStateChanged(function(user) {
   if (!user) {
-    location.replace('../auth/login.html?next=/admin/notify-subscribers.html');
+    location.replace('../auth/login.html?next=/admin/newsletter-subscribers.html');
     return;
   }
   if (!isAdmin(user.email)) {
@@ -241,7 +241,7 @@ function downloadCSV() {
   var a = document.createElement('a');
   a.href = url;
   var today = new Date();
-  var fname = 'archinode-notify-subscribers-' + today.getFullYear() + pad(today.getMonth()+1) + pad(today.getDate()) + '.csv';
+  var fname = 'archinode-newsletter-subscribers-' + today.getFullYear() + pad(today.getMonth()+1) + pad(today.getDate()) + '.csv';
   a.download = fname;
   document.body.appendChild(a);
   a.click();
