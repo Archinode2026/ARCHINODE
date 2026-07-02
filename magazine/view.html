@@ -80,7 +80,6 @@
         </div>
       </div>
       <a href="../brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
-      <a href="../trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a>
       <a href="../magazine.html" style="color:var(--black);font-weight:600;" data-en="Magazine" data-ko="매거진">Magazine</a>
       <a href="../trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a>
       <a href="../about.html" data-en="About" data-ko="소개">About</a>
@@ -185,18 +184,48 @@ async function loadArticle() {
     }
 }
 
+function escapeHtml(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderBlocks(blocks) {
+    if (!Array.isArray(blocks) || blocks.length === 0) return '';
+    return blocks.map(function(b) {
+        if (b.type === 'text') {
+            return '<p style="white-space:pre-wrap;">' + escapeHtml(b.content || '') + '</p>';
+        }
+        if (b.type === 'image' && b.url) {
+            var cap = b.caption ? '<figcaption style="font-size:0.82rem;color:var(--gray-500);margin-top:8px;text-align:center;">' + escapeHtml(b.caption) + '</figcaption>' : '';
+            return '<figure style="margin:32px 0;"><img src="' + escapeHtml(b.url) + '" alt="' + escapeHtml(b.alt || '') + '" loading="lazy" style="width:100%;border-radius:4px;">' + cap + '</figure>';
+        }
+        return '';
+    }).join('');
+}
+
 function renderArticle(a) {
     const dateStr = a.publishedAt ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : (a.createdAt ? a.createdAt.toDate().toLocaleDateString('ko-KR') : '');
-    const escapeHtml = (str) => str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    const contentHtml = a.content ? a.content.split('\n').filter(p => p.trim()).map(p => `<p>${escapeHtml(p)}</p>`).join('') : '';
+    // blocks 스키마 우선. 없으면 옛 content/imageUrl 폴백.
+    let bodyHtml = '';
+    if (Array.isArray(a.blocks) && a.blocks.length > 0) {
+        bodyHtml = renderBlocks(a.blocks);
+    } else if (a.content) {
+        bodyHtml = a.content.split('\n').filter(p => p.trim()).map(p => '<p>' + escapeHtml(p) + '</p>').join('');
+    }
+    // 히어로 이미지: coverImage(신) 우선, imageUrl(구) 폴백
+    const heroImg = a.coverImage || a.imageUrl || '';
+    // 브랜드 링크: brandSlug 없으면 링크 대신 텍스트만
+    const brandLinkOpen = a.brandSlug ? '<a href="../brands/view.html?id=' + escapeHtml(a.brandSlug) + '">' : '<span>';
+    const brandLinkClose = a.brandSlug ? '</a>' : '</span>';
 
     contentDiv.innerHTML = `
     <!-- HERO -->
     <div class="ma-hero">
-        ${a.imageUrl ? `<img src="${a.imageUrl}" alt="${a.title}">` : ''}
+        ${heroImg ? `<img src="${escapeHtml(heroImg)}" alt="${escapeHtml(a.title || '')}">` : ''}
         <div class="ma-hero-overlay">
-            <span class="ma-hero-tag">${a.tag || 'Article'}</span>
-            <h1>${a.title}</h1>
+            <span class="ma-hero-tag">${escapeHtml(a.tag || 'Article')}</span>
+            <h1>${escapeHtml(a.title || '')}</h1>
         </div>
     </div>
 
@@ -204,25 +233,25 @@ function renderArticle(a) {
         <div class="ma-breadcrumb">
             <a href="../index.html">Home</a> &nbsp;/&nbsp;
             <a href="../magazine.html">Magazine</a> &nbsp;/&nbsp;
-            <span>${a.title}</span>
+            <span>${escapeHtml(a.title || '')}</span>
         </div>
 
         <div class="ma-meta">
-            <span>${a.tag || ''}</span>
+            <span>${escapeHtml(a.tag || '')}</span>
             <span>·</span>
-            <a href="../brands/view.html?id=${a.brandSlug || ''}">${a.brandName}</a>
+            ${brandLinkOpen}${escapeHtml(a.brandName || '')}${brandLinkClose}
             ${dateStr ? `<span>·</span><span>${dateStr}</span>` : ''}
         </div>
 
         <div class="ma-content">
-            ${contentHtml}
+            ${bodyHtml}
 
             <div class="ma-brand-box">
                 <div class="ma-brand-box-text">
-                    <h4>${a.brandName}</h4>
+                    <h4>${escapeHtml(a.brandName || '')}</h4>
                     <p data-en="View brand page on ARCHINODE" data-ko="ARCHINODE에서 브랜드 페이지 보기">View brand page on ARCHINODE</p>
                 </div>
-                <a href="../brands/view.html?id=${a.brandSlug || ''}" data-en="View Brand" data-ko="브랜드 보기">View Brand →</a>
+                ${a.brandSlug ? `<a href="../brands/view.html?id=${escapeHtml(a.brandSlug)}" data-en="View Brand" data-ko="브랜드 보기">View Brand →</a>` : ''}
             </div>
         </div>
     </div>`;
