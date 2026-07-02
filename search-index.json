@@ -1,778 +1,1378 @@
 [
   {
-    "type": "category",
-    "name_en": "Furniture",
-    "name_ko": "가구",
-    "desc_en": "Sofas, chairs, tables, storage and more",
-    "desc_ko": "소파, 의자, 테이블, 수납 등",
-    "url": "categories/furniture.html"
+    "type": "page",
+    "name_en": "건축을 잇다",
+    "name_ko": "건축을 잇다",
+    "desc_en": "ARCHINODE connects global architecture and design brands with the Korean market. Learn about our mission, services, and vision.",
+    "desc_ko": "ARCHINODE connects global architecture and design brands with the Korean market. Learn about our mission, services, and vision.",
+    "url": "about.html"
+  },
+  {
+    "type": "page",
+    "name_en": "Brands",
+    "name_ko": "브랜드",
+    "desc_en": "ARCHINODE는 유럽 디자인 브랜드와 한국 시장을 매끄럽게 연결합니다. 첫 입점 브랜드를 모집 중입니다.",
+    "desc_ko": "ARCHINODE는 유럽 디자인 브랜드와 한국 시장을 매끄럽게 연결합니다. 첫 입점 브랜드를 모집 중입니다.",
+    "url": "brands.html"
+  },
+  {
+    "type": "page",
+    "name_en": "Contact",
+    "name_ko": "문의",
+    "desc_en": "ARCHINODE에 문의하세요. 브랜드 입점, 딜러십, 파트너십 관련 문의를 환영합니다.",
+    "desc_ko": "ARCHINODE에 문의하세요. 브랜드 입점, 딜러십, 파트너십 관련 문의를 환영합니다.",
+    "url": "contact.html"
+  },
+  {
+    "type": "page",
+    "name_en": "ARCHINODE Digital Products",
+    "name_ko": "ARCHINODE 디지털 상품",
+    "desc_en": "Generic CAD libraries don",
+    "desc_ko": "일반 CAD 라이브러리는 한국 시장을 모릅니다. 일반 브랜드 매거진는 건축·디자인 실무를 모릅니다. ARCHINODE는 그 중간에 있습니다 — 12년의 밀라노–서울 파트너십을 도면·블록·리포트로 정리해 실제 작업을 돕습니다.",
+    "url": "digital-products.html"
+  },
+  {
+    "type": "page",
+    "name_en": "Your Gateway to Korea",
+    "name_ko": "한국의 480억 달러 디자인 시장으로의 관문",
+    "desc_en": "ARCHINODE connects European and global architecture & design brands directly with Korean architects, interior designers, builders, and buyers.",
+    "desc_ko": "ARCHINODE는 유럽 및 글로벌 건축, 디자인 브랜드와 한국의 건축가, 인테리어 디자이너, 시공사, 구매자를 직접 연결합니다.",
+    "url": "for-brands.html"
+  },
+  {
+    "type": "page",
+    "name_en": "ARCHINODE",
+    "name_ko": "ARCHINODE",
+    "desc_en": "ARCHINODE — 유럽 디자인의 감도와 트렌드를 한국 건축가·디자이너에게 전합니다. 밀라노 현지 큐레이션과 한국 시장 최적화로 유럽 브랜드의 한국 진출을 잇는 플랫폼.",
+    "desc_ko": "ARCHINODE — 유럽 디자인의 감도와 트렌드를 한국 건축가·디자이너에게 전합니다. 밀라노 현지 큐레이션과 한국 시장 최적화로 유럽 브랜드의 한국 진출을 잇는 플랫폼.",
+    "url": "index.html"
+  },
+  {
+    "type": "page",
+    "name_en": "List Your Brand",
+    "name_ko": "List Your Brand",
+    "desc_en": "Register your architecture or design brand on ARCHINODE to access the Korean market. Free listing with auto brand page creation.",
+    "desc_ko": "Register your architecture or design brand on ARCHINODE to access the Korean market. Free listing with auto brand page creation.",
+    "url": "list-your-brand.html"
+  },
+  {
+    "type": "page",
+    "name_en": "Magazine",
+    "name_ko": "매거진",
+    "desc_en": "ARCHINODE Magazine — 건축과 디자인 세계의 인사이트, 트렌드, 이야기.",
+    "desc_ko": "ARCHINODE Magazine — 건축과 디자인 세계의 인사이트, 트렌드, 이야기.",
+    "url": "magazine.html"
+  },
+  {
+    "type": "page",
+    "name_en": "Korea, Decoded",
+    "name_ko": "한국 시장을 정확하게 읽어드립니다",
+    "desc_en": "ARCHINODE 컨설팅 — 12년 유럽 디자인 파트너십 기반의 한국 시장 진출 자문. 시장 진출 / 파트너십 매칭 / 자재 소싱.",
+    "desc_ko": "ARCHINODE 컨설팅 — 12년 유럽 디자인 파트너십 기반의 한국 시장 진출 자문. 시장 진출 / 파트너십 매칭 / 자재 소싱.",
+    "url": "request-consultation.html"
+  },
+  {
+    "type": "page",
+    "name_en": "Brand Magazine",
+    "name_ko": "브랜드 매거진",
+    "desc_en": "ARCHINODE Brand Magazine — 유럽 디자인 브랜드가 직접 발행하는 브랜드 매거진. 박람회 인사이트, 신제품, 브랜드 스피릿을 한국 건축가·디자이너에게 전합니다.",
+    "desc_ko": "ARCHINODE Brand Magazine — 유럽 디자인 브랜드가 직접 발행하는 브랜드 매거진. 박람회 인사이트, 신제품, 브랜드 스피릿을 한국 건축가·디자이너에게 전합니다.",
+    "url": "trend-report.html"
   },
   {
     "type": "category",
     "name_en": "Bathroom",
     "name_ko": "욕실",
-    "desc_en": "Bathtubs, showers, vanities, taps",
-    "desc_ko": "욕조, 샤워, 세면대, 수전",
+    "desc_en": "",
+    "desc_ko": "",
     "url": "categories/bathroom.html"
-  },
-  {
-    "type": "category",
-    "name_en": "Outdoor",
-    "name_ko": "아웃도어",
-    "desc_en": "Outdoor furniture, lighting, gardens",
-    "desc_ko": "야외 가구, 조명, 정원",
-    "url": "categories/outdoor.html"
-  },
-  {
-    "type": "category",
-    "name_en": "Lighting",
-    "name_ko": "조명",
-    "desc_en": "Pendant, floor, table, wall lights",
-    "desc_ko": "펜던트, 플로어, 테이블, 벽 조명",
-    "url": "categories/lighting.html"
-  },
-  {
-    "type": "category",
-    "name_en": "Kitchen",
-    "name_ko": "주방",
-    "desc_en": "Kitchen systems, appliances, countertops",
-    "desc_ko": "주방 시스템, 가전, 조리대",
-    "url": "categories/kitchen.html"
-  },
-  {
-    "type": "category",
-    "name_en": "Office",
-    "name_ko": "오피스",
-    "desc_en": "Desks, office chairs, meeting furniture",
-    "desc_ko": "책상, 사무용 의자, 회의 가구",
-    "url": "categories/office.html"
-  },
-  {
-    "type": "category",
-    "name_en": "Finishes",
-    "name_ko": "마감재",
-    "desc_en": "Tiles, wood flooring, stone, panels",
-    "desc_ko": "타일, 원목 마루, 석재, 패널",
-    "url": "categories/finishes.html"
-  },
-  {
-    "type": "category",
-    "name_en": "Wellness",
-    "name_ko": "웰니스",
-    "desc_en": "Saunas, spas, pools, steam rooms",
-    "desc_ko": "사우나, 스파, 수영장, 스팀룸",
-    "url": "categories/wellness.html"
-  },
-  {
-    "type": "category",
-    "name_en": "Decor",
-    "name_ko": "데코",
-    "desc_en": "Rugs, art, vases, textiles",
-    "desc_ko": "러그, 아트, 화병, 텍스타일",
-    "url": "categories/decor.html"
   },
   {
     "type": "category",
     "name_en": "Construction",
     "name_ko": "건축자재",
-    "desc_en": "Windows, doors, facades, insulation",
-    "desc_ko": "창호, 문, 외장재, 단열재",
+    "desc_en": "",
+    "desc_ko": "",
     "url": "categories/construction.html"
+  },
+  {
+    "type": "category",
+    "name_en": "Decor",
+    "name_ko": "데코",
+    "desc_en": "",
+    "desc_ko": "",
+    "url": "categories/decor.html"
+  },
+  {
+    "type": "category",
+    "name_en": "Finishes",
+    "name_ko": "마감재",
+    "desc_en": "",
+    "desc_ko": "",
+    "url": "categories/finishes.html"
+  },
+  {
+    "type": "category",
+    "name_en": "Furniture",
+    "name_ko": "가구",
+    "desc_en": "",
+    "desc_ko": "",
+    "url": "categories/furniture.html"
+  },
+  {
+    "type": "category",
+    "name_en": "Kitchen",
+    "name_ko": "주방",
+    "desc_en": "",
+    "desc_ko": "",
+    "url": "categories/kitchen.html"
+  },
+  {
+    "type": "category",
+    "name_en": "Lighting",
+    "name_ko": "조명",
+    "desc_en": "",
+    "desc_ko": "",
+    "url": "categories/lighting.html"
+  },
+  {
+    "type": "category",
+    "name_en": "Office",
+    "name_ko": "오피스",
+    "desc_en": "",
+    "desc_ko": "",
+    "url": "categories/office.html"
+  },
+  {
+    "type": "category",
+    "name_en": "Outdoor",
+    "name_ko": "아웃도어",
+    "desc_en": "",
+    "desc_ko": "",
+    "url": "categories/outdoor.html"
+  },
+  {
+    "type": "category",
+    "name_en": "Wellness",
+    "name_ko": "웰니스",
+    "desc_en": "",
+    "desc_ko": "",
+    "url": "categories/wellness.html"
   },
   {
     "type": "subcategory",
     "name_en": "Bathroom Accessories",
     "name_ko": "욕실 액세서리",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Towel racks, soap dispensers, and bathroom accessories — the finishing touches of design.",
+    "desc_ko": "Towel racks, soap dispensers, and bathroom accessories — the finishing touches of design.",
     "url": "categories/bathroom/bathroom-accessories.html"
   },
   {
     "type": "subcategory",
     "name_en": "Bathroom Furniture",
     "name_ko": "욕실 가구",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Bathroom cabinets, shelving, and furniture — elegant storage solutions for wet spaces.",
+    "desc_ko": "Bathroom cabinets, shelving, and furniture — elegant storage solutions for wet spaces.",
     "url": "categories/bathroom/bathroom-furniture.html"
   },
   {
     "type": "subcategory",
     "name_en": "Bathroom Taps",
     "name_ko": "수전",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Precision-crafted bathroom taps and faucets — blending technology with timeless design.",
+    "desc_ko": "Precision-crafted bathroom taps and faucets — blending technology with timeless design.",
     "url": "categories/bathroom/bathroom-taps.html"
   },
   {
     "type": "subcategory",
     "name_en": "Bathtubs",
     "name_ko": "욕조",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Freestanding and built-in bathtubs — transforming bathrooms into personal sanctuaries.",
+    "desc_ko": "Freestanding and built-in bathtubs — transforming bathrooms into personal sanctuaries.",
     "url": "categories/bathroom/bathtubs.html"
   },
   {
     "type": "subcategory",
     "name_en": "Mirrors",
     "name_ko": "거울",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Bathroom mirrors with integrated lighting and smart features — functional art for the bathroom.",
+    "desc_ko": "Bathroom mirrors with integrated lighting and smart features — functional art for the bathroom.",
     "url": "categories/bathroom/mirrors.html"
   },
   {
     "type": "subcategory",
     "name_en": "Showers",
     "name_ko": "샤워",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Designer shower systems and enclosures — rain showers, walk-in solutions, and luxury fixtures.",
+    "desc_ko": "Designer shower systems and enclosures — rain showers, walk-in solutions, and luxury fixtures.",
     "url": "categories/bathroom/showers.html"
   },
   {
     "type": "subcategory",
     "name_en": "Steam Rooms",
     "name_ko": "스팀룸",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Luxury steam room solutions for modern wellness and spa spaces.",
+    "desc_ko": "Luxury steam room solutions for modern wellness and spa spaces.",
     "url": "categories/bathroom/steam-rooms.html"
   },
   {
     "type": "subcategory",
     "name_en": "Toilets & Bidets",
     "name_ko": "변기 & 비데",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Modern toilets and bidets — intelligent hygiene solutions with sleek contemporary design.",
+    "desc_ko": "Modern toilets and bidets — intelligent hygiene solutions with sleek contemporary design.",
     "url": "categories/bathroom/toilets-bidets.html"
   },
   {
     "type": "subcategory",
     "name_en": "Washbasins & Vanities",
     "name_ko": "세면대 & 세면장",
-    "parent_en": "Bathroom",
-    "parent_ko": "욕실",
+    "desc_en": "Premium washbasins and vanity units — from minimalist designs to sculptural statement pieces.",
+    "desc_ko": "Premium washbasins and vanity units — from minimalist designs to sculptural statement pieces.",
     "url": "categories/bathroom/washbasins-vanities.html"
   },
   {
     "type": "subcategory",
     "name_en": "Building Automation",
     "name_ko": "빌딩 자동화",
-    "parent_en": "Construction",
-    "parent_ko": "건축자재",
+    "desc_en": "Smart building systems — HVAC control, motorized shading, security, and home automation.",
+    "desc_ko": "Smart building systems — HVAC control, motorized shading, security, and home automation.",
     "url": "categories/construction/building-automation.html"
   },
   {
     "type": "subcategory",
     "name_en": "Facades & Cladding",
     "name_ko": "파사드 & 클래딩",
-    "parent_en": "Construction",
-    "parent_ko": "건축자재",
+    "desc_en": "Ventilated facades, curtain walls, and cladding systems — the skin of modern architecture.",
+    "desc_ko": "Ventilated facades, curtain walls, and cladding systems — the skin of modern architecture.",
     "url": "categories/construction/facades-cladding.html"
   },
   {
     "type": "subcategory",
     "name_en": "Insulation",
     "name_ko": "단열재",
-    "parent_en": "Construction",
-    "parent_ko": "건축자재",
+    "desc_en": "Thermal and acoustic insulation — energy efficiency and comfort for sustainable buildings.",
+    "desc_ko": "Thermal and acoustic insulation — energy efficiency and comfort for sustainable buildings.",
     "url": "categories/construction/insulation.html"
   },
   {
     "type": "subcategory",
     "name_en": "Roofing Systems",
     "name_ko": "지붕 시스템",
-    "parent_en": "Construction",
-    "parent_ko": "건축자재",
+    "desc_en": "Roofing materials and systems — flat roofs, pitched roofs, and green roof solutions.",
+    "desc_ko": "Roofing materials and systems — flat roofs, pitched roofs, and green roof solutions.",
     "url": "categories/construction/roofing-systems.html"
   },
   {
     "type": "subcategory",
     "name_en": "Stairs & Railings",
     "name_ko": "계단 & 난간",
-    "parent_en": "Construction",
-    "parent_ko": "건축자재",
+    "desc_en": "Designer staircases and railing systems — sculptural elements connecting architectural levels.",
+    "desc_ko": "Designer staircases and railing systems — sculptural elements connecting architectural levels.",
     "url": "categories/construction/stairs-railings.html"
   },
   {
     "type": "subcategory",
     "name_en": "Windows & Doors",
     "name_ko": "창호 & 도어",
-    "parent_en": "Construction",
-    "parent_ko": "건축자재",
+    "desc_en": "High-performance windows and architectural doors — thermal efficiency and design precision.",
+    "desc_ko": "High-performance windows and architectural doors — thermal efficiency and design precision.",
     "url": "categories/construction/windows-doors.html"
   },
   {
     "type": "subcategory",
     "name_en": "Art & Wall Decor",
     "name_ko": "아트 & 월 데코",
-    "parent_en": "Decor",
-    "parent_ko": "데코",
+    "desc_en": "Wall art, prints, and decorative wall installations — curated pieces for distinctive interiors.",
+    "desc_ko": "Wall art, prints, and decorative wall installations — curated pieces for distinctive interiors.",
     "url": "categories/decor/art-wall-decor.html"
   },
   {
     "type": "subcategory",
     "name_en": "Clocks & Objects",
     "name_ko": "시계 & 오브제",
-    "parent_en": "Decor",
-    "parent_ko": "데코",
+    "desc_en": "Designer clocks, bookends, and decorative objects — small details with big impact.",
+    "desc_ko": "Designer clocks, bookends, and decorative objects — small details with big impact.",
     "url": "categories/decor/clocks-objects.html"
   },
   {
     "type": "subcategory",
     "name_en": "Mirrors & Frames",
     "name_ko": "거울 & 프레임",
-    "parent_en": "Decor",
-    "parent_ko": "데코",
+    "desc_en": "Decorative mirrors and picture frames — reflections and displays that elevate walls.",
+    "desc_ko": "Decorative mirrors and picture frames — reflections and displays that elevate walls.",
     "url": "categories/decor/mirrors-frames.html"
   },
   {
     "type": "subcategory",
     "name_en": "Rugs & Carpets",
     "name_ko": "러그 & 카펫",
-    "parent_en": "Decor",
-    "parent_ko": "데코",
+    "desc_en": "Handwoven rugs, designer carpets, and luxury floor coverings — texture and warmth for every room.",
+    "desc_ko": "Handwoven rugs, designer carpets, and luxury floor coverings — texture and warmth for every room.",
     "url": "categories/decor/rugs-carpets.html"
   },
   {
     "type": "subcategory",
     "name_en": "Textiles & Cushions",
     "name_ko": "텍스타일 & 쿠션",
-    "parent_en": "Decor",
-    "parent_ko": "데코",
+    "desc_en": "Luxury fabrics, cushions, throws, and curtains — soft furnishings that complete interiors.",
+    "desc_ko": "Luxury fabrics, cushions, throws, and curtains — soft furnishings that complete interiors.",
     "url": "categories/decor/textiles-cushions.html"
   },
   {
     "type": "subcategory",
     "name_en": "Vases & Planters",
     "name_ko": "화병 & 플랜터",
-    "parent_en": "Decor",
-    "parent_ko": "데코",
+    "desc_en": "Decorative vases and indoor planters — ceramic, glass, and metal pieces for greenery and flowers.",
+    "desc_ko": "Decorative vases and indoor planters — ceramic, glass, and metal pieces for greenery and flowers.",
     "url": "categories/decor/vases-planters.html"
   },
   {
     "type": "subcategory",
     "name_en": "Decorative Panels",
     "name_ko": "장식 패널",
-    "parent_en": "Finishes",
-    "parent_ko": "마감재",
+    "desc_en": "3D wall panels, acoustic tiles, and decorative surfaces — adding dimension and texture.",
+    "desc_ko": "3D wall panels, acoustic tiles, and decorative surfaces — adding dimension and texture.",
     "url": "categories/finishes/decorative-panels.html"
   },
   {
     "type": "subcategory",
     "name_en": "Metal Finishes",
     "name_ko": "메탈 피니시",
-    "parent_en": "Finishes",
-    "parent_ko": "마감재",
+    "desc_en": "Metal cladding, mesh, and decorative metal finishes — industrial elegance for modern spaces.",
+    "desc_ko": "Metal cladding, mesh, and decorative metal finishes — industrial elegance for modern spaces.",
     "url": "categories/finishes/metal-finishes.html"
   },
   {
     "type": "subcategory",
     "name_en": "Natural Stone",
     "name_ko": "천연석",
-    "parent_en": "Finishes",
-    "parent_ko": "마감재",
+    "desc_en": "Marble, granite, travertine, and natural stone — timeless materials for floors and walls.",
+    "desc_ko": "Marble, granite, travertine, and natural stone — timeless materials for floors and walls.",
     "url": "categories/finishes/natural-stone.html"
   },
   {
     "type": "subcategory",
     "name_en": "Tiles & Ceramics",
     "name_ko": "타일 & 세라믹",
-    "parent_en": "Finishes",
-    "parent_ko": "마감재",
+    "desc_en": "Premium ceramic and porcelain tiles — from large-format slabs to artisanal mosaics.",
+    "desc_ko": "Premium ceramic and porcelain tiles — from large-format slabs to artisanal mosaics.",
     "url": "categories/finishes/tiles-ceramics.html"
   },
   {
     "type": "subcategory",
     "name_en": "Wallcoverings",
     "name_ko": "벽면 마감",
-    "parent_en": "Finishes",
-    "parent_ko": "마감재",
+    "desc_en": "Wallpapers, fabric wallcoverings, and decorative wall panels — texture and pattern for interiors.",
+    "desc_ko": "Wallpapers, fabric wallcoverings, and decorative wall panels — texture and pattern for interiors.",
     "url": "categories/finishes/wallcoverings.html"
   },
   {
     "type": "subcategory",
     "name_en": "Wood Flooring",
     "name_ko": "목재 바닥",
-    "parent_en": "Finishes",
-    "parent_ko": "마감재",
+    "desc_en": "Engineered and solid wood flooring — oak, walnut, and exotic species with premium finishes.",
+    "desc_ko": "Engineered and solid wood flooring — oak, walnut, and exotic species with premium finishes.",
     "url": "categories/finishes/wood-flooring.html"
   },
   {
     "type": "subcategory",
     "name_en": "Beds & Bedroom",
     "name_ko": "침대 & 침실",
-    "parent_en": "Furniture",
-    "parent_ko": "가구",
+    "desc_en": "Luxury beds, headboards, and bedroom furniture — creating perfect rest spaces.",
+    "desc_ko": "Luxury beds, headboards, and bedroom furniture — creating perfect rest spaces.",
     "url": "categories/furniture/beds-bedroom.html"
   },
   {
     "type": "subcategory",
     "name_en": "Cabinets & Sideboards",
     "name_ko": "캐비닛 & 사이드보드",
-    "parent_en": "Furniture",
-    "parent_ko": "가구",
+    "desc_en": "Elegant cabinets and sideboards — statement storage pieces that enhance any interior.",
+    "desc_ko": "Elegant cabinets and sideboards — statement storage pieces that enhance any interior.",
     "url": "categories/furniture/cabinets-sideboards.html"
   },
   {
     "type": "subcategory",
     "name_en": "Chairs & Stools",
     "name_ko": "의자 & 스툴",
-    "parent_en": "Furniture",
-    "parent_ko": "가구",
+    "desc_en": "From iconic designer chairs to versatile stools — find seating that defines spaces.",
+    "desc_ko": "From iconic designer chairs to versatile stools — find seating that defines spaces.",
     "url": "categories/furniture/chairs-stools.html"
   },
   {
     "type": "subcategory",
     "name_en": "Kids Furniture",
     "name_ko": "키즈 가구",
-    "parent_en": "Furniture",
-    "parent_ko": "가구",
+    "desc_en": "Playful yet sophisticated furniture for children — designed for safety, creativity, and growth.",
+    "desc_ko": "Playful yet sophisticated furniture for children — designed for safety, creativity, and growth.",
     "url": "categories/furniture/kids-furniture.html"
   },
   {
     "type": "subcategory",
     "name_en": "Modular Systems",
     "name_ko": "모듈러 시스템",
-    "parent_en": "Furniture",
-    "parent_ko": "가구",
+    "desc_en": "Versatile modular furniture systems — customize layouts and configurations for any space.",
+    "desc_ko": "Versatile modular furniture systems — customize layouts and configurations for any space.",
     "url": "categories/furniture/modular-systems.html"
   },
   {
     "type": "subcategory",
     "name_en": "Sofas & Armchairs",
     "name_ko": "소파 & 안락의자",
-    "parent_en": "Furniture",
-    "parent_ko": "가구",
+    "desc_en": "Explore premium sofas and armchairs from world-renowned furniture brands — comfort meets design excellence.",
+    "desc_ko": "Explore premium sofas and armchairs from world-renowned furniture brands — comfort meets design excellence.",
     "url": "categories/furniture/sofas-armchairs.html"
   },
   {
     "type": "subcategory",
     "name_en": "Storage & Shelving",
     "name_ko": "수납 & 선반",
-    "parent_en": "Furniture",
-    "parent_ko": "가구",
+    "desc_en": "Functional and beautiful storage solutions — bookcases, shelving systems, and modular storage.",
+    "desc_ko": "Functional and beautiful storage solutions — bookcases, shelving systems, and modular storage.",
     "url": "categories/furniture/storage-shelving.html"
   },
   {
     "type": "subcategory",
     "name_en": "Tables & Desks",
     "name_ko": "테이블 & 데스크",
-    "parent_en": "Furniture",
-    "parent_ko": "가구",
+    "desc_en": "Discover designer tables and desks — dining tables, coffee tables, side tables, and work desks from leading brands.",
+    "desc_ko": "Discover designer tables and desks — dining tables, coffee tables, side tables, and work desks from leading brands.",
     "url": "categories/furniture/tables-desks.html"
   },
   {
     "type": "subcategory",
     "name_en": "Countertops",
     "name_ko": "상판",
-    "parent_en": "Kitchen",
-    "parent_ko": "주방",
+    "desc_en": "Kitchen countertop surfaces — natural stone, engineered quartz, ceramics, and solid surfaces.",
+    "desc_ko": "Kitchen countertop surfaces — natural stone, engineered quartz, ceramics, and solid surfaces.",
     "url": "categories/kitchen/countertops.html"
   },
   {
     "type": "subcategory",
     "name_en": "Kitchen Appliances",
     "name_ko": "주방 가전",
-    "parent_en": "Kitchen",
-    "parent_ko": "주방",
+    "desc_en": "Premium kitchen appliances — ovens, cooktops, refrigerators, and dishwashers from top brands.",
+    "desc_ko": "Premium kitchen appliances — ovens, cooktops, refrigerators, and dishwashers from top brands.",
     "url": "categories/kitchen/kitchen-appliances.html"
   },
   {
     "type": "subcategory",
     "name_en": "Kitchen Storage",
     "name_ko": "주방 수납",
-    "parent_en": "Kitchen",
-    "parent_ko": "주방",
+    "desc_en": "Kitchen storage systems — pull-outs, pantry solutions, and organizational accessories.",
+    "desc_ko": "Kitchen storage systems — pull-outs, pantry solutions, and organizational accessories.",
     "url": "categories/kitchen/kitchen-storage.html"
   },
   {
     "type": "subcategory",
     "name_en": "Kitchen Systems",
     "name_ko": "주방 시스템",
-    "parent_en": "Kitchen",
-    "parent_ko": "주방",
+    "desc_en": "Complete kitchen systems — modular designs from leading Italian and European manufacturers.",
+    "desc_ko": "Complete kitchen systems — modular designs from leading Italian and European manufacturers.",
     "url": "categories/kitchen/kitchen-systems.html"
   },
   {
     "type": "subcategory",
     "name_en": "Sinks & Taps",
     "name_ko": "싱크 & 수전",
-    "parent_en": "Kitchen",
-    "parent_ko": "주방",
+    "desc_en": "Kitchen sinks and taps — functional design meets precision engineering.",
+    "desc_ko": "Kitchen sinks and taps — functional design meets precision engineering.",
     "url": "categories/kitchen/sinks-taps.html"
   },
   {
     "type": "subcategory",
     "name_en": "Tableware",
     "name_ko": "테이블웨어",
-    "parent_en": "Kitchen",
-    "parent_ko": "주방",
+    "desc_en": "Designer tableware — plates, glasses, cutlery, and serving pieces for elevated dining.",
+    "desc_ko": "Designer tableware — plates, glasses, cutlery, and serving pieces for elevated dining.",
     "url": "categories/kitchen/tableware.html"
   },
   {
     "type": "subcategory",
     "name_en": "Architectural Lighting",
     "name_ko": "건축 조명",
-    "parent_en": "Lighting",
-    "parent_ko": "조명",
+    "desc_en": "Recessed, track, and linear lighting systems — precision illumination for architecture.",
+    "desc_ko": "Recessed, track, and linear lighting systems — precision illumination for architecture.",
     "url": "categories/lighting/architectural-lighting.html"
   },
   {
     "type": "subcategory",
     "name_en": "Ceiling Lights",
     "name_ko": "천장 조명",
-    "parent_en": "Lighting",
-    "parent_ko": "조명",
+    "desc_en": "Flush and semi-flush ceiling lights — clean overhead illumination for modern interiors.",
+    "desc_ko": "Flush and semi-flush ceiling lights — clean overhead illumination for modern interiors.",
     "url": "categories/lighting/ceiling-lights.html"
   },
   {
     "type": "subcategory",
     "name_en": "Floor Lamps",
     "name_ko": "플로어 램프",
-    "parent_en": "Lighting",
-    "parent_ko": "조명",
+    "desc_en": "Designer floor lamps — sculptural lighting that transforms living and working spaces.",
+    "desc_ko": "Designer floor lamps — sculptural lighting that transforms living and working spaces.",
     "url": "categories/lighting/floor-lamps.html"
   },
   {
     "type": "subcategory",
     "name_en": "Outdoor Lighting",
     "name_ko": "아웃도어 조명",
-    "parent_en": "Lighting",
-    "parent_ko": "조명",
+    "desc_en": "Weather-resistant outdoor luminaires — landscape, pathway, and facade lighting.",
+    "desc_ko": "Weather-resistant outdoor luminaires — landscape, pathway, and facade lighting.",
     "url": "categories/lighting/outdoor-lighting.html"
   },
   {
     "type": "subcategory",
     "name_en": "Pendant Lights",
     "name_ko": "펜던트 조명",
-    "parent_en": "Lighting",
-    "parent_ko": "조명",
+    "desc_en": "Statement pendant lights — suspended fixtures that define and illuminate spaces.",
+    "desc_ko": "Statement pendant lights — suspended fixtures that define and illuminate spaces.",
     "url": "categories/lighting/pendant-lights.html"
   },
   {
     "type": "subcategory",
     "name_en": "Smart Lighting",
     "name_ko": "스마트 조명",
-    "parent_en": "Lighting",
-    "parent_ko": "조명",
+    "desc_en": "Connected and intelligent lighting systems — tunable, automated, and app-controlled.",
+    "desc_ko": "Connected and intelligent lighting systems — tunable, automated, and app-controlled.",
     "url": "categories/lighting/smart-lighting.html"
   },
   {
     "type": "subcategory",
     "name_en": "Table Lamps",
     "name_ko": "테이블 램프",
-    "parent_en": "Lighting",
-    "parent_ko": "조명",
+    "desc_en": "Iconic table lamps — from classic desk lamps to contemporary accent lighting.",
+    "desc_ko": "Iconic table lamps — from classic desk lamps to contemporary accent lighting.",
     "url": "categories/lighting/table-lamps.html"
   },
   {
     "type": "subcategory",
     "name_en": "Wall Lights",
     "name_ko": "벽등",
-    "parent_en": "Lighting",
-    "parent_ko": "조명",
+    "desc_en": "Wall-mounted lighting fixtures — sconces and wall lamps that add depth and character.",
+    "desc_ko": "Wall-mounted lighting fixtures — sconces and wall lamps that add depth and character.",
     "url": "categories/lighting/wall-lights.html"
   },
   {
     "type": "subcategory",
     "name_en": "Acoustic Solutions",
     "name_ko": "방음 솔루션",
-    "parent_en": "Office",
-    "parent_ko": "오피스",
+    "desc_en": "Acoustic panels, phone booths, and sound management systems for open offices.",
+    "desc_ko": "Acoustic panels, phone booths, and sound management systems for open offices.",
     "url": "categories/office/acoustic-solutions.html"
   },
   {
     "type": "subcategory",
     "name_en": "Desks & Workstations",
     "name_ko": "데스크 & 워크스테이션",
-    "parent_en": "Office",
-    "parent_ko": "오피스",
+    "desc_en": "Office desks, sit-stand workstations, and executive desks — built for productivity.",
+    "desc_ko": "Office desks, sit-stand workstations, and executive desks — built for productivity.",
     "url": "categories/office/desks-workstations.html"
   },
   {
     "type": "subcategory",
     "name_en": "Lounge & Reception",
     "name_ko": "라운지 & 리셉션",
-    "parent_en": "Office",
-    "parent_ko": "오피스",
+    "desc_en": "Lounge chairs, sofas, and reception furniture — creating welcoming workplace spaces.",
+    "desc_ko": "Lounge chairs, sofas, and reception furniture — creating welcoming workplace spaces.",
     "url": "categories/office/lounge-reception.html"
   },
   {
     "type": "subcategory",
     "name_en": "Meeting & Conference",
     "name_ko": "회의 & 컨퍼런스",
-    "parent_en": "Office",
-    "parent_ko": "오피스",
+    "desc_en": "Conference tables, meeting room furniture, and collaborative workspace solutions.",
+    "desc_ko": "Conference tables, meeting room furniture, and collaborative workspace solutions.",
     "url": "categories/office/meeting-conference.html"
   },
   {
     "type": "subcategory",
     "name_en": "Office Chairs",
     "name_ko": "오피스 체어",
-    "parent_en": "Office",
-    "parent_ko": "오피스",
+    "desc_en": "Ergonomic and designer office chairs — combining comfort, health, and aesthetics.",
+    "desc_ko": "Ergonomic and designer office chairs — combining comfort, health, and aesthetics.",
     "url": "categories/office/office-chairs.html"
   },
   {
     "type": "subcategory",
     "name_en": "Office Storage",
     "name_ko": "오피스 수납",
-    "parent_en": "Office",
-    "parent_ko": "오피스",
+    "desc_en": "Office filing, lockers, and storage systems — organized workspaces, streamlined workflows.",
+    "desc_ko": "Office filing, lockers, and storage systems — organized workspaces, streamlined workflows.",
     "url": "categories/office/office-storage.html"
   },
   {
     "type": "subcategory",
     "name_en": "Fire Pits & Heaters",
     "name_ko": "파이어피트 & 히터",
-    "parent_en": "Outdoor",
-    "parent_ko": "아웃도어",
+    "desc_en": "Outdoor fire pits and heating solutions — warmth and ambiance for outdoor gatherings.",
+    "desc_ko": "Outdoor fire pits and heating solutions — warmth and ambiance for outdoor gatherings.",
     "url": "categories/outdoor/fire-pits-heaters.html"
   },
   {
     "type": "subcategory",
     "name_en": "Garden Decor",
     "name_ko": "가든 데코",
-    "parent_en": "Outdoor",
-    "parent_ko": "아웃도어",
+    "desc_en": "Decorative elements for outdoor spaces — sculptures, water features, and garden art.",
+    "desc_ko": "Decorative elements for outdoor spaces — sculptures, water features, and garden art.",
     "url": "categories/outdoor/garden-decor.html"
   },
   {
     "type": "subcategory",
     "name_en": "Outdoor Furniture",
     "name_ko": "아웃도어 가구",
-    "parent_en": "Outdoor",
-    "parent_ko": "아웃도어",
+    "desc_en": "Weather-resistant outdoor furniture — sofas, dining sets, and loungers for exterior living.",
+    "desc_ko": "Weather-resistant outdoor furniture — sofas, dining sets, and loungers for exterior living.",
     "url": "categories/outdoor/outdoor-furniture.html"
   },
   {
     "type": "subcategory",
     "name_en": "Outdoor Kitchens",
     "name_ko": "아웃도어 주방",
-    "parent_en": "Outdoor",
-    "parent_ko": "아웃도어",
+    "desc_en": "Outdoor kitchen systems and BBQ islands — professional cooking in open-air settings.",
+    "desc_ko": "Outdoor kitchen systems and BBQ islands — professional cooking in open-air settings.",
     "url": "categories/outdoor/outdoor-kitchens.html"
   },
   {
     "type": "subcategory",
     "name_en": "Outdoor Lighting",
     "name_ko": "아웃도어 조명",
-    "parent_en": "Outdoor",
-    "parent_ko": "아웃도어",
+    "desc_en": "Landscape and architectural outdoor lighting — illuminating gardens, terraces, and facades.",
+    "desc_ko": "Landscape and architectural outdoor lighting — illuminating gardens, terraces, and facades.",
     "url": "categories/outdoor/outdoor-lighting.html"
   },
   {
     "type": "subcategory",
     "name_en": "Pergolas & Canopies",
     "name_ko": "퍼골라 & 캐노피",
-    "parent_en": "Outdoor",
-    "parent_ko": "아웃도어",
+    "desc_en": "Architectural pergolas and shade systems — extending living spaces outdoors.",
+    "desc_ko": "Architectural pergolas and shade systems — extending living spaces outdoors.",
     "url": "categories/outdoor/pergolas-canopies.html"
   },
   {
     "type": "subcategory",
     "name_en": "Planters & Pots",
     "name_ko": "화분 & 플랜터",
-    "parent_en": "Outdoor",
-    "parent_ko": "아웃도어",
+    "desc_en": "Architectural planters and designer pots — showcasing greenery with style.",
+    "desc_ko": "Architectural planters and designer pots — showcasing greenery with style.",
     "url": "categories/outdoor/planters-pots.html"
   },
   {
     "type": "subcategory",
     "name_en": "Swimming Pools",
     "name_ko": "수영장",
-    "parent_en": "Outdoor",
-    "parent_ko": "아웃도어",
+    "desc_en": "Luxury swimming pools and aquatic features — design, engineering, and water art.",
+    "desc_ko": "Luxury swimming pools and aquatic features — design, engineering, and water art.",
     "url": "categories/outdoor/swimming-pools.html"
   },
   {
     "type": "subcategory",
     "name_en": "Fitness Equipment",
     "name_ko": "피트니스 장비",
-    "parent_en": "Wellness",
-    "parent_ko": "웰니스",
+    "desc_en": "Designer fitness equipment — home gyms, cycling, and training machines with premium aesthetics.",
+    "desc_ko": "Designer fitness equipment — home gyms, cycling, and training machines with premium aesthetics.",
     "url": "categories/wellness/fitness-equipment.html"
   },
   {
     "type": "subcategory",
     "name_en": "Pools & Whirlpools",
     "name_ko": "수영장 & 월풀",
-    "parent_en": "Wellness",
-    "parent_ko": "웰니스",
+    "desc_en": "Indoor pools, swim spas, and whirlpool systems — aquatic wellness at home.",
+    "desc_ko": "Indoor pools, swim spas, and whirlpool systems — aquatic wellness at home.",
     "url": "categories/wellness/pools-whirlpools.html"
   },
   {
     "type": "subcategory",
     "name_en": "Saunas",
     "name_ko": "사우나",
-    "parent_en": "Wellness",
-    "parent_ko": "웰니스",
+    "desc_en": "Indoor and outdoor saunas — Finnish, infrared, and designer wellness cabins.",
+    "desc_ko": "Indoor and outdoor saunas — Finnish, infrared, and designer wellness cabins.",
     "url": "categories/wellness/saunas.html"
   },
   {
     "type": "subcategory",
     "name_en": "Spa & Hot Tubs",
     "name_ko": "스파 & 자쿠지",
-    "parent_en": "Wellness",
-    "parent_ko": "웰니스",
+    "desc_en": "Luxury spa baths and hot tubs — hydrotherapy and relaxation for home and hospitality.",
+    "desc_ko": "Luxury spa baths and hot tubs — hydrotherapy and relaxation for home and hospitality.",
     "url": "categories/wellness/spa-hot-tubs.html"
   },
   {
     "type": "subcategory",
     "name_en": "Steam Rooms",
     "name_ko": "스팀룸",
-    "parent_en": "Wellness",
-    "parent_ko": "웰니스",
+    "desc_en": "Designer steam rooms and hammam systems — luxury wellness with advanced steam technology.",
+    "desc_ko": "Designer steam rooms and hammam systems — luxury wellness with advanced steam technology.",
     "url": "categories/wellness/steam-rooms.html"
   },
   {
     "type": "subcategory",
     "name_en": "Wellness Showers",
     "name_ko": "웰니스 샤워",
-    "parent_en": "Wellness",
-    "parent_ko": "웰니스",
+    "desc_en": "Experience showers with chromotherapy, aromatherapy, and multi-sensory water features.",
+    "desc_ko": "Experience showers with chromotherapy, aromatherapy, and multi-sensory water features.",
     "url": "categories/wellness/wellness-showers.html"
   },
   {
-    "type": "magazine",
-    "name_en": "Brand Spotlight: Flos — Illuminating Korean Architecture",
-    "name_ko": "이탈리아 조명 브랜드 Flos의 한국 시장 진출 스토리와 인기 제품",
-    "url": "magazine/brand-spotlight-flos-korea.html"
-  },
-  {
-    "type": "magazine",
-    "name_en": "A Complete Guide to Choosing Flooring for Korean Homes",
-    "name_ko": "한국 주거 환경에 맞는 바닥재 선택 가이드 — 온돌 호환성부터 관리까지",
-    "url": "magazine/guide-choosing-flooring-korean-homes.html"
-  },
-  {
-    "type": "magazine",
-    "name_en": "Italian Design Meets Korea: A Cross-Cultural Dialogue",
-    "name_ko": "이탈리아 디자인이 한국 시장에서 어떻게 재해석되는지에 대한 인터뷰",
-    "url": "magazine/interview-italian-design-meets-korea.html"
-  },
-  {
-    "type": "magazine",
-    "name_en": "2026 Korean Bathroom Design Trends",
-    "name_ko": "한국 욕실 디자인의 최신 트렌드 — 미니멀리즘, 자연 소재, 스마트 기능의 융합",
-    "url": "magazine/korean-bathroom-design-trends-2026.html"
-  },
-  {
-    "type": "magazine",
-    "name_en": "Korean Architecture & Design Market Report 2026",
-    "name_ko": "2026 한국 건축·디자인 시장 현황 및 전망 — 시장 규모, 트렌드, 기회",
-    "url": "magazine/korean-design-market-report-2026.html"
-  },
-  {
-    "type": "magazine",
-    "name_en": "Milan Design Week 2026: What Korean Market Should Watch",
-    "name_ko": "밀라노 디자인 위크 2026 프리뷰 — 한국 시장에 영향을 줄 주요 전시와 브랜드",
-    "url": "magazine/milan-design-week-2026-preview.html"
-  },
-  {
-    "type": "magazine",
-    "name_en": "Seoul Hannam-dong: Where Global Design Brands Come Together",
-    "name_ko": "서울 한남동 고급 주거 프로젝트에 적용된 글로벌 디자인 브랜드 사례",
-    "url": "magazine/seoul-hannam-dong-luxury-residence.html"
-  },
-  {
-    "type": "magazine",
-    "name_en": "Smart Home Integration in Korean Apartments: A Practical Guide",
-    "name_ko": "한국 아파트에 스마트홈 시스템을 도입하는 실용적 가이드",
-    "url": "magazine/smart-home-integration-korean-apartments.html"
-  },
-  {
-    "type": "page",
-    "name_en": "Home",
-    "name_ko": "홈",
-    "url": "index.html"
-  },
-  {
-    "type": "page",
-    "name_en": "All Categories",
-    "name_ko": "전체 카테고리",
-    "url": "categories.html"
-  },
-  {
-    "type": "page",
-    "name_en": "Brands Directory",
-    "name_ko": "브랜드 디렉토리",
-    "url": "brands.html"
-  },
-  {
-    "type": "page",
-    "name_en": "Magazine",
-    "name_ko": "매거진",
-    "url": "magazine.html"
-  },
-  {
-    "type": "page",
-    "name_en": "About ARCHINODE",
-    "name_ko": "ARCHINODE 소개",
-    "url": "about.html"
-  },
-  {
-    "type": "page",
-    "name_en": "Contact",
-    "name_ko": "문의",
-    "url": "contact.html"
-  },
-  {
-    "type": "page",
-    "name_en": "List Your Brand",
-    "name_ko": "브랜드 입점",
-    "url": "list-your-brand.html"
-  },
-  {
-    "type": "page",
-    "name_en": "For Brands",
-    "name_ko": "브랜드를 위해",
-    "url": "for-brands.html"
-  },
-  {
-    "type": "page",
-    "name_en": "Trend Report",
-    "name_ko": "트렌드 리포트",
-    "desc_en": "European design brands speak directly. Insights from Milano fairs and brand spirit.",
-    "desc_ko": "유럽 디자인 브랜드가 직접 전합니다. 밀라노 박람회 인사이트, 브랜드 스피릿.",
-    "url": "trend-report.html"
+    "type": "article",
+    "name_en": "AGM&apos;s Thermroof — Korea&apos;s New Roofing Bet, and Whether It Will Hold Up",
+    "name_ko": "에이지엠 써모루프 — 한국 지붕재의 신소재 도전, 정말로 답이 될까",
+    "desc_en": "At 2026 Korea Build Week, AGM unveiled Thermroof — an aluminum-galvalume hybrid sheet with fluoropolymer coating, sold as the lightweight, high-insulation roof Korean single-family and rural buildings have been waiting for. The pitch is good. The Korean roof market is, on closer reading, harder than the pitch admits.",
+    "desc_ko": "2026 코리아빌드위크에서 에이지엠은 신제품 지붕재",
+    "url": "magazine/agm-thermroof-roofing-material-2026.html"
   },
   {
     "type": "article",
-    "name_en": "Salone del Mobile 2026 — The Urban Greenhouse Returns",
-    "name_ko": "살로네 델 모빌 2026 — 도심 속 온실의 귀환",
-    "desc_en": "ARCHINODE Editorial x Sylvia Caligaris reports from Milano. What 'Urban Greenhouse' means for Korean homes and projects.",
-    "desc_ko": "ARCHINODE 편집부 X 실비아 칼리가리스의 밀라노 현장 리포트. '도심 속 온실'이 한국의 주거와 프로젝트에 어떻게 닿을지.",
-    "url": "trend-report/salone-del-mobile-2026-trends.html"
-  },
-  {
-    "type": "page",
-    "name_en": "Submit Trend Report",
-    "name_ko": "트렌드 리포트 제출",
-    "desc_en": "For European brands. Submit your editorial trend report. ARCHINODE editors review within 5 business days.",
-    "desc_ko": "유럽 브랜드 대상. 에디토리얼 트렌드 리포트를 제출하세요. ARCHINODE 편집부가 5영업일 안에 검토합니다.",
-    "url": "submit-trend.html"
+    "name_en": "AIBIM Opens Its Doors in December",
+    "name_ko": "AIBIM이 12월에 문을 연다",
+    "desc_en": "The AI shift in Korean architectural administration — and what it signals to the design and materials industry.",
+    "desc_ko": "건축행정 AI 대전환과 — 디자인·자재 산업이 읽어야 할 신호.",
+    "url": "magazine/aibim-platform-construction-ai-2026.html"
   },
   {
     "type": "article",
-    "name_en": "ETS Phase 4 — Cement and Steel Faces Real Cap",
-    "name_ko": "배출권 4기 — 시멘트·철강에 처음 닥치는 실질 감축",
-    "desc_en": "Korea's emissions trading scheme enters phase 4 — what this means for construction materials cost in 2026.",
-    "desc_ko": "한국 배출권 거래제 4기 진입 — 2026년 건축자재 가격에 어떤 영향이 있을지.",
+    "name_en": "When Architects Started Making Furniture — Milan 2026 and the Collapse of Disciplines",
+    "name_ko": "건축가가 가구를 만들기 시작했다 — 밀라노 2026이 보여준 영역의 붕괴",
+    "desc_en": "From Lina Ghotmeh&apos;s pavilion at Palazzo Litta to Zaha Hadid Architects&apos; expanded Erosion Collection — the line between architecture and furniture is dissolving.",
+    "desc_ko": "Lina Ghotmeh의 팔라초 리타 파빌리온부터 자하 하디드의 Erosion Collection 확장까지 — 건축과 가구 사이의 선이 녹고 있다.",
+    "url": "magazine/architects-furniture-milan-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Doors Have Started to Think",
+    "name_ko": "문이 생각하기 시작했다",
+    "desc_en": "Automatic vestibule doors, pet doors, hidden doors — &apos;conveni-premium&apos; and an era of 15 million companion animals are redesigning the entryway and the hallway.",
+    "desc_ko": "자동 중문·펫도어·히든도어 — &apos;편리미엄&apos;과 반려 1,500만 시대가 현관과 복도를 다시 설계한다.",
+    "url": "magazine/auto-door-pet-door-convenipremium-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Number that Sets Korean Construction&apos;s Price — Just Went Digital",
+    "name_ko": "공사비 기준값이 바뀐다 — 표준단가에 BIM이 들어왔다",
+    "desc_en": "1,457 pages, May 8 notice — H2 2026 standard market unit price, with a BIM-cost manual bundled in for the first time.",
+    "desc_ko": "1,457페이지, 5월 8일 공고 — 2026 하반기 표준시장단가에 BIM 단가 상세설명서가 처음 함께 수록됐다.",
+    "url": "magazine/bim-construction-unit-price-h2-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The 50 Billion Won Era — How BIM Is Redrawing Korean Construction",
+    "name_ko": "500억 시대, BIM이 한국 건설을 다시 그린다",
+    "desc_en": "From 2026, BIM becomes mandatory for public projects above 50B KRW — and it is more than a software requirement. It is industry restructuring.",
+    "desc_ko": "2026년부터 500억 이상 공공사업에 BIM 의무화 — 단순한 소프트웨어 요건이 아닌 산업 재편의 신호다.",
+    "url": "magazine/bim-mandate-500-billion-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Bottega Veneta Trusted a Korean Artist with Its Light",
+    "name_ko": "보테가 베네타가 한국 작가의 손에 빛을 맡겼다",
+    "desc_en": "&apos;Lightful&apos;, unveiled at the Milan boutique — the era of luxury maisons curating Korean artists has begun.",
+    "desc_ko": "밀라노 매장에서 공개된 &apos;Lightful&apos; — 럭셔리 메종이 한국 작가를 큐레이션하는 시대가 시작됐다.",
+    "url": "magazine/bottega-veneta-kwangho-lee-lightful.html"
+  },
+  {
+    "type": "article",
+    "name_en": "3,000 Products Gather at Busan BEXCO",
+    "name_ko": "부산 BEXCO에 모인 3,000개 아이템",
+    "desc_en": "The 10th Busan Architecture Expo, recapped — what 300 exhibitors revealed about the temperature of the materials market in the second half of 2026.",
+    "desc_ko": "제10회 부산 건축박람회 결산 — 300여 업체가 보여준 2026년 하반기 자재 시장의 온도.",
+    "url": "magazine/busan-architecture-expo-2026-recap.html"
+  },
+  {
+    "type": "article",
+    "name_en": "In 2026–2027, Two Cities Get a New Face",
+    "name_ko": "2026~2027, 도시가 새 얼굴을 갖는다",
+    "desc_en": "Snøhetta&apos;s Busan Opera House finishes major works late 2026 for a 2027 opening; Sejong&apos;s National Museum of Urbanism and Architecture completes in the second half of 2026.",
+    "desc_ko": "스노헤타의 부산오페라하우스는 2026년 말 주요 공사를 마치고 2027년 개관을, 세종 국립도시건축박물관은 2026년 하반기 완공을 앞두고 있다.",
+    "url": "magazine/busan-opera-house-sejong-architecture-museum-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Materials Beginning to Replace Concrete",
+    "name_ko": "콘크리트를 대체하기 시작한 자재들",
+    "desc_en": "Hempcrete, cross-laminated timber, mycelium insulation — in 2026 the carbon-negative shift moves from manifesto to material.",
+    "desc_ko": "헴프크리트, 교차집성목, 미셀륨 단열재 — 2026년, 탄소네거티브 전환이 선언에서 자재로 내려온다.",
+    "url": "magazine/carbon-negative-materials-global-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Cement and Rebar&apos;s Contradictory Crisis — ETS Phase 4 and the ESG Inflection for Korean Materials",
+    "name_ko": "시멘트·철근의 모순된 위기 — ETS 4차, 자재 산업의 ESG 분기점",
+    "desc_en": "2026 is the first year Korean cement and rebar absorb two pressures simultaneously: the Emissions Trading Scheme&apos;s Phase 4 begins, while construction demand sits 35% below its peak. From Milan&apos;s Circle 2026, GBCI named the new keyword: resilience, not just sustainability.",
+    "desc_ko": "2026년은 한국 시멘트·철근 산업이 두 압력을 동시에 받는 첫해다. 한쪽에서는 배출권거래제(ETS) 4차 계획기가 시작되고, 다른 쪽에서는 건설 수요가 정점 대비 35% 줄었다. 5월 7일 밀라노에서 GBCI는 새 키워드를 선언했다 — 지속가능성을 넘어 회복탄력성으로.",
     "url": "magazine/cement-steel-ets-phase4-2026.html"
   },
   {
     "type": "article",
-    "name_en": "Construction Cost Baseline Up 2.98%",
-    "name_ko": "표준시장단가 2.98% 상승 — 정부 약속이 깨진 첫 번째 수치",
-    "desc_en": "MOLIT May 8 publication. PF guarantees over 134% of equity. The 0.98pp gap from the '2% management' pledge.",
-    "desc_ko": "국토교통부 5월 8일 공고. PF 보증이 자기자본 134%를 넘긴 시점, '2% 관리' 약속과의 0.98%포인트 갭.",
+    "name_en": "A Box of Light Opens in Yeouido",
+    "name_ko": "빛의 상자가 여의도에 열렸다",
+    "desc_en": "Centre Pompidou Hanwha opens where the 63 Building&apos;s aquarium once stood — and rewrites the schedule of Korea&apos;s financial district.",
+    "desc_ko": "63빌딩 수족관 자리에 들어선 퐁피두센터 한화, 금융가의 시간표를 바꾸다.",
+    "url": "magazine/centre-pompidou-hanwha-seoul-yeouido-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "On June 18, the Industry Asks: Is This a Turning Point?",
+    "name_ko": "6월 18일, 업계가 묻는다 — 지금이 변곡점인가",
+    "desc_en": "CERIK convenes its second-half outlook seminar on construction and real estate. The real question underneath: is the market merely cycling, or structurally re-forming?",
+    "desc_ko": "한국건설산업연구원이 하반기 건설·부동산 경기 전망 세미나를 연다. 그 밑에 깔린 질문 — 시장은 순환 중인가, 구조적으로 재편되는 중인가.",
+    "url": "magazine/cerik-h2-2026-construction-realestate-outlook-seminar.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Changneung Opens the Public Subscription",
+    "name_ko": "창릉이 본청약을 연다",
+    "desc_en": "June 2026 — 3,387 units across three blocks. The signal a 3.5-year gap sends to Korean materials and interiors.",
+    "desc_ko": "2026년 6월, 세 블록 합산 3,387가구. 본청약과 입주 사이 3년 반의 시차가 한국 자재·인테리어 산업에 보내는 신호.",
+    "url": "magazine/changneung-new-town-public-subscription-june-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Why Capital Flows Only to Gangnam",
+    "name_ko": "강남에만 자본이 몰리는 이유",
+    "desc_en": "Commercial real estate polarization — transactions have collapsed, yet money keeps flowing to core locations.",
+    "desc_ko": "상업용 빌딩 거래 양극화 — 거래는 급감했지만 핵심 입지에는 돈이 모인다.",
+    "url": "magazine/commercial-real-estate-polarization-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Construction Cost Baseline Up 2.98% — The First Number That Broke the Government&apos;s Promise",
+    "name_ko": "표준시장단가 2.98% 상승 — 정부 약속이 깨진 첫번째 수치",
+    "desc_en": "MOLIT publishes the 2026 H2 standard market unit prices on May 8. With major contractors&apos; PF guarantees already past 134% of equity, the headline 0.98 percentage-point gap from Seoul&apos;s &apos;2% management&apos; pledge reads very differently.",
+    "desc_ko": "국토교통부가 5월 8일 2026년 하반기 표준시장단가를 공고했다. 대형 건설사의 PF 보증이 이미 자기자본의 134%를 넘긴 시점에서, 정부가 약속한 &apos;2% 관리&apos;와의 0.98%포인트 갭은 다른 의미로 읽힌다.",
     "url": "magazine/construction-cost-baseline-2026-shift.html"
   },
   {
     "type": "article",
-    "name_en": "Venice Biennale 2026 — Korean Pavilion",
-    "name_ko": "베니스 비엔날레 2026 — 한국관의 단단한 한 수",
-    "desc_en": "Korean Pavilion at the 19th Venice Architecture Biennale 2026.",
-    "desc_ko": "제19회 베니스 건축 비엔날레 2026 한국관.",
+    "name_en": "Construction Costs Climbed Again",
+    "name_ko": "공사비는 또 올랐다",
+    "desc_en": "The April 2026 construction cost index hit 136.88, up 4.4% year-on-year — asphalt concrete and rebar are pushing the number up again, even as orders rise and sites stay quiet.",
+    "desc_ko": "2026년 4월 건설공사비지수가 136.88, 전년 대비 4.4% 올랐다. 수주는 늘고 현장은 조용한데, 아스콘과 철근이 숫자를 다시 밀어 올린다.",
+    "url": "magazine/construction-cost-index-april-2026-material-prices.html"
+  },
+  {
+    "type": "article",
+    "name_en": "It&apos;s No Longer About Selling More — It&apos;s About Getting It Exactly Right",
+    "name_ko": "더 못 파는 게 아니라, 정확히 맞춰야 사는 시대",
+    "desc_en": "2026 building materials enter a low-growth new normal — ready-mix and cement demand fall together, rebar piles up, aggregate runs dry.",
+    "desc_ko": "2026 건설자재가 저성장 뉴노멀에 진입한다 — 레미콘·시멘트 수요는 함께 줄고, 철근은 쌓이고, 골재는 마른다.",
+    "url": "magazine/construction-materials-low-growth-new-normal-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Orders Are Up. Why Is the Site So Quiet?",
+    "name_ko": "수주는 늘었는데, 현장은 왜 조용한가",
+    "desc_en": "April orders jumped 35.9% year-on-year. Yet completed work fell, the private sector slid, and financing stayed tight. A rebound — or a statistical mirage?",
+    "desc_ko": "4월 수주는 전년 대비 35.9% 뛰었다. 그런데 기성은 줄고, 민간은 미끄러지고, 자금은 빡빡했다. 반등인가, 통계의 착시인가.",
+    "url": "magazine/construction-orders-rebound-mirage-april-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Robots Are Entering the Jobsite — The Reality of the &apos;Physical AI&apos; Year",
+    "name_ko": "현장에 로봇이 들어온다 — &apos;피지컬 AI&apos; 원년의 실제",
+    "desc_en": "2026 is being called the first year of physical AI on the construction site. The promise is safety and quality. The catch is that Korea is still taking its first steps.",
+    "desc_ko": "2026년은 건설 현장 피지컬 AI의 원년으로 불린다. 약속은 안전과 품질이다. 함정은 한국이 아직 걸음마 단계라는 데 있다.",
+    "url": "magazine/construction-physical-ai-robotics-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Clock on Construction Costs Just Got Faster",
+    "name_ko": "공사비의 시계가 빨라진다",
+    "desc_en": "The May 8 release of Korea&apos;s 2026 H2 Standard Market Unit Price — why MOLIT pushed it back by eight days, and what shifting to March-based cost indices actually means.",
+    "desc_ko": "5월 8일 공고된 2026년 하반기 건설공사 표준시장단가 — 국토부가 공고일을 8일 늦추고 3월 기준 공사비지수를 즉시 반영한 의미.",
+    "url": "magazine/construction-standard-unit-price-may-2026-shift.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Site Is Getting Old",
+    "name_ko": "현장이 늙고 있다",
+    "desc_en": "Over-50s now make up 62.2% of Korea&apos;s construction workforce, and nearly one in five workers is foreign. A structural crack, not a seasonal shortage.",
+    "desc_ko": "한국 건설현장의 50대 이상이 62.2%, 다섯 명 중 한 명이 외국인이다. 계절적 인력난이 아니라 구조적 균열이다.",
+    "url": "magazine/construction-workforce-aging-foreign-dependency-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Why Korean Floors Are Leaving PVC — The Cork-and-Bamboo Re-emergence",
+    "name_ko": "한국 바닥재가 PVC를 떠나는 이유 — 코르크·대나무가 다시 올라온다",
+    "desc_en": "The 2026 keyword for Korean interior materials is circular economy. Cork, bamboo, and hybrid natural floors are quietly displacing PVC — and exposing which &apos;eco&apos; claims actually hold up.",
+    "desc_ko": "2026년 한국 인테리어 자재의 키워드는 순환 경제. 코르크·대나무·하이브리드 천연 바닥재가 PVC를 조용히 밀어내고 있다 — 그리고 어느 &apos;친환경&apos; 주장이 진짜인지 가른다.",
+    "url": "magazine/cork-bamboo-flooring-korea-2026-pvc-shift.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Korea&apos;s Government Opens a 60,000-Material Green Database",
+    "name_ko": "정부가 6만개 친환경 자재 DB를 열었다",
+    "desc_en": "The launch of &apos;2026 Green Building Materials Information&apos; — but how do we tell real green from marketing green?",
+    "desc_ko": "&apos;2026 친환경 건설자재 정보&apos; 공개 — 그러나 진짜 친환경과 마케팅용 친환경을 어떻게 구분할까?",
+    "url": "magazine/esg-government-green-materials-db-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "To Sell Materials in Europe, You Now Need a “Passport”",
+    "name_ko": "유럽에 자재를 팔려면, 이제 &apos;여권&apos;이 필요하다",
+    "desc_en": "The EU Digital Product Passport reaches construction materials in 2026 — a new entry condition for concrete, steel, and insulation.",
+    "desc_ko": "EU 디지털 제품 여권(DPP)이 2026년 건설자재로 확대된다 — 콘크리트·철강·단열재에 붙는 새 통과 조건.",
+    "url": "magazine/eu-digital-product-passport-construction-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "This Time, the Survey Asks the Prime Contractor",
+    "name_ko": "이번엔 원청을 묻는다",
+    "desc_en": "Korea&apos;s Fair Trade Commission opens a 100,000-firm subcontract survey — and for the first time, it directly probes how prime contractors push safety costs downstream.",
+    "desc_ko": "공정위가 10만 개 업체 하도급 실태조사에 착수했다. 올해 처음으로 원청의 안전관리 비용 전가를 직접 들여다본다.",
+    "url": "magazine/fair-trade-subcontract-survey-prime-contractor-safety-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "2026 — When Korean Materials Want to Enter Europe",
+    "name_ko": "2026, 한국 자재가 유럽에 들어가려면",
+    "desc_en": "CSRD, CBAM, ESPR — the three EU regulations that turn 2026 from optional to mandatory for ESG reporting. For Korean material brands selling into Europe, this is not a sustainability story. It is a market access story.",
+    "desc_ko": "CSRD, CBAM, ESPR — 2026년에 본격화되는 EU의 3대 규제. 한국 건축자재·가구 브랜드에게 이 이야기는 지속가능성 이야기가 아니다. 시장 접근 이야기다.",
+    "url": "magazine/global-esg-regulation-2026-korea-materials.html"
+  },
+  {
+    "type": "article",
+    "name_en": "35,000 Green Materials — Now With Prices Attached",
+    "name_ko": "친환경 자재 3만5천 개, 이제 가격까지 묶였다",
+    "desc_en": "KEITI&apos;s 2026 Green Construction Materials databook lists tens of thousands of certified products — with price information. The question is whether a site will actually use it.",
+    "desc_ko": "환경산업기술원의 2026 친환경 건설자재 정보집이 수만 개 인증 제품을 가격정보까지 담아 펴냈다. 관건은 현장이 그것을 실제로 쓰느냐다.",
+    "url": "magazine/green-materials-databook-2026-keiti.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Green Remodeling 2.0 Opens a 25-Billion Won Stage",
+    "name_ko": "그린리모델링 2.0이 펼친 250억의 무대",
+    "desc_en": "A new guideline. Up to KRW 25B in subsidies per cluster. The time has come for sustainable material brands — and homeowners need to read the small print.",
+    "desc_ko": "새 가이드라인, 군집당 최대 250억 국비 지원 — 친환경 자재 브랜드의 시간이 왔다. 그리고 건축주는 작은 글씨를 읽어야 한다.",
+    "url": "magazine/green-remodeling-2-0-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Hanssem&apos;s 2-Day Bathroom and Korea&apos;s Quiet Pivot",
+    "name_ko": "한샘 이지바스5와 2일짜리 욕실 — 한국 욕실 산업의 변곡점",
+    "desc_en": "At the 2026 Korea Build Week, Hanssem unveiled Easybath 5 — a bathroom installable in two days. Sevian Living Care brought a seated-system bath. Two different products, one signal.",
+    "desc_ko": "2026 코리아빌드위크에서 한샘은 2일 시공 욕실 이지바스5를 공개했다. 세비앙리빙케어는 좌식 욕실을 들고 나왔다. 서로 다른 두 제품, 같은 신호.",
+    "url": "magazine/hanssem-easy-bath5-2day-bathroom-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Hanssem Wants the Office to Feel Like a Living Room",
+    "name_ko": "한샘의 사무실, 거실처럼 만든다 — 이머전이 묻는 질문",
+    "desc_en": "Hanssem expands its first B2B office furniture line &apos;Emergen&apos; — a 4-leg motion desk, a side multi cabinet, and a one-word thesis: homelike. The biggest Korean home furniture brand is moving into the office category.",
+    "desc_ko": "한샘이 첫 B2B 오피스 가구 시리즈 &apos;이머전(Emergen)&apos;을 본격 확장한다. 4-leg 모션데스크, 사이드 멀티장, 한 단어로 된 명제 — 홈라이크(Homelike). 한국 최대 홈 가구 브랜드가 오피스 카테고리로 들어간다.",
+    "url": "magazine/hanssem-emergen-office-furniture-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Curves Heatherwick Drew Over Yeouido",
+    "name_ko": "헤더윅이 여의도에 그린 곡선",
+    "desc_en": "Daekyo Apartment reconstruction — what changes when a global star architect enters Korea",
+    "desc_ko": "대교아파트 재건축 — 글로벌 거장이 한국 일반 주거 시장에 들어왔을 때 무엇이 바뀌는가.",
+    "url": "magazine/heatherwick-yeouido-daekyo-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Hwang Yujeong&apos;s Iryeolobongdo — What a Korean Designer Said with an iF Award",
+    "name_ko": "황유정의 일월오봉도 — 한국 디자이너가 iF 본상으로 답한 것",
+    "desc_en": "Studio XYJ wins Interior Architecture at iF Design Award 2026 with the Hana Bank Family Office VIP Lounge — and quietly resets the conversation about Korean design.",
+    "desc_ko": "스튜디오 XYJ가 하나은행 패밀리오피스 VIP 라운지로 iF 디자인 어워드 2026 실내건축 본상 수상. 한국 디자인의 좌표가 조용히 다시 그어진다.",
+    "url": "magazine/hwang-yujeong-if-design-award-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Incheon Gyeyang Breaks First — What December 2026 Means for the 3rd-Phase New Cities",
+    "name_ko": "인천계양이 먼저 깬다 — 3기 신도시 첫 입주가 12월이라는 의미",
+    "desc_en": "Seven years after the 3rd-phase announcement, the first residents move in this December. LH&apos;s May 14 site inspection signals the gap between Gyeyang and the rest.",
+    "desc_ko": "3기 신도시 발표 7년 만에 첫 입주가 올해 12월. LH의 5월 14일 현장 특별점검이 보여주는 계양과 나머지 사이의 격차.",
+    "url": "magazine/incheon-gyeyang-first-move-in-december-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Walls Get Their Texture Back",
+    "name_ko": "벽이 다시 손맛을 입는다",
+    "desc_en": "Plaster walls, earthy tones, arch doors, and quietly functional finishes — what the 2026 finishes shift means for your home, and what it actually costs to build.",
+    "desc_ko": "회벽과 어시 톤, 아치 도어, 그리고 조용히 일하는 기능성 마감재. 2026 마감재 흐름이 내 집에서 무엇을 바꾸고, 시공에는 얼마가 드는가.",
+    "url": "magazine/interior-finishes-trend-2026-plaster-arch-functional.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Stucco Returns, Wood Plank Goes Square",
+    "name_ko": "회벽이 돌아오고, 강마루는 정사각이 된다",
+    "desc_en": "2026 Korean interior switches surfaces — KCC&apos;s &apos;Facade&apos;, LX Z:IN&apos;s &apos;Diamant&apos;, Gaenari&apos;s &apos;Primo&apos;, and the square plank changing the living-room floor.",
+    "desc_ko": "2026 한국 인테리어가 표면을 바꾼다 — KCC신한벽지 &apos;파사드&apos;, LX하우시스 &apos;디아망&apos;, 개나리벽지 &apos;프리모&apos;, 그리고 거실 바닥을 다시 짜는 정사각 강마루.",
+    "url": "magazine/interior-materials-trend-2026-arch-tile-flat-flooring.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Where 2026 Interiors Are Going — Soft Minimalism, Newtro Wood, Biophilic",
+    "name_ko": "2026 인테리어가 가는 길 — 소프트 미니멀리즘, 뉴트로 우드, 바이오필릭",
+    "desc_en": "From Maison Korea and LX Hausys to influencer design studios — three directions Korean interiors are walking in 2026. Not slick minimal but soft minimal. Not cold gray but warm wood. Not synthetic but biophilic.",
+    "desc_ko": "메종코리아·LX하우시스부터 인플루언서 디자이너까지 — 한국 인테리어가 2026년에 걷는 세 방향. 매끈한 미니멀이 아니라 부드러운 미니멀. 차가운 회색이 아니라 따뜻한 우드. 인공이 아니라 자연.",
+    "url": "magazine/interior-trends-2026-soft-minimalism.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Home Where Even the Tech Hides",
+    "name_ko": "가전도 가구도 숨는 집 — 2026 주거 트렌드 ",
+    "desc_en": "In 2026, the appliances disappear and the walls flow into the floor. &apos;Invisible tech&apos; and &apos;seamless&apos; are the words shaping the Korean home — and they change what you buy.",
+    "desc_ko": "2026년, 가전은 사라지고 벽은 바닥으로 흘러든다. &apos;인비저블 테크&apos;와 &apos;심리스&apos;가 한국의 집을 다시 그리는 키워드다 — 그리고 무엇을 살지를 바꾼다.",
+    "url": "magazine/invisible-tech-seamless-living-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "K-Materials Got an Answer in Orlando",
+    "name_ko": "K-자재, 올랜도에서 답을 받았다",
+    "desc_en": "LX Hausys at KBIS 2026 — 6 Viatera quartzes, 4 HiMacs, the new Teracanto. The distance between being welcomed and becoming the spec.",
+    "desc_ko": "KBIS 2026의 LX하우시스 — 비아테라 6종, 하이막스 4종, 신규 브랜드 테라칸토. 환영받는 것과 시방의 기본이 되는 것 사이의 거리.",
+    "url": "magazine/k-materials-lx-hausys-kbis-2026-north-america.html"
+  },
+  {
+    "type": "article",
+    "name_en": "How Far Should We Trust an Odorless Paint?",
+    "name_ko": "냄새 없는 페인트, 어디까지 믿어야 하나",
+    "desc_en": "KCC&apos;s premium enamel &apos;Royal Enamel Plus&apos; targets the reform market with indoor-air certification, higher hiding power, and a fruity finish.",
+    "desc_ko": "KCC 로얄에나멜플러스 — 실내마크 인증, 높아진 은폐력, 그리고 과일향까지 더한 리폼용 프리미엄 에나멜.",
+    "url": "magazine/kcc-royal-enamel-plus-interior-paint-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "KIGB Asks: Who Is Accountable After Certification?",
+    "name_ko": "KIGB가 묻는 질문 — 인증 이후 누가 책임지는가",
+    "desc_en": "The Korea Institute of Green Building launches as a non-profit under MOLIT, targeting performance management after certification — the gap Korean green buildings have been quietly avoiding.",
+    "desc_ko": "한국녹색건축원(KIGB)이 국토교통부 비영리법인으로 출범한다. 인증 이후의 성능 관리 — 한국 녹색건축이 지금까지 조용히 외면해 온 공백을 정조준한다.",
+    "url": "magazine/kigb-launch-green-building-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The 7-Story Timber Era — How a Law Change Redrew Korea&apos;s Skyline",
+    "name_ko": "국내 7층 목조건축 시대 — 건축법이 바꾼 도시의 키",
+    "desc_en": "With the height limit on timber buildings removed, Korea steps into multi-story wood architecture. What does it mean for the industry?",
+    "desc_ko": "목조건축 층수 제한이 사라지며 한국이 다층 목조 시대로 들어섰다. 산업과 도시에는 어떤 의미인가.",
+    "url": "magazine/korea-7-story-timber-architecture-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Korea Build Week 2026: New Materials Report",
+    "name_ko": "2026 코리아빌드위크 자재 리포트",
+    "desc_en": "Thermoroof, Vincero Wall, Hybrid UV — what Korea Build Week&apos;s new releases look like from the construction and distribution side.",
+    "desc_ko": "써모루프, 빈체로 월, 하이브리드 UV — 4월 킨텍스에서 공개된 신제품을 시공·유통의 시선으로 본다.",
+    "url": "magazine/korea-build-week-2026-new-materials.html"
+  },
+  {
+    "type": "article",
+    "name_en": "A Record Budget, but the Hammers Come Late",
+    "name_ko": "역대 최대 예산에도 망치 소리는 늦다",
+    "desc_en": "SOC spending hits a record 21 trillion won, yet construction investment recovers only around 2%. Private-sector PF and regional polarization hold the line back.",
+    "desc_ko": "SOC 예산 21조로 역대 최대, 그러나 건설투자 회복은 2% 안팎. 민간 PF와 수도권·지방 양극화가 발목을 잡는다.",
+    "url": "magazine/korea-construction-h2-2026-soc-budget-outlook.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The K-GX Hour — Why &apos;Green&apos; Must Now Pass a Guideline",
+    "name_ko": "K-GX의 시간 — &apos;녹색&apos;이 가이드라인을 통과해야 하는 이유",
+    "desc_en": "Korea&apos;s green-transition (K-GX) strategy arrives in H1 2026, paired with the 2026 building energy-saving guideline. The era when &apos;eco-friendly&apos; was an adjective is closing.",
+    "desc_ko": "2026년 상반기 정부 K-GX(녹색전환) 전략과 함께 2026 건축물 에너지 절감 가이드라인이 자리잡는다. &apos;친환경&apos;을 형용사로 쓰던 시대가 닫힌다.",
+    "url": "magazine/korea-k-gx-strategy-building-energy-guideline-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "5GW in the Desert — Korea Holds the Blueprint",
+    "name_ko": "사막에 짓는 5GW, 한국이 설계도를 든다",
+    "desc_en": "Abu Dhabi&apos;s Stargate AI data center brings Korea in as a core partner for low-carbon power and cooling — the moment construction becomes an energy industry.",
+    "desc_ko": "아부다비 스타게이트 AI 데이터센터, 한국의 저탄소 전력·공조 기술이 핵심 파트너로. 건설이 곧 에너지 산업이 되는 전환점.",
+    "url": "magazine/korea-uae-stargate-ai-datacenter-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "500 Architects Protest in Sejong",
+    "name_ko": "건축사협회 500명, 세종시 집회",
+    "desc_en": "What does the supervision-unification policy try to change, and why does the field push back?",
+    "desc_ko": "감리 일원화 정책이 무엇을 바꾸려 하는가, 그리고 현장은 왜 반대하는가.",
+    "url": "magazine/korean-architects-association-protest-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "LH Scales Factory Housing to 3,000 Units a Year",
+    "name_ko": "LH가 공장에서 짓는 집을 연 3,000호로 — 모듈러·PC의 본격 시동",
+    "desc_en": "Korea&apos;s public housing client commits to 3,000 modular and precast-concrete units per year from 2026 — and a special activation law is on its way.",
+    "desc_ko": "LH가 2026~2029년 모듈러·PC 공공주택 발주를 연 3,000호 규모로 키운다. 정부는 활성화 특별법까지 예고했다.",
+    "url": "magazine/lh-modular-pc-housing-3000-units-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "618 Local Housing Associations Under Inspection",
+    "name_ko": "지역주택조합, 618곳 전수점검이 남긴 질문",
+    "desc_en": "The July 11 joint special inspection asks a bigger question — about the scheme itself.",
+    "desc_ko": "7월 11일 관계기관 합동 특별점검 착수 — 제도 자체를 다시 묻다",
+    "url": "magazine/local-housing-association-special-inspection-july-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "When a Street, a Scent, a Skyline Becomes Your Story",
+    "name_ko": "거리, 냄새, 스카이라인이 내 이야기가 될 때",
+    "desc_en": "The London Festival of Architecture 2026 chose &apos;Belonging&apos; — the softest, least measurable question a building can raise.",
+    "desc_ko": "런던건축축제 2026이 택한 주제 &apos;소속&apos; — 건물이 던질 수 있는 가장 부드럽고 가장 측정되지 않는 질문.",
+    "url": "magazine/london-festival-architecture-2026-belonging.html"
+  },
+  {
+    "type": "article",
+    "name_en": "When Recycled Plastic Silences the Floor Above",
+    "name_ko": "폐플라스틱이 층간소음을 잡는다",
+    "desc_en": "Lotte E&amp;C and Regen TNI&apos;s &apos;Soilastic&apos; sound-barrier pallet — recycled aggregate plus waste plastic, 4–6 dB cut, 50% lower cost.",
+    "desc_ko": "롯데건설과 리젠티앤아이가 만든 &apos;소일라스틱&apos; 차음 팔레트 — 재생골재와 폐플라스틱, 4~6dB 차단, 비용 50% 절감.",
+    "url": "magazine/lotte-soilastic-recycled-plastic-noise-barrier-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Wood Is Rebuilding the City",
+    "name_ko": "나무가 도시를 다시 짓는다",
+    "desc_en": "From Vienna to Vancouver, mass timber and breathing façades are pushing green architecture into its next chapter — but how much of it is real?",
+    "desc_ko": "비엔나에서 밴쿠버까지, 매스팀버와 숨쉬는 파사드가 친환경 건축을 다음 단계로 밀어올린다 — 그런데 그중 진짜는 얼마일까?",
+    "url": "magazine/mass-timber-breathing-facade-global-green-architecture-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Return of Oak, and the Home as a Place of Comfort",
+    "name_ko": "오크 마루의 귀환, 그리고 위안의 집",
+    "desc_en": "From the home as something to show, to the home as somewhere to stay — what a change in flooring quietly says about how we want to live.",
+    "desc_ko": "&apos;보여주는 집&apos;에서 &apos;머무는 집&apos;으로 — 바닥재의 변화가 조용히 말하는, 우리가 살고 싶은 방식.",
+    "url": "magazine/oak-flooring-return-home-as-comfort-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Parking Robots Are Coming Home — How July&apos;s Deregulation Will Reshape the Korean Apartment Garage",
+    "name_ko": "주차로봇이 아파트로 들어온다 — 7월 규제 완화가 바꿀 한국 주차장의 미래",
+    "desc_en": "MOLIT will amend the housing construction regulation in July 2026, removing the rule that classifies parking robots as mechanical parking equipment and bans them from apartment complexes. HL D&I Halla, HL Robotics, and Junglim Architecture are already redesigning the basement.",
+    "desc_ko": "국토교통부가 2026년 7월",
+    "url": "magazine/parking-robot-deregulation-july-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Wall and Door a Pet Redesigned",
+    "name_ko": "반려동물이 바꾼 벽과 문",
+    "desc_en": "Scratch-proof wallpaper and auto sliding doors are moving from niche add-on to new-apartment standard. The home is being re-specced around who else lives in it.",
+    "desc_ko": "스크래치 방지 벽지와 자동 중문이 틈새 옵션에서 신축 아파트 기본으로 옮겨간다. 집이",
+    "url": "magazine/pet-durable-wallpaper-auto-door-interior-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "When Walls Get Expensive: The Rise of High-End Finishes",
+    "name_ko": "벽이 비싸지는 시대 — 하이엔드 마감재의 부상",
+    "desc_en": "Premium wallpapers and stone-look boards are widening the finishes market in H2 2026.",
+    "desc_ko": "프리미엄 벽지와 석재 질감 벽장재가 넓히는 2026 하반기 마감재 시장",
+    "url": "magazine/premium-wall-finishes-market-h2-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "2026 Pritzker — Smiljan Radić, and the Stage Where Korea Was Not",
+    "name_ko": "2026 프리츠커상 스밀얀 라디치 — 그리고 그 무대에 없는 한국",
+    "desc_en": "The Hyatt Foundation gave the 55th Pritzker Prize to the Chilean architect who builds vulnerability instead of permanence, guests instead of monuments. Two months later, the Korean question remains: why are we still not on that stage?",
+    "desc_ko": "하얏트재단은 55회 프리츠커상을 칠레 건축가에게 줬다. 영속 대신 취약함을, 기념비 대신 손님을 짓는 건축가. 두 달 후, 한국의 질문은 그대로다. 우리는 왜 아직도 그 무대에 없는가.",
+    "url": "magazine/pritzker-2026-smiljan-radic-korea-absence.html"
+  },
+  {
+    "type": "article",
+    "name_en": "When the Concrete Stopped",
+    "name_ko": "콘크리트가 멈추자 드러난 것",
+    "desc_en": "A Seoul-area ready-mix concrete strike froze 117 construction sites — and exposed the polarization underneath the industry.",
+    "desc_ko": "수도권 레미콘 운송 파업이 117개 건설현장을 멈춰 세웠다 — 그리고 그 아래 깔린 건설업 양극화의 구조를 드러냈다.",
+    "url": "magazine/ready-mix-concrete-strike-construction-shutdown-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Red Dot Looks to Korea — This Year, Rest and Lightness",
+    "name_ko": "레드닷이 비춘 한국 — 올해의 키워드는 ",
+    "desc_en": "From Seoul&apos;s &apos;Handeulhandeul&apos; rest installation winning Urban Design to Helinox&apos;s feather-light furniture, the 2026 Red Dot results reveal the grain of Korean design this year.",
+    "desc_ko": "서울시 &apos;한들한들&apos; 휴식 설치물의 도시디자인 본상부터 헬리녹스 초경량 가구까지, 2026 레드닷이 비춘 한국 디자인의 결.",
+    "url": "magazine/red-dot-2026-korea-handeulhandeul-helinox.html"
+  },
+  {
+    "type": "article",
+    "name_en": "A 1% Loan Restarts Stalled Redevelopment Sites",
+    "name_ko": "연 1% 융자가 멈춰 있던 재개발 현장을 다시 움직인다",
+    "desc_en": "A government 1% special loan and Seoul&apos;s 18-billion-won fund — the early-stage cash crunch eases.",
+    "desc_ko": "국토부 연 1% 특판과 서울시 180억 융자 — 초기 자금난에 묶여 있던 추진위·조합이 다시 움직이기 시작했다.",
+    "url": "magazine/redevelopment-early-stage-loan-special-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Day the Hammers Fall Silent After 144 Years",
+    "name_ko": "144년의 망치가 멈추는 날",
+    "desc_en": "June 10, 2026 — Sagrada Família, on the centenary of Gaudí&apos;s death. What 144 years leaves behind in a city.",
+    "desc_ko": "2026년 6월 10일, 가우디 사망 100주기에 닿는 사그라다 파밀리아. 144년이 한 도시에 남기는 것.",
+    "url": "magazine/sagrada-familia-completion-gaudi-centenary-june-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Statement Samsung Made in Milan",
+    "name_ko": "삼성이 밀라노에서 던진 한 문장",
+    "desc_en": "&apos;Design is an Act of Love&apos; — A Korean conglomerate steps beyond appliances into the lifestyle brand stage.",
+    "desc_ko": "&apos;Design is an Act of Love&apos; — 한국 대기업이 가전을 넘어 라이프스타일 브랜드로 진입하는 시점.",
+    "url": "magazine/samsung-milan-design-week-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Seoul&apos;s 85,000-Unit Fast-Track — What the Package Actually Means",
+    "name_ko": "서울 8만5천가구 신속착공 — 정비사업 정상화의 진짜 의미",
+    "desc_en": "A six-part fast-track package, KRW 50B in housing-fund relocation loans, three-year owner-transfer easing — what shifts and what doesn&apos;t.",
+    "desc_ko": "신속착공 6종 패키지, 500억 이주비, 3년 한시 조합원 지위양도 완화 — 무엇이 움직이고 무엇은 그대로인가.",
+    "url": "magazine/seoul-85k-units-fast-track-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The City Picks Its Own Architecture",
+    "name_ko": "시민이 고른 건축, 9월의 서울",
+    "desc_en": "Architect Kook Hyoung-gul returns as festival director, and citizens vote for Seoul&apos;s 30 best designs. Who gets to decide the face of a city?",
+    "desc_ko": "국형걸 총감독 연임, 시민투표로 뽑은 우수디자인 30선. 누가 도시의 얼굴을 결정하는가.",
+    "url": "magazine/seoul-architecture-festival-2026-citizen-design.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Seoul Stacks the Downtown — The Layered Park and the North-South Green Axis",
+    "name_ko": "서울이 도심을 쌓아 올린다 — 층층공원과 남북녹지축",
+    "desc_en": "Seoul&apos;s 2026 city-space plan stacks parks vertically and runs a green spine from Jongmyo to Toegye-ro. Architecture stops being a single object and becomes part of a continuous ground.",
+    "desc_ko": "2026 서울시 도시공간본부 계획이 공원을 수직으로 쌓고, 종묘에서 퇴계로까지 녹지축을 잇는다. 건축이 단일 오브제에서 연속된 지면의 일부로 옮겨간다.",
+    "url": "magazine/seoul-layered-park-jongmyo-toegye-green-axis-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "What 510 Brands Saw in 2026 — SLDF Recap",
+    "name_ko": "510개 브랜드가 본 2026 — SLDF 결산 리포트",
+    "desc_en": "Seoul Living Design Fair 2026 closed at record scale. What 510 brands and 1,910 booths revealed about Korea&apos;s lifestyle market today.",
+    "desc_ko": "2026 서울리빙디자인페어, 역대 최대 규모로 막을 내렸다. 510개 브랜드와 1,910개 부스가 보여준 한국 라이프스타일 시장의 현재.",
+    "url": "magazine/seoul-living-design-fair-2026-recap.html"
+  },
+  {
+    "type": "article",
+    "name_en": "An 80-Trillion-Won Market Opens — But Who Wins?",
+    "name_ko": "80조 시장이 열렸다, 그런데 누가 웃는가",
+    "desc_en": "Seoul&apos;s 2026 redevelopment market — Apgujeong, Seongsu, Yeouido, Mokdong — is a contest of giants. Behind the headline number, the field looks more uneven than it sounds.",
+    "desc_ko": "2026 서울 정비사업 — 압구정·성수·여의도·목동을 둘러싼 대형사 각축전. 화려한 숫자 뒤의 판은 들리는 것보다 고르지 않다.",
+    "url": "magazine/seoul-redevelopment-80-trillion-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Why Seoul Sent a Small Table to Milan",
+    "name_ko": "서울 소반이 밀라노에 간 이유 — 작은 상 위에 놓인 큰 질문",
+    "desc_en": "Seoul Life 2026 Milan — Heritage Reimagined, Soban. At ADI Design Museum, the city brought Korea&apos;s most ordinary piece of furniture and asked the world to look again.",
+    "desc_ko": "Seoul Life 2026 Milan — Heritage Reimagined, Soban. ADI Design Museum에서, 서울은 한국에서 가장 평범한 가구 하나를 들고 와서 세계에게 다시 보아 달라고 청한다.",
+    "url": "magazine/seoul-soban-milan-design-week-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Neighborhood Where the Car Disappeared",
+    "name_ko": "차가 사라진 동네",
+    "desc_en": "UNStudio and Hyundai Development Company are turning a 405,000 m² industrial site in northeast Seoul into a car-free",
+    "desc_ko": "UNStudio와 현대산업개발이 서울 동북부 40만5천㎡ 산업부지를 차 없는",
+    "url": "magazine/seoulone-unstudio-10-minute-car-free-city-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Seun 4 District Height Deregulation",
+    "name_ko": "세운4구역 높이 규제 완화",
+    "desc_en": "Asking the legitimacy of downtown Seoul redevelopment — a city for whom?",
+    "desc_ko": "서울 도심 재개발의 정당성을 묻는다 — 누구를 위한 도시인가.",
+    "url": "magazine/seun-4-district-height-deregulation-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "What If a House Could Feed Itself",
+    "name_ko": "집이 스스로를 먹여 살린다면",
+    "desc_en": "WASP and Olfattiva&apos;s eight-hectare 3D-printed laboratory for self-sufficient living, opened June 8 in Emilia-Romagna.",
+    "desc_ko": "6월 8일 에밀리아로마냐에 문을 연 WASP·Olfattiva의 8헥타르 3D 프린팅 자급자족 실험실.",
+    "url": "magazine/shamballa-3d-printed-sustainable-living-italy-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Block Boundary Loosens",
+    "name_ko": "가로구역이 풀린다",
+    "desc_en": "Small-scale housing regeneration eases — and the neighborhood block becomes a new market unit.",
+    "desc_ko": "소규모주택정비사업 가로구역 완화 — 동네 단위가 새로운 시장 단위가 된다.",
+    "url": "magazine/small-housing-regeneration-deregulation-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "41 vs 70 — The Battle Over Construction&apos;s Walls",
+    "name_ko": "건설업 칸막이를 둘러싼 41만 대 70만의 충돌",
+    "desc_en": "Five years after the markets opened, specialty contractors demand the walls back, general contractors demand they stay down.",
+    "desc_ko": "상호시장 개방 5년, 전문건설은 칸막이를 다시 세우라 하고 종합건설은 허물린 채 두라 한다.",
+    "url": "magazine/specialty-general-contractor-market-overlap-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Five People Who Build Time",
+    "name_ko": "시간을 짓는 다섯 사람",
+    "desc_en": "Architectural Record names Seoul",
+    "desc_ko": "아키텍처럴 레코드가 2026 디자인 뱅가드에 서울의 스튜디오 히치를 선정했다. 완성된 형태가 아니라 만들어지는 과정을 작업으로 보는 팀이다.",
+    "url": "magazine/studio-heech-design-vanguard-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Tailored Classic and the Age of Earth Tones",
+    "name_ko": "테일러드 클래식과 어스톤의 시대",
+    "desc_en": "Permanence over trends, curves over straight lines. Where Korean interiors are heading in 2026.",
+    "desc_ko": "유행 대신 영속성, 직선 대신 곡선. 2026년 한국 인테리어가 향하는 곳.",
+    "url": "magazine/tailored-classic-earth-tone-2026-korea.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Built in a Factory, Stored in a Forest",
+    "name_ko": "공장에서 짓고, 숲에서 가둔다",
+    "desc_en": "Public-rental modular scaling to 3,000 units, tax and floor-area incentives under review, timber cutting carbon by up to 77% — why Korea is accelerating toward timber and modular.",
+    "desc_ko": "공공임대 모듈러 3,000호 확대, 세제·용적률 완화 검토, 목재로 탄소 최대 77% 감축 — 한국이 목조·모듈러로 가속하는 이유.",
+    "url": "magazine/timber-modular-architecture-korea-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "10,000 Architects Are Heading to Barcelona",
+    "name_ko": "세계 건축가 1만 명이 바르셀로나로 모인다",
+    "desc_en": "UIA World Congress of Architects 2026 — the theme is &apos;Becoming&apos;, asking what architecture means for a planet in transition.",
+    "desc_ko": "UIA 2026 바르셀로나 세계건축대회 — 주제는 &apos;비커밍(Becoming)&apos;, 전환의 시대에 건축을 묻다.",
+    "url": "magazine/uia-barcelona-2026-world-congress-becoming.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Barcelona and the Architecture of Transition",
+    "name_ko": "바르셀로나가 던진 &#x27;전환기의 건축&#x27;",
+    "desc_en": "UIA World Congress 2026 closes — &#x27;Becoming: Architectures for a Planet in Transition.&#x27;",
+    "desc_ko": "UIA 세계건축대회 2026 폐막 — &#x27;되어감: 전환하는 행성을 위한 건축&#x27;",
+    "url": "magazine/uia-world-congress-barcelona-2026-becoming.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Cars Go Underground, People Stay Within Ten Minutes",
+    "name_ko": "차는 지하로, 사람은 10분 안으로",
+    "desc_en": "UNStudio&apos;s SeoulOne turns a 405,000㎡ rail-and-factory site into a car-free, walkable district. Beneath the rendering lie real questions.",
+    "desc_ko": "옛 철도·공장 부지 40만㎡를 차 없는 걷는 생활권으로 바꾸는 UNStudio의 SeoulOne. 조감도 뒤에 진짜 질문이 있다.",
+    "url": "magazine/unstudio-seoulone-car-free-10min-city-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Korea Pavilion at Venice — &apos;Liberation Space: Fortress and Nest&apos;",
+    "name_ko": "베니스 한국관 — &apos;해방공간: 요새와 둥지&apos;가 244㎡에서 묻는 것",
+    "desc_en": "The 61st Venice International Art Exhibition opened on May 9. Korea&apos;s pavilion brings together Choi Goen and Roh Hyeri under a single theme. But the real protagonist remains the 244㎡ building that has been asking the same question for thirty years.",
+    "desc_ko": "제61회 베니스 비엔날레가 5월 9일 개막했다. 한국관은 최고은·노혜리 두 작가를 한 주제 아래 묶었다. 그러나 진짜 주인공은 30년째 같은 질문을 던지고 있는 244㎡의 건물이다.",
     "url": "magazine/venice-biennale-korea-pavilion-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Reimagining the Elevator as a Resting Space",
+    "name_ko": "엘리베이터를 휴식 공간으로",
+    "desc_en": "Woomee&apos;s &apos;The Infinite Chamber&apos; wins iF Design Award — the moment a Korean construction company evolves into a design company.",
+    "desc_ko": "우미건설 &apos;디 인피닛 챔버&apos;, 2026 iF 디자인 어워드 본상 — 한국 건설사가 디자인사로 진화하는 순간.",
+    "url": "magazine/woomee-elevator-if-design-award-2026.html"
+  },
+  {
+    "type": "article",
+    "name_en": "Now Private Buildings Must Prove “Zero Energy” Too",
+    "name_ko": "이제 민간 건물도 &apos;제로에너지&apos;를 증명해야 한다",
+    "desc_en": "Zero-energy building certification moves beyond the public sector — a new baseline for buildings over 1,000㎡.",
+    "desc_ko": "제로에너지 건축물 인증이 공공을 넘어 민간으로 — 연면적 1,000㎡ 이상 건물이 맞닥뜨린 새 기준선.",
+    "url": "magazine/zeb-private-building-mandate-2026.html"
+  },
+  {
+    "type": "trend-report",
+    "name_en": "살로네 델 모빌 2026 — 도심 속 온실의 귀환",
+    "name_ko": "살로네 델 모빌 2026 — 도심 속 온실의 귀환",
+    "desc_en": "2026 밀라노 살로네 델 모빌 현장 리포트.",
+    "desc_ko": "2026 밀라노 살로네 델 모빌 현장 리포트.",
+    "url": "trend-report/salone-del-mobile-2026-trends.html"
   }
 ]
