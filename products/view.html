@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">Product | ARCHINODE</title>
 <meta name="description" id="metaDesc" content="Product details on ARCHINODE — global architecture and design products for the Korean market.">
@@ -235,7 +236,7 @@
 
 <script src="../firebase-config.js"></script>
 <script src="../search.js"></script>
-<script src="../lang.js?v=20260618"></script>
+<script src="../lang.js?v=20260630"></script>
 <script src="../auth-ui.js"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
@@ -319,7 +320,7 @@ function renderProduct(p, related) {
                     ${related.map(r => `
                         <a href="view.html?id=${r.slug || ''}" class="pp-rel-card">
                             <div class="pp-rel-card-img">
-                                ${r.imageUrl ? `<img src="${r.imageUrl}" alt="${r.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);"><i class="fas fa-cube" style="font-size:2rem;"></i></div>'}
+                                ${r.imageUrl ? `<img loading="lazy" src="${r.imageUrl}" alt="${r.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);"><i class="fas fa-cube" style="font-size:2rem;"></i></div>'}
                             </div>
                             <div class="pp-rel-card-body">
                                 <div class="pp-rel-card-brand">${r.brandName}</div>
@@ -347,12 +348,12 @@ function renderProduct(p, related) {
             <!-- IMAGE -->
             <div class="pp-gallery">
                 <div class="pp-main-image">
-                    ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" id="mainImg">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:3rem;"><i class="fas fa-cube"></i></div>'}
+                    ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}" id="mainImg">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:3rem;"><i class="fas fa-cube"></i></div>'}
                 </div>
                 ${p.images && p.images.length > 0 ? `
                 <div class="pp-thumbs">
-                    <div class="pp-thumb active" onclick="changeImg('${p.imageUrl}',this)"><img src="${p.imageUrl}" alt="Main"></div>
-                    ${p.images.map(img => `<div class="pp-thumb" onclick="changeImg('${img}',this)"><img src="${img}" alt="${p.name}"></div>`).join('')}
+                    <div class="pp-thumb active" onclick="changeImg('${p.imageUrl}',this)"><img loading="lazy" src="${p.imageUrl}" alt="Main"></div>
+                    ${p.images.map(img => `<div class="pp-thumb" onclick="changeImg('${img}',this)"><img loading="lazy" src="${img}" alt="${p.name}"></div>`).join('')}
                 </div>` : ''}
             </div>
 
@@ -493,5 +494,8 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') document.getE
 const header = document.getElementById('header');
 window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 50); });
 </script>
+<script src="../cookie-consent.js?v=20260630" defer></script>
+<script src="../analytics-loader.js?v=20260630" defer></script>
+<script src="../sentry-loader.js?v=20260630" defer></script>
 </body>
 </html>

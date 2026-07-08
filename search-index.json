@@ -849,6 +849,14 @@
   },
   {
     "type": "article",
+    "name_en": "The Spring the Materials Ran Out",
+    "name_ko": "자재가 바닥난 봄",
+    "desc_en": "A 57% asphalt spike, ascon at 70% of supply, insulation stocks halved — the shortage that turned procurement into risk management.",
+    "desc_ko": "아스팔트 57% 폭등, 아스콘 공급 70% 수준, 단열재 재고 절반. 조달을 리스크 관리로 바꿔 놓은 공급 쇼크.",
+    "url": "magazine/construction-material-supply-shock-asphalt-insulation-2026.html"
+  },
+  {
+    "type": "article",
     "name_en": "It&apos;s No Longer About Selling More — It&apos;s About Getting It Exactly Right",
     "name_ko": "더 못 파는 게 아니라, 정확히 맞춰야 사는 시대",
     "desc_en": "2026 building materials enter a low-growth new normal — ready-mix and cement demand fall together, rebar piles up, aggregate runs dry.",
@@ -1129,6 +1137,14 @@
   },
   {
     "type": "article",
+    "name_en": "The Architecture That Independence Built",
+    "name_ko": "독립이 지은 건축",
+    "desc_en": "MoMA",
+    "desc_ko": "MoMA",
+    "url": "magazine/moma-architects-of-liberation-western-africa-2026.html"
+  },
+  {
+    "type": "article",
     "name_en": "The Return of Oak, and the Home as a Place of Comfort",
     "name_ko": "오크 마루의 귀환, 그리고 위안의 집",
     "desc_en": "From the home as something to show, to the home as somewhere to stay — what a change in flooring quietly says about how we want to live.",
@@ -1222,6 +1238,14 @@
     "desc_en": "Architect Kook Hyoung-gul returns as festival director, and citizens vote for Seoul&apos;s 30 best designs. Who gets to decide the face of a city?",
     "desc_ko": "국형걸 총감독 연임, 시민투표로 뽑은 우수디자인 30선. 누가 도시의 얼굴을 결정하는가.",
     "url": "magazine/seoul-architecture-festival-2026-citizen-design.html"
+  },
+  {
+    "type": "article",
+    "name_en": "The Award That Asks Only One Thing",
+    "name_ko": "단 하나만 묻는 디자인 상",
+    "desc_en": "The Seoul Design Award 2026 closes entries — the world",
+    "desc_ko": "서울디자인어워드 2026 접수 마감 — 지속가능한 일상만 다루는 세계 유일의 공공 디자인 어워드, designboom 특별상까지.",
+    "url": "magazine/seoul-design-award-2026-sustainable-impact.html"
   },
   {
     "type": "article",

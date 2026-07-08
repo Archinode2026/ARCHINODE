@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="metaTitle">Brand Magazine | ARCHINODE</title>
 <meta name="description" content="ARCHINODE Brand Magazine — 유럽 디자인 브랜드가 직접 발행하는 글.">
@@ -81,7 +82,7 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#1a1a1a; backgroun
     <h1 id="aTitle">—</h1>
     <div class="meta" id="aMeta"></div>
   </section>
-  <div class="cover-image" id="aCover" style="display:none;"><img id="aCoverImg" alt=""></div>
+  <div class="cover-image" id="aCover" style="display:none;"><img loading="lazy" id="aCoverImg" alt=""></div>
   <div class="article-body" id="aBody"></div>
   <div class="back-link">
     <a href="../trend-report.html" data-en="← Back to Brand Magazine" data-ko="← 브랜드 매거진으로">← Back to Brand Magazine</a>
@@ -101,7 +102,7 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#1a1a1a; backgroun
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="../firebase-config.js"></script>
-<script src="../lang.js?v=20260618"></script>
+<script src="../lang.js?v=20260630"></script>
 <script>
 (function(){
   function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -154,5 +155,8 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#1a1a1a; backgroun
   });
 })();
 </script>
+<script src="../cookie-consent.js?v=20260630" defer></script>
+<script src="../analytics-loader.js?v=20260630" defer></script>
+<script src="../sentry-loader.js?v=20260630" defer></script>
 </body>
 </html>

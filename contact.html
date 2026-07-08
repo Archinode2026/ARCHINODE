@@ -71,7 +71,7 @@
 </div>
 
 <section class="page-hero" style="min-height:300px;">
-  <img class="page-hero-bg" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80" alt="Contact">
+  <img loading="lazy" class="page-hero-bg" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80" alt="Contact">
   <div class="page-hero-content">
     <div class="page-hero-inner">
       <span class="page-hero-tag" data-en="Get in Touch" data-ko="문의하기">Get in Touch</span>
@@ -277,7 +277,11 @@ const fadeObs = new IntersectionObserver(entries => {
 fadeEls.forEach(el => fadeObs.observe(el));
 </script>
 <script src="search.js"></script>
-<script src="lang.js?v=20260618"></script>
+<script src="lang.js?v=20260630"></script>
 <script src="auth-ui.js"></script>
+<script src="cookie-consent.js?v=20260630" defer></script>
+<script src="analytics-loader.js?v=20260630" defer></script>
+<script src="sentry-loader.js?v=20260630" defer></script>
+<script src="form-throttle.js?v=20260630" defer></script>
 </body>
 </html>

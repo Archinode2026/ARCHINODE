@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">Magazine | ARCHINODE</title>
 <meta name="description" id="metaDesc" content="ARCHINODE Magazine — architecture and design insights.">
@@ -154,7 +155,7 @@
 
 <script src="../firebase-config.js"></script>
 <script src="../search.js"></script>
-<script src="../lang.js?v=20260618"></script>
+<script src="../lang.js?v=20260630"></script>
 <script src="../auth-ui.js"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
@@ -222,7 +223,7 @@ function renderArticle(a) {
     contentDiv.innerHTML = `
     <!-- HERO -->
     <div class="ma-hero">
-        ${heroImg ? `<img src="${escapeHtml(heroImg)}" alt="${escapeHtml(a.title || '')}">` : ''}
+        ${heroImg ? `<img loading="lazy" src="${escapeHtml(heroImg)}" alt="${escapeHtml(a.title || '')}">` : ''}
         <div class="ma-hero-overlay">
             <span class="ma-hero-tag">${escapeHtml(a.tag || 'Article')}</span>
             <h1>${escapeHtml(a.title || '')}</h1>
@@ -276,5 +277,8 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') document.getE
 const header = document.getElementById('header');
 window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 50); });
 </script>
+<script src="../cookie-consent.js?v=20260630" defer></script>
+<script src="../analytics-loader.js?v=20260630" defer></script>
+<script src="../sentry-loader.js?v=20260630" defer></script>
 </body>
 </html>

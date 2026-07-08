@@ -173,7 +173,7 @@
     <h1><span data-en="List Your Brand on " data-ko=""></span><span class="gold">ARCHINODE</span><span data-en="" data-ko="에 브랜드를 등록하세요"></span></h1>
     <p data-en="Register below and get your own brand page, login portal, and direct access to Korean architects and designers." data-ko="아래 양식을 작성하시면 브랜드 페이지, 로그인 포털, 한국 건축가·디자이너 접근권을 받으실 수 있습니다."></p>
     <div style="margin-top:28px; text-align:center;">
-      <a href="downloads/ARCHINODE_Brand_Proposal_2026.pdf" download style="display:inline-block; padding:14px 28px; background:#fff; color:#000; border:none; border-radius:6px; font-size:0.95rem; font-weight:700; text-decoration:none; transition:background 0.2s; box-shadow:0 2px 8px rgba(255,255,255,0.15);" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='#fff'" data-en="↓ Korea's $48B Market Guide (Free PDF)" data-ko="↓ 한국 480억 달러 시장 진출 가이드 (무료 PDF)">↓ Korea's $48B Market Guide (Free PDF)</a>
+      <a href="downloads/ARCHINODE_Brand_Proposal_2026.pdf" download style="display:inline-block; padding:14px 28px; background:#fff; color:#000; border:none; border-radius:6px; font-size:0.95rem; font-weight:700; text-decoration:none; transition:background 0.2s; box-shadow:0 2px 8px rgba(255,255,255,0.15);" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='#fff'" data-en="↓ Download Free 24-page Guide: How EU Brands Enter Korea (PDF)" data-ko="↓ 무료 24페이지 가이드 다운로드: 유럽 브랜드의 한국 진출 방법 (PDF)">↓ Download Free 24-page Guide: How EU Brands Enter Korea (PDF)</a>
     </div>
 </section>
 
@@ -491,7 +491,7 @@
 </footer>
 
 <!-- Lang Script -->
-<script src="lang.js?v=20260618"></script>
+<script src="lang.js?v=20260630"></script>
 
 <!-- Firebase -->
 <script src="firebase-config.js"></script>
@@ -607,6 +607,33 @@ form.addEventListener('submit', async function(e) {
 
         // 4. 어드민 알림 (Firebase Extensions "Trigger Email")
         try {
+            // 브랜드에게 접수 확인 이메일
+            await db.collection('mail').add({
+                to: email,
+                message: {
+                    subject: '[ARCHINODE] Your listing application has been received',
+                    text: [
+                        'Dear ' + document.getElementById('contactName').value.trim() + ',',
+                        '',
+                        'Thank you for applying to list ' + brandName + ' on ARCHINODE.',
+                        'We have received your application and our team will review it within 2-3 business days.',
+                        '',
+                        'What happens next:',
+                        '- Our team reviews the details you provided',
+                        '- Once approved, you will receive login access to the Brand Portal',
+                        '- You can then upload products, publish articles, and manage your presence',
+                        '',
+                        'Meanwhile, if you have questions, reply to this email or contact office@archinode.org',
+                        '',
+                        'Best regards,',
+                        'ARCHINODE Team',
+                        'https://archinodekr.com'
+                    ].join('\n')
+                }
+            });
+        } catch(mailErr) { console.warn('Brand confirmation skipped:', mailErr); }
+
+        try {
             await db.collection('mail').add({
                 to: 'office@archinode.org',
                 message: {
@@ -668,5 +695,9 @@ function copyCred(elId, btn) {
     });
 }
 </script>
+<script src="cookie-consent.js?v=20260630" defer></script>
+<script src="analytics-loader.js?v=20260630" defer></script>
+<script src="sentry-loader.js?v=20260630" defer></script>
+<script src="form-throttle.js?v=20260630" defer></script>
 </body>
 </html>

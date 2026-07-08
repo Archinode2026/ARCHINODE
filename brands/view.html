@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<meta name="description" content="Brand page on ARCHINODE">
 <meta charset="UTF-8">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">Brand | ARCHINODE</title>
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
@@ -333,7 +335,7 @@
 
 <script src="../firebase-config.js"></script>
 <script src="../search.js"></script>
-<script src="../lang.js?v=20260618"></script>
+<script src="../lang.js?v=20260630"></script>
 <script src="../auth-ui.js"></script>
 <script>
 // ── URL에서 브랜드 slug 가져오기 ──
@@ -419,9 +421,9 @@ function renderBrand(brand, products) {
 
     // Hero image or logo or placeholder
     const heroHtml = heroImage
-        ? `<img src="${heroImage}" alt="${brand.brandName}">`
+        ? `<img loading="lazy" src="${heroImage}" alt="${brand.brandName}">`
         : logoUrl
-            ? `<img src="${logoUrl}" alt="${brand.brandName}" style="object-fit:contain;padding:40px;">`
+            ? `<img loading="lazy" src="${logoUrl}" alt="${brand.brandName}" style="object-fit:contain;padding:40px;">`
             : `<span class="placeholder-logo">${brand.brandName.charAt(0)}</span>`;
 
     // SNS links
@@ -443,7 +445,7 @@ function renderBrand(brand, products) {
                 <p class="bp-section-desc">${brand.brandName}의 브랜드 이미지</p>
             </div>
             <div class="bp-gallery-grid">
-                ${galleryImages.map(img => `<div class="bp-gallery-item fade-in"><img src="${img}" alt="${brand.brandName}"></div>`).join('')}
+                ${galleryImages.map(img => `<div class="bp-gallery-item fade-in"><img loading="lazy" src="${img}" alt="${brand.brandName}"></div>`).join('')}
             </div>
         </section>`;
     }
@@ -454,7 +456,7 @@ function renderBrand(brand, products) {
         const productCards = products.map(p => `
             <a href="../products/view.html?id=${p.slug || ''}" class="product-card fade-in" style="text-decoration:none;color:inherit;">
                 <div class="product-card-image">
-                    ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:2rem;"><i class="fas fa-cube"></i></div>'}
+                    ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:2rem;"><i class="fas fa-cube"></i></div>'}
                 </div>
                 <div class="product-card-content">
                     <span class="product-card-brand">${brand.brandName}</span>
@@ -498,7 +500,7 @@ function renderBrand(brand, products) {
             </div>
             <div class="bp-hero-content fade-in">
                 <span class="bp-hero-badge">${categoryLabel}</span>
-                ${logoUrl && heroImage ? `<img src="${logoUrl}" alt="${brand.brandName}" style="height:48px;object-fit:contain;margin-bottom:12px;">` : ''}
+                ${logoUrl && heroImage ? `<img loading="lazy" src="${logoUrl}" alt="${brand.brandName}" style="height:48px;object-fit:contain;margin-bottom:12px;">` : ''}
                 <h1>${brand.brandName}</h1>
                 ${tagline ? `<p class="bp-hero-subtitle" style="font-style:italic;color:var(--gray-500);">"${tagline}"</p>` : ''}
                 ${description ? `<p class="bp-hero-subtitle">${description.substring(0, 250)}${description.length > 250 ? '...' : ''}</p>` : ''}
@@ -690,5 +692,8 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
+<script src="../cookie-consent.js?v=20260630" defer></script>
+<script src="../analytics-loader.js?v=20260630" defer></script>
+<script src="../sentry-loader.js?v=20260630" defer></script>
 </body>
 </html>

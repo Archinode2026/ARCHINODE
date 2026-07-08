@@ -197,7 +197,7 @@
 
 <!-- PAGE HERO -->
 <section class="page-hero">
-  <img class="page-hero-bg" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80" alt="Brands">
+  <img loading="lazy" class="page-hero-bg" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80" alt="Brands">
   <div class="page-hero-content">
     <div class="page-hero-inner">
       <span class="page-hero-tag" data-en="Brand Directory" data-ko="브랜드 디렉토리"></span>
@@ -431,7 +431,7 @@ async function loadRegisteredBrands() {
             count++;
             const initial = b.brandName ? b.brandName.charAt(0).toUpperCase() : '?';
             const logoHtml = b.logoUrl
-                ? `<img src="${b.logoUrl}" alt="${b.brandName}">`
+                ? `<img loading="lazy" src="${b.logoUrl}" alt="${b.brandName}">`
                 : initial;
             const link = b.slug ? `brands/view.html?id=${b.slug}` : '#';
 
@@ -462,7 +462,10 @@ loadRegisteredBrands();
 
 <!-- Lang Script -->
 <script src="search.js"></script>
-<script src="lang.js?v=20260618"></script>
+<script src="lang.js?v=20260630"></script>
 <script src="auth-ui.js"></script>
+<script src="cookie-consent.js?v=20260630" defer></script>
+<script src="analytics-loader.js?v=20260630" defer></script>
+<script src="sentry-loader.js?v=20260630" defer></script>
 </body>
 </html>

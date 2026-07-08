@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="description" content="ARCHINODE Admin Dashboard">
 <meta charset="UTF-8">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard | ARCHINODE</title>
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
@@ -222,7 +224,7 @@ tr:hover { background: #fafafa; }
 
 <script src="../firebase-config.js"></script>
 <script src="../search.js"></script>
-<script src="../lang.js?v=20260618"></script>
+<script src="../lang.js?v=20260630"></script>
 <script>
 // ── 인증 확인 (관리자만) ──
 auth.onAuthStateChanged(async (user) => {
@@ -295,11 +297,11 @@ async function loadBrands() {
         if (b.status === 'pending') pending++;
         tbody.innerHTML += `
             <tr>
-                <td><strong>${b.brandName}</strong></td>
-                <td>${b.country || '-'}</td>
-                <td>${b.category || '-'}</td>
-                <td>${b.contactName || '-'}<br><small style="color:#999;">${b.email}</small></td>
-                <td>${b.koreanDealer && b.koreanDealer.name ? `<strong>${b.koreanDealer.name}</strong><br><small style="color:#999;">${b.koreanDealer.contact || ''}</small>` : '<span style="color:#ccc;">—</span>'}</td>
+                <td><strong>${escapeHtml(b.brandName)}</strong></td>
+                <td>${escapeHtml(b.country || '-')}</td>
+                <td>${escapeHtml(b.category || '-')}</td>
+                <td>${escapeHtml(b.contactName || '-')}<br><small style="color:#999;">${escapeHtml(b.email)}</small></td>
+                <td>${b.koreanDealer && b.koreanDealer.name ? `<strong>${escapeHtml(b.koreanDealer.name)}</strong><br><small style="color:#999;">${escapeHtml(b.koreanDealer.contact || '')}</small>` : '<span style="color:#ccc;">—</span>'}</td>
                 <td><span class="status status-${b.status}">${b.status}</span></td>
                 <td>${brandActionButtons(b, doc.id)}</td>
             </tr>`;
@@ -350,6 +352,54 @@ async function updateBrand(docId, newStatus) {
 
     try {
         await db.collection('brands').doc(docId).update(updateData);
+        
+        // 상태 변경 시 브랜드에게 이메일 알림 (approve/suspend/reject/restore)
+        try {
+            const brandDoc = await db.collection('brands').doc(docId).get();
+            const b = brandDoc.data();
+            if (b && b.email) {
+                const statusText = {
+                    approved:  'approved',
+                    suspended: 'suspended',
+                    rejected:  'rejected'
+                }[newStatus] || newStatus;
+                const subject = '[ARCHINODE] Your listing status: ' + statusText;
+                const lines = ['Dear brand team,', ''];
+                if (newStatus === 'approved') {
+                    lines.push('Your brand ' + (b.brandName || '') + ' has been approved on ARCHINODE.');
+                    lines.push('');
+                    lines.push('You can now log in to the Brand Portal:');
+                    lines.push('https://archinodekr.com/brand-portal/login.html');
+                    lines.push('');
+                    lines.push('Use the email and temporary password you received when you first applied.');
+                } else if (newStatus === 'suspended') {
+                    lines.push('Your listing on ARCHINODE has been suspended.');
+                    if (reason) { lines.push(''); lines.push('Reason: ' + reason); }
+                    lines.push('');
+                    lines.push('This is a temporary status. Please contact office@archinode.org for more information.');
+                } else if (newStatus === 'rejected') {
+                    lines.push('Your listing application on ARCHINODE has been declined.');
+                    if (reason) { lines.push(''); lines.push('Reason: ' + reason); }
+                    lines.push('');
+                    lines.push('If you believe this was in error, please contact office@archinode.org.');
+                } else {
+                    lines.push('Your listing status has been updated to: ' + newStatus);
+                    if (reason) { lines.push(''); lines.push('Note: ' + reason); }
+                }
+                lines.push('');
+                lines.push('Best regards,');
+                lines.push('ARCHINODE Team');
+                
+                await db.collection('mail').add({
+                    to: b.email,
+                    message: {
+                        subject: subject,
+                        text: lines.join('\n')
+                    }
+                });
+            }
+        } catch(mailErr) { console.warn('Brand status notification skipped:', mailErr); }
+        
         await loadBrands();
     } catch (e) {
         alert('Failed to update brand status: ' + e.message);
@@ -434,18 +484,19 @@ async function viewBrand(docId) {
 
     const actionsHtml = brandActionButtonsForModal(b, docId);
 
+    const safeWebsite = (b.website && /^https?:\/\//i.test(b.website)) ? b.website : '#';
     document.getElementById('modalContent').innerHTML = `
-        <h2>${b.brandName}</h2>
+        <h2>${escapeHtml(b.brandName)}</h2>
         <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value"><span class="status status-${b.status}">${b.status}</span></div></div>
         ${statusHistoryHtml}
-        <div class="detail-row"><div class="detail-label">Country</div><div class="detail-value">${b.country || '-'}</div></div>
-        <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${b.category || '-'}</div></div>
-        <div class="detail-row"><div class="detail-label">Website</div><div class="detail-value"><a href="${b.website}" target="_blank">${b.website || '-'}</a></div></div>
-        <div class="detail-row"><div class="detail-label">Contact</div><div class="detail-value">${b.contactName || '-'} (${b.position || '-'})</div></div>
-        <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${b.email}</div></div>
-        <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-value">${b.phone || '-'}</div></div>
-        <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value">${b.description || '-'}</div></div>
-        <div class="detail-row"><div class="detail-label">Referral</div><div class="detail-value">${b.referral || '-'}</div></div>
+        <div class="detail-row"><div class="detail-label">Country</div><div class="detail-value">${escapeHtml(b.country || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${escapeHtml(b.category || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Website</div><div class="detail-value"><a href="${escapeHtml(safeWebsite)}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.website || '-')}</a></div></div>
+        <div class="detail-row"><div class="detail-label">Contact</div><div class="detail-value">${escapeHtml(b.contactName || '-')} (${escapeHtml(b.position || '-')})</div></div>
+        <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${escapeHtml(b.email)}</div></div>
+        <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-value">${escapeHtml(b.phone || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(b.description || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Referral</div><div class="detail-value">${escapeHtml(b.referral || '-')}</div></div>
         <div style="margin-top:20px;">${actionsHtml}</div>`;
     document.getElementById('modal').classList.add('show');
 }
@@ -498,11 +549,11 @@ async function loadProducts() {
         if (p.status === 'pending') pending++;
         tbody.innerHTML += `
             <tr>
-                <td><strong>${p.name}</strong><br><small style="color:#999;">${p.collection || ''}</small></td>
-                <td>${p.brandName}</td>
-                <td>${p.category || '-'}<br><small style="color:#999;">${p.subcategory || ''}</small></td>
-                <td>${p.materials || '-'}</td>
-                <td>${p.imageUrl ? `<img src="${p.imageUrl}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
+                <td><strong>${escapeHtml(p.name)}</strong><br><small style="color:#999;">${escapeHtml(p.collection || '')}</small></td>
+                <td>${escapeHtml(p.brandName)}</td>
+                <td>${escapeHtml(p.category || '-')}<br><small style="color:#999;">${escapeHtml(p.subcategory || '')}</small></td>
+                <td>${escapeHtml(p.materials || '-')}</td>
+                <td>${p.imageUrl ? `<img loading="lazy" src="${escapeHtml(p.imageUrl)}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
                 <td><span class="status status-${p.status}">${p.status}</span></td>
                 <td>
                     ${p.status === 'pending' ? `
@@ -530,9 +581,9 @@ async function loadArticles() {
         if (a.status === 'pending') pending++;
         tbody.innerHTML += `
             <tr>
-                <td><strong>${a.title}</strong></td>
-                <td>${a.brandName}</td>
-                <td><span style="color:#C8A96E;font-size:0.8rem;">${a.tag}</span></td>
+                <td><strong>${escapeHtml(a.title)}</strong></td>
+                <td>${escapeHtml(a.brandName)}</td>
+                <td><span style="color:#C8A96E;font-size:0.8rem;">${escapeHtml(a.tag || '')}</span></td>
                 <td><span class="status status-${a.status}">${a.status}</span></td>
                 <td>
                     ${a.status === 'pending' ? `
@@ -554,10 +605,10 @@ async function viewArticle(docId) {
     const doc = await db.collection('articles').doc(docId).get();
     const a = doc.data();
     document.getElementById('modalContent').innerHTML = `
-        <h2>${a.title}</h2>
-        <p style="color:#C8A96E;font-size:0.85rem;margin-bottom:16px;">${a.tag} · ${a.brandName}</p>
-        ${a.imageUrl ? `<img src="${a.imageUrl}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
-        <div style="white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:#444;">${a.content}</div>
+        <h2>${escapeHtml(a.title)}</h2>
+        <p style="color:#C8A96E;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(a.tag || '')} · ${escapeHtml(a.brandName)}</p>
+        ${a.imageUrl ? `<img loading="lazy" src="${escapeHtml(a.imageUrl)}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
+        <div style="white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:#444;">${escapeHtml(a.content || '')}</div>
         <div style="margin-top:24px;">
             <button class="act-btn act-approve" onclick="updateDoc('articles','${docId}','approved');closeModal();">Approve</button>
             <button class="act-btn act-reject" onclick="updateDoc('articles','${docId}','rejected');closeModal();">Reject</button>

@@ -153,6 +153,23 @@
       .replace(/^-|-$/g, '')
       .substring(0, 80) || 'untitled';
   }
+
+  async function getUniqueSlug(baseSlug) {
+    try {
+      const snap = await db.collection('articles').where('slug', '==', baseSlug).limit(1).get();
+      if (snap.empty) return baseSlug;
+      let suffix = 2;
+      while (suffix < 100) {
+        const candidate = baseSlug + '-' + suffix;
+        const check = await db.collection('articles').where('slug', '==', candidate).limit(1).get();
+        if (check.empty) return candidate;
+        suffix++;
+      }
+      return baseSlug + '-' + Date.now();
+    } catch (e) {
+      return baseSlug + '-' + Date.now();
+    }
+  }
   function getExcerpt() {
     const t = blocks.find(b => b.type === 'text' && b.content);
     return t ? t.content.trim().substring(0, 150) : '';

@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="description" content="ARCHINODE Account">
 <meta charset="UTF-8">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign Up | ARCHINODE</title>
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
@@ -192,7 +194,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; mi
 </div>
 
 <script src="../firebase-config.js"></script>
-<script src="../lang.js?v=20260618"></script>
+<script src="../lang.js?v=20260630"></script>
 <script>
 // ── 세션 유지 ──
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
@@ -296,5 +298,6 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     }
 });
 </script>
+<script src="../form-throttle.js?v=20260630" defer></script>
 </body>
 </html>

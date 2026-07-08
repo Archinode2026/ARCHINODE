@@ -93,7 +93,7 @@ Firestore `trend-submissions` 컬렉션에서 `status: 'pending'`인 문서들�
 
 번역 원칙:
 - 직역 X, 의역 O. 한국 건축·디자인 업계 용어 사용.
-- 브랜드명·제품명·디자이너명은 원어 유지 (예: Salone del Mobile, Silvia Caligaris, Ligne Roset).
+- 브랜드명·제품명·디자이너명은 원어 유지 (예: Salone del Mobile, Silvia Vandone, Ligne Roset).
 - 영문 inch·feet 단위는 미터법 병기 (예: 12 inches → 30cm).
 - 영어 번역: 원문 톤·문체 보존. 한국어 번역: 한국 디자이너 어휘 우선.
 

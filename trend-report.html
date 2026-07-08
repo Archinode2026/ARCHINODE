@@ -434,12 +434,12 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 <section class="featured-article">
   <div class="container">
     <a href="trend-report/salone-del-mobile-2026-trends.html" class="featured-card fade-in" style="text-decoration:none;color:inherit;">
-      <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80" alt="Salone del Mobile 2026 — Urban Greenhouse">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80" alt="Salone del Mobile 2026 — Urban Greenhouse">
       <div class="featured-overlay">
         <span class="featured-tag" data-en="EDITORIAL · MILANO" data-ko="에디토리얼 · 밀라노">EDITORIAL · MILANO</span>
         <h2 data-en="Salone del Mobile 2026 — The Urban Greenhouse Returns" data-ko="살로네 델 모빌 2026 — 도심 속 온실의 귀환">살로네 델 모빌 2026 — 도심 속 온실의 귀환</h2>
-        <p class="featured-excerpt" data-en="Olive trees, citrus plants, and sun-faded textures took over the Milano halls. ARCHINODE editor Silvia Caligaris reports from the floor — what the &lsquo;Urban Greenhouse&rsquo; means for Korean homes and projects." data-ko="올리브 나무, 시트러스, 햇빛에 바랜 텍스처가 밀라노 전시장을 채웠다. ARCHINODE 편집부 실비아 칼리가리스가 현장에서 전한다 — &lsquo;도심 속 온실&rsquo;이 한국의 주거와 프로젝트에 어떻게 닿을지.">올리브 나무, 시트러스, 햇빛에 바랜 텍스처가 밀라노 전시장을 채웠다. ARCHINODE 편집부 실비아 칼리가리스가 현장에서 전한다 — '도심 속 온실'이 한국의 주거와 프로젝트에 어떻게 닿을지.</p>
-        <span class="featured-meta" data-en="May 2026 · By ARCHINODE Editorial × Silvia Caligaris (Milan Office)" data-ko="2026년 5월 · ARCHINODE 편집부 × 실비아 칼리가리스 (밀라노 오피스)">May 2026 · By ARCHINODE Editorial × Silvia Caligaris (Milan Office)</span>
+        <p class="featured-excerpt" data-en="Olive trees, citrus plants, and sun-faded textures took over the Milano halls. ARCHINODE editor Silvia Vandone reports from the floor — what the &lsquo;Urban Greenhouse&rsquo; means for Korean homes and projects." data-ko="올리브 나무, 시트러스, 햇빛에 바랜 텍스처가 밀라노 전시장을 채웠다. ARCHINODE 편집부 실비아 반돈가 현장에서 전한다 — &lsquo;도심 속 온실&rsquo;이 한국의 주거와 프로젝트에 어떻게 닿을지.">올리브 나무, 시트러스, 햇빛에 바랜 텍스처가 밀라노 전시장을 채웠다. ARCHINODE 편집부 실비아 반돈가 현장에서 전한다 — '도심 속 온실'이 한국의 주거와 프로젝트에 어떻게 닿을지.</p>
+        <span class="featured-meta" data-en="May 2026 · By ARCHINODE Editorial × Silvia Vandone (Milan Office)" data-ko="2026년 5월 · ARCHINODE 편집부 × 실비아 반돈 (밀라노 오피스)">May 2026 · By ARCHINODE Editorial × Silvia Vandone (Milan Office)</span>
       </div>
     </a>
   </div>
@@ -607,7 +607,7 @@ const fadeObserver = new IntersectionObserver((entries) => {
 fadeEls.forEach(el => fadeObserver.observe(el));
 </script>
 <script src="search.js"></script>
-<script src="lang.js?v=20260618"></script>
+<script src="lang.js?v=20260630"></script>
 <script src="auth-ui.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -689,5 +689,9 @@ window.subscribeNewsletter = async function(e, source) {
 };
 </script>
 
+<script src="cookie-consent.js?v=20260630" defer></script>
+<script src="analytics-loader.js?v=20260630" defer></script>
+<script src="sentry-loader.js?v=20260630" defer></script>
+<script src="form-throttle.js?v=20260630" defer></script>
 </body>
 </html>

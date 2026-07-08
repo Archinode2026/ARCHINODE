@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Digital Products | ARCHINODE — 한국 시장 진출 디지털 자료</title>
 <meta name="description" content="ARCHINODE 디지털 상품 — 한국 시장 진출을 위한 브랜드 매거진 PDF, CAD 라이브러리, BIM 패밀리, 자재 스펙시트, 시장 인텔리전스 자료. 2026년 하반기 출시.">
@@ -465,7 +466,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="search.js"></script>
-<script src="lang.js?v=20260618"></script>
+<script src="lang.js?v=20260630"></script>
 <script src="auth-ui.js"></script>
 <script>
 // Filter products by category
@@ -513,5 +514,16 @@ async function submitNotify(e) {
   return false;
 }
 </script>
+<script src="cookie-consent.js?v=20260630" defer></script>
+<script src="analytics-loader.js?v=20260630" defer></script>
+<script src="sentry-loader.js?v=20260630" defer></script>
+<script src="form-throttle.js?v=20260630" defer></script>
+
+<!-- P3-1 Order CTA -->
+<div style="background:linear-gradient(135deg,#C8A96E 0%,#a88752 100%);color:#fff;padding:40px 24px;text-align:center;margin:40px 0;">
+  <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:8px;" data-en="Ready to order?" data-ko="주문 준비 되셨나요?">Ready to order?</h2>
+  <p style="font-size:0.95rem;margin-bottom:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;" data-en="Contact us with the product name and we will send a PayPal invoice within 24 hours." data-ko="원하시는 상품명을 알려주시면 24시간 내 PayPal 인보이스를 보내드립니다.">Contact us with the product name and we will send a PayPal invoice within 24 hours.</p>
+  <a href="mailto:office@archinode.org?subject=ARCHINODE%20Digital%20Product%20Order" style="display:inline-block;background:#0a0a0a;color:#fff;padding:14px 36px;font-size:0.95rem;font-weight:700;text-decoration:none;border-radius:6px;" data-en="Order via Email" data-ko="이메일로 주문">Order via Email &rarr;</a>
+</div>
 </body>
 </html>
