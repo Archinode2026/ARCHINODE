@@ -102,10 +102,16 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   cursor: pointer;
 }
 .featured-card img {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
   object-fit: cover;
+  display: block;
   transition: transform 0.6s;
+}
+.featured-card img[src$=".svg"] {
+  min-width: 100%;
+  min-height: 100%;
 }
 .featured-card:hover img { transform: scale(1.03); }
 .featured-overlay {
@@ -450,6 +456,138 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   <div class="container">
     <h2 class="section-title fade-in" data-en="Latest Articles" data-ko="최신 기사">Latest Articles</h2>
     <div class="articles-grid">
+      <a href="magazine/construction-ai-robot-adoption-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/construction.svg" alt="구호는 로봇 현장은 센서 건설현장 AI 로봇 도입 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Technology" data-ko="기술">기술</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="Robots on the Slogan, Sensors on the Site" data-ko="구호는 로봇, 현장은 센서">구호는 로봇, 현장은 센서</h3>
+          <p data-en="At the 2026 Construction Day the industry chanted AI and robots — what actually works on site is quieter and narrower." data-ko="2026 건설의 날, 업계는 AI·로봇을 외쳤다. 현장에서 실제로 먹히는 것은 더 조용하고 더 좁다.">2026 건설의 날, 업계는 AI·로봇을 외쳤다. 현장에서 실제로 먹히는 것은 더 조용하고 더 좁다.</p>
+          <span class="article-card-date">2026-07-16</span>
+        </div>
+      </a>
+      <a href="magazine/zeb-mandate-green-remodeling-envelope-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/design.svg" alt="외피가 곧 탄소다 ZEB 민간 의무화 그린리모델링 2.0 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Sustainability" data-ko="지속가능성">지속가능성</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="The Envelope Is the Carbon" data-ko="외피가 곧 탄소다">외피가 곧 탄소다</h3>
+          <p data-en="ZEB moves from public to private buildings and Green Remodeling 2.0 targets old stock — windows and curtain walls become the front line." data-ko="ZEB가 공공에서 민간으로, 그린리모델링 2.0은 노후 건물로 — 창호와 커튼월이 최전선에 선다.">ZEB가 공공에서 민간으로, 그린리모델링 2.0은 노후 건물로 — 창호와 커튼월이 최전선에 선다.</p>
+          <span class="article-card-date">2026-07-16</span>
+        </div>
+      </a>
+      <a href="magazine/pohang-municipal-museum-international-competition-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/architecture.svg" alt="포항 세계를 향해 문을 열다 포항시립박물관 국제설계공모 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Project" data-ko="프로젝트">프로젝트</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="Pohang Opens Its Door to the World" data-ko="포항, 세계를 향해 문을 열다">포항, 세계를 향해 문을 열다</h3>
+          <p data-en="An international competition for the Pohang Municipal Museum — a steel city bets on memory at the water’s edge." data-ko="포항시립박물관 국제설계공모 — 철의 도시가 물가에서 기억을 짓는다.">포항시립박물관 국제설계공모 — 철의 도시가 물가에서 기억을 짓는다.</p>
+          <span class="article-card-date">2026-07-16</span>
+        </div>
+      </a>
+      <a href="magazine/stress-dsr-3-real-estate-lending-squeeze-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/construction.svg" alt="대출을 조이면 집이 멈춘다 스트레스 DSR 3단계 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Market" data-ko="시장">시장</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="When Lending Tightens, the Market Freezes" data-ko="대출을 조이면 집이 멈춘다">대출을 조이면 집이 멈춘다</h3>
+          <p data-en="The stress DSR&apos;s third stage hits the capital region while the provinces get a reprieve — and the freeze reaches interiors and materials." data-ko="스트레스 DSR 3단계는 수도권을 조이고 지방은 유예한다. 그 멈춤은 인테리어와 자재까지 내려온다.">스트레스 DSR 3단계는 수도권을 조이고 지방은 유예한다. 그 멈춤은 인테리어와 자재까지 내려온다.</p>
+          <span class="article-card-date">2026-07-15</span>
+        </div>
+      </a>
+      <a href="magazine/k-design-award-2026-finalists-hankook-a-design-gold.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/design.svg" alt="여름 K-디자인이 성적표를 받는다 K-디자인 어워드 2026 ARCHINODE 매거진">
+          <span class="article-card-tag" data-en="Design" data-ko="디자인">디자인</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="Summer, When K-Design Gets Its Report Card" data-ko="여름, K-디자인이 성적표를 받는다">여름, K-디자인이 성적표를 받는다</h3>
+          <p data-en="K-Design Award 2026 finalists and Hankook Tire&apos;s A&apos; Design gold — how Korean design became a fixture on the world circuit." data-ko="K-디자인 어워드 2026 파이널리스트와 한국타이어 A&apos; 디자인 금상 — 한국 디자인은 어떻게 세계의 상수가 됐나.">K-디자인 어워드 2026 파이널리스트와 한국타이어 A&apos; 디자인 금상 — 한국 디자인은 어떻게 세계의 상수가 됐나.</p>
+          <span class="article-card-date">2026-07-15</span>
+        </div>
+      </a>
+      <a href="magazine/from-monument-to-empathy-global-architecture-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/architecture.svg" alt="기념비에서 공감으로 2026 세계 건축의 전환 ARCHINODE 매거진">
+          <span class="article-card-tag" data-en="Culture" data-ko="문화">문화</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="From Monument to Empathy" data-ko="기념비에서 공감으로">기념비에서 공감으로</h3>
+          <p data-en="In 2026, global architecture moves past the starchitect toward an &apos;empathetic&apos; turn that is quietly a materials turn." data-ko="2026년 세계 건축은 스타키텍트를 넘어 &apos;공감의 건축&apos;으로 이동한다 — 그리고 그것은 조용히 자재적 전환이다.">2026년 세계 건축은 스타키텍트를 넘어 &apos;공감의 건축&apos;으로 이동한다 — 그리고 그것은 조용히 자재적 전환이다.</p>
+          <span class="article-card-date">2026-07-15</span>
+        </div>
+      </a>
+      <a href="magazine/office-interior-cost-rise-h2-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/design.svg" alt="사무실 인테리어 하반기엔 더 비싸진다 사무실 인테리어 비용 상승 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Market" data-ko="시장">Market</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="Office Interiors Get Pricier in the Second Half" data-ko="사무실 인테리어, 하반기엔 더 비싸진다">사무실 인테리어, 하반기엔 더 비싸진다</h3>
+          <p data-en="90% of contractors expect price hikes within six months as tariffs and labor push costs up at once. How clients should budget." data-ko="시공사 90%가 6개월 내 단가 인상을 예측한다. 관세와 인건비가 동시에 밀어올리는 하반기, 발주사는 어떻게 예산을 짜야 하나.">시공사 90%가 6개월 내 단가 인상을 예측한다. 관세와 인건비가 동시에 밀어올리는 하반기, 발주사는 어떻게 예산을 짜야 하나.</p>
+          <span class="article-card-date">2026-07-10</span>
+        </div>
+      </a>
+      <a href="magazine/snohetta-shanghai-grand-opera-house-october-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/architecture.svg" alt="황푸강 위의 나선 스노헤타 상하이 그랜드 오페라하우스 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Architecture" data-ko="건축">Architecture</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="A Spiral on the Huangpu" data-ko="황푸강 위의 나선">황푸강 위의 나선</h3>
+          <p data-en="Snøhetta's Shanghai Grand Opera House opens October 17 — 146,786㎡, oak-lined halls, Nagata acoustics, a roof you climb." data-ko="스노헤타의 상하이 그랜드 오페라하우스가 10월 17일 개관한다. 146,786㎡, 오크 마감 홀, 나가타 음향, 그리고 올라가는 지붕.">스노헤타의 상하이 그랜드 오페라하우스가 10월 17일 개관한다. 146,786㎡, 오크 마감 홀, 나가타 음향, 그리고 올라가는 지붕.</p>
+          <span class="article-card-date">2026-07-10</span>
+        </div>
+      </a>
+      <a href="magazine/square-tile-laminate-flooring-trend-h2-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/design.svg" alt="대리석처럼 보이고 나무처럼 따뜻한 바닥 정사각 타일형 강마루 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Finishes" data-ko="마감재">Finishes</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="Looks Like Marble, Warm Like Wood" data-ko="대리석처럼 보이고 나무처럼 따뜻한 바닥">대리석처럼 보이고 나무처럼 따뜻한 바닥</h3>
+          <p data-en="2026's second half moves to square-tile laminate flooring and FSC-certified natural materials. The trade-off that defined Korean floors is gone." data-ko="2026 하반기 바닥재는 정사각 타일형 강마루와 FSC 친환경 소재로 이동한다. 한국 바닥을 괴롭히던 선택이 사라졌다.">2026 하반기 바닥재는 정사각 타일형 강마루와 FSC 친환경 소재로 이동한다. 한국 바닥을 괴롭히던 선택이 사라졌다.</p>
+          <span class="article-card-date">2026-07-10</span>
+        </div>
+      </a>
+      <a href="magazine/raemian-one-perla-london-design-awards-gold-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/design.svg" alt="브라운의 아파트가 런던에서 금상을 받은 이유 래미안 원페를라 런던 디자인 어워즈 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Design" data-ko="디자인">Design</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="Why a Brown Apartment Won Gold in London" data-ko="브라운의 아파트가 런던에서 금상을 받은 이유">브라운의 아파트가 런던에서 금상을 받은 이유</h3>
+          <p data-en="Samsung C&amp;T&apos;s Raemian One Perla took Gold at the 2026 London Design Awards — a second straight win. K-residential design, or apartment-brand marketing?" data-ko="삼성물산 래미안 원페를라가 2026 런던 디자인 어워즈 건축 부문 금상을 2년 연속 받았다. K-주거 디자인의 실력인가, 아파트 브랜드 마케팅인가.">삼성물산 래미안 원페를라가 2026 런던 디자인 어워즈 건축 부문 금상을 2년 연속 받았다. K-주거 디자인의 실력인가, 아파트 브랜드 마케팅인가.</p>
+          <span class="article-card-date">2026-07-09</span>
+        </div>
+      </a>
+      <a href="magazine/design-competition-jury-integrity-reform-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/architecture.svg" alt="심사위원을 공무원으로 본다는 것 설계공모 운영지침 개정 심사 공정성 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Policy" data-ko="정책">Policy</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="Treating a Juror Like a Public Official" data-ko="심사위원을 공무원으로 본다는 것">심사위원을 공무원으로 본다는 것</h3>
+          <p data-en="Korea moves to punish corrupt design-competition jurors as public officials and make pre-contact reportable. What the integrity reform targets — and misses." data-ko="부정행위 심사위원을 공무원처럼 처벌하고 사전접촉을 신고 의무화한다. 설계공모 심사 개정이 겨냥한 것과 놓친 것.">부정행위 심사위원을 공무원처럼 처벌하고 사전접촉을 신고 의무화한다. 설계공모 심사 개정이 겨냥한 것과 놓친 것.</p>
+          <span class="article-card-date">2026-07-09</span>
+        </div>
+      </a>
+      <a href="magazine/construction-output-slump-july-2026.html" class="article-card fade-in">
+        <div class="article-card-img">
+          <img loading="lazy" src="assets/magazine/placeholders/construction.svg" alt="수주는 오르는데 현장은 비었다 2026년 7월 건설기성 부진 ARCHINODE 매거진 2026">
+          <span class="article-card-tag" data-en="Market" data-ko="시장">Market</span>
+        </div>
+        <div class="article-card-body">
+          <h3 data-en="Orders Are Rising, But the Sites Sit Empty" data-ko="수주는 오르는데 현장은 비었다">수주는 오르는데 현장은 비었다</h3>
+          <p data-en="July 2026 construction output fell 14.2% on heat, tight financing and a regional slump — yet new orders jumped. One industry, two opposite signals." data-ko="2026년 7월 건설기성 -14.2%. 폭염·자금난·지방 침체가 현장을 멈췄지만 수주는 뛰었다. 하나의 산업, 두 개의 정반대 신호.">2026년 7월 건설기성 -14.2%. 폭염·자금난·지방 침체가 현장을 멈췄지만 수주는 뛰었다. 하나의 산업, 두 개의 정반대 신호.</p>
+          <span class="article-card-date">2026-07-09</span>
+        </div>
+      </a>
       <a href="magazine/washington-triumphal-arch-monument-debate-2026.html" class="article-card fade-in">
         <div class="article-card-img">
           <img loading="lazy" src="assets/magazine/placeholders/architecture.svg" alt="기념물은 무엇을 기념하는가 ARCHINODE 매거진 2026">
