@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="description" content="ARCHINODE Brand Onboarding Guide — What to do after your listing is approved. For European brands entering the Korean market.">
+<meta charset="UTF-8">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Guide — Getting Started | ARCHINODE</title>
+<meta name="description" content="What to do after your ARCHINODE listing is approved. Step-by-step guide for European design and architecture brands.">
+<meta property="og:title" content="ARCHINODE Brand Guide — Getting Started">
+<meta property="og:description" content="A short guide for approved ARCHINODE brands. Log in, complete your profile, add products, publish stories, receive leads from Korean architects and designers.">
+<meta property="og:type" content="article">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+
+<style>
+.bg-hero { background: linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%); color:#fff; padding: 120px 0 80px; text-align:center; }
+.bg-hero .container { max-width: 780px; }
+.bg-hero .eyebrow { font-size:0.72rem; letter-spacing:0.2em; text-transform:uppercase; color:#C8A96E; margin-bottom:20px; font-weight:700; }
+.bg-hero h1 { font-size:2.6rem; font-weight:800; line-height:1.15; letter-spacing:-0.02em; margin-bottom:20px; }
+.bg-hero p { font-size:1.05rem; color:rgba(255,255,255,0.72); line-height:1.7; max-width:600px; margin:0 auto; }
+@media (max-width:768px) { .bg-hero { padding: 80px 0 60px; } .bg-hero h1 { font-size:1.9rem; } }
+
+.bg-intro { background:#fff; padding:60px 0; border-bottom:1px solid #eee; }
+.bg-intro .container { max-width:780px; }
+.bg-intro p { font-size:1rem; color:#555; line-height:1.85; }
+
+.bg-steps { background:#fafafa; padding:70px 0; }
+.bg-steps .container { max-width:840px; }
+
+.step { background:#fff; border:1px solid #e5e5e5; border-radius:10px; padding:36px 40px; margin-bottom:24px; position:relative; }
+.step-header { display:flex; align-items:center; gap:20px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #f0f0f0; }
+.step-num { flex-shrink:0; width:44px; height:44px; border-radius:50%; background:#0a0a0a; color:#C8A96E; font-family:Georgia,serif; font-size:1.2rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.step-title { flex:1; font-size:1.35rem; font-weight:800; color:#111; letter-spacing:-0.01em; }
+.step-time { flex-shrink:0; font-size:0.75rem; color:#C8A96E; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; }
+.step-body p { font-size:0.95rem; color:#444; line-height:1.8; margin-bottom:14px; }
+.step-body ul { margin: 8px 0 14px; padding-left:22px; }
+.step-body li { font-size:0.94rem; color:#444; line-height:1.75; margin-bottom:8px; }
+.step-body strong { color:#0a0a0a; }
+.step-body a { color:#C8A96E; font-weight:600; text-decoration:none; border-bottom:1px solid rgba(200,169,110,0.4); }
+.step-body a:hover { border-bottom-color:#C8A96E; }
+.step-tip { background:#fff9ef; border-left:3px solid #C8A96E; padding:14px 18px; margin:14px 0 4px; font-size:0.9rem; color:#5a4c2c; line-height:1.65; border-radius:0 4px 4px 0; }
+.step-tip strong { color:#7a5a12; }
+@media (max-width:768px) {
+  .step { padding:26px 22px; }
+  .step-header { flex-wrap:wrap; }
+  .step-time { order:3; width:100%; padding-top:8px; }
+}
+
+.bg-support { background:#0a0a0a; color:#fff; padding:70px 0; }
+.bg-support .container { max-width:780px; text-align:center; }
+.bg-support h2 { font-size:1.6rem; font-weight:800; margin-bottom:14px; }
+.bg-support p { color:rgba(255,255,255,0.72); font-size:0.95rem; line-height:1.8; margin-bottom:24px; }
+.bg-support .support-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; margin-top:32px; text-align:left; }
+.support-card { background:#141414; border:1px solid #222; padding:24px 26px; border-radius:8px; }
+.support-card .role { font-size:0.7rem; letter-spacing:0.18em; color:#C8A96E; font-weight:700; text-transform:uppercase; margin-bottom:10px; }
+.support-card .name { font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:6px; }
+.support-card .detail { font-size:0.85rem; color:#888; line-height:1.7; }
+.support-card a { color:#C8A96E; text-decoration:none; }
+.support-card a:hover { text-decoration:underline; }
+
+.bg-founding { background:#fff9ef; padding:56px 0; border-top:3px solid #C8A96E; }
+.bg-founding .container { max-width:780px; text-align:center; }
+.bg-founding .badge { display:inline-block; font-size:0.7rem; letter-spacing:0.2em; color:#7a5a12; font-weight:800; padding:6px 16px; border:1px solid #C8A96E; border-radius:20px; text-transform:uppercase; margin-bottom:18px; }
+.bg-founding h2 { font-size:1.5rem; font-weight:800; color:#0a0a0a; margin-bottom:12px; }
+.bg-founding p { color:#5a4c2c; font-size:0.98rem; line-height:1.8; }
+.bg-founding strong { color:#0a0a0a; }
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="announcement-bar">
+  <span>2026 Brand Listing —</span> <strong>Now Free</strong> &nbsp;|&nbsp; <span>List your brand on ARCHINODE at no cost.</span> <a href="list-your-brand.html">Learn more &rarr;</a>
+</div>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container">
+    <a href="index.html" class="logo">ARCHINODE <span class="logo-sub">Where Global Design meets Korea</span></a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger" onclick="toggleCatMenu()">Categories <i class="fas fa-chevron-down"></i></button>
+        <div class="nav-dropdown-menu" id="catMenu">
+          <a href="categories/furniture.html"><span>Furniture</span><small>Furniture</small></a>
+          <a href="categories/bathroom.html"><span>Bathroom</span><small>Bathroom</small></a>
+          <a href="categories/outdoor.html"><span>Outdoor</span><small>Outdoor</small></a>
+          <a href="categories/lighting.html"><span>Lighting</span><small>Lighting</small></a>
+          <a href="categories/kitchen.html"><span>Kitchen</span><small>Kitchen</small></a>
+          <a href="categories/office.html"><span>Office</span><small>Office</small></a>
+          <a href="categories/finishes.html"><span>Finishes</span><small>Finishes</small></a>
+          <a href="categories/wellness.html"><span>Wellness</span><small>Wellness</small></a>
+          <a href="categories/decor.html"><span>Decor</span><small>Decor</small></a>
+          <a href="categories/construction.html"><span>Construction</span><small>Construction</small></a>
+        </div>
+      </div>
+      <a href="brands.html">Brands</a>
+      <a href="magazine.html">Magazine</a>
+      <a href="trend-report.html">Brand Magazine</a>
+      <a href="about.html">About</a>
+      <a href="list-your-brand.html" class="nav-cta">List Your Brand</a>
+    </nav>
+    <div class="header-actions">
+      <a href="brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;">Brand Login</a>
+      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="bg-hero">
+  <div class="container">
+    <div class="eyebrow">Brand Guide — Getting Started</div>
+    <h1>Your listing is approved.<br>Here is how to make it work for you.</h1>
+    <p>A short, practical guide for European design and architecture brands who have just joined ARCHINODE. Five steps, no jargon, roughly one hour of your time to be fully set up.</p>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="bg-intro">
+  <div class="container">
+    <p>Welcome to ARCHINODE. Your application has been reviewed and approved by our team. From this point on, your brand is discoverable by Korean architects, interior designers, specifiers, and developers who are actively searching for European design partners. This guide walks you through what to do next — from your first login to your first specifier inquiry.</p>
+    <p>If at any point something is unclear, contact us. We would rather answer a small question early than have you set things up twice.</p>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="bg-steps">
+  <div class="container">
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div class="step-title">Log in to your Brand Portal</div>
+        <div class="step-time">5 min</div>
+      </div>
+      <div class="step-body">
+        <p>Go to <a href="brand-portal/login.html" target="_blank">archinodekr.com/brand-portal/login.html</a> and sign in with:</p>
+        <ul>
+          <li><strong>Email:</strong> the address you submitted during listing</li>
+          <li><strong>Temporary password:</strong> the one shown on the success screen right after your application, also included in the confirmation email</li>
+        </ul>
+        <p>Once inside, use the settings menu to change your password to something you will remember. This is your brand's dedicated workspace on ARCHINODE.</p>
+        <div class="step-tip">
+          <strong>Tip:</strong> Bookmark the Brand Portal login page. Your dashboard is where you will spend most of your time managing your presence on ARCHINODE.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div class="step-title">Complete your brand profile</div>
+        <div class="step-time">15 min</div>
+      </div>
+      <div class="step-body">
+        <p>Your brand profile is the first page Korean specifiers see when they discover you. Take time on this — it is the equivalent of a small landing page dedicated to your brand.</p>
+        <p>Fill in these fields inside the Brand Portal:</p>
+        <ul>
+          <li><strong>Brand story</strong> — one to two paragraphs. Where you come from, what you make, what makes you distinct. Write for a professional audience, not for consumers.</li>
+          <li><strong>Hero image</strong> — one high-resolution image (landscape orientation, minimum 1600 pixels wide) that represents your brand. Interior shots, product-in-context, or manufacturing details all work well. Avoid pure product cutouts here — those go in the product catalog.</li>
+          <li><strong>Logo</strong> — a clean, transparent-background PNG or SVG works best. Displayed on your brand page and in search results.</li>
+          <li><strong>Categories</strong> — you selected these at application. Adjust anytime.</li>
+          <li><strong>Website, Instagram, LinkedIn</strong> — outbound links so interested specifiers can dig deeper.</li>
+          <li><strong>Contact person for Korean inquiries</strong> — usually your export manager or business development lead.</li>
+        </ul>
+        <div class="step-tip">
+          <strong>Tip:</strong> Copy from your existing English brand book if you have one. You do not need to write anything new — Korean specifiers value authenticity over local marketing polish.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <div class="step-title">Add your products</div>
+        <div class="step-time">10–30 min</div>
+      </div>
+      <div class="step-body">
+        <p>Products are what make you show up in Korean specifiers' searches. From your dashboard, click <strong>Add Product</strong> and provide:</p>
+        <ul>
+          <li><strong>Product name and collection</strong> — the name as it appears in your catalog</li>
+          <li><strong>Category and subcategory</strong> — this determines where you appear on ARCHINODE</li>
+          <li><strong>Product images</strong> — one main image plus up to five additional views. Product-in-context photos perform better than cutouts</li>
+          <li><strong>Materials, finishes, dimensions</strong> — specifiers filter and compare by these fields</li>
+          <li><strong>Description</strong> — one paragraph in English is enough. Focus on materials, use cases, and what makes this product distinct</li>
+        </ul>
+        <p>You do not need to add your entire catalog at once. Start with your ten or fifteen most representative products. You can always add more as they become relevant to the Korean market.</p>
+        <div class="step-tip">
+          <strong>Tip:</strong> If you sell BIM files, CAD files, or spec sheets, upload them as attachments — Korean architects search for these first when preparing a specification.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">4</div>
+        <div class="step-title">Publish a brand story (optional but recommended)</div>
+        <div class="step-time">20 min</div>
+      </div>
+      <div class="step-body">
+        <p>The Brand Magazine on ARCHINODE is where you tell your story in your own words — not a product pitch, but a piece of professional journalism about your work. Recent projects, design philosophy, a designer collaboration, a new collection announcement, or a behind-the-scenes look at how something is made.</p>
+        <p>From the Brand Portal, open <strong>Write Article</strong> and use the block editor:</p>
+        <ul>
+          <li>Alternate <strong>text blocks</strong> and <strong>image blocks</strong> in any order you like</li>
+          <li>Each image can carry a caption and alt-text — please fill both for accessibility</li>
+          <li>Article language: English or Korean. If you write in English we will not translate; if you want a Korean version, submit both</li>
+          <li>Select a tag (Trend, Design, Culture, Industry, etc.) so your article appears in the right feed</li>
+          <li>Save as draft, or submit for editorial review when ready</li>
+        </ul>
+        <p>Articles are reviewed by our editorial team within 3–5 business days. Once approved, your article is published to the Brand Magazine and linked from your brand page. Approved articles are also promoted in our monthly newsletter to Korean architects and designers.</p>
+        <div class="step-tip">
+          <strong>Tip:</strong> One well-written article per quarter is worth more than four rushed ones. Brands with published stories receive roughly three times more specifier inquiries than brands with product listings only.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">5</div>
+        <div class="step-title">Receive and respond to leads</div>
+        <div class="step-time">Ongoing</div>
+      </div>
+      <div class="step-body">
+        <p>Once your profile is public, Korean specifiers can inquire about your brand or a specific product directly through ARCHINODE. Every inquiry arrives at:</p>
+        <ul>
+          <li><strong>The contact email you provided at Step 2</strong> — inquiry details, contact person, project context</li>
+          <li><strong>Your Brand Portal Inbox</strong> — for record-keeping and follow-up</li>
+        </ul>
+        <p>What Korean specifiers usually want on the first contact:</p>
+        <ul>
+          <li>Confirmation the product is available for the Korean market</li>
+          <li>Lead time and shipping options</li>
+          <li>Certification documents if the product goes into a public building (KC, KS, or equivalent EU document)</li>
+          <li>Contact for a local dealer or, if none, direct import terms</li>
+        </ul>
+        <p>Respond within 48 hours whenever possible. Korean project timelines move quickly and a fast, professional first reply is often what turns an inquiry into a specification.</p>
+        <div class="step-tip">
+          <strong>Tip:</strong> If you do not yet have a Korean dealer, that is fine — many EU brands enter Korea through direct project supply first and appoint a dealer only once volume justifies it. We can advise on the transition when the time comes.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOUNDING RATE -->
+<section class="bg-founding">
+  <div class="container">
+    <div class="badge">Founding Brand Benefit</div>
+    <h2>Your listing is free through December 2026.</h2>
+    <p>Brands who join before December 2026 automatically retain the <strong>€10 / month founding rate permanently</strong>, even as our standard price rises after 2027. Use this window to build your presence — the pricing lock is yours to keep.</p>
+  </div>
+</section>
+
+<!-- SUPPORT -->
+<section class="bg-support">
+  <div class="container">
+    <h2>Something unclear? Reach out.</h2>
+    <p>You have two direct points of contact. Both read every message.</p>
+    <div class="support-grid">
+      <div class="support-card">
+        <div class="role">Korean Headquarters</div>
+        <div class="name">ARCHINODE Team</div>
+        <div class="detail">
+          Product, technical, admin, and general questions.<br>
+          <a href="mailto:office@archinode.org">office@archinode.org</a>
+        </div>
+      </div>
+      <div class="support-card">
+        <div class="role">Milan Office · EU Director</div>
+        <div class="name">Silvia Vandone</div>
+        <div class="detail">
+          European brand relationships, on-site visits, and dedicated EU support.<br>
+          <a href="mailto:silviavandone@hotmail.com">silviavandone@hotmail.com</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (simplified copy of standard footer) -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">ARCHINODE <span class="logo-sub">Where Global Design meets Korea</span></div>
+        <p>Connecting global architecture &amp; design brands with the Korean market.</p>
+      </div>
+      <div class="footer-col"><h4>Company</h4><ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="for-brands.html">For Brands</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>For Brands</h4><ul>
+        <li><a href="list-your-brand.html">List Your Brand</a></li>
+        <li><a href="brand-portal/login.html">Brand Login</a></li>
+        <li><a href="brand-guide.html">Brand Guide</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Legal</h4><ul>
+        <li><a href="terms.html">Terms</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-business-info" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;margin-top:40px;margin-bottom:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
+      상호: 비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
+      주소: 경기도 의왕시 내손로 13, 103동 804호 &nbsp;|&nbsp; 이메일: office@archinode.org
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 ARCHINODE. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="firebase-config.js"></script>
+<script src="lang.js?v=20260630"></script>
+<script src="auth-ui.js"></script>
+<script>
+function toggleCatMenu() { document.getElementById('catMenu').classList.toggle('active'); }
+function toggleMobile() { document.getElementById('mainNav').classList.toggle('active'); }
+document.addEventListener('click', e => { const d = document.querySelector('.nav-dropdown'); if(d && !d.contains(e.target)) document.getElementById('catMenu').classList.remove('active'); });
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 50); });
+</script>
+
+<script src="cookie-consent.js?v=20260630" defer></script>
+<script src="analytics-loader.js?v=20260630" defer></script>
+<script src="sentry-loader.js?v=20260630" defer></script>
+</body>
+</html>

@@ -372,6 +372,9 @@ async function updateBrand(docId, newStatus) {
                     lines.push('https://archinodekr.com/brand-portal/login.html');
                     lines.push('');
                     lines.push('Use the email and temporary password you received when you first applied.');
+                    lines.push('');
+                    lines.push('Next steps — our short Brand Guide walks you through login, profile setup, product upload, and receiving Korean specifier inquiries:');
+                    lines.push('https://archinodekr.com/brand-guide.html');
                 } else if (newStatus === 'suspended') {
                     lines.push('Your listing on ARCHINODE has been suspended.');
                     if (reason) { lines.push(''); lines.push('Reason: ' + reason); }
