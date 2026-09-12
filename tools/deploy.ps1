@@ -14,6 +14,7 @@
 # 배포는 반드시 이 스크립트로만 한다. 손으로 push하면 4번(라이브 대조)이 빠진다.
 
 param(
+    [switch]$Rules,           # firestore.rules 를 Firebase CLI로 게시 (2026-09-12부터 가능 — office@archinode.org 로 login:use 됨)
     [switch]$NoPush,          # push 생략, 라이브 대조만
     [string]$CheckString,     # 라이브 페이지에 이 문자열이 몇 번 나오는지 추가 확인
     [string]$CheckPath = '',  # CheckString을 찾을 경로 (기본: 루트 index.html)
@@ -72,7 +73,21 @@ $rulesChanged = (git diff --name-only $range | Where-Object { $_ -eq 'firestore.
 Write-Host "[확인] 브랜치 main · 미커밋 0 · 올릴 커밋 $ahead 개 · 대조할 정적 파일 $($changed.Count) 개" -ForegroundColor Cyan
 if ($ahead -gt 0) { git log --oneline $range | ForEach-Object { Write-Host "       $_" } }
 
-# ── 2. firestore.rules 경고 ──
+# ── 2. firestore.rules — -Rules 면 CLI로 게시, 아니면 경고 ──
+if ($Rules) {
+    Write-Host '[규칙] firestore.rules 를 Firebase 에 게시합니다 (프로젝트 archinode-8ab04). 넓히기/좁히기를 컬렉션마다 나눠 판단했습니까?' -ForegroundColor Yellow
+    $log = Join-Path $env:TEMP 'archinode-deploy-rules.log'
+    npx firebase-tools deploy --only firestore:rules --project archinode-8ab04 | Tee-Object -FilePath $log | Out-Host
+    $rtext = ''
+    if (Test-Path $log) { $rtext = Get-Content $log -Raw }
+    if ($null -eq $rtext) { $rtext = '' }
+    if ($LASTEXITCODE -ne 0 -or ($rtext -notmatch 'Deploy complete')) {
+        Write-Host '[실패] 규칙 게시가 끝까지 가지 못했습니다. 위 로그를 확인하고 다시 실행하세요. (push는 아직 안 했습니다)' -ForegroundColor Red
+        exit 1
+    }
+    Write-Host '[규칙] 게시 완료.' -ForegroundColor Green
+    $rulesChanged = $null
+}
 if ($rulesChanged) {
     Write-Host ''
     Write-Host '#################################################################' -ForegroundColor Red
