@@ -15,7 +15,8 @@ firestore/
 ├── articles/        ← 매거진 기사 (자동 생성 ID)
 ├── users/           ← 국내 전문가 계정 (Phase 2B, 문서 ID = Auth UID)
 ├── adminLogs/       ← 어드민 활동 장부 (2026-09-12 개편 2단계, 어드민 전용, 덧붙이기만 — 7절)
-└── settings/        ← 정책 값·사이트 정보 (2026-09-12 개편 3단계, 문서 1개 config, 읽기 공개·쓰기 어드민 — 8절)
+├── settings/        ← 정책 값·사이트 정보 (2026-09-12 개편 3단계, 문서 1개 config, 읽기 공개·쓰기 어드민 — 8절)
+└── leads/           ← 리드 인박스 (2026-09-12 개편 4a 활성 — 어드민 등록·배정, 브랜드 포털 Inbox — 9절)
 ```
 
 ---
@@ -331,3 +332,28 @@ articles: status ASC, createdAt DESC
 ```
 
 카테고리(10+69)·어드민 이메일(2개)은 **넣지 않는다** — 카테고리는 정적 페이지 79개와 1:1(브랜드 포털 `SUBCATEGORIES` 가 정본), 어드민 이메일은 `firestore.rules` `isAdmin()` 문자열 고정. 설정 화면 ③ 탭은 둘을 읽기 전용으로 보여만 준다(계약서 2-3).
+
+---
+
+## 9. leads 컬렉션 (2026-09-12 어드민 개편 4a — 규칙에 "선언만" 있던 컬렉션을 활성. 계약서 4-3)
+
+**문서 ID:** 자동 생성 · **규칙:** create 누구나(4b 공개 폼 대비 — `type in ['quote','brand-inquiry','dealer']`·`status=='new'`·`name`·`email.size()>5`·`message`·`createdAt==request.time`) / read `isAdmin() || (isSignedIn() && resource.data.brandId == request.auth.uid)` / update 어드민 전부, 브랜드는 `diff().affectedKeys().hasOnly(['status','brandNote','history','updatedAt'])` + `status in ['assigned','contacted','closed']` / delete 어드민.
+**쓰는 곳:** `admin/js/view-leads.js`(고객 > 리드 인박스 — 「+ 수동 등록」 create, 배정·상태·adminNote update, `logAdmin('lead.create'|'lead.assign'|'lead.status')`, 배정 시 `mail` 1통 "New lead assigned — ARCHINODE") · `brand-portal/dashboard.html` Inbox 탭(브랜드 — status·brandNote·history·updatedAt **4키만** update). 공개 폼(brands/view·products/view·contact)은 **4b, 한울님 복귀 후**.
+**읽는 곳:** 어드민 `orderBy('createdAt','desc').limit(200)` 단일 필드 / 포털 `where('brandId','==',uid)` **orderBy 없이** 클라이언트 정렬(`brandId+createdAt` 복합 색인 회피).
+
+```javascript
+{
+  type:        'quote',                 // 'quote' | 'brand-inquiry' | 'dealer'
+  status:      'new',                   // 'new' → 'assigned' → 'contacted' → 'closed' | 'spam' (포털은 assigned→contacted→closed 만)
+  brandId:     '',                      // 배정 브랜드 uid ('' = 미배정)      brandName: ''   비정규화
+  productId:   '',                      // 견적요청이면 제품 문서 id ('')     productName: '' 비정규화
+  name: '', company: '', email: '', phone: '', industry: '',   // industry 는 users.industry 와 같은 값(auth/signup.html 목록)
+  message:     '',                      // 본문 — 외부 입력. 표시 시 escapeHtml(저장 시 이스케이프 아님)
+  source:      'admin-manual',          // 'admin-manual' | 'brand-page' | 'product-page' | 'contact'
+  userId:      '',                      // 로그인한 전문가면 uid, 아니면 ''
+  adminNote:   '',                      // 어드민 메모      brandNote: ''   브랜드 메모(포털 한 줄)
+  createdAt:   Timestamp,               // serverTimestamp (= request.time, 규칙 검사)
+  updatedAt:   Timestamp,  assignedAt: Timestamp | null,
+  history:     [{ status: 'new', by: 'office@archinode.org', byRole: 'admin', at: '2026-09-12T…Z', note: 'manual entry' }]   // byRole 'admin' | 'brand', at 은 ISO 문자열(arrayUnion 이라 serverTimestamp 불가)
+}
+```

@@ -21,7 +21,10 @@ var LOG_ACTIONS = {
     'trend.status':        { en: 'Trend submission status', ko: '트렌드 투고 상태' },
     'newsletter.status':   { en: 'Newsletter subscriber',  ko: '뉴스레터 구독자' },
     'notify.status':       { en: 'Digital notify subscriber', ko: '디지털 알림 신청자' },
-    'settings.save':       { en: 'Settings saved',          ko: '설정 저장' }              // 3단계 view-settings.js
+    'settings.save':       { en: 'Settings saved',          ko: '설정 저장' },             // 3단계 view-settings.js
+    'lead.create':         { en: 'Lead registered',         ko: '리드 등록' },             // 4a단계 view-leads.js
+    'lead.assign':         { en: 'Lead assigned',           ko: '리드 배정' },
+    'lead.status':         { en: 'Lead status',             ko: '리드 상태' }
 };
 
 // 종류 필터 = action 접두어 ('' = 전체)
@@ -35,7 +38,8 @@ var LOG_KINDS = [
     { key: 'trend',        en: 'Trend submissions', ko: '트렌드 투고' },
     { key: 'newsletter',   en: 'Newsletter',     ko: '뉴스레터' },
     { key: 'notify',       en: 'Digital notify', ko: '디지털 알림' },
-    { key: 'settings',     en: 'Settings',       ko: '설정' }
+    { key: 'settings',     en: 'Settings',       ko: '설정' },
+    { key: 'lead',         en: 'Leads',          ko: '리드' }                // 4a단계
 ];
 
 // 기간 필터 (로컬 시간 기준 — toISOString 금지)

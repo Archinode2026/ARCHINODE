@@ -34,8 +34,8 @@
 ```
 ARCHINODE/
 ├── index, about, brands, categories, magazine, for-brands, list-your-brand, contact, ...  # 공개 페이지
-├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계, 활동 로그(`adminLogs`·`admin/js/view-logs.js`, 브랜드 `history[]`) — 2단계, 설정·규정집(`settings/config`·`view-settings.js`·`view-regulations.js` — cdnjs marked 12.0.2 + DOMPurify 3.1.6 버전 고정) — 3단계)
-├── auth/             # 전문가 로그인·가입·프로필   ├── brand-portal/  # 브랜드 대시보드 + article-editor.js
+├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계, 활동 로그(`adminLogs`·`admin/js/view-logs.js`, 브랜드 `history[]`) — 2단계, 설정·규정집(`settings/config`·`view-settings.js`·`view-regulations.js` — cdnjs marked 12.0.2 + DOMPurify 3.1.6 버전 고정) — 3단계, 리드 인박스(`leads`·`view-leads.js` — 수동 등록·배정·상태·이력, 배정 시 `mail` 1통) — 4a단계)
+├── auth/             # 전문가 로그인·가입·프로필   ├── brand-portal/  # 브랜드 대시보드 + article-editor.js + Inbox 탭(배정 리드, 4a — update 키 status·brandNote·history·updatedAt 4개만)
 ├── brands/view.html  # 브랜드 상세 라우터           ├── products/view.html
 ├── categories/       # 10 대분류 + 69 서브          ├── magazine/, trend-report/
 ├── downloads/ assets/ sales/ silvia/                 # 브로슈어·이미지·실비아 자료
@@ -60,7 +60,7 @@ ARCHINODE/
 
 ## 5. Firestore 콜렉션
 
-brands(입점, status pending/approved/suspended/rejected + 사유) · products · articles(blocks 배열) · users(전문가) · leads(선언만, 미사용) · trend-submissions · consultations · digital-products-notify · newsletter-subscribers · mail(Trigger Email Extension용 — **설치 여부 미확인**, `docs/admin-email-notification-setup.md`) · **reviewIssues**(검수관리 게시판, 어드민 전용 read/write, 2026-09-12 신설 — 오픈 전 임시 도구, 필드는 `docs/회의/2026-09-12-작업지시-검수관리탭.md` 1절) · **adminLogs**(어드민 활동 장부, 2026-09-12 개편 2단계 — create·read 어드민, update·delete 전면 금지(덧붙이기만), 필드는 `docs/firestore-schema.md` 7절; `brands.history[]` 도 같은 단계) · **settings**(`settings/config` 1문서 — 정책 값 listing.*·사이트 정보 site.*·adminNotice, **read 공개·write 어드민**, 2026-09-12 개편 3단계, 필드는 `docs/firestore-schema.md` 8절. 값은 for-brands.html 문구를 옮긴 것이라 공개 페이지 연동은 안건 1 결정·복귀 후). 스키마 `docs/firestore-schema.md`, `docs/articles-schema.md`.
+brands(입점, status pending/approved/suspended/rejected + 사유) · products · articles(blocks 배열) · users(전문가) · **leads**(2026-09-12 개편 **4a 활성** — 어드민 리드 인박스 `admin/js/view-leads.js` + 브랜드 포털 Inbox 탭. create 누구나(type·status 'new'·name·email·message·createdAt 검사) / read 어드민 ∪ 배정 브랜드 본인 / update 어드민 전부, 브랜드는 `status·brandNote·history·updatedAt` 4키만(`affectedKeys().hasOnly`) + status assigned·contacted·closed / delete 어드민. 필드는 `docs/firestore-schema.md` 9절. **공개 폼은 4b(복귀 후)** — 지금 입구는 어드민 수동 등록뿐. 포털 조회는 `where('brandId','==',uid)` 만(복합 색인 회피)) · trend-submissions · consultations · digital-products-notify · newsletter-subscribers · mail(Trigger Email Extension용 — **설치 여부 미확인**, `docs/admin-email-notification-setup.md`) · **reviewIssues**(검수관리 게시판, 어드민 전용 read/write, 2026-09-12 신설 — 오픈 전 임시 도구, 필드는 `docs/회의/2026-09-12-작업지시-검수관리탭.md` 1절) · **adminLogs**(어드민 활동 장부, 2026-09-12 개편 2단계 — create·read 어드민, update·delete 전면 금지(덧붙이기만), 필드는 `docs/firestore-schema.md` 7절; `brands.history[]` 도 같은 단계) · **settings**(`settings/config` 1문서 — 정책 값 listing.*·사이트 정보 site.*·adminNotice, **read 공개·write 어드민**, 2026-09-12 개편 3단계, 필드는 `docs/firestore-schema.md` 8절. 값은 for-brands.html 문구를 옮긴 것이라 공개 페이지 연동은 안건 1 결정·복귀 후). 스키마 `docs/firestore-schema.md`, `docs/articles-schema.md`.
 
 ## 6. 팀 — 지휘 창 · 스킬 · 에이전트 (2026-09-12, 엑사·단번 체계 이식)
 

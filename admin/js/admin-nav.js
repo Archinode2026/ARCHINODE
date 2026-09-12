@@ -16,7 +16,7 @@ var ADMIN_MENUS = [
         { id: 'dashboard', en: 'Dashboard', ko: '대시보드', icon: 'fa-th-large', kind: 'view', target: 'dashboard', ready: true }
     ] },
     { key: 'customer', en: 'Customers', ko: '고객', items: [
-        { id: 'leads',     en: 'Lead Inbox',    ko: '리드 인박스', icon: 'fa-inbox',        kind: 'view', target: 'leads',     ready: false },   // 4단계
+        { id: 'leads',     en: 'Lead Inbox',    ko: '리드 인박스', icon: 'fa-inbox',        kind: 'view', target: 'leads',     ready: true },    // 4a단계 ✓ view-leads.js
         { id: 'inquiries', en: '1:1 Inquiries', ko: '1:1 문의',    icon: 'fa-comment-dots', kind: 'view', target: 'inquiries', ready: false },   // 5단계
         { id: 'members',   en: 'Professionals', ko: '전문가 회원', icon: 'fa-users',        kind: 'view', target: 'members',   ready: false }    // 6단계
     ] },
@@ -138,6 +138,7 @@ function adm_route() {
         if (item.target === 'logs' && typeof logs_render === 'function') logs_render(view);   // 2단계 활동 로그
         if (item.target === 'settings' && typeof set_render === 'function') set_render(view);         // 3단계 설정
         if (item.target === 'regulations' && typeof reg_render === 'function') reg_render(view);      // 3단계 규정집
+        if (item.target === 'leads' && typeof leads_render === 'function') leads_render(view);        // 4a단계 리드 인박스
     }
     adm_setActive(item.id);
 }

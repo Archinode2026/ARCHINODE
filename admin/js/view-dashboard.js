@@ -2,13 +2,14 @@
    view-dashboard.js — 대시보드 첫 화면 (2026-09-12 어드민 개편 1단계)
    정본: docs/회의/2026-09-12-구현계약서-어드민개편.md 3장 1단계 · 6장 리스크 7·8
 
-   대기 건수 카드 6개 + 「최근 활동」(2단계: adminLogs 최신 20건 — view-logs.js 의 logs_tableHtml 재사용).
+   대기 건수 카드 7개(4a: 「새 리드」 추가) + 「최근 활동」(2단계: adminLogs 최신 20건 — view-logs.js 의 logs_tableHtml 재사용).
    카운트는 컬렉션마다 where('status','==',…) 단일 필드 한 번 — orderBy 를 붙이면
    복합 색인이 필요해지므로 붙이지 않는다(리스크 8). Firestore 쓰기 없음.
    ★ 전역 `var`/`function` 만. 접두어 dash_.
    ───────────────────────────────────────────────────────────────────────── */
 
 var DASH_CARDS = [
+    { id: 'leads',         en: 'New leads',             ko: '새 리드',          icon: 'fa-inbox',            coll: 'leads',             status: 'new',      href: 'dashboard.html#leads' },     // 4a단계
     { id: 'brands',        en: 'Brands pending',        ko: '브랜드 승인 대기', icon: 'fa-building',         coll: 'brands',            status: 'pending',  href: 'dashboard.html#brands' },
     { id: 'products',      en: 'Products to review',    ko: '제품 검토 대기',   icon: 'fa-box-open',         coll: 'products',          status: 'pending',  href: 'dashboard.html#products' },
     { id: 'articles',      en: 'Articles to review',    ko: '아티클 검토 대기', icon: 'fa-newspaper',        coll: 'articles',          status: 'pending',  href: 'dashboard.html#articles' },

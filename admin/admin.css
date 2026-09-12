@@ -22,7 +22,7 @@
 .adm-item.active i { color: #C8A96E; }
 
 /* DASHBOARD CARDS */
-.adm-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.adm-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }   /* 4a: 카드 7장 → 4+3 (3열이면 3+3+1) */
 .adm-card { display: block; background: #fff; border-radius: 10px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-decoration: none; color: #333; border: 1px solid transparent; transition: border-color 0.2s; }
 .adm-card:hover { border-color: #C8A96E; }
 .adm-card-icon { float: right; font-size: 1.4rem; color: #e0e0e0; }
@@ -102,6 +102,40 @@
 .adm-notice { background: #f3f4f6; border: 1px solid #e5e7eb; border-left: 4px solid #C8A96E; color: #333; padding: 12px 16px; border-radius: 6px; font-size: 0.86rem; margin-bottom: 20px; white-space: pre-wrap; word-break: break-word; }
 .adm-notice i { color: #C8A96E; margin-right: 6px; }
 .adm-notice-err { border-left-color: #dc2626; color: #991b1b; }
+
+/* LEAD INBOX (4a단계 — view-leads.js). 상태 뱃지는 dashboard.html .status 와 같은 모양, 없는 값만 추가 */
+.adm-leads { border-radius: 10px; }
+.status-new { background: #dbeafe; color: #1e40af; }
+.status-assigned { background: #ede9fe; color: #5b21b6; }
+.status-closed { background: #e5e7eb; color: #374151; }
+.adm-type { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: #f3f4f6; color: #444; white-space: nowrap; }
+.adm-type-quote { background: #fef3c7; color: #92400e; }
+.adm-type-brand { background: #e0e7ff; color: #3730a3; }
+.adm-type-dealer { background: #d1fae5; color: #065f46; }
+.adm-lead-h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+/* 폼(수동 등록) — dashboard.html .rv-form 과 같은 모양이지만 검수관리 탭이 걷힐 때를 대비해 따로 둔다 */
+.adm-form label { display: block; font-size: 0.82rem; font-weight: 600; color: #444; margin: 12px 0 6px; }
+.adm-form input, .adm-form select, .adm-form textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.86rem; }
+.adm-form textarea { min-height: 90px; resize: vertical; }
+.adm-form input:focus, .adm-form select:focus, .adm-form textarea:focus { outline: none; border-color: #C8A96E; }
+.adm-form .adm-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.adm-form-actions { margin-top: 18px; display: flex; gap: 8px; justify-content: flex-end; }
+.adm-btn-cancel { background: #f3f4f6; color: #555; }
+.adm-err { color: #dc2626; font-size: 0.8rem; margin-top: 10px; display: none; white-space: pre-wrap; }
+/* 상세 모달 — 정의 목록 · 조작 줄 · 이력 */
+.adm-dl { margin: 12px 0; }
+.adm-dl dt { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 12px; }
+.adm-dl dd { font-size: 0.88rem; color: #333; margin: 4px 0 0; white-space: pre-wrap; word-break: break-word; }
+.adm-bar { margin-top: 14px; padding-top: 12px; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.adm-bar label { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; min-width: 72px; }
+.adm-bar select, .adm-bar input, .adm-bar textarea { padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.82rem; }
+.adm-bar input, .adm-bar textarea { flex: 1; min-width: 160px; }
+.adm-bar textarea { resize: vertical; min-height: 40px; }
+.adm-hist-head { margin-top: 16px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+.adm-hist { list-style: none; margin: 8px 0 0; padding: 0; font-size: 0.8rem; color: #555; }
+.adm-hist li { padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+.adm-hist li small { color: #999; margin-left: 6px; }
+.adm-hist li div { margin-top: 3px; white-space: pre-wrap; }
 
 /* 규정집 뷰어 — 목차(왼쪽) + 본문. 본문은 DOMPurify 를 거친 마크다운 HTML */
 .adm-regs { border-radius: 10px; }

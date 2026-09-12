@@ -161,17 +161,28 @@ service cloud.firestore {
     }
 
     // ────────────────────────────────────────────────────────────────────
-    // leads 컬렉션 (향후 사용 — 브랜드 리드 생성)
-    // 문서 ID = 자동 생성
-    // 현재는 contact 폼이 Formspree로 가지만, 향후 직접 수집 시 사용
+    // leads 컬렉션 — 리드 인박스 (2026-09-12 어드민 개편 4a 활성. 필드는 docs/firestore-schema.md 9절)
+    // 문서 ID = 자동 생성. type 'quote'|'brand-inquiry'|'dealer', status new→assigned→contacted→closed | spam
+    // 4a: 어드민 수동 등록(admin/js/view-leads.js) + 브랜드 포털 Inbox 탭. 공개 폼(4b)은 한울님 복귀 후.
     // ────────────────────────────────────────────────────────────────────
     match /leads/{leadId} {
-      // 생성: 누구나 (방문자 폼 제출). 단, 필수 필드 검증.
-      allow create: if request.resource.data.email is string
-                    && request.resource.data.email.size() > 5
+      // 생성: 누구나(4b 공개 폼 대비) — type·status=='new'·name·email·message·createdAt==request.time 검사
+      //       (기존 조건 email·createdAt 에 type·status·name·message 를 더한 좁히기 — 4a 전에는 create 를 쓰는 곳이 없었다)
+      allow create: if request.resource.data.type in ['quote','brand-inquiry','dealer']
+                    && request.resource.data.status == 'new'
+                    && request.resource.data.name is string && request.resource.data.name.size() > 0
+                    && request.resource.data.email is string && request.resource.data.email.size() > 5
+                    && request.resource.data.message is string
                     && request.resource.data.createdAt == request.time;
-      // 읽기·수정·삭제: 어드민만 (개인정보 보호)
-      allow read, update, delete: if isAdmin();
+      // 읽기: 어드민, 또는 배정된 브랜드 본인 (포털은 where('brandId','==',uid) 로만 조회 — list 는 문서별 판정)
+      allow read: if isAdmin() || (isSignedIn() && resource.data.brandId == request.auth.uid);
+      // 수정: 어드민 전부 / 브랜드는 배정 건에서 status·brandNote·history·updatedAt 만, status 는 assigned·contacted·closed 만
+      allow update: if isAdmin()
+                    || (isSignedIn() && resource.data.brandId == request.auth.uid
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','brandNote','history','updatedAt'])
+                        && request.resource.data.status in ['assigned','contacted','closed']);
+      // 삭제: 어드민만
+      allow delete: if isAdmin();
     }
 
     // ────────────────────────────────────────────────────────────────────

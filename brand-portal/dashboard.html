@@ -116,6 +116,40 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
+/* INBOX (2026-09-12 어드민 개편 4a — 배정된 리드. 모달은 admin/dashboard.html .modal-overlay 와 같은 모양, 확인창 없음) */
+.tab .tab-badge { background: #fee2e2; color: #dc2626; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
+.inbox-intro { font-size: 0.85rem; color: #666; margin-bottom: 8px; line-height: 1.6; }
+.inbox-msg { font-size: 0.82rem; color: #666; margin-bottom: 12px; min-height: 1em; }
+.inbox-msg.err { color: #dc2626; }
+.inbox-table { width: 100%; border-collapse: collapse; }
+.inbox-table th { text-align: left; padding: 10px 12px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f0f0; }
+.inbox-table td { padding: 12px; font-size: 0.86rem; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+.inbox-table tr:hover { background: #fafafa; }
+.inbox-sub { display: block; font-size: 0.72rem; color: #999; margin-top: 2px; word-break: break-all; }
+.inbox-ellip { display: inline-block; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+.inbox-type { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: #f3f4f6; color: #444; white-space: nowrap; }
+.status-assigned { background: #ede9fe; color: #5b21b6; }
+.status-contacted { background: #d1fae5; color: #065f46; }
+.status-closed { background: #e5e7eb; color: #374151; }
+.inbox-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+.inbox-overlay.show { display: flex; }
+.inbox-modal { background: #fff; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 32px; }
+.inbox-modal h2 { font-size: 1.1rem; font-weight: 700; color: #111; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.inbox-modal .close-btn { float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+.inbox-dl dt { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 12px; }
+.inbox-dl dd { font-size: 0.88rem; color: #333; margin: 4px 0 0; white-space: pre-wrap; word-break: break-word; }
+.inbox-bar { margin-top: 16px; padding-top: 14px; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.inbox-bar label { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+.inbox-bar select, .inbox-bar input { padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-family: inherit; font-size: 0.85rem; background: #fafafa; }
+.inbox-bar input { flex: 1; min-width: 160px; }
+.inbox-err { color: #dc2626; font-size: 0.8rem; margin-top: 10px; display: none; }
+.inbox-actions { margin-top: 14px; display: flex; gap: 8px; justify-content: flex-end; }
+.inbox-hist-head { margin-top: 16px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+.inbox-hist { list-style: none; margin: 8px 0 0; font-size: 0.8rem; color: #555; }
+.inbox-hist li { padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+.inbox-hist li small { color: #999; margin-left: 6px; }
+.inbox-hist li div { margin-top: 3px; white-space: pre-wrap; }
+
 /* LOADING */
 .loading { text-align: center; padding: 60px; color: #999; }
 .loading i { font-size: 2rem; margin-bottom: 12px; color: #C8A96E; }
@@ -193,6 +227,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
         <div class="tab active" data-tab="brand" data-en="Brand Info" data-ko="브랜드 정보">Brand Info</div>
         <div class="tab" data-tab="products" data-en="Products" data-ko="제품">Products</div>
         <div class="tab" data-tab="magazine" data-en="Brand Magazine" data-ko="브랜드 매거진">Magazine</div>
+        <div class="tab" data-tab="inbox" data-en="Inbox" data-ko="인박스">Inbox <span class="tab-badge" id="inboxBadge" style="display:none;"></span></div>
         <div class="tab" data-tab="settings" data-en="Settings" data-ko="설정">Settings</div>
     </div>
 
@@ -511,6 +546,40 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
     </div>
 
     <!-- TAB: SETTINGS -->
+    <!-- TAB: INBOX (2026-09-12 어드민 개편 4a — ARCHINODE 가 배정한 리드. leads where brandId==uid, orderBy 없음·클라이언트 정렬) -->
+    <div class="tab-content" id="tab-inbox">
+        <div class="section-card">
+            <h2><i class="fas fa-inbox"></i> <span data-en="Lead Inbox" data-ko="리드 인박스">Lead Inbox</span></h2>
+            <p class="inbox-intro" data-en="Leads that ARCHINODE assigned to your brand. Open one to see the full message, then update the status once you have contacted the customer (Assigned → Contacted → Closed)." data-ko="ARCHINODE 가 귀사에 배정한 리드입니다. 열어서 본문을 확인하고, 고객에게 연락한 뒤 상태를 바꿔 주세요 (배정됨 → 연락함 → 종료).">Leads that ARCHINODE assigned to your brand. Open one to see the full message, then update the status once you have contacted the customer (Assigned → Contacted → Closed).</p>
+            <div class="inbox-msg" id="inboxMsg"></div>
+            <div style="overflow-x:auto;">
+                <table class="inbox-table">
+                    <thead><tr>
+                        <th data-en="Date" data-ko="날짜">Date</th>
+                        <th data-en="Type" data-ko="유형">Type</th>
+                        <th data-en="Name / Company" data-ko="이름 / 회사">Name / Company</th>
+                        <th data-en="Contact" data-ko="연락처">Contact</th>
+                        <th data-en="Message" data-ko="메시지">Message</th>
+                        <th data-en="Status" data-ko="상태">Status</th>
+                        <th></th>
+                    </tr></thead>
+                    <tbody id="inboxList"></tbody>
+                </table>
+            </div>
+            <div class="empty-state" id="emptyInbox" style="display:none;">
+                <i class="fas fa-inbox"></i>
+                <p data-en="No leads assigned yet." data-ko="아직 배정된 리드가 없습니다.">No leads assigned yet.</p>
+            </div>
+        </div>
+        <!-- INBOX DETAIL MODAL — 본문은 inbox_open() 이 채운다 -->
+        <div class="inbox-overlay" id="inboxModal">
+            <div class="inbox-modal">
+                <button type="button" class="close-btn" id="inboxClose" aria-label="Close">&times;</button>
+                <div id="inboxModalContent"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="tab-content" id="tab-settings">
         <div class="section-card">
             <h2><i class="fas fa-cog"></i> Account Settings</h2>
@@ -1028,6 +1097,147 @@ function showSaveMsg(id) {
     el.classList.add('show');
     setTimeout(() => el.classList.remove('show'), 2500);
 }
+</script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// Inbox 탭 — leads 컬렉션 (2026-09-12 어드민 개편 4a단계)
+// 정본: docs/회의/2026-09-12-구현계약서-어드민개편.md 3장 4a · 4-3절 · 6장 리스크 8·11
+// 조회: where('brandId','==',uid) 만 — orderBy 를 붙이면 brandId+createdAt 복합 색인이 필요해진다(리스크 8). 정렬은 클라이언트.
+// 수정: update 가 보내는 키는 정확히 status·brandNote·history·updatedAt 4개 — firestore.rules leads hasOnly 와 일치.
+//       brandId·adminNote·type 은 바꾸는 UI 자체가 없다. 상태는 assigned→contacted→closed 앞으로만.
+// 확인창(confirm/prompt/alert) 없음 — 기존 코드의 alert 는 손대지 않는다(리스크 11). 값은 전부 inbox_esc 로 출력(외부 입력).
+// 전역은 var/function 만, 접두어 inbox_. 위 인라인 스크립트의 currentUser·db·auth·firebase 를 쓴다.
+// ══════════════════════════════════════════════════════════════════════
+var inbox_state = { items: [], current: null, saving: false };
+var INBOX_TYPES = { 'quote': { en: 'Quote request', ko: '견적 요청' }, 'brand-inquiry': { en: 'Brand inquiry', ko: '브랜드 문의' }, 'dealer': { en: 'Dealer connection', ko: '딜러 연결' } };
+var INBOX_STATUSES = { assigned: { en: 'Assigned', ko: '배정됨' }, contacted: { en: 'Contacted', ko: '연락함' }, closed: { en: 'Closed', ko: '종료' } };
+var INBOX_NEXT = { assigned: ['assigned', 'contacted', 'closed'], contacted: ['contacted', 'closed'], closed: ['closed'] };   // 앞으로만
+
+function inbox_esc(s) { var d = document.createElement('div'); d.textContent = String(s == null ? '' : s); return d.innerHTML; }
+function inbox_attrEsc(s) { return inbox_esc(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+function inbox_lang() { return document.documentElement.lang === 'ko' ? 'ko' : 'en'; }
+function inbox_t(en, ko) { return inbox_lang() === 'ko' ? ko : en; }
+function inbox_attr(en, ko) { return 'data-en="' + inbox_attrEsc(en) + '" data-ko="' + inbox_attrEsc(ko) + '"'; }
+function inbox_span(en, ko) { return '<span ' + inbox_attr(en, ko) + '>' + inbox_esc(inbox_t(en, ko)) + '</span>'; }
+function inbox_millis(ts) { if (!ts) return 0; var d = (typeof ts.toDate === 'function') ? ts.toDate() : new Date(ts); var m = d.getTime(); return isNaN(m) ? 0 : m; }
+function inbox_fmtDate(ts) {   // 로컬 기준 (toISOString 금지)
+    var m = inbox_millis(ts); if (!m) return '-';
+    var d = new Date(m); var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function inbox_typeBadge(type) { var m = INBOX_TYPES[type]; return m ? '<span class="inbox-type" ' + inbox_attr(m.en, m.ko) + '>' + inbox_esc(inbox_t(m.en, m.ko)) + '</span>' : '<span class="inbox-type">' + inbox_esc(type || '-') + '</span>'; }
+function inbox_statusBadge(status) { var m = INBOX_STATUSES[status]; return m ? '<span class="status-badge status-' + inbox_attrEsc(status) + '" ' + inbox_attr(m.en, m.ko) + '>' + inbox_esc(inbox_t(m.en, m.ko)) + '</span>' : '<span class="status-badge status-pending">' + inbox_esc(status || '-') + '</span>'; }
+function inbox_msg(text, isErr) { var el = document.getElementById('inboxMsg'); if (!el) return; el.textContent = text || ''; el.classList.toggle('err', !!isErr); }
+function inbox_find(id) { for (var i = 0; i < inbox_state.items.length; i++) if (inbox_state.items[i].id === id) return inbox_state.items[i]; return null; }
+
+// ── 읽기 — where 하나, orderBy 없음. 실패는 숨기지 않는다(규칙 미게시면 permission-denied 안내) ──
+function inbox_load(uid) {
+    inbox_msg(inbox_t('Loading…', '불러오는 중…'), false);
+    db.collection('leads').where('brandId', '==', uid).get().then(function (snap) {
+        var items = [];
+        snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
+        items.sort(function (a, b) { return inbox_millis(b.createdAt) - inbox_millis(a.createdAt); });   // 클라이언트 정렬 (복합 색인 회피)
+        inbox_state.items = items;
+        inbox_msg('', false);
+        inbox_draw();
+    }).catch(function (err) {
+        console.error('[inbox] leads read failed', err);
+        var code = (err && err.code) || (err && err.message) || '';
+        inbox_msg(code === 'permission-denied'
+            ? inbox_t('Could not load your inbox (permission-denied) — the leads rule may not be published yet. Please contact office@archinode.org.', '인박스를 불러오지 못했습니다(permission-denied) — leads 규칙이 아직 게시되지 않았을 수 있습니다. office@archinode.org 로 문의해 주세요.')
+            : inbox_t('Could not load your inbox: ', '인박스를 불러오지 못했습니다: ') + code, true);
+        inbox_draw();
+    });
+}
+
+// ── 목록 + 배지(assigned 건수) ──
+function inbox_draw() {
+    var list = document.getElementById('inboxList'), empty = document.getElementById('emptyInbox'), badge = document.getElementById('inboxBadge');
+    var items = inbox_state.items, assigned = 0, html = '';
+    for (var i = 0; i < items.length; i++) {
+        var it = items[i] || {};
+        if (it.status === 'assigned') assigned++;
+        var msg = String(it.message || '');
+        html += '<tr>'
+            + '<td style="white-space:nowrap;">' + inbox_esc(inbox_fmtDate(it.createdAt)) + '</td>'
+            + '<td>' + inbox_typeBadge(it.type) + '</td>'
+            + '<td>' + inbox_esc(it.name || '-') + (it.company ? '<small class="inbox-sub">' + inbox_esc(it.company) + '</small>' : '') + '</td>'
+            + '<td>' + inbox_esc(it.email || '-') + (it.phone ? '<small class="inbox-sub">' + inbox_esc(it.phone) + '</small>' : '') + '</td>'
+            + '<td><span class="inbox-ellip" title="' + inbox_attrEsc(msg) + '">' + inbox_esc(msg.length > 60 ? msg.slice(0, 60) + '…' : msg) + '</span></td>'
+            + '<td>' + inbox_statusBadge(it.status) + '</td>'
+            + '<td><button type="button" class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;" data-inbox-view="' + inbox_attrEsc(it.id) + '" ' + inbox_attr('View', '보기') + '>' + inbox_esc(inbox_t('View', '보기')) + '</button></td>'
+            + '</tr>';
+    }
+    list.innerHTML = html;
+    empty.style.display = items.length ? 'none' : 'block';
+    badge.textContent = assigned ? String(assigned) : '';
+    badge.style.display = assigned ? 'inline' : 'none';
+}
+
+// ── 상세 모달 — 전체 본문 + 상태 select(앞으로만) + brandNote 한 줄 + [저장] ──
+function inbox_open(id) {
+    var it = inbox_find(id); if (!it) return;
+    inbox_state.current = it;
+    var allowed = INBOX_NEXT[it.status] || ['assigned', 'contacted', 'closed'];
+    var opts = '';
+    for (var i = 0; i < allowed.length; i++) { var m = INBOX_STATUSES[allowed[i]]; opts += '<option value="' + allowed[i] + '"' + (allowed[i] === it.status ? ' selected' : '') + ' ' + inbox_attr(m.en, m.ko) + '>' + inbox_esc(inbox_t(m.en, m.ko)) + '</option>'; }
+    var dd = function (en, ko, val) { return '<dt ' + inbox_attr(en, ko) + '>' + inbox_esc(inbox_t(en, ko)) + '</dt><dd>' + inbox_esc(val || '-') + '</dd>'; };
+    var hist = Array.isArray(it.history) ? it.history.slice().reverse() : [], histHtml = '';
+    for (var h = 0; h < hist.length; h++) { var e = hist[h] || {}; histHtml += '<li>' + inbox_statusBadge(e.status) + ' <small>' + inbox_esc(inbox_fmtDate(e.at)) + ' · ' + inbox_esc(e.byRole || '-') + '</small>' + (e.note ? '<div>' + inbox_esc(e.note) + '</div>' : '') + '</li>'; }
+    document.getElementById('inboxModalContent').innerHTML = '<h2>' + inbox_esc(it.name || '-') + ' ' + inbox_typeBadge(it.type) + ' ' + inbox_statusBadge(it.status) + '</h2>'
+        + '<dl class="inbox-dl">' + dd('Company', '회사', it.company) + dd('Email', '이메일', it.email) + dd('Phone', '전화', it.phone) + dd('Industry', '업종', it.industry)
+        + dd('Product', '제품', it.productName) + dd('Received', '접수', inbox_fmtDate(it.createdAt)) + dd('Assigned', '배정', inbox_fmtDate(it.assignedAt)) + dd('Message', '본문', it.message) + '</dl>'
+        + '<div class="inbox-bar"><label ' + inbox_attr('Status', '상태') + '>' + inbox_esc(inbox_t('Status', '상태')) + '</label><select id="inboxStatus">' + opts + '</select>'
+        + '<input type="text" id="inboxNote" maxlength="200" value="' + inbox_attrEsc(it.brandNote || '') + '" placeholder="' + inbox_attrEsc(inbox_t('Your note (one line, optional)', '메모 한 줄 (선택)')) + '" data-en-placeholder="Your note (one line, optional)" data-ko-placeholder="메모 한 줄 (선택)"></div>'
+        + '<div class="inbox-err" id="inboxErr"></div>'
+        + '<div class="inbox-actions"><button type="button" class="btn btn-secondary" id="inboxCancelBtn" ' + inbox_attr('Close', '닫기') + '>' + inbox_esc(inbox_t('Close', '닫기')) + '</button>'
+        + '<button type="button" class="btn btn-primary" id="inboxSaveBtn" ' + inbox_attr('Save', '저장') + '>' + inbox_esc(inbox_t('Save', '저장')) + '</button></div>'
+        + '<div class="inbox-hist-head" ' + inbox_attr('History', '이력') + '>' + inbox_esc(inbox_t('History', '이력')) + '</div><ul class="inbox-hist">' + (histHtml || '<li style="color:#999;">-</li>') + '</ul>';
+    document.getElementById('inboxCancelBtn').addEventListener('click', inbox_close);
+    document.getElementById('inboxSaveBtn').addEventListener('click', inbox_save);
+    document.getElementById('inboxModal').classList.add('show');
+}
+function inbox_close() { document.getElementById('inboxModal').classList.remove('show'); inbox_state.current = null; }
+
+// ── 저장 — ★ 보내는 키 4개 고정: status · brandNote · history · updatedAt (규칙 hasOnly). 다른 키를 더하면 거부된다 ──
+function inbox_save() {
+    var it = inbox_state.current; if (!it || inbox_state.saving) return;
+    var status = document.getElementById('inboxStatus').value, note = document.getElementById('inboxNote').value.trim();
+    var err = document.getElementById('inboxErr'), btn = document.getElementById('inboxSaveBtn');
+    var allowed = INBOX_NEXT[it.status] || ['assigned', 'contacted', 'closed'];
+    if (allowed.indexOf(status) === -1) { err.textContent = inbox_t('That status is not allowed.', '허용되지 않는 상태입니다.'); err.style.display = 'block'; return; }
+    if (status === it.status && note === String(it.brandNote || '')) { err.textContent = inbox_t('Nothing changed.', '바뀐 것이 없습니다.'); err.style.display = 'block'; return; }
+    err.style.display = 'none';
+    var entry = { status: status, by: (auth.currentUser && auth.currentUser.email) || '', byRole: 'brand', at: new Date().toISOString(), note: note };
+    inbox_state.saving = true; btn.disabled = true;
+    db.collection('leads').doc(it.id).update({
+        status: status,
+        brandNote: note,
+        history: firebase.firestore.FieldValue.arrayUnion(entry),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function () {
+        inbox_state.saving = false; btn.disabled = false;
+        it.status = status; it.brandNote = note; it.updatedAt = new Date();
+        it.history = (Array.isArray(it.history) ? it.history : []).concat([entry]);
+        inbox_close();
+        inbox_draw();
+        inbox_msg(inbox_t('Saved.', '저장했습니다.'), false);
+    }).catch(function (e) {
+        inbox_state.saving = false; btn.disabled = false;
+        console.error('[inbox] save failed', e);
+        var code = (e && e.code) || (e && e.message) || '';
+        err.textContent = code === 'permission-denied'
+            ? inbox_t('Save failed (permission-denied) — only the status and your note can be changed. If this persists, contact office@archinode.org.', '저장 실패(permission-denied) — 상태와 메모만 바꿀 수 있습니다. 계속되면 office@archinode.org 로 문의해 주세요.')
+            : inbox_t('Save failed: ', '저장 실패: ') + code;
+        err.style.display = 'block';
+    });
+}
+
+// ── 연결 — 로그인 뒤 한 번 읽는다(위 onAuthStateChanged 는 손대지 않고 따로 건다). [보기]는 data-inbox-view + 위임 ──
+auth.onAuthStateChanged(function (u) { if (u) inbox_load(u.uid); });
+document.getElementById('inboxList').addEventListener('click', function (e) { var b = e.target.closest('[data-inbox-view]'); if (b) inbox_open(b.getAttribute('data-inbox-view')); });
+document.getElementById('inboxClose').addEventListener('click', inbox_close);
+document.getElementById('inboxModal').addEventListener('click', function (e) { if (e.target === e.currentTarget) inbox_close(); });
 </script>
 <script src="article-editor.js"></script>
 <script src="../form-throttle.js?v=20260630" defer></script>
