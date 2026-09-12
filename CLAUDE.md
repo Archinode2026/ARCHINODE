@@ -65,7 +65,7 @@ brands(입점, status pending/approved/suspended/rejected + 사유) · products 
 ## 6. 팀 — 지휘 창 · 스킬 · 에이전트 (2026-09-12, 엑사·단번 체계 이식)
 
 **스킬**(지금 대화창의 행동 규칙, `.claude/skills/`): `archinode`(지휘 창, 트리거 "아키노드") · `archinode-shutdown`("종료") · `gray-benchmark`(아키프로덕트 조사) · `gold-cmo`(마케팅) · `trend-editor`.
-**에이전트**(실행창이 부르는 별도 일꾼, `.claude/agents/`): `node-gold`(설계) → `node-white`(구현) → `node-black`(정적 검증, CRITICAL 0) → `node-bronze`(실브라우저 E2E, 로그인 필요한 확인 전담) / `node-silver`(우선순위·요구사항 번역).
+**에이전트 12명**(실행창이 부르는 별도 일꾼, `.claude/agents/`, 단번 12명 체계 이식 2026-09-12 저녁): 개발 축 `node-gold`(설계·구현 계약서) → `node-white`(구현) → `node-black`(정적 검증, CRITICAL 0) → `node-bronze`(실브라우저 E2E, 2모드 마라톤, 로그인 필요한 확인 전담) / `node-silver`(PM·우선순위·두 갈래 목록) / 지원 축 `node-gray`(벤치마크) · `node-purple`(디자인 판정) · `node-navy`(법무·개인정보) · `node-orange`(데이터·재무) · `node-green`(B2B 브랜드 유치) · `node-pink`(B2C 전문가 모집) · `node-beige`(CS·운영·가이드). 산출물 폴더 `docs/리서치·디자인·법무·재무·영업·마케팅·운영/`.
 **계정 스킬**(Cowork 동기화, 폴더 밖): `archi-white/black/gray/gold/bronze`, 매거진 편집팀 `mag-*` 8종. 이름이 비슷해도 **프로젝트 에이전트(`node-*`)와 별개**. 옛 프로젝트 스킬 `white-pm`·`black-qa`는 `.claude/skills-백업-2026-09-12/`.
 
 **흐름**: 한울님 → 지휘 창(지시서 `docs/회의/`) → 실행창 → 골드·화이트·블랙·브론즈 → 「배포 준비됨」 → 지휘 창 「배포할까요?」 → `tools/deploy.ps1`. 작은 수정은 화이트→블랙만.
