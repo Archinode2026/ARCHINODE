@@ -6,7 +6,7 @@
 // 실행 (tools 폴더에서 npm install 먼저):
 //   node tools/make-qa-user.js                                               → qa-bronze@archinodekr.com (어드민 화이트리스트 계정)
 //   node tools/make-qa-user.js --email qa-brand@archinodekr.com --brand      → [테스트-브론즈] 브랜드 계정 + brands 문서(approved)
-//   node tools/make-qa-user.js --email qa-pro@archinodekr.com --pro          → [테스트-브론즈] 전문가 계정 + users 문서
+//   node tools/make-qa-user.js --email qa-pro@archinodekr.com --pro          → [테스트-브론즈] 전문가 계정 + users 문서(auth/signup.html 과 같은 필드)
 //
 // ⚠️ qa-bronze 가 어드민으로 동작하려면 firebase-config.js 의 ADMIN_EMAILS 와 firestore.rules 의 isAdmin() 두 곳에
 //    그 이메일이 들어 있어야 한다(코드·규칙 변경은 화이트 → 지휘 창 배포). 이 스크립트는 계정만 만든다.
@@ -46,7 +46,10 @@ const email = arg('--email', 'qa-bronze@archinodekr.com');
     const ref = db.collection('users').doc(user.uid);
     if ((await ref.get()).exists) { console.log('[있음] users 문서'); }
     else {
-      await ref.set({ name: '[테스트-브론즈] QA Pro', email, company: '[테스트-브론즈]', profession: 'architect', role: 'professional', createdAt: now, likes: { products: [], brands: [] } });
+      // 필드는 auth/signup.html 의 users set 과 같게 — displayName·email·company·jobTitle·industry·phone·role·likedProducts·likedBrands·createdAt·updatedAt.
+      // industry 는 signup <option value> 키(architect …) — 어드민 전문가 회원 업종 필터(view-users.js USR_INDUSTRIES)가 이 키로 거른다.
+      // (브론즈 R11: 옛 name·profession·likes 로 만든 문서는 어드민에서 이름이 비어 보였다 — 이미 만든 qa-pro 문서는 여기서 손대지 않는다.)
+      await ref.set({ displayName: '[테스트-브론즈] QA Pro', email, company: '[테스트-브론즈]', jobTitle: 'QA', industry: 'architect', phone: '010-0000-0002', role: 'professional', likedProducts: [], likedBrands: [], createdAt: now, updatedAt: now });
       console.log('[생성] users/' + user.uid + ' ([테스트-브론즈])');
     }
   }

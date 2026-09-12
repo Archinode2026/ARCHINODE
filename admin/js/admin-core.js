@@ -163,14 +163,15 @@ function downloadCSV(rows, filename) {
 }
 
 // ── 통합 검색 캐시 (6단계) — 각 화면이 이미 읽은 배열을 이름으로 등록한다. 검색은 이것만 뒤진다(추가 읽기 없음 — 리스크 7).
-//    dashboard.html loadBrands/loadProducts/loadArticles/loadReview · view-leads.js leads_load · view-users.js users_load 가 등록.
+//    dashboard.html loadBrands/loadProducts/loadArticles/loadReview · view-leads.js leads_load · view-users.js users_load
+//    · view-notices.js notices_load · view-inquiries.js inquiries_load(검수대장 A-041) 가 등록.
 //    `var` 는 별도 페이지가 같은 이름을 다시 선언해도 무해(const/let 만 SyntaxError — 리스크 5).
 var adm_caches = {};
 function admRegisterCache(name, arr) { adm_caches[String(name)] = Array.isArray(arr) ? arr : []; }
 function admGetCache(name) { return adm_caches.hasOwnProperty(String(name)) ? adm_caches[String(name)] : null; }
 
 // ── 검색 대상 정의 — 종류 뱃지 · 사이드바 항목(id) · 상세 함수 이름(없으면 화면만) · 라벨/부제/검색 본문 ──
-//    부제: 브랜드=국가/카테고리, 제품=브랜드·카테고리, 아티클=브랜드·태그, 리드=유형/상태, 회원=회사, 검수=상태.
+//    부제: 브랜드=국가/카테고리, 제품=브랜드·카테고리, 아티클=브랜드·태그, 리드=유형/상태, 회원=회사, 검수=상태, 공지=대상/노출, 문의=보낸 사람/상태.
 //    hay 에 이메일이 들어가는 건 검색용일 뿐 — 결과에는 이름·회사만 찍는다(개인정보는 상세에서).
 var ADM_SEARCH_SOURCES = [
     { key: 'brands',       en: 'Brand',   ko: '브랜드', cls: 'adm-kind-brand',   menu: 'brands',   view: 'viewBrand',
@@ -196,7 +197,19 @@ var ADM_SEARCH_SOURCES = [
     { key: 'reviewIssues', en: 'Review',  ko: '검수',   cls: 'adm-kind-review',  menu: 'review',   view: 'viewReview',
       label: function (d) { return (d.no || '-') + ' ' + (d.area || ''); },
       sub:   function (d) { return d.status || ''; },
-      hay:   function (d) { return [d.no, d.area, d.screen, d.action, d.gap, d.status].join(' '); } }
+      hay:   function (d) { return [d.no, d.area, d.screen, d.action, d.gap, d.status].join(' '); } },
+    // 공지·문의 (검수대장 A-041 — 5단계 화면이 6단계 검색 범위에 빠져 있었다). 라벨은 현재 언어 제목(다른 언어로 대체), 상세는 미리보기·보기 모달.
+    //    부제의 대상·상태 라벨은 view-notices/inquiries.js 의 메타 함수가 있으면 그것으로(dashboard.html 만 로드 — 없으면 키 그대로).
+    { key: 'notices',      en: 'Notice',  ko: '공지',   cls: 'adm-kind-notice',  menu: 'notices',   view: 'ntc_preview',
+      label: function (d) { return t(d.title_en || d.title_ko, d.title_ko || d.title_en) || d.id; },
+      sub:   function (d) { var a = (typeof ntc_audienceMeta === 'function') ? ntc_audienceMeta(d.audience) : null;
+                            return [a ? t(a.en, a.ko) : (d.audience || ''), d.visible ? t('Visible', '노출') : t('Hidden', '숨김')].filter(Boolean).join(' / '); },
+      hay:   function (d) { return [d.title_en, d.title_ko, d.body_en, d.body_ko, d.audience, d.visible ? 'visible 노출' : 'hidden 숨김', d.updatedBy].join(' '); } },
+    { key: 'inquiries',    en: 'Inquiry', ko: '문의',   cls: 'adm-kind-inquiry', menu: 'inquiries', view: 'inq_view',
+      label: function (d) { return d.subject || d.id; },
+      sub:   function (d) { var s = (typeof inq_statusMeta === 'function') ? inq_statusMeta(d.status) : null;
+                            return [d.fromName, s ? t(s.en, s.ko) : (d.status || '')].filter(Boolean).join(' / '); },
+      hay:   function (d) { return [d.subject, d.body, d.fromName, d.fromEmail, d.fromRole, d.status, d.answer].join(' '); } }
 ];
 var ADM_SEARCH_MAX = 30;
 

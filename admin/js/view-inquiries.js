@@ -11,6 +11,7 @@
      + mail 1통(보낸 사람 이메일, "Re: <subject> — ARCHINODE", 답변 + 포털 링크 — list-your-brand.html 의 mail.add 패턴)
      + logAdmin('inquiry.answer').
    열린 건수 — where('status','==','open') 한 번(inq_loadOpenCount): 사이드바 배지 + 대시보드 카드 「열린 문의」(view-dashboard.js loader).
+   목록을 읽으면 admRegisterCache('inquiries') 로 통합 검색 캐시에 올린다(검수대장 A-041).
    ★ 전역 `var`/`function` 만 (const/let 전역 금지 — 리스크 5). 접두어 inq_/inquiries_.
    ★ 제목·본문·이름·이메일은 브랜드가 쓴 외부 입력, 답변은 어드민 입력 — 출력은 예외 없이 escapeHtml/escapeAttr
      (표시 시 이스케이프로 통일 — 리스크 4). onclick 문자열 대신 data-* + 이벤트 위임.
@@ -112,6 +113,7 @@ function inquiries_load(more) {
     inquiries_msg(t('Loading…', '불러오는 중…'), false);
     q.get().then(function (snap) {
         snap.forEach(function (d) { inq_state.items.push(Object.assign({ id: d.id }, d.data())); });
+        if (typeof admRegisterCache === 'function') admRegisterCache('inquiries', inq_state.items);   // 6단계 통합 검색 캐시(추가 읽기 없음 — 검수대장 A-041)
         if (snap.size) inq_state.lastDoc = snap.docs[snap.docs.length - 1];
         inq_state.hasMore = snap.size === INQ_PAGE_SIZE;
         inq_state.loading = false;

@@ -199,6 +199,8 @@
 .adm-kind-lead    { background: #dbeafe; color: #1e40af; }
 .adm-kind-user    { background: #d1fae5; color: #065f46; }
 .adm-kind-review  { background: #fee2e2; color: #991b1b; }
+.adm-kind-notice  { background: #fef9c3; color: #854d0e; }   /* 공지 (A-041) */
+.adm-kind-inquiry { background: #ffe4e6; color: #9f1239; }   /* 1:1 문의 (A-041) */
 .adm-kind-page    { background: #f3f4f6; color: #666; }
 /* 한/영 토글 (2026-09-12, 검수대장 A-035 — admin-nav.js adm_langHtml). 검색창 아래 오른쪽 KO | EN, 활성 언어는 골드 */
 .adm-lang { display: flex; justify-content: flex-end; align-items: center; gap: 2px; margin: -4px 14px 6px; }

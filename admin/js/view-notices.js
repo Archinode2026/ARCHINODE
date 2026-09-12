@@ -6,6 +6,7 @@
    notices 컬렉션을 orderBy('createdAt','desc') 단일 필드로 200건 읽고, 표시 순서(고정 → order → 최신)는 클라이언트 정렬.
    등록/수정 모달(제목·본문 EN/KO · 대상 brand/site/all · 정렬 · 노출 · 고정) + 목록의 노출 on/off 토글.
    저장 → createdAt/By·updatedAt/By + logAdmin('notice.save'). 삭제 없음(노출 off 로 숨긴다 — 확인창을 쓰지 않기 위해).
+   목록을 읽으면 admRegisterCache('notices') 로 통합 검색 캐시에 올린다(검수대장 A-041). 노출 토글은 update 뒤 목록을 다시 읽어 서버 값으로 그린다(A-042).
    ★ 본문은 줄바꿈만, HTML 아님 — 미리보기는 escapeHtml + <br> 만(ntc_bodyHtml). 브랜드 포털 배너도 같은 방식.
    ★ 이미지 첨부 없음(단번 notices 축약). 사이트 공개 노출(비로그인)은 복귀 후 — 여기서는 audience 값만 저장한다.
    ★ 전역 `var`/`function` 만 (const/let 전역 금지 — 리스크 5). 접두어 ntc_/notices_.
@@ -102,6 +103,7 @@ function notices_load() {
         var items = [];
         snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
         ntc_state.items = notices_sorted(items);
+        if (typeof admRegisterCache === 'function') admRegisterCache('notices', ntc_state.items);   // 6단계 통합 검색 캐시(추가 읽기 없음 — 검수대장 A-041)
         ntc_state.loading = false;
         ntc_state.loaded = true;
         notices_draw();
@@ -291,29 +293,48 @@ function ntc_save(id) {
 }
 
 // ── 목록의 노출 on/off — visible 만 뒤집는다 + updatedAt/By + logAdmin('notice.save'). 확인창 없음(되돌리기는 한 번 더 누르면 된다) ──
+//    검수대장 A-042(브론즈 R11 "숨기기를 눌러도 상태 불변") — 코드검토·vm 주입 실측으로는 재현되지 않았다(update 페이로드·재렌더 정상).
+//    브라우저에서 무엇이 달랐든 화면이 서버 값과 어긋나지 않게 고친다: ① 저장 중이면 조용히 무시하지 않고 토스트 ② 누른 버튼을 잠근다
+//    ③ 성공하면 «지금 목록»의 항목을 id 로 찾아 즉시 다시 그린다(쓰는 사이 목록이 다시 읽혔어도 오래된 참조를 고치지 않는다)
+//    ④ 토스트·활동 로그는 다시 그린 뒤에(둘 중 하나가 죽어도 화면은 바뀐다) ⑤ ntc_save 와 같게 notices_load() 로 서버 값을 한 번 더 읽는다.
 function ntc_toggleVisible(id) {
     var it = ntc_findItem(id);
-    if (!it || ntc_state.saving) return;
+    if (!it) return;
+    if (ntc_state.saving) { showToast(t('Still saving — try again in a moment', '저장 중입니다 — 잠시 뒤 다시 누르세요'), 'error'); return; }
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) { showToast(t('Sign in required', '로그인 필요'), 'error'); return; }
-    var next = !it.visible;
+    var prevVisible = !!it.visible;
+    var next = !prevVisible;
     var by = auth.currentUser.email || '';
+    var label = ntc_title(it);
+    var btn = ntc_toggleBtn(id);
     ntc_state.saving = true;
+    if (btn) btn.disabled = true;
     db.collection('notices').doc(id).update({
         visible: next,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedBy: by
     }).then(function () {
         ntc_state.saving = false;
-        logAdmin({ action: 'notice.save', target: { col: 'notices', id: id, label: ntc_title(it) }, from: it.visible ? 'visible' : 'hidden', to: next ? 'visible' : 'hidden', note: 'toggle' });
-        it.visible = next; it.updatedAt = new Date(); it.updatedBy = by;   // 로컬 반영 (다시 읽지 않는다)
-        showToast(t(next ? 'Notice is now visible' : 'Notice hidden', next ? '공지를 노출했습니다' : '공지를 숨겼습니다'), 'success');
+        var cur = ntc_findItem(id) || it;
+        cur.visible = next; cur.updatedAt = new Date(); cur.updatedBy = by;   // 로컬 반영 → 즉시 다시 그린다
         notices_draw();
+        showToast(t(next ? 'Notice is now visible' : 'Notice hidden', next ? '공지를 노출했습니다' : '공지를 숨겼습니다'), 'success');
+        logAdmin({ action: 'notice.save', target: { col: 'notices', id: id, label: label }, from: prevVisible ? 'visible' : 'hidden', to: next ? 'visible' : 'hidden', note: 'toggle' });
+        notices_load();   // 서버 값으로 한 번 더 (ntc_save 와 같은 마무리)
     }).catch(function (err) {
         ntc_state.saving = false;
+        if (btn) btn.disabled = false;
         console.error('[notices] toggle failed', err);
         var code = (err && err.code) || (err && err.message) || '';
         showToast(code === 'permission-denied'
             ? t('Update failed (permission-denied) — check that the notices rule is published', '변경 실패(permission-denied) — notices 규칙 게시 여부 확인')
             : t('Update failed: ', '변경 실패: ') + code, 'error');
     });
+}
+// 목록의 노출 토글 버튼(id 로). 선택자 문자열에 id 를 끼워 넣지 않고 속성값을 비교한다
+function ntc_toggleBtn(id) {
+    var tb = document.getElementById('ntcTable');
+    var bs = tb ? tb.querySelectorAll('[data-ntc-toggle]') : [];
+    for (var i = 0; i < bs.length; i++) if (bs[i].getAttribute('data-ntc-toggle') === id) return bs[i];
+    return null;
 }
