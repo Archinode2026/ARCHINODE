@@ -453,12 +453,14 @@ document.getElementById('btnReject').addEventListener('click', function() {
 
 function doAction(newStatus, extras) {
   if (!currentDoc) return;
+  var logDoc = currentDoc;   // 2단계: 활동 로그용 스냅샷 (then 시점엔 closeModal 로 null 일 수 있음)
   var updates = Object.assign({
     status: newStatus,
     reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
   }, extras || {});
   db.collection('consultations').doc(currentDoc.id).update(updates)
     .then(function() {
+      logAdmin({ action: 'consultation.status', target: { col: 'consultations', id: logDoc.id, label: logDoc.companyName || '' }, from: logDoc.status || '', to: newStatus, note: (extras && (extras.reviewerNote || extras.triageNote)) || '' });   // 2단계: 활동 로그
       showToast('업데이트 완료', 'success');
       closeModal();
       loadConsultations();

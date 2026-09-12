@@ -13,7 +13,8 @@ firestore/
 ├── brands/          ← 브랜드 (문서 ID = Firebase Auth UID)
 ├── products/        ← 제품 (자동 생성 ID)
 ├── articles/        ← 매거진 기사 (자동 생성 ID)
-└── users/           ← 국내 전문가 계정 (Phase 2B, 문서 ID = Auth UID)
+├── users/           ← 국내 전문가 계정 (Phase 2B, 문서 ID = Auth UID)
+└── adminLogs/       ← 어드민 활동 장부 (2026-09-12 개편 2단계, 어드민 전용, 덧붙이기만 — 7절)
 ```
 
 ---
@@ -69,6 +70,11 @@ firestore/
   createdAt: Timestamp,                 // 입점 신청 시각
   approvedAt: Timestamp,                // 승인 시각
   updatedAt: Timestamp,                 // 마지막 수정 시각
+  // 어드민 전용 (옵션 B 정지·거절·복구): statusReason, statusChangedAt, statusChangedBy — 공개 페이지·규칙이 참조, 그대로 둔다
+  // 2026-09-12 개편 2단계 — 상태 이력. 없어도 화면이 도는 선택 필드. reviewIssues 의 history 패턴과 같다.
+  history: [                            // 상태가 바뀔 때마다 arrayUnion (같은 update 호출에 동봉)
+    { status: "suspended", by: "office@archinode.org", at: "2026-09-12T10:00:00.000Z", note: "사유" }   // at 은 ISO 문자열
+  ],
 
   // ── 통계 (Phase 2B에서 추가) ──
   likeCount: 0,                         // 좋아요 수
@@ -271,3 +277,28 @@ products: subcategory ASC, status ASC, createdAt DESC
 articles: brandId ASC, createdAt DESC
 articles: status ASC, createdAt DESC
 ```
+
+---
+
+## 7. adminLogs 컬렉션 (2026-09-12 어드민 개편 2단계 — 어드민 전용, 덧붙이기만)
+
+**문서 ID:** 자동 생성 · **규칙:** `allow create, read: if isAdmin(); allow update, delete: if false;` (어드민이라도 수정·삭제 불가)
+**쓰는 곳:** `admin/js/admin-core.js` `logAdmin(entry)` — 어드민의 모든 상태 변경 뒤 한 줄. 실패해도 화면 흐름을 막지 않는다(콘솔 warn + 토스트).
+**읽는 곳:** `admin/js/view-logs.js`(운영 > 활동 로그, 100건씩 「더 보기」) · `view-dashboard.js`(최근 활동 20건).
+
+```javascript
+{
+  at:     Timestamp,                    // serverTimestamp — orderBy('at','desc') 단일 필드만 (복합 색인 금지)
+  by:     "office@archinode.org",       // 어드민 이메일
+  action: "brand.status",               // 'brand.status' | 'product.status' | 'article.status' | 'review.status'
+                                        // | 'consultation.status' | 'trend.status' | 'newsletter.status' | 'notify.status'
+                                        // (계약서 4-1 예약: 'lead.status' | 'lead.assign' | 'inquiry.answer' | 'notice.save' | 'settings.save' | 'prospect.status' | 'prospect.import')
+  target: { col: "brands", id: "docId", label: "Fritz Hansen" },   // label 은 사람이 읽는 이름
+  from:   "approved",                   // 이전 값 (문자열, 없으면 '')
+  to:     "suspended",                  // 새 값
+  note:   "사유·메모",                   // updateBrand 의 reason 등
+  page:   "dashboard"                   // 어느 화면에서 — 파일명에서 .html 을 뗀 것 ('dashboard' | 'consultations' | …)
+}
+```
+
+기간·종류 필터는 클라이언트에서. 뉴스레터·디지털 알림은 상태가 아니라 삭제라 `from:'subscribed', to:'deleted'` 로 적는다.

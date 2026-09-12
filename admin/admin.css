@@ -38,6 +38,22 @@
 .adm-toast.show { opacity: 1; }
 .adm-toast.error { background: #ef4444; }
 .adm-toast.success { background: #10b981; }
+.adm-toast.warn { background: #b45309; }   /* logAdmin 실패 (2단계) */
+
+/* ACTIVITY LOG (2단계 — view-logs.js, 대시보드 최근 활동도 같은 표) */
+.adm-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.adm-toolbar select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.82rem; background: #fff; }
+.adm-spacer { flex: 1; }
+.adm-msg { font-size: 0.8rem; color: #666; margin-bottom: 12px; min-height: 1em; }
+.adm-msg.err { color: #dc2626; }
+.adm-nowrap { white-space: nowrap; }
+.adm-log-sub { display: block; font-size: 0.7rem; color: #aaa; margin-top: 2px; word-break: break-all; }
+.adm-log-arrow { color: #C8A96E; font-weight: 700; }
+.adm-log-note { max-width: 320px; white-space: pre-wrap; word-break: break-word; font-size: 0.82rem; color: #555; }
+.adm-more { margin-top: 14px; text-align: center; font-size: 0.82rem; }
+.adm-more a { color: #8a6a2a; font-weight: 600; }
+.adm-log-table td { padding: 10px 12px; font-size: 0.82rem; }
+.brand-history li small { display: block; color: #777; margin: 2px 0 0; white-space: pre-wrap; }
 
 /* MODAL — admin-core.js 가 #modal 을 만들었을 때(페이지에 .modal-overlay 가 없을 때) 쓰는 모양 */
 .adm-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }

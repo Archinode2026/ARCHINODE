@@ -274,6 +274,15 @@ service cloud.firestore {
     }
 
     // ────────────────────────────────────────────────────────────────────
+    // adminLogs — 어드민 활동 장부 (2026-09-12, 개편 2단계). 덧붙이기만 된다: 어드민이라도 수정·삭제 불가.
+    // 필드: at(serverTimestamp), by, action, target{col,id,label}, from, to, note, page — docs/firestore-schema.md 7절
+    // ────────────────────────────────────────────────────────────────────
+    match /adminLogs/{logId} {
+      allow create, read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ────────────────────────────────────────────────────────────────────
     // 기본 정책: 위에 매칭되지 않는 모든 경로 차단
     // ────────────────────────────────────────────────────────────────────
     match /{document=**} {

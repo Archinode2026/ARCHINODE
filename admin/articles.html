@@ -474,6 +474,7 @@ document.getElementById('btnApprove').addEventListener('click', function() {
 
 function doAction(newStatus, label) {
   if (!currentDoc) return;
+  var logDoc = currentDoc;   // 2단계: 활동 로그용 스냅샷 (then 시점엔 closeModal 로 null 일 수 있음)
   var updates = {
     status: newStatus,
     publishedAt: (newStatus === "approved" ? firebase.firestore.FieldValue.serverTimestamp() : null),
@@ -484,6 +485,7 @@ function doAction(newStatus, label) {
   };
   db.collection('articles').doc(currentDoc.id).update(updates)
     .then(function() {
+      logAdmin({ action: 'article.status', target: { col: 'articles', id: logDoc.id, label: logDoc.title || '' }, from: logDoc.status || '', to: newStatus, note: updates.reviewerNote || '' });   // 2단계: 활동 로그
       showToast(label + ' 완료', 'success');
       closeModal();
       loadSubmissions();

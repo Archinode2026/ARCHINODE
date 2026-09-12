@@ -2,7 +2,7 @@
    view-dashboard.js — 대시보드 첫 화면 (2026-09-12 어드민 개편 1단계)
    정본: docs/회의/2026-09-12-구현계약서-어드민개편.md 3장 1단계 · 6장 리스크 7·8
 
-   대기 건수 카드 6개 + 「최근 활동」 자리(2단계 활동 로그 전까지 안내문).
+   대기 건수 카드 6개 + 「최근 활동」(2단계: adminLogs 최신 20건 — view-logs.js 의 logs_tableHtml 재사용).
    카운트는 컬렉션마다 where('status','==',…) 단일 필드 한 번 — orderBy 를 붙이면
    복합 색인이 필요해지므로 붙이지 않는다(리스크 8). Firestore 쓰기 없음.
    ★ 전역 `var`/`function` 만. 접두어 dash_.
@@ -34,12 +34,34 @@ function dash_render(el) {
     html += '</div>'
         + '<div class="section-card adm-activity">'
         + '<h3 ' + tAttr('Recent Activity', '최근 활동') + '>' + escapeHtml(t('Recent Activity', '최근 활동')) + '</h3>'
-        + '<p class="adm-muted" ' + tAttr('Activity log coming in step 2', '활동 로그는 2단계에서') + '>'
-        + escapeHtml(t('Activity log coming in step 2', '활동 로그는 2단계에서')) + '</p>'
+        + '<div id="dashRecent"><p class="adm-muted">' + tSpan('Loading…', '불러오는 중…') + '</p></div>'
+        + '<p class="adm-more"><a href="dashboard.html#logs" ' + tAttr('View all activity', '활동 로그 전체 보기') + '>' + escapeHtml(t('View all activity', '활동 로그 전체 보기')) + '</a></p>'
         + '</div>';
     el.innerHTML = html;
 
     dash_loadCounts();
+    dash_loadRecent();
+}
+
+// ── 최근 활동 20건 — adminLogs orderBy('at','desc') 단일 필드 (2단계). 실패는 자리에 표시한다 ──
+function dash_loadRecent() {
+    var box = document.getElementById('dashRecent');
+    if (!box) return;
+    if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) return;   // 로그인 전: loadAll() 끝에서 다시 부른다
+    if (typeof logs_tableHtml !== 'function') { box.innerHTML = '<p class="adm-muted">view-logs.js not loaded</p>'; return; }
+    db.collection('adminLogs').orderBy('at', 'desc').limit(20).get()
+        .then(function (snap) {
+            var items = [];
+            snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
+            box.innerHTML = logs_tableHtml(items);
+        })
+        .catch(function (err) {
+            console.error('[dashboard] adminLogs read failed', err);
+            var code = (err && err.code) || (err && err.message) || '';
+            box.innerHTML = '<p class="adm-muted adm-num-err">' + escapeHtml(code === 'permission-denied'
+                ? t('Read failed (permission-denied) — check that the adminLogs rule is published', '읽기 실패(permission-denied) — adminLogs 규칙 게시 여부 확인')
+                : t('Read failed: ', '읽기 실패: ') + code) + '</p>';
+        });
 }
 
 // ── 카운트 읽기. 실패는 숨기지 않고 카드에 표시한다(조용한 실패 방지) ──

@@ -195,6 +195,8 @@ tr:hover { background: #fafafa; }
 
     <!-- VIEW: DASHBOARD (1단계 셸 — view-dashboard.js 가 그린다) -->
     <div class="tab-content" id="tab-dashboard"></div>
+    <!-- VIEW: ACTIVITY LOG (2단계 — view-logs.js 가 그린다) -->
+    <div class="tab-content" id="tab-logs"></div>
 
     <!-- TABS -->
     <div class="tabs">
@@ -315,6 +317,7 @@ tr:hover { background: #fafafa; }
 <script src="js/admin-core.js?v=20260912"></script>
 <script src="js/admin-nav.js?v=20260912"></script>
 <script src="js/view-dashboard.js?v=20260912"></script>
+<script src="js/view-logs.js?v=20260912"></script>
 <script src="../search.js"></script>
 <script src="../lang.js?v=20260630"></script>
 <script>
@@ -409,9 +412,11 @@ async function loadBrands() {
 // ── 브랜드 상태 변경 (사유 입력 모달) ──
 async function updateBrand(docId, newStatus) {
     let brandName = '';
+    let prevStatus = '';   // 2단계: 활동 로그 from 값 (같은 get() 재사용)
     try {
         const doc = await db.collection('brands').doc(docId).get();
         brandName = (doc.data() && doc.data().brandName) || '';
+        prevStatus = (doc.data() && doc.data().status) || '';
     } catch (e) {}
 
     const reasonRequired = (newStatus !== 'approved');
@@ -437,7 +442,9 @@ async function updateBrand(docId, newStatus) {
         status: newStatus,
         statusReason: reason || '',
         statusChangedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        statusChangedBy: (auth.currentUser && auth.currentUser.uid) || ''
+        statusChangedBy: (auth.currentUser && auth.currentUser.uid) || '',
+        // 2단계: 상태 이력 덧붙이기 (검수대장 A-009) — 같은 update 한 번에. reviewIssues 의 history 패턴과 동일
+        history: firebase.firestore.FieldValue.arrayUnion({ status: newStatus, by: (auth.currentUser && auth.currentUser.email) || '', at: new Date().toISOString(), note: reason || '' })
     };
     if (newStatus === 'approved') {
         updateData.approvedAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -445,6 +452,7 @@ async function updateBrand(docId, newStatus) {
 
     try {
         await db.collection('brands').doc(docId).update(updateData);
+        logAdmin({ action: 'brand.status', target: { col: 'brands', id: docId, label: brandName }, from: prevStatus, to: newStatus, note: reason || '' });   // 2단계: 활동 로그
         
         // 상태 변경 시 브랜드에게 이메일 알림 (approve/suspend/reject/restore)
         try {
@@ -577,6 +585,13 @@ async function viewBrand(docId) {
             statusHistoryHtml += `<div class="detail-row"><div class="detail-label">Changed At</div><div class="detail-value">${dt.toLocaleString()}</div></div>`;
         } catch (e) {}
     }
+
+    // 2단계: 상태 이력 (brands.history[] — 최신 위로, reviewIssues 와 같은 패턴). 없으면 안내 한 줄. 값은 전부 escapeHtml/escapeAttr.
+    const hist = Array.isArray(b.history) ? b.history.slice().reverse() : [];
+    const histRows = hist.length
+        ? hist.map(h => `<li><span class="status status-${escapeAttr(h.status || '')}">${escapeHtml(h.status || '')}</span> · ${escapeHtml(h.by || '')} · ${escapeHtml(fmtDate(h.at))}${h.note ? '<small>' + escapeHtml(h.note) + '</small>' : ''}</li>`).join('')
+        : `<li class="adm-muted">${tSpan('No history yet', '이력 없음')}</li>`;
+    statusHistoryHtml += `<div class="detail-row"><div class="detail-label">${tSpan('History', '이력')}</div><div class="detail-value"><ul class="rv-history brand-history">${histRows}</ul></div></div>`;
 
     const actionsHtml = brandActionButtonsForModal(b, docId);
 
@@ -715,7 +730,10 @@ async function viewArticle(docId) {
 // ── 범용 상태 업데이트 ──
 async function updateDoc(collection, docId, status) {
     if (!confirm(`${status === 'approved' ? 'Approve' : 'Reject'} this item?`)) return;
+    let prev = null;   // 2단계: 활동 로그 from·label 용 — 이 흐름은 get() 이 없어 한 번 읽는다
+    try { prev = (await db.collection(collection).doc(docId).get()).data() || null; } catch (e) {}
     await db.collection(collection).doc(docId).update({ status: status });
+    logAdmin({ action: collection === 'products' ? 'product.status' : 'article.status', target: { col: collection, id: docId, label: (prev && (prev.name || prev.title)) || '' }, from: (prev && prev.status) || '', to: status, note: '' });   // 2단계: 활동 로그
     await loadAll();
 }
 
@@ -972,11 +990,13 @@ async function saveReviewStatus(id) {
     btn.disabled = true;
     try {
         const by = (auth.currentUser && auth.currentUser.email) || '';
+        const cur = reviewCache.find(x => x.id === id) || {};   // 2단계: 활동 로그 from·label
         await db.collection('reviewIssues').doc(id).update({
             status: status,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             history: firebase.firestore.FieldValue.arrayUnion({ status: status, by: by, at: new Date().toISOString(), note: note })
         });
+        logAdmin({ action: 'review.status', target: { col: 'reviewIssues', id: id, label: cur.no || '' }, from: cur.status || '', to: status, note: note });   // 2단계: 활동 로그
         await loadReview();
         viewReview(id);   // 갱신된 상태·이력으로 다시 그림 (확인창 없음)
     } catch (e) {

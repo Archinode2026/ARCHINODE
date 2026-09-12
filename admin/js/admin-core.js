@@ -85,10 +85,31 @@ function safeUrl(u) {
     return (u && /^https?:\/\//i.test(String(u))) ? String(u) : '';
 }
 
-// ── 활동 로그 — ★ 지금은 빈 함수. 2단계(adminLogs 컬렉션·규칙 게시)에서 채운다. ──
-//    1단계는 Firestore 쓰기가 없다. 호출부는 지금부터 logAdmin({...}) 을 불러도 무해.
+// ── 활동 로그 — adminLogs 컬렉션에 덧붙인다 (2026-09-12 개편 2단계, 계약서 4-1 필드 그대로) ──
+//    entry = { action, target:{col,id,label}, from, to, note }. by·at·page 는 여기서 채운다.
+//    ★ 실패해도 화면 흐름을 막지 않는다 — try/catch + 콘솔 warn + 토스트 한 줄(조용한 실패 방지).
+//    db 가 없으면 아무것도 안 한다. 오프라인이면 add() 가 대기 상태라 catch 가 안 온다(검수대장 A-010 계열).
 function logAdmin(entry) {
-    /* 2단계에서 구현: db.collection('adminLogs').add({...entry, by, at: serverTimestamp}) */
+    if (typeof db === 'undefined' || !db || typeof firebase === 'undefined') return;
+    try {
+        var e = entry || {};
+        var tg = e.target || {};
+        var page = (location.pathname.split('/').pop() || '').replace(/\.html$/i, '') || 'dashboard';   // 'dashboard' | 'consultations' | …
+        return db.collection('adminLogs').add({
+            at: firebase.firestore.FieldValue.serverTimestamp(),
+            by: (typeof auth !== 'undefined' && auth.currentUser && auth.currentUser.email) || '',
+            action: String(e.action || ''),
+            target: { col: String(tg.col || ''), id: String(tg.id || ''), label: String(tg.label == null ? '' : tg.label) },
+            from: e.from == null ? '' : String(e.from),
+            to: e.to == null ? '' : String(e.to),
+            note: e.note == null ? '' : String(e.note),
+            page: page
+        }).catch(function (err) { logAdmin_fail(err); });
+    } catch (err) { logAdmin_fail(err); }
+}
+function logAdmin_fail(err) {
+    console.warn('[adminLogs] 기록 실패', err);
+    showToast(t('Activity log failed — see dev note', '활동 기록 실패 — 개발 메모 참조'), 'warn');
 }
 
 // ── 검색 — 여러 단어 AND 부분일치, 대소문자 무시 (6단계 통합 검색용) ──

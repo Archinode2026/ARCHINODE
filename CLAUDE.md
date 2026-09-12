@@ -34,7 +34,7 @@
 ```
 ARCHINODE/
 ├── index, about, brands, categories, magazine, for-brands, list-your-brand, contact, ...  # 공개 페이지
-├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계)
+├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계, 활동 로그(`adminLogs`·`admin/js/view-logs.js`, 브랜드 `history[]`) — 2단계)
 ├── auth/             # 전문가 로그인·가입·프로필   ├── brand-portal/  # 브랜드 대시보드 + article-editor.js
 ├── brands/view.html  # 브랜드 상세 라우터           ├── products/view.html
 ├── categories/       # 10 대분류 + 69 서브          ├── magazine/, trend-report/
@@ -60,7 +60,7 @@ ARCHINODE/
 
 ## 5. Firestore 콜렉션
 
-brands(입점, status pending/approved/suspended/rejected + 사유) · products · articles(blocks 배열) · users(전문가) · leads(선언만, 미사용) · trend-submissions · consultations · digital-products-notify · newsletter-subscribers · mail(Trigger Email Extension용 — **설치 여부 미확인**, `docs/admin-email-notification-setup.md`) · **reviewIssues**(검수관리 게시판, 어드민 전용 read/write, 2026-09-12 신설 — 오픈 전 임시 도구, 필드는 `docs/회의/2026-09-12-작업지시-검수관리탭.md` 1절). 스키마 `docs/firestore-schema.md`, `docs/articles-schema.md`.
+brands(입점, status pending/approved/suspended/rejected + 사유) · products · articles(blocks 배열) · users(전문가) · leads(선언만, 미사용) · trend-submissions · consultations · digital-products-notify · newsletter-subscribers · mail(Trigger Email Extension용 — **설치 여부 미확인**, `docs/admin-email-notification-setup.md`) · **reviewIssues**(검수관리 게시판, 어드민 전용 read/write, 2026-09-12 신설 — 오픈 전 임시 도구, 필드는 `docs/회의/2026-09-12-작업지시-검수관리탭.md` 1절) · **adminLogs**(어드민 활동 장부, 2026-09-12 개편 2단계 — create·read 어드민, update·delete 전면 금지(덧붙이기만), 필드는 `docs/firestore-schema.md` 7절; `brands.history[]` 도 같은 단계). 스키마 `docs/firestore-schema.md`, `docs/articles-schema.md`.
 
 ## 6. 팀 — 지휘 창 · 스킬 · 에이전트 (2026-09-12, 엑사·단번 체계 이식)
 

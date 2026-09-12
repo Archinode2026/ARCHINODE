@@ -220,6 +220,7 @@ window.deleteSubscriber = function(id, email) {
   if (!confirm('정말 ' + email + ' 를 목록에서 삭제하시겠습니까?')) return;
   db.collection('newsletter-subscribers').doc(id).delete()
     .then(function() {
+      logAdmin({ action: 'newsletter.status', target: { col: 'newsletter-subscribers', id: id, label: email || '' }, from: 'subscribed', to: 'deleted', note: '' });   // 2단계: 활동 로그
       showToast('삭제 완료', 'success');
       loadSubscribers();
     })

@@ -35,7 +35,7 @@ var ADMIN_MENUS = [
     ] },
     { key: 'ops', en: 'Operations', ko: '운영', items: [
         { id: 'notices',     en: 'Notices',      ko: '공지사항',  icon: 'fa-bullhorn',        kind: 'view', target: 'notices',     ready: false },   // 5단계
-        { id: 'logs',        en: 'Activity Log', ko: '활동 로그', icon: 'fa-history',         kind: 'view', target: 'logs',        ready: false },   // 2단계
+        { id: 'logs',        en: 'Activity Log', ko: '활동 로그', icon: 'fa-history',         kind: 'view', target: 'logs',        ready: true },    // 2단계 ✓ view-logs.js
         { id: 'review',      en: 'Review Board', ko: '검수관리',  icon: 'fa-clipboard-check', kind: 'tab',  target: 'review',      ready: true },
         { id: 'regulations', en: 'Regulations',  ko: '규정집',    icon: 'fa-book-open',       kind: 'view', target: 'regulations', ready: false },   // 3단계
         { id: 'settings',    en: 'Settings',     ko: '설정',      icon: 'fa-cog',             kind: 'view', target: 'settings',    ready: false }    // 3단계
@@ -135,6 +135,7 @@ function adm_route() {
         var view = document.getElementById('tab-' + item.target);
         if (view) view.classList.add('active');
         if (item.target === 'dashboard' && typeof dash_render === 'function') dash_render(view);
+        if (item.target === 'logs' && typeof logs_render === 'function') logs_render(view);   // 2단계 활동 로그
     }
     adm_setActive(item.id);
 }
