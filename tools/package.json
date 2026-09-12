@@ -1,0 +1,8 @@
+{
+  "name": "archinode-tools",
+  "private": true,
+  "description": "ARCHINODE 운영 도구 (scan-test-data.js 용 firebase-admin). 사이트 코드가 아니다.",
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}

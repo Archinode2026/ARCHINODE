@@ -5,3 +5,7 @@ archi-diary/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ── 도구·스테이징 산출물 (2026-09-12) ──
+tools/node_modules/
+.firebase/

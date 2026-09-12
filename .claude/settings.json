@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -ExecutionPolicy Bypass -File tools/deploy.ps1 *)",
+      "Bash(powershell -ExecutionPolicy Bypass -File tools\\deploy.ps1 *)",
+      "Bash(powershell -ExecutionPolicy Bypass -File tools/deploy-staging.ps1 *)",
+      "Bash(powershell -ExecutionPolicy Bypass -File tools\\deploy-staging.ps1 *)",
+      "PowerShell(powershell -ExecutionPolicy Bypass -File tools\\deploy.ps1 *)",
+      "PowerShell(powershell -ExecutionPolicy Bypass -File tools\\deploy-staging.ps1 *)"
+    ],
+    "deny": [
+      "mcp__ccd_session__spawn_task"
+    ]
+  }
+}

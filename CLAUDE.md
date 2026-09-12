@@ -1,111 +1,99 @@
 # CLAUDE.md — ARCHINODE 프로젝트 안내 (AI 에이전트용)
 
-**목적**: 새 Claude 세션이 이 리포지토리를 처음 열었을 때 5분 안에 프로젝트를 이해할 수 있게 하는 요약본. 상세는 `archi-diary/handoff-*.md` 참조.
+**목적**: 새 Claude 세션이 이 리포지토리를 처음 열었을 때 5분 안에 프로젝트를 이해할 수 있게 하는 요약본.
+**사실은 이 문서가 기준**이다. `.claude/CLAUDE.md`(2026-04-11)는 비전·로드맵·거버넌스 원칙을 볼 때만 신뢰하고, 충돌하면 이 문서가 이긴다. **결정의 정본은 `docs/ARCHINODE 규정집.md`**, **할 일의 정본은 `docs/작업일지.md`**, **결함의 정본은 `docs/검수대장.md`**다.
 
 ---
 
+## 0. 세션을 시작하면 (2026-09-12 개정)
+
+1. **폴더 확인** — 이 파일이 있는 최하위 폴더(`...\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE`, `.git` 있음)가 작업 대상. 바깥 두 층은 2026-04 옛 사본이라 편집 금지. 세션도 여기서 열어야 `.claude/`가 로드된다.
+2. `docs/작업일지.md` 맨 위 **"다음에 할 일"** 을 읽는다.
+3. `git log --oneline -10` · `git status --short` · `git rev-list --left-right --count origin/main...main`.
+4. 마지막 커밋 날짜와 작업일지 갱신 날짜를 대조한다. 작업일지가 더 오래됐으면 그 사이 "종료"를 안 밟은 것이다(`archinode` 스킬 1-3).
+5. 실질 작업 요청이면 **`archinode` 스킬(지휘 창)** 규칙을 따른다 — 대화 창은 코드를 직접 고치지 않고 지시서로 실행창에 넘긴다.
+6. 하루를 마칠 때 한울님이 **"종료"** 라고 하면 `archinode-shutdown` 스킬을 처음부터 끝까지 돈다.
+
+> 기기 이전(2026-09-12) 경위와 검증은 `archi-diary/_migration/MIGRATION.md`. `verify.ps1` 26건 통과 확인됨.
+
 ## 1. 프로젝트 한 줄
 
-**ARCHINODE** — 유럽 건축·디자인 브랜드를 한국 시장과 연결하는 정적 HTML + Firebase 플랫폼. 도메인: https://archinodekr.com
+**ARCHINODE** — 유럽 건축·디자인 브랜드를 한국 시장과 연결하는 정적 HTML + Firebase 플랫폼. https://archinodekr.com
+운영 주체 표기: 비비들리바이브(대표 박승리). EU 영업: Silvia Vandone(밀라노). 리포: `github.com/Archinode2026/ARCHINODE`.
 
 ## 2. 기술 스택
 
-- **Frontend**: 정적 HTML + CSS + Vanilla JS (모듈 없음). 194+ HTML 페이지.
-- **Backend**: Firebase Firestore (9개 콜렉션) + Firebase Auth + Firebase Storage
-- **Hosting**: GitHub Pages (main 브랜치 자동 배포, 5~10분 빌드)
-- **다국어**: lang.js가 `data-en`/`data-ko` 속성 스캔해서 토글. `data-langs` body 속성으로 페이지별 언어 세트 지정.
-- **Auth**: Firebase Auth (email/password). 어드민 화이트리스트는 `wool21wool@gmail.com`, `office@archinode.org` 두 개.
+- **Frontend**: 정적 HTML + CSS + Vanilla JS(모듈 없음). HTML 228, 매거진 기사 116, 카테고리 10+69. 공유 `style.css`. Inter + Noto Sans KR, 흑백회색 + 골드 `#C8A96E`.
+- **Backend**: Firebase 프로젝트 `archinode-8ab04` — Firestore 10 콜렉션 + Auth(email/password) + Storage. 서버 코드(Cloud Functions) 없음.
+- **Hosting**: GitHub Pages, `main` push = 배포(5~10분). 스테이징은 Firebase Hosting 미리보기 채널(`tools/deploy-staging.ps1`, 첫 실행 전 로그인 필요).
+- **다국어**: `lang.js`가 `data-en`/`data-ko` 속성을 토글. `<body data-langs="en">`이면 영어 단일(입점 신청·브랜드 가이드). IP로 초기 언어, 사용자 선택 우선.
+- **어드민**: `wool21wool@gmail.com`, `office@archinode.org` (`firebase-config.js`의 `ADMIN_EMAILS` + `firestore.rules`의 `isAdmin()`).
 
 ## 3. 폴더 구조
 
 ```
 ARCHINODE/
-├── index.html              # 메인
-├── about, contact, brands, categories, magazine 등  # 랜딩·인덱스
-├── admin/                  # 어드민 대시보드 (isAdmin 가드)
-├── auth/                   # 로그인·회원가입·프로필
-├── brand-portal/           # 브랜드 전용 대시보드 + article-editor.js
-├── brands/view.html        # 브랜드 상세 페이지 라우터
-├── categories/             # 10 대분류 + 69 서브카테고리
-├── magazine/               # 82 매거진 글 + view.html (Firestore articles 렌더)
-├── trend-report/           # 트렌드 리포트 채널 (Brand Magazine)
-├── downloads/              # PDF 브로슈어
-├── assets/                 # 이미지 + placeholder SVG
-├── scripts/                # 자동화 스크립트 (make_sitemap, make_search_index)
-├── docs/                   # 세팅 가이드
-├── sales/                  # 실비아 컨택 자료 (콜드 메일, 브랜드 리스트)
-├── silvia/                 # 실비아 명함 PDF
-└── archi-diary/            # 개발 일지 + 인수인계 handoff
+├── index, about, brands, categories, magazine, for-brands, list-your-brand, contact, ...  # 공개 페이지
+├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구)
+├── auth/             # 전문가 로그인·가입·프로필   ├── brand-portal/  # 브랜드 대시보드 + article-editor.js
+├── brands/view.html  # 브랜드 상세 라우터           ├── products/view.html
+├── categories/       # 10 대분류 + 69 서브          ├── magazine/, trend-report/
+├── downloads/ assets/ sales/ silvia/                 # 브로슈어·이미지·실비아 자료
+├── scripts/          # make_sitemap.py, make_search_index.py (★ 이 PC엔 Python 없음)
+├── tools/            # deploy.ps1(push+라이브 대조) · deploy-staging.ps1 · scan-test-data.js
+├── docs/             # 작업일지 · 규정집 · 검수대장 · 회의/(지시서) · 스키마 · 세팅 가이드 · deferred-work
+├── archi-diary/      # 개발일지·handoff·브론즈 리포트 (.gitignore — GitHub에 없음, 유일한 사본)
+└── .claude/          # CLAUDE.md(비전) · skills/(archinode, archinode-shutdown, gray-benchmark, gold-cmo, trend-editor) · agents/(node-*) · settings.json
 ```
 
 ## 4. 핵심 파일
 
 | 파일 | 역할 |
 |---|---|
-| `firebase-config.js` | Firebase 초기화 + `db`, `auth`, `storage`, `isAdmin()` 노출 |
-| `lang.js` | 다국어 토글 IIFE. `window.setLang`, `window.toggleLang` 노출 |
-| `firestore.rules` | 프로덕션 보안 룰 (Firebase Console에 별도 게시 필요) |
-| `admin/dashboard.html` | 옵션 B (Suspend/Restore) 포함 어드민 |
-| `brand-portal/article-editor.js` | 블록 에디터 (텍스트+이미지 인라인) |
-| `sitemap.xml`, `search-index.json` | `scripts/make_*.py`로 재생성 |
+| `firebase-config.js` | Firebase 초기화, `db`·`auth`·`storage`·`isAdmin()`. ★ 28줄 `firebase.auth()` 무가드 = BUG-1(검수대장 A-001) |
+| `lang.js` / `auth-ui.js` | 다국어 토글 / 헤더 로그인 상태. 모든 공개 페이지가 로드 |
+| `cookie-consent.js` `analytics-loader.js` `sentry-loader.js` `form-throttle.js` | GDPR 배너 / GA4(동의 후, `GA_ID` 미설정) / Sentry(`DSN` 미설정) / 폼 5초 재제출 차단 |
+| `firestore.rules` | 프로덕션 규칙. **push로 반영 안 됨 — 콘솔 게시(한울님)** |
+| `admin/dashboard.html` `brand-portal/dashboard.html` `magazine.html` `lang.js` | **큰 파일 4종 — Edit 통째 치환 금지**(10절) |
+| `sitemap.xml` `search-index.json` | `scripts/make_*.py`로 재생성(Python 필요) |
 
 ## 5. Firestore 콜렉션
 
-1. **brands** — 브랜드 신청·승인. status 4단계: pending/approved/suspended/rejected. 옵션 B UI로 관리.
-2. **products** — 제품 카탈로그. brands와 연결.
-3. **articles** — 매거진 원고. blocks 배열 (text/image 인라인). `magazine/view.html`이 렌더.
-4. **users** — 국내 전문가 계정 (Phase 2B).
-5. **leads** — 향후 사용 (현재 contact는 Formspree).
-6. **trend-submissions** — Trend Report 원고.
-7. **consultations** — 한국 시장 자문 요청.
-8. **digital-products-notify** — 디지털 상품 알림 신청.
-9. **newsletter-subscribers** — 뉴스레터 구독.
-10. **mail** — Firebase Extensions "Trigger Email"용. 각 폼이 write, Extension이 발송.
+brands(입점, status pending/approved/suspended/rejected + 사유) · products · articles(blocks 배열) · users(전문가) · leads(선언만, 미사용) · trend-submissions · consultations · digital-products-notify · newsletter-subscribers · mail(Trigger Email Extension용 — **설치 여부 미확인**, `docs/admin-email-notification-setup.md`). 스키마 `docs/firestore-schema.md`, `docs/articles-schema.md`.
 
-## 6. 어드민 이메일 알림
+## 6. 팀 — 지휘 창 · 스킬 · 에이전트 (2026-09-12, 엑사·단번 체계 이식)
 
-- 4개 폼 (신규 브랜드/컨설팅/매거진 원고/뉴스레터)이 저장 후 mail 콜렉션에 알림 문서 추가
-- Firebase Extension "Trigger Email from Firestore" 설치 필요 (`docs/admin-email-notification-setup.md` 참조)
-- SMTP: Gmail 앱 비밀번호 사용
+**스킬**(지금 대화창의 행동 규칙, `.claude/skills/`): `archinode`(지휘 창, 트리거 "아키노드") · `archinode-shutdown`("종료") · `gray-benchmark`(아키프로덕트 조사) · `gold-cmo`(마케팅) · `trend-editor`.
+**에이전트**(실행창이 부르는 별도 일꾼, `.claude/agents/`): `node-gold`(설계) → `node-white`(구현) → `node-black`(정적 검증, CRITICAL 0) → `node-bronze`(실브라우저 E2E, 로그인 필요한 확인 전담) / `node-silver`(우선순위·요구사항 번역).
+**계정 스킬**(Cowork 동기화, 폴더 밖): `archi-white/black/gray/gold/bronze`, 매거진 편집팀 `mag-*` 8종. 이름이 비슷해도 **프로젝트 에이전트(`node-*`)와 별개**. 옛 프로젝트 스킬 `white-pm`·`black-qa`는 `.claude/skills-백업-2026-09-12/`.
 
-## 7. 사이트 스크립트 4종 (P3에서 신설)
+**흐름**: 한울님 → 지휘 창(지시서 `docs/회의/`) → 실행창 → 골드·화이트·블랙·브론즈 → 「배포 준비됨」 → 지휘 창 「배포할까요?」 → `tools/deploy.ps1`. 작은 수정은 화이트→블랙만.
 
-- `cookie-consent.js` — GDPR 배너. `window.__cookieConsent` 노출
-- `analytics-loader.js` — GA4 (consent gated). `GA_ID` 세팅 필요
-- `sentry-loader.js` — 에러 트래킹. `DSN` 세팅 필요
-- `form-throttle.js` — 폼 5초 재제출 차단
+## 7. 지키는 것
 
-## 8. 실비아 (EU Director)
+- **검수 없이 배포 없음.** 코드가 바뀌면 node-black CRITICAL 0, 화면이 바뀌면 node-bronze.
+- **지휘 창은 코드를 안 고친다.** 배포(push)·라이브 대조·백업만 직접. 배포 전 **「배포할까요?」**(실방문자가 있는 사이트).
+- **`firestore.rules`는 콘솔 게시가 배포다.** `deploy.ps1`이 경고를 낸다. 보고 맨 위에 적는다.
+- **테스트 데이터는 `[테스트-○○]` 표시만 달고 지우지 않는다.** 정리는 한울님이 정한 때 한 번에(`tools/scan-test-data.js`로 목록).
+- **결함은 `docs/검수대장.md`에.** 사람이 판정한 것만 고친다. 보류 영역(작업일지 B·C)은 발견해도 `보류`로만.
+- **결정은 규정집 먼저, 코드는 그 다음.** 정책 숫자(요금·날짜)를 코드에 새로 박지 않는다.
+- **이중 언어 필수**, 공유 `style.css`, 디자인 시스템 준수.
+- 한울님은 반말로 지시하지만 답은 존댓말. 비전문가 — 선택지+추천+이유+잃는 것.
 
-- **이름**: Silvia Vandone
-- **이메일**: silviavandone@hotmail.com (SPF/DKIM 없어 스팸함 위험 — 향후 도메인 이메일로 이전 권장)
-- **역할**: EU 브랜드 콜드 메일 발송, 응답 관리, 첫 컨택
-- **자료**: `sales/silvia-batch-1-*`
+## 8. 알려진 함정 (실제 사고)
 
-## 9. 개발 워크플로우
+- **Edit 도구 잘림** — `magazine.html`·`lang.js` 끝이 잘려 사이트 다운(커밋 `8d0931e`, `639303c`). 200줄+ 변경은 Node 줄 단위 치환, 끝나면 `</html>` 확인.
+- **대량 `git add` → index 손상**(Cowork mount). `git add -A` 금지, 경로 지정. 50 파일 이상은 GitHub Desktop.
+- **`firebase-auth-compat.js` 없는 페이지에서 `firebase-config.js`가 throw**(BUG-1). Firestore 쓰는 페이지는 auth-compat까지 싣는다.
+- **카테고리 nav `../` 404**(2026-07-02) — 깊이별 상대경로 검사.
+- **매거진 자동 발행 스케줄**(Cowork, 편집팀 8인)이 옛 PC 절대경로로 돌고 있다 — 작업일지 A-⑤.
+- **바깥 폴더 메모 docx에 평문 자격정보** — 옮겨 적지 말 것. 작업일지 A-⑦.
+- **`.ps1`은 UTF-8 BOM 필수** — PowerShell 5.1이 BOM 없는 한글 파일을 CP949로 읽어 따옴표·괄호를 삼킨다(2026-09-12 `deploy.ps1` 실측). Write 도구는 BOM 없이 쓰므로 저장 후 BOM으로 재저장.
 
-**작업 요청 → 순서**:
-1. 골드 (설계) — 방향·리스크·선택지 제시. 화이트 넘기기 전 필수.
-2. 화이트 (구현) — 파일 수정·기능 추가.
-3. 블랙 (검증) — 정적 스캔 (문법·문법·다국어·nav). CRITICAL 0건이면 통과.
-4. 브론즈 (E2E) — Chrome 자동화로 실사용 테스트.
+## 9. 실비아 (EU Director)
 
-## 10. 알려진 함정
-
-- **Edit 도구 잘림**: 큰 파일에 큰 replace 시 끝부분 자름. 200줄+ 변경은 Python `replace()` 사용.
-- **Cowork git index 손상**: mount 파일시스템에서 반복 `git add` 시 index 손상. commit은 소규모(50 파일 미만) 또는 한울님 GitHub Desktop 로컬로 처리.
-- **admin/dashboard.html 및 brand-portal/dashboard.html**: 큰 파일이라 Edit 특히 위험.
-
-## 11. Firebase Console 룰 재게시 규칙
-
-`firestore.rules` 변경 후 GitHub push만으로는 반영 안 됨. **한울님이 Firebase Console → Firestore Database → Rules 탭에 전체 복사·게시 필수**.
-
-## 12. 다음 세션 시작 시
-
-- `archi-diary/handoff-*.md` 최신 파일 읽기
-- `git log --oneline -10`으로 최근 commit 확인
-- `git status`로 미commit 변경 확인
+Silvia Vandone · silviavandone@hotmail.com(스팸함 위험, 응답률<5%면 도메인 메일로) · 1차 20개 브랜드 자료 `sales/silvia-batch-1-*`, 브로슈어 `downloads/`. 1차 발송 여부·응답률은 **확인 못 함**(규정집 안건 7).
 
 ---
 
-작성: 2026-07-02 · 아키-화이트
+개정: 2026-09-12 · 아키노드 지휘 창 (운영 체계 이식) / 원본: 2026-07-02 · 아키-화이트

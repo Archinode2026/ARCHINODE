@@ -1,0 +1,28 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "**/.*",
+      "**/node_modules/**",
+      "archi-diary/**",
+      "docs/**",
+      "tools/**",
+      "scripts/**",
+      "sales/**",
+      "silvia/**",
+      "backup/**",
+      "**/*.md",
+      "**/*.py",
+      "**/*.ps1",
+      "**/*.pptx",
+      "**/*.xlsx",
+      "**/*.docx",
+      "firestore.rules"
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

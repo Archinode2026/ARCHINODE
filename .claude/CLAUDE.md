@@ -2,7 +2,8 @@
 
 > 이 문서는 ARCHINODE 프로젝트의 비전, 구조, 기술적 결정사항을 기록합니다.
 > 세션이 바뀌어도 이 문서를 읽으면 프로젝트를 이해할 수 있어야 합니다.
-> 최종 수정: 2026-04-11
+> 최종 수정: 2026-04-11 · 사실 정정 2026-09-12
+> ★ 이 문서는 **비전·로드맵·거버넌스 원칙**용이다. 기술적 사실(리모트·에이전트·파일 수·워크플로우)은 **루트 `CLAUDE.md`(2026-09-12)** 가 기준이고, 결정의 정본은 `docs/ARCHINODE 규정집.md`다. 충돌하면 그쪽이 이긴다.
 
 ---
 
@@ -14,7 +15,7 @@
 
 **도메인:** archinodekr.com
 
-**GitHub:** https://github.com/OSKA-HQ/ARCHINODE
+**GitHub:** https://github.com/Archinode2026/ARCHINODE (2026-09-12 정정 — 옛 OSKA-HQ 주소는 폐기)
 
 **운영 주체:** 비비들리바이브 (VIVIDELIVIBE) / 대표: 박승리 / 사업자등록번호: 640-03-02879
 
@@ -204,10 +205,12 @@ archinodekr.com/
 
 ## 8. 에이전트 팀
 
-| 이름 | 역할 | 호출 키워드 | 스킬 파일 |
+> **2026-09-12 개정** — 아래 3인 표는 폐기. 현재 팀은 루트 `CLAUDE.md` 6절이 기준: 지휘 창 스킬 `archinode`·마감 `archinode-shutdown`, 프로젝트 에이전트 `node-gold/white/black/bronze/silver`, 프로젝트 스킬 `gray-benchmark`·`gold-cmo`·`trend-editor`, 계정 스킬 `archi-*`·`mag-*`. `white-pm`·`black-qa`는 계정 스킬과 중복이라 `.claude/skills-백업-2026-09-12/`로 옮겼다(거버넌스 "역할 중복 금지" 적용). 아래 거버넌스 규칙은 그대로 유효하다.
+
+| 이름 | 역할 | 호출 키워드 | 파일 |
 |------|------|-----------|----------|
-| 화이트 (White) | PM — 작업 계획, 우선순위, 구현 설계 | "화이트", "다음 뭐 해?" | .claude/skills/white-pm/SKILL.md |
-| 블랙 (Black) | QA — 품질 검수 (코드+콘텐츠+렌더링) | "블랙", "검수해" | .claude/skills/black-qa/SKILL.md |
+| 지휘 창 (아키노드) | 대화 창 행동 규칙 — 코드 안 고침, 지시서·배포·보고 | "아키노드" | .claude/skills/archinode/SKILL.md |
+| 노드-골드/화이트/블랙/브론즈/실버 | 설계/구현/정적검증/E2E/PM | 실행창이 Agent 도구로 호출 | .claude/agents/node-*.md |
 | 그레이 (Gray) | 벤치마크 — 업계 조사, 경쟁 분석 | "그레이", "아키프로덕트" | .claude/skills/gray-benchmark/SKILL.md |
 
 ### 에이전트 거버넌스 규칙 (2026-04-11 확정)
