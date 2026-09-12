@@ -101,6 +101,7 @@ function adm_renderSidebar() {
     var html = '<button type="button" class="adm-toggle" id="admNavToggle" aria-label="Menu">'
         + '<i class="fas fa-bars"></i> ' + tSpan('Menu', '메뉴') + '</button>'
         + adm_searchHtml()   // 6단계 통합 검색창
+        + adm_langHtml()     // 한/영 토글 (A-035)
         + '<nav class="adm-nav">';
     for (var g = 0; g < ADMIN_MENUS.length; g++) {
         var group = ADMIN_MENUS[g];
@@ -124,13 +125,17 @@ function adm_renderSidebar() {
     document.getElementById('admInstallBtn').addEventListener('click', adm_installApp);
     if (adm_installEvt) adm_showInstallBtn(true);
     adm_initSearch();   // 6단계 통합 검색 (searchAll 은 admin-core.js)
+    adm_initLangToggle();   // 한/영 토글 (A-035)
 
     // 모바일(≤768px) 접기/펼치기
     document.getElementById('admNavToggle').addEventListener('click', function () {
         aside.classList.toggle('open');
     });
 
-    // 사이드바 클릭 — dashboard 안에서는 해시만 바꾸고(새로고침 없음) 라우터가 처리
+    // 사이드바 클릭 — dashboard 안에서는 해시만 바꾸고(새로고침 없음) 라우터가 처리.
+    // aside 자체는 재렌더(한/영 토글)돼도 그대로라 리스너는 한 번만 단다(중복이면 adm_route 가 두 번 돈다).
+    if (aside.dataset.admBound) return;
+    aside.dataset.admBound = '1';
     aside.addEventListener('click', function (e) {
         var a = e.target.closest('.adm-item');
         if (!a) return;
@@ -192,12 +197,54 @@ function adm_init() {
         adm_route();   // 초기 진입(# 없음) = 대시보드
     } else {
         // 별도 페이지: 현재 파일명과 같은 page 항목을 강조
-        var cur = adm_currentPage();
-        var items = adm_items();
-        for (var i = 0; i < items.length; i++) {
-            if (items[i].kind === 'page' && items[i].target.toLowerCase() === cur) { adm_setActive(items[i].id); break; }
-        }
+        adm_setActive(adm_activeId());
     }
+}
+
+// ── 지금 강조할 사이드바 항목 id — dashboard 는 해시(모르면 대시보드), 별도 페이지는 파일명. 재렌더 뒤 adm_setActive 에 쓴다 ──
+function adm_activeId() {
+    if (adm_isDashboard()) {
+        var item = adm_findItem((location.hash || '').replace(/^#/, ''));
+        if (!item || !item.ready || item.kind === 'page') item = adm_findItem('dashboard');
+        return item.id;
+    }
+    var cur = adm_currentPage();
+    var items = adm_items();
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].kind === 'page' && items[i].target.toLowerCase() === cur) return items[i].id;
+    }
+    return '';
+}
+
+// ── 한/영 토글 (2026-09-12, 검수대장 A-035) — 검색창 아래 KO | EN. 클릭 → lang.js 의 window.toggleLang()(localStorage 'archinode-lang' 저장 →
+//    다른 어드민 페이지로 가도 유지) → 정적 data-en/ko 짝은 lang.js 가 다시 훑고, t() 로 찍은 동적 부분은 사이드바 재렌더로 갱신.
+//    초기 언어(저장값 > ko)는 admin-core.js admInitLang(). 확인창 없음. lang.js 가 없으면 토스트로 알린다(조용한 실패 방지).
+function adm_langHtml() {
+    var cur = admLang();
+    return '<div class="adm-lang" role="group" aria-label="Language">'
+        + '<button type="button" class="adm-lang-btn' + (cur === 'ko' ? ' active' : '') + '" data-lang="ko" ' + tAttr('Korean', '한국어') + '>KO</button>'
+        + '<span class="adm-lang-sep">|</span>'
+        + '<button type="button" class="adm-lang-btn' + (cur === 'en' ? ' active' : '') + '" data-lang="en" ' + tAttr('English', '영어') + '>EN</button>'
+        + '</div>';
+}
+function adm_initLangToggle() {
+    var btns = document.querySelectorAll('#adminSidebar .adm-lang-btn');
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener('click', function () { adm_switchLang(this.getAttribute('data-lang')); });
+    }
+}
+function adm_switchLang(lang) {
+    if (lang !== 'en' && lang !== 'ko') return;
+    if (lang === admLang()) return;   // 이미 그 언어
+    if (typeof window.toggleLang !== 'function') {
+        showToast(t('Language toggle unavailable (lang.js not loaded)', '언어 전환을 쓸 수 없습니다 (lang.js 미로드)'), 'error');
+        return;
+    }
+    window.toggleLang();   // en ↔ ko (어드민은 두 언어뿐) — applyLanguage 가 <html lang> 과 data-en/ko 짝을 바꾼다
+    adm_renderSidebar();   // t() 로 찍힌 동적 부분(토글 활성·검색 안내 등) 재렌더
+    adm_setActive(adm_activeId());
+    // 1:1 문의 배지는 재렌더로 사라지므로 마지막 건수로 다시 단다(view-inquiries.js, dashboard 만)
+    if (typeof inq_setOpenCount === 'function' && typeof inq_state !== 'undefined' && typeof inq_state.openCount === 'number') inq_setOpenCount(inq_state.openCount);
 }
 
 // ── 통합 검색창 (2026-09-12 어드민 개편 6단계) — admin-core.js searchAll 이 등록된 캐시만 뒤진다(추가 읽기 없음).
@@ -211,6 +258,7 @@ function adm_searchHtml() {
         + '<div class="adm-search-results" id="admSearchResults" hidden></div>'
         + '</div>';
 }
+var adm_searchDocBound = false;   // document 클릭 리스너 1회 바인딩 표시(재렌더 대비)
 function adm_initSearch() {
     var input = document.getElementById('admSearchInput');
     var box = document.getElementById('admSearchResults');
@@ -231,7 +279,10 @@ function adm_initSearch() {
         e.preventDefault();
         adm_goResult(a.dataset);
     });
-    document.addEventListener('click', function (e) { if (!e.target.closest('#admSearch')) adm_hideSearch(); });
+    if (!adm_searchDocBound) {   // 재렌더(한/영 토글) 때 document 리스너가 쌓이지 않게
+        adm_searchDocBound = true;
+        document.addEventListener('click', function (e) { if (!e.target.closest('#admSearch')) adm_hideSearch(); });
+    }
 }
 function adm_hideSearch() {
     var box = document.getElementById('admSearchResults');

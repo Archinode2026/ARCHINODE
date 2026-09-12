@@ -200,6 +200,14 @@
 .adm-kind-user    { background: #d1fae5; color: #065f46; }
 .adm-kind-review  { background: #fee2e2; color: #991b1b; }
 .adm-kind-page    { background: #f3f4f6; color: #666; }
+/* 한/영 토글 (2026-09-12, 검수대장 A-035 — admin-nav.js adm_langHtml). 검색창 아래 오른쪽 KO | EN, 활성 언어는 골드 */
+.adm-lang { display: flex; justify-content: flex-end; align-items: center; gap: 2px; margin: -4px 14px 6px; }
+.adm-lang-btn { background: none; border: none; padding: 2px 4px; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.4px; color: #aaa; cursor: pointer; transition: color 0.2s; }
+.adm-lang-btn:hover { color: #111; }
+.adm-lang-btn.active { color: #C8A96E; cursor: default; }
+.adm-lang-sep { color: #ddd; font-size: 0.7rem; }
+/* lang.js 는 페이지에 .lang-switcher 가 없으면 body 끝에 떠 있는 스위처를 붙인다 — 어드민은 사이드바 토글이 대신하므로 숨긴다 */
+.lang-switcher-floating { display: none; }
 @media (max-width: 768px) {
     .adm-search { margin: 8px 12px; }
     .adm-search-results { position: static; width: auto; max-height: none; box-shadow: none; margin-top: 6px; }   /* 사이드바 overflow:hidden 에 잘리지 않게 */

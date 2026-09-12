@@ -29,6 +29,23 @@ function t(en, ko) { return admLang() === 'ko' ? ko : en; }
 function tAttr(en, ko) { return 'data-en="' + escapeAttr(en) + '" data-ko="' + escapeAttr(ko) + '"'; }
 function tSpan(en, ko) { return '<span ' + tAttr(en, ko) + '>' + escapeHtml(t(en, ko)) + '</span>'; }
 
+// ── 어드민 초기 언어 (2026-09-12, 검수대장 A-035) — 「저장된 선택 > 기본 한국어」. lang.js 본체는 공개 페이지 공통이라 손대지 않는다.
+//    lang.js pickInitialLang 순서 = 저장값('archinode-lang') > IP 캐시('archinode-lang-auto') > ko 이고, IP 조회(detectCountryAndApply)는
+//    저장값이 있을 때만 건너뛴다. html/body 의 data-langs 는 언어 «목록»만 줄일 수 있어(ko 단일 = 토글 불가) 초기값·IP 조회를 못 막는다.
+//    → 저장값이 없으면(또는 en/ko 가 아니면) 여기서 'ko' 를 저장해 lang.js 가 "사용자 선택" 경로를 타게 한다(IP 조회 안 함).
+//      같은 브라우저의 공개 페이지도 이 저장값을 읽으므로 IP 감지를 건너뛴다 — 어드민 본인 브라우저에 한한 영향.
+//    document.documentElement.lang 도 지금 맞춘다 — admin-nav 의 사이드바(t())가 lang.js 의 DOMContentLoaded 보다 먼저 그려지기 때문.
+function admInitLang() {
+    var saved = null;
+    try { saved = localStorage.getItem('archinode-lang'); } catch (e) {}
+    if (saved !== 'en' && saved !== 'ko') {
+        saved = 'ko';
+        try { localStorage.setItem('archinode-lang', 'ko'); } catch (e) {}
+    }
+    document.documentElement.lang = saved;
+}
+admInitLang();
+
 // ── 모달 — 기존 #modal / #modalContent 재사용, 없으면 만든다 ──
 //    닫기 버튼은 closeModal 이름을 부르지 않고 직접 닫는다(별도 페이지가 window.closeModal 을
 //    자기 #modalOverlay 용으로 덮어쓰므로 이름 호출이면 엉뚱한 요소를 닫는다).
