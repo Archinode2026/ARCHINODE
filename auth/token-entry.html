@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Signing in… — ARCHINODE</title>
+<link rel="icon" type="image/x-icon" href="../favicon.ico">
+<!-- 브론즈(자동 검수) 1회용 열쇠 착륙 페이지 — tools/bronze-token.js 가 #t=<커스텀토큰>&to=<경로> 로 보낸다.
+     링크·sitemap 노출 없음. 토큰은 fragment 로만 오고(서버 미전송) 아래 스크립트가 읽자마자 주소창에서 지운다. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #333; }
+#msg { font-size: 0.95rem; text-align: center; padding: 24px; line-height: 1.7; }
+#msg.err { color: #dc2626; }
+</style>
+</head>
+<body>
+<p id="msg" data-en="Signing in…" data-ko="로그인 중…">Signing in…</p>
+
+<script src="../firebase-config.js"></script>
+<script>
+// ── 1) fragment 읽고 즉시 지운다 (주소창·히스토리에 토큰이 남지 않게) ──
+var _frag = location.hash.charAt(0) === '#' ? location.hash.slice(1) : '';
+history.replaceState(null, '', location.pathname);
+var _params = new URLSearchParams(_frag);
+var _token = _params.get('t') || '';
+var _to = sanitizeTo(_params.get('to'));
+
+// to 는 리포 루트 기준 같은 출처 상대경로만 (예 admin/dashboard.html). 절대 URL·프로토콜·상위 이동은 거부 → 기본값.
+function sanitizeTo(v) {
+    var DEFAULT = 'admin/dashboard.html';
+    if (typeof v !== 'string' || !v) return DEFAULT;
+    if (v.indexOf('//') !== -1 || v.indexOf(':') !== -1 || v.indexOf('..') !== -1 || v.indexOf('\\') !== -1) return DEFAULT;
+    if (!/^[a-z0-9][a-z0-9_\-./]*\.html(\?[^\s#]*)?$/i.test(v)) return DEFAULT;
+    return v;
+}
+
+function say(en, ko, isErr) {
+    var el = document.getElementById('msg');
+    var lang = 'en';
+    try { if (localStorage.getItem('archinode-lang') === 'ko') lang = 'ko'; } catch (e) {}
+    el.setAttribute('data-en', en);
+    el.setAttribute('data-ko', ko);
+    el.textContent = lang === 'ko' ? ko : en;
+    el.className = isErr ? 'err' : '';
+}
+
+// ── 2) 토큰으로 로그인 → to 로 이동 ──
+if (!_token) {
+    say('No sign-in key was provided. Issue a new one with tools/bronze-token.js.',
+        '열쇠가 없습니다. tools/bronze-token.js 로 다시 발급받으세요.', true);
+} else {
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .catch(function (err) { console.warn('Persistence:', err && err.code); })
+        .then(function () { return auth.signInWithCustomToken(_token); })
+        .then(function () { _token = ''; location.replace('../' + _to); })
+        .catch(function (err) {
+            _token = '';
+            console.error('token-entry sign-in failed:', err && err.code);
+            say('The sign-in key has expired or is invalid. Please issue a new one.',
+                '열쇠가 만료됐거나 잘못됐습니다. 다시 발급받으세요.', true);
+        });
+}
+</script>
+</body>
+</html>

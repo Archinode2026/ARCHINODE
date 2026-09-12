@@ -53,6 +53,7 @@ ARCHINODE/
 | `firebase-config.js` | Firebase 초기화, `db`·`auth`·`storage`·`isAdmin()`. ★ 28줄 `firebase.auth()` 무가드 = BUG-1(검수대장 A-001) |
 | `admin/js/admin-core.js` | 어드민 공통 부품 — `escapeHtml`·**`escapeAttr`(속성용, A-011)**·`t/tAttr/tSpan`·`openModal/closeModal`·`showToast`·`fmtDate`·`safeUrl`·`logAdmin`(2단계 전 빈 함수)·`matchText`·**`downloadCSV(rows, filename)`·`admRegisterCache/admGetCache`·`searchAll`(6단계 — 뉴스레터·알림 페이지는 자기 `downloadCSV()`가 뒤 선언으로 이긴다)**. 전역 `function`만(const/let 금지 — 별도 페이지 재선언 충돌; `var`는 허용) |
 | `lang.js` / `auth-ui.js` | 다국어 토글 / 헤더 로그인 상태. 모든 공개 페이지가 로드 |
+| `auth/token-entry.html` | 브론즈 열쇠 착륙 페이지 — `tools/bronze-token.js` 가 보낸 fragment 토큰으로 로그인 후 `to` 로 이동, noindex·링크·sitemap 없음(2026-09-12) |
 | `cookie-consent.js` `analytics-loader.js` `sentry-loader.js` `form-throttle.js` | GDPR 배너 / GA4(동의 후, `GA_ID` 미설정) / Sentry(`DSN` 미설정) / 폼 5초 재제출 차단 |
 | `firestore.rules` | 프로덕션 규칙. **push로 반영 안 됨 — 콘솔 게시(한울님)** |
 | `admin/dashboard.html` `brand-portal/dashboard.html` `magazine.html` `lang.js` | **큰 파일 4종 — Edit 통째 치환 금지**(10절) |

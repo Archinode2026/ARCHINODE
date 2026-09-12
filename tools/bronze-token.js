@@ -13,7 +13,7 @@
 //   node tools/bronze-token.js --print-only                     → (진단용) 토큰 발급까지만 해보고 성공/실패만 출력
 //
 // 출력: `http://127.0.0.1:52719/enter?k=…` 한 줄. 60초 안에 한 번만 열린다. 열리면 대상 사이트의
-// /auth/token-entry.html 로 토큰을 fragment(#)에 실어 넘긴다(서버로 전송되지 않고 그 페이지가 즉시 지운다).
+// /auth/token-entry.html 로 토큰을 fragment(#)에 실어 넘긴다(서버로 전송되지 않고 그 페이지가 즉시 지운다). auth/token-entry.html 이 이 역할을 한다(2026-09-12).
 
 const http = require('http');
 const crypto = require('crypto');
