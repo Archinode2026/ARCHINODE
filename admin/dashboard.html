@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="admin.css?v=20260912">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -145,11 +146,11 @@ tr:hover { background: #fafafa; }
 <div class="topbar">
     <a href="../index.html" class="logo">ARCHINODE <span>ADMIN</span></a>
     <div class="right">
-        <a href="trend-submissions.html" style="font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-inbox"></i> Trend Submissions</a>
-        <a href="consultations.html" style="font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-comments"></i> Consultations</a>
-        <a href="notify-subscribers.html" style="font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-bell"></i> Notify Subscribers</a>
-        <a href="newsletter-subscribers.html" style="font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-envelope-open-text"></i> Newsletter</a>
-        <a href="articles.html" style="font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color=\'#C8A96E\'" onmouseout="this.style.color=\'#aaa\'"><i class="fas fa-newspaper"></i> Articles</a>
+        <a href="trend-submissions.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-inbox"></i> Trend Submissions</a>
+        <a href="consultations.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-comments"></i> Consultations</a>
+        <a href="notify-subscribers.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-bell"></i> Notify Subscribers</a>
+        <a href="newsletter-subscribers.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-envelope-open-text"></i> Newsletter</a>
+        <a href="articles.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color=\'#C8A96E\'" onmouseout="this.style.color=\'#aaa\'"><i class="fas fa-newspaper"></i> Articles</a>
         <span class="admin-email" id="adminEmail"></span>
         <a href="../brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
         <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
@@ -162,6 +163,11 @@ tr:hover { background: #fafafa; }
 </div>
 
 <div class="admin" id="adminContent" style="display:none;">
+<!-- ADMIN SHELL (2026-09-12 어드민 개편 1단계) — 사이드바 + 본문 2단 -->
+<div class="adm-layout">
+<aside id="adminSidebar"></aside>
+<div class="adm-main">
+
 
     <!-- STATS -->
     <div class="stats-row">
@@ -186,6 +192,9 @@ tr:hover { background: #fafafa; }
             <div class="label" data-en="Articles to Review" data-ko="검토할 아티클">Articles to Review</div>
         </div>
     </div>
+
+    <!-- VIEW: DASHBOARD (1단계 셸 — view-dashboard.js 가 그린다) -->
+    <div class="tab-content" id="tab-dashboard"></div>
 
     <!-- TABS -->
     <div class="tabs">
@@ -290,6 +299,8 @@ tr:hover { background: #fafafa; }
             </table>
         </div>
     </div>
+</div><!-- /.adm-main -->
+</div><!-- /.adm-layout -->
 </div>
 
 <!-- DETAIL MODAL -->
@@ -301,6 +312,9 @@ tr:hover { background: #fafafa; }
 </div>
 
 <script src="../firebase-config.js"></script>
+<script src="js/admin-core.js?v=20260912"></script>
+<script src="js/admin-nav.js?v=20260912"></script>
+<script src="js/view-dashboard.js?v=20260912"></script>
 <script src="../search.js"></script>
 <script src="../lang.js?v=20260630"></script>
 <script>
@@ -322,6 +336,7 @@ auth.onAuthStateChanged(async (user) => {
 // ── 전체 데이터 로드 ──
 async function loadAll() {
     await Promise.all([loadBrands(), loadProducts(), loadArticles(), loadReview()]);
+    dash_render(document.getElementById('tab-dashboard'));   // 대시보드 카드 카운트 갱신 (1단계 셸)
 }
 
 // ── 브랜드 상태별 액션 버튼 ──

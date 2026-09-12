@@ -34,7 +34,7 @@
 ```
 ARCHINODE/
 ├── index, about, brands, categories, magazine, for-brands, list-your-brand, contact, ...  # 공개 페이지
-├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12)
+├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계)
 ├── auth/             # 전문가 로그인·가입·프로필   ├── brand-portal/  # 브랜드 대시보드 + article-editor.js
 ├── brands/view.html  # 브랜드 상세 라우터           ├── products/view.html
 ├── categories/       # 10 대분류 + 69 서브          ├── magazine/, trend-report/
@@ -51,6 +51,7 @@ ARCHINODE/
 | 파일 | 역할 |
 |---|---|
 | `firebase-config.js` | Firebase 초기화, `db`·`auth`·`storage`·`isAdmin()`. ★ 28줄 `firebase.auth()` 무가드 = BUG-1(검수대장 A-001) |
+| `admin/js/admin-core.js` | 어드민 공통 부품 — `escapeHtml`·**`escapeAttr`(속성용, A-011)**·`t/tAttr/tSpan`·`openModal/closeModal`·`showToast`·`fmtDate`·`safeUrl`·`logAdmin`(2단계 전 빈 함수)·`matchText`. 전역 `function`만(const/let 금지 — 별도 페이지 재선언 충돌) |
 | `lang.js` / `auth-ui.js` | 다국어 토글 / 헤더 로그인 상태. 모든 공개 페이지가 로드 |
 | `cookie-consent.js` `analytics-loader.js` `sentry-loader.js` `form-throttle.js` | GDPR 배너 / GA4(동의 후, `GA_ID` 미설정) / Sentry(`DSN` 미설정) / 폼 5초 재제출 차단 |
 | `firestore.rules` | 프로덕션 규칙. **push로 반영 안 됨 — 콘솔 게시(한울님)** |

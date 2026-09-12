@@ -1,0 +1,63 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   view-dashboard.js — 대시보드 첫 화면 (2026-09-12 어드민 개편 1단계)
+   정본: docs/회의/2026-09-12-구현계약서-어드민개편.md 3장 1단계 · 6장 리스크 7·8
+
+   대기 건수 카드 6개 + 「최근 활동」 자리(2단계 활동 로그 전까지 안내문).
+   카운트는 컬렉션마다 where('status','==',…) 단일 필드 한 번 — orderBy 를 붙이면
+   복합 색인이 필요해지므로 붙이지 않는다(리스크 8). Firestore 쓰기 없음.
+   ★ 전역 `var`/`function` 만. 접두어 dash_.
+   ───────────────────────────────────────────────────────────────────────── */
+
+var DASH_CARDS = [
+    { id: 'brands',        en: 'Brands pending',        ko: '브랜드 승인 대기', icon: 'fa-building',         coll: 'brands',            status: 'pending',  href: 'dashboard.html#brands' },
+    { id: 'products',      en: 'Products to review',    ko: '제품 검토 대기',   icon: 'fa-box-open',         coll: 'products',          status: 'pending',  href: 'dashboard.html#products' },
+    { id: 'articles',      en: 'Articles to review',    ko: '아티클 검토 대기', icon: 'fa-newspaper',        coll: 'articles',          status: 'pending',  href: 'dashboard.html#articles' },
+    { id: 'consultations', en: 'Consultations pending', ko: '자문 요청 대기',   icon: 'fa-comments',         coll: 'consultations',     status: 'pending',  href: 'consultations.html' },
+    { id: 'trend',         en: 'Trend submissions',     ko: '트렌드 투고 대기', icon: 'fa-lightbulb',        coll: 'trend-submissions', status: 'pending',  href: 'trend-submissions.html' },
+    { id: 'review',        en: 'Review issues open',    ko: '검수 검토대기',    icon: 'fa-clipboard-check',  coll: 'reviewIssues',      status: '검토대기', href: 'dashboard.html#review' }
+];
+
+// ── 화면 그리기. el = #tab-dashboard. 로그인 전에는 자리만 그리고 읽지 않는다 ──
+function dash_render(el) {
+    el = el || document.getElementById('tab-dashboard');
+    if (!el) return;
+
+    var html = '<div class="adm-cards">';
+    for (var i = 0; i < DASH_CARDS.length; i++) {
+        var c = DASH_CARDS[i];
+        html += '<a class="adm-card" href="' + escapeAttr(c.href) + '" data-card="' + escapeAttr(c.id) + '">'
+            + '<i class="fas ' + escapeAttr(c.icon) + ' adm-card-icon"></i>'
+            + '<div class="adm-num" id="dashNum-' + escapeAttr(c.id) + '">…</div>'
+            + '<div class="adm-label" ' + tAttr(c.en, c.ko) + '>' + escapeHtml(t(c.en, c.ko)) + '</div>'
+            + '</a>';
+    }
+    html += '</div>'
+        + '<div class="section-card adm-activity">'
+        + '<h3 ' + tAttr('Recent Activity', '최근 활동') + '>' + escapeHtml(t('Recent Activity', '최근 활동')) + '</h3>'
+        + '<p class="adm-muted" ' + tAttr('Activity log coming in step 2', '활동 로그는 2단계에서') + '>'
+        + escapeHtml(t('Activity log coming in step 2', '활동 로그는 2단계에서')) + '</p>'
+        + '</div>';
+    el.innerHTML = html;
+
+    dash_loadCounts();
+}
+
+// ── 카운트 읽기. 실패는 숨기지 않고 카드에 표시한다(조용한 실패 방지) ──
+function dash_loadCounts() {
+    if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) return;   // 로그인 전: loadAll() 끝에서 다시 부른다
+    DASH_CARDS.forEach(function (c) {
+        db.collection(c.coll).where('status', '==', c.status).get()
+            .then(function (snap) { dash_setNum(c.id, String(snap.size), ''); })
+            .catch(function (err) {
+                console.error('[dashboard] ' + c.coll + ' count failed', err);
+                dash_setNum(c.id, '!', t('Read failed: ', '읽기 실패: ') + ((err && err.code) || ''));
+            });
+    });
+}
+function dash_setNum(id, text, title) {
+    var el = document.getElementById('dashNum-' + id);
+    if (!el) return;
+    el.textContent = text;
+    el.classList.toggle('adm-num-err', text === '!');
+    if (title) el.setAttribute('title', title); else el.removeAttribute('title');
+}

@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="admin.css?v=20260912">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -143,6 +144,11 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; co
 </div>
 
 <div class="admin" id="adminContent" style="display:none;">
+<!-- ADMIN SHELL (2026-09-12 어드민 개편 1단계) — 사이드바 + 본문 2단 -->
+<div class="adm-layout">
+<aside id="adminSidebar"></aside>
+<div class="adm-main">
+
 
   <div class="page-head">
     <div>
@@ -172,6 +178,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; co
     <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#C8A96E;"></i><p style="margin-top:12px;">Loading submissions...</p></div>
   </div>
 
+</div><!-- /.adm-main -->
+</div><!-- /.adm-layout -->
 </div>
 
 <!-- DETAIL MODAL -->
@@ -244,6 +252,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; co
 <div class="toast" id="toast"></div>
 
 <script src="../firebase-config.js"></script>
+<script src="js/admin-core.js?v=20260912"></script>
+<script src="js/admin-nav.js?v=20260912"></script>
 <script>
 // ADMIN_EMAILS, isAdmin() 는 firebase-config.js 에서 제공
 let currentStatus = 'pending';
