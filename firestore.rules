@@ -321,12 +321,13 @@ service cloud.firestore {
     // ────────────────────────────────────────────────────────────────────
     // inquiries — 1:1 문의 (2026-09-12, 개편 5단계). 브랜드 포털 Support 탭이 create, 어드민이 답변(update).
     // 필드: fromUid, fromRole, fromEmail, fromName, subject, body, status(open|answered), answer, answeredAt/By, createdAt, updatedAt, history — docs/firestore-schema.md 11절
-    // create: 로그인 본인 uid · status open · subject 1~199자 · body 1~4999자 · createdAt == request.time
+    // create: 로그인 본인 uid · fromEmail == 로그인 계정 이메일 · status open · subject 1~199자 · body 1~4999자 · createdAt == request.time
     // read: 본인 ∪ 어드민 (포털 조회는 where('fromUid','==',uid) 만) / update·delete 어드민
     // ────────────────────────────────────────────────────────────────────
     match /inquiries/{inquiryId} {
       allow create: if isSignedIn()
                     && request.resource.data.fromUid == request.auth.uid
+                    && request.resource.data.fromEmail == request.auth.token.email   // 작성자 이메일은 로그인 계정과 같아야(2026-09-12 블랙 지적)
                     && request.resource.data.status == 'open'
                     && request.resource.data.subject is string && request.resource.data.subject.size() > 0 && request.resource.data.subject.size() < 200
                     && request.resource.data.body is string && request.resource.data.body.size() > 0 && request.resource.data.body.size() < 5000

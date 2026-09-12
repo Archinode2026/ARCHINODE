@@ -22,7 +22,7 @@
 .adm-item.active i { color: #C8A96E; }
 
 /* DASHBOARD CARDS */
-.adm-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }   /* 4a: 카드 7장 → 4+3 (3열이면 3+3+1) */
+.adm-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }   /* 카드 9장(5단계) → 3열 (3+3+3) */
 .adm-card { display: block; background: #fff; border-radius: 10px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-decoration: none; color: #333; border: 1px solid transparent; transition: border-color 0.2s; }
 .adm-card:hover { border-color: #C8A96E; }
 .adm-card-icon { float: right; font-size: 1.4rem; color: #e0e0e0; }
