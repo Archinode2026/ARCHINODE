@@ -2,7 +2,7 @@
    view-dashboard.js — 대시보드 첫 화면 (2026-09-12 어드민 개편 1단계)
    정본: docs/회의/2026-09-12-구현계약서-어드민개편.md 3장 1단계 · 6장 리스크 7·8
 
-   대기 건수 카드 7개(4a: 「새 리드」 추가) + 「최근 활동」(2단계: adminLogs 최신 20건 — view-logs.js 의 logs_tableHtml 재사용).
+   대기 건수 카드 9개(4a: 「새 리드」 · 5: 「열린 문의」 · 6: 「회원」 추가) + 「최근 활동」(2단계: adminLogs 최신 20건 — view-logs.js 의 logs_tableHtml 재사용).
    카운트는 컬렉션마다 where('status','==',…) 단일 필드 한 번 — orderBy 를 붙이면
    복합 색인이 필요해지므로 붙이지 않는다(리스크 8). Firestore 쓰기 없음.
    ★ 전역 `var`/`function` 만. 접두어 dash_.
@@ -10,6 +10,7 @@
 
 var DASH_CARDS = [
     { id: 'leads',         en: 'New leads',             ko: '새 리드',          icon: 'fa-inbox',            coll: 'leads',             status: 'new',      href: 'dashboard.html#leads' },     // 4a단계
+    { id: 'inquiries',     en: 'Open inquiries',        ko: '열린 문의',        icon: 'fa-comment-dots',     coll: 'inquiries',         status: 'open',     href: 'dashboard.html#inquiries', loader: 'inq_loadOpenCount' },   // 5단계: view-inquiries.js 가 where 한 번으로 카드 + 사이드바 배지 둘 다 채운다
     { id: 'brands',        en: 'Brands pending',        ko: '브랜드 승인 대기', icon: 'fa-building',         coll: 'brands',            status: 'pending',  href: 'dashboard.html#brands' },
     { id: 'products',      en: 'Products to review',    ko: '제품 검토 대기',   icon: 'fa-box-open',         coll: 'products',          status: 'pending',  href: 'dashboard.html#products' },
     { id: 'articles',      en: 'Articles to review',    ko: '아티클 검토 대기', icon: 'fa-newspaper',        coll: 'articles',          status: 'pending',  href: 'dashboard.html#articles' },
@@ -98,6 +99,10 @@ function dash_loadCounts() {
     DASH_CARDS.forEach(function (c) {
         if (c.cache) {   // 6단계 회원 수 — 별도 카운트 쿼리 없이 users_load 결과(캐시)로. 이미 읽었으면 다시 읽지 않는다
             if (typeof users_ensureLoaded === 'function') users_ensureLoaded(); else dash_setNum(c.id, '-', 'view-users.js not loaded');
+            return;
+        }
+        if (c.loader) {   // 5단계 열린 문의 — 그 화면의 전역 function 이 where 한 번으로 카드(dash_setNum) + 사이드바 배지를 같이 채운다
+            if (typeof window[c.loader] === 'function') window[c.loader](); else dash_setNum(c.id, '-', c.loader + ' not loaded');
             return;
         }
         db.collection(c.coll).where('status', '==', c.status).get()

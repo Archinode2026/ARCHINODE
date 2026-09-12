@@ -308,6 +308,34 @@ service cloud.firestore {
     }
 
     // ────────────────────────────────────────────────────────────────────
+    // notices — 공지사항 (2026-09-12, 개편 5단계). 어드민이 쓰고 브랜드 포털 배너가 읽는다.
+    // 필드: title_en/ko, body_en/ko(평문), audience(brand|site|all), visible, pinned, order, createdAt/By, updatedAt/By — docs/firestore-schema.md 10절
+    // read: 어드민 ∪ (로그인 ∧ visible==true). 포털 조회는 where('visible','==',true) 만(문서별 판정과 일치).
+    // 사이트 공개 공지(비로그인)는 복귀 후 `|| resource.data.audience in ['site','all']` 로 한 번 더 넓힌다.
+    // ────────────────────────────────────────────────────────────────────
+    match /notices/{noticeId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.visible == true);
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // inquiries — 1:1 문의 (2026-09-12, 개편 5단계). 브랜드 포털 Support 탭이 create, 어드민이 답변(update).
+    // 필드: fromUid, fromRole, fromEmail, fromName, subject, body, status(open|answered), answer, answeredAt/By, createdAt, updatedAt, history — docs/firestore-schema.md 11절
+    // create: 로그인 본인 uid · status open · subject 1~199자 · body 1~4999자 · createdAt == request.time
+    // read: 본인 ∪ 어드민 (포털 조회는 where('fromUid','==',uid) 만) / update·delete 어드민
+    // ────────────────────────────────────────────────────────────────────
+    match /inquiries/{inquiryId} {
+      allow create: if isSignedIn()
+                    && request.resource.data.fromUid == request.auth.uid
+                    && request.resource.data.status == 'open'
+                    && request.resource.data.subject is string && request.resource.data.subject.size() > 0 && request.resource.data.subject.size() < 200
+                    && request.resource.data.body is string && request.resource.data.body.size() > 0 && request.resource.data.body.size() < 5000
+                    && request.resource.data.createdAt == request.time;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.fromUid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
     // 기본 정책: 위에 매칭되지 않는 모든 경로 차단
     // ────────────────────────────────────────────────────────────────────
     match /{document=**} {

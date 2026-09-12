@@ -24,7 +24,9 @@ var LOG_ACTIONS = {
     'settings.save':       { en: 'Settings saved',          ko: '설정 저장' },             // 3단계 view-settings.js
     'lead.create':         { en: 'Lead registered',         ko: '리드 등록' },             // 4a단계 view-leads.js
     'lead.assign':         { en: 'Lead assigned',           ko: '리드 배정' },
-    'lead.status':         { en: 'Lead status',             ko: '리드 상태' }
+    'lead.status':         { en: 'Lead status',             ko: '리드 상태' },
+    'notice.save':         { en: 'Notice saved',            ko: '공지 저장' },             // 5단계 view-notices.js (등록·수정·노출 토글)
+    'inquiry.answer':      { en: 'Inquiry answered',        ko: '문의 답변' }              // 5단계 view-inquiries.js
 };
 
 // 종류 필터 = action 접두어 ('' = 전체)

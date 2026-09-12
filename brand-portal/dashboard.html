@@ -118,6 +118,28 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
 
 /* INBOX (2026-09-12 어드민 개편 4a — 배정된 리드. 모달은 admin/dashboard.html .modal-overlay 와 같은 모양, 확인창 없음) */
 .tab .tab-badge { background: #fee2e2; color: #dc2626; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
+/* NOTICE BANNER + SUPPORT (2026-09-12 어드민 개편 5단계 — notices 배너 · inquiries Support 탭. 확인창 없음, 값은 inbox_esc) */
+.notice-banner { display: none; background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #C8A96E; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; }
+.notice-banner .notice-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.notice-banner .notice-row > i { color: #C8A96E; margin-top: 3px; }
+.notice-banner .notice-main { flex: 1; min-width: 200px; }
+.notice-banner h3 { font-size: 0.92rem; font-weight: 700; color: #111; margin: 0 0 4px; }
+.notice-banner p { font-size: 0.84rem; color: #555; margin: 0; line-height: 1.5; word-break: break-word; }
+.notice-banner .notice-all { background: none; border: 1px solid #C8A96E; color: #8a6a2a; padding: 6px 12px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.notice-banner .notice-all:hover { background: #C8A96E; color: #fff; }
+.notice-item { padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+.notice-item h3 { font-size: 0.92rem; font-weight: 700; color: #111; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.notice-item h3 small { font-size: 0.72rem; color: #999; font-weight: 400; }
+.notice-item p { font-size: 0.85rem; color: #444; line-height: 1.6; margin: 0; word-break: break-word; }
+.sup-item { padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
+.sup-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.sup-head strong { font-size: 0.92rem; color: #111; }
+.sup-head small { font-size: 0.74rem; color: #999; }
+.sup-body { font-size: 0.85rem; color: #444; line-height: 1.6; word-break: break-word; }
+.sup-answer { margin-top: 10px; padding: 12px 14px; background: #f8f6f1; border-left: 3px solid #C8A96E; border-radius: 6px; font-size: 0.85rem; color: #333; line-height: 1.6; word-break: break-word; }
+.sup-answer .sup-answer-head { font-size: 0.72rem; font-weight: 700; color: #8a6a2a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.sup-wait { margin-top: 8px; font-size: 0.78rem; color: #999; }
+
 .inbox-intro { font-size: 0.85rem; color: #666; margin-bottom: 8px; line-height: 1.6; }
 .inbox-msg { font-size: 0.82rem; color: #666; margin-bottom: 12px; min-height: 1em; }
 .inbox-msg.err { color: #dc2626; }
@@ -202,6 +224,22 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
         </p>
     </div>
 
+    <!-- NOTICE BANNER (2026-09-12 어드민 개편 5단계 — notices where visible==true, 대상 brand/all 은 클라이언트 필터, 고정 우선 1건. pn_draw() 가 채운다) -->
+    <div class="notice-banner" id="noticeBanner">
+        <div class="notice-row">
+            <i class="fas fa-bullhorn"></i>
+            <div class="notice-main" id="noticeMain"></div>
+            <button type="button" class="notice-all" id="noticeAllBtn"></button>
+        </div>
+    </div>
+    <!-- NOTICE LIST MODAL — 본문은 pn_openAll() 이 채운다 (Inbox 모달과 같은 모양) -->
+    <div class="inbox-overlay" id="noticeModal">
+        <div class="inbox-modal">
+            <button type="button" class="close-btn" id="noticeClose" aria-label="Close">&times;</button>
+            <div id="noticeModalContent"></div>
+        </div>
+    </div>
+
     <!-- STATS CARDS -->
     <div id="statsCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;">
         <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
@@ -228,6 +266,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
         <div class="tab" data-tab="products" data-en="Products" data-ko="제품">Products</div>
         <div class="tab" data-tab="magazine" data-en="Brand Magazine" data-ko="브랜드 매거진">Magazine</div>
         <div class="tab" data-tab="inbox" data-en="Inbox" data-ko="인박스">Inbox <span class="tab-badge" id="inboxBadge" style="display:none;"></span></div>
+        <div class="tab" data-tab="support" data-en="Support" data-ko="문의">Support <span class="tab-badge" id="supportBadge" style="display:none;"></span></div>
         <div class="tab" data-tab="settings" data-en="Settings" data-ko="설정">Settings</div>
     </div>
 
@@ -576,6 +615,35 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
             <div class="inbox-modal">
                 <button type="button" class="close-btn" id="inboxClose" aria-label="Close">&times;</button>
                 <div id="inboxModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: SUPPORT (2026-09-12 어드민 개편 5단계 — 1:1 문의. inquiries create 는 규칙 조건과 1:1(sup_send), 목록은 where fromUid==uid 만·클라이언트 정렬) -->
+    <div class="tab-content" id="tab-support">
+        <div class="section-card">
+            <h2><i class="fas fa-life-ring"></i> <span data-en="Ask ARCHINODE" data-ko="ARCHINODE 에 문의">Ask ARCHINODE</span></h2>
+            <p class="inbox-intro" data-en="Questions about your listing, products, reviews or the platform. Our team answers here in the portal and by email." data-ko="입점·제품·검수·플랫폼에 관해 물어보세요. 답변은 이 포털과 이메일로 드립니다.">Questions about your listing, products, reviews or the platform. Our team answers here in the portal and by email.</p>
+            <form id="supportForm" novalidate>
+                <div class="field">
+                    <label for="supSubject" data-en="Subject" data-ko="제목">Subject</label>
+                    <input type="text" id="supSubject" maxlength="199" placeholder="What is your question about?" data-en-placeholder="What is your question about?" data-ko-placeholder="무엇에 관한 문의인가요?">
+                </div>
+                <div class="field">
+                    <label for="supBody" data-en="Message" data-ko="내용">Message</label>
+                    <textarea id="supBody" rows="6" maxlength="4999" placeholder="Describe your question in detail." data-en-placeholder="Describe your question in detail." data-ko-placeholder="문의 내용을 자세히 적어 주세요."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" id="supSendBtn" data-en="Send" data-ko="보내기">Send</button>
+                <span class="inbox-msg" id="supMsg" style="display:inline-block;margin:0 0 0 12px;"></span>
+            </form>
+        </div>
+        <div class="section-card">
+            <h2><i class="fas fa-comment-dots"></i> <span data-en="My Inquiries" data-ko="내 문의">My Inquiries</span></h2>
+            <div class="inbox-msg" id="supListMsg"></div>
+            <div id="supList"></div>
+            <div class="empty-state" id="emptySupport" style="display:none;">
+                <i class="fas fa-comment-dots"></i>
+                <p data-en="No inquiries yet." data-ko="아직 보낸 문의가 없습니다.">No inquiries yet.</p>
             </div>
         </div>
     </div>
@@ -1238,6 +1306,178 @@ auth.onAuthStateChanged(function (u) { if (u) inbox_load(u.uid); });
 document.getElementById('inboxList').addEventListener('click', function (e) { var b = e.target.closest('[data-inbox-view]'); if (b) inbox_open(b.getAttribute('data-inbox-view')); });
 document.getElementById('inboxClose').addEventListener('click', inbox_close);
 document.getElementById('inboxModal').addEventListener('click', function (e) { if (e.target === e.currentTarget) inbox_close(); });
+</script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// 공지 배너 + Support 탭 (2026-09-12 어드민 개편 5단계)
+// 정본: docs/회의/2026-09-12-구현계약서-어드민개편.md 3장 5단계 · 4-4·4-5절 · 6장 리스크 4·8·11
+// 공지: where('visible','==',true) 만(규칙 read 분기와 동일) — audience brand/all 필터·정렬(고정 → order → 최신)은 클라이언트(복합 색인 회피).
+//       본문은 inbox_esc + <br> 만 — HTML 렌더 금지(계약서 4-4).
+// 문의: add 가 보내는 키는 fromUid·fromRole·fromEmail·fromName·subject·body·status·answer·answeredAt·answeredBy·createdAt·updatedAt·history —
+//       규칙 create 조건(fromUid==auth.uid · status 'open' · subject 1~199자 · body 1~4999자 · createdAt==request.time)과 1:1.
+//       목록은 where('fromUid','==',uid) 만(규칙 read 분기와 동일), 정렬은 클라이언트. 답변(answer)은 어드민이 update 로 채운다.
+// 확인창(confirm/prompt/alert) 없음 — 기존 코드의 alert 는 손대지 않는다(리스크 11). 값은 전부 inbox_esc/inbox_attrEsc(4a 헬퍼 재사용).
+// 전역은 var/function 만, 접두어 pn_(공지)·sup_(문의). 위 인라인 스크립트의 currentUser·brandData·db·auth·firebase 를 쓴다.
+// ══════════════════════════════════════════════════════════════════════
+var pn_state = { items: [] };
+var sup_state = { items: [], sending: false };
+var SUP_STATUSES = { open: { en: 'Open', ko: '열림' }, answered: { en: 'Answered', ko: '답변됨' } };
+
+function pn_text(it, key) { var l = inbox_lang(), o = l === 'ko' ? 'en' : 'ko'; return String(it[key + '_' + l] || it[key + '_' + o] || ''); }   // 현재 언어, 없으면 다른 언어
+function pn_bodyHtml(s) { return inbox_esc(s).replace(/\r?\n/g, '<br>'); }   // 줄바꿈만 — HTML 해석 없음
+function pn_sort(items) {
+    return items.sort(function (a, b) {
+        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+        var ao = Number(a.order) || 0, bo = Number(b.order) || 0;
+        if (ao !== bo) return ao - bo;
+        return inbox_millis(b.createdAt) - inbox_millis(a.createdAt);
+    });
+}
+
+// ── 공지 읽기 — where visible==true 만. 실패해도 대시보드를 막지 않는다(배너에 한 줄, 콘솔) ──
+function pn_load() {
+    db.collection('notices').where('visible', '==', true).get().then(function (snap) {
+        var items = [];
+        snap.forEach(function (d) { var n = Object.assign({ id: d.id }, d.data()); if (n.audience === 'brand' || n.audience === 'all') items.push(n); });
+        pn_state.items = pn_sort(items);
+        pn_draw();
+    }).catch(function (err) {
+        console.warn('[notices] read failed', err);
+        var main = document.getElementById('noticeMain'), banner = document.getElementById('noticeBanner'), all = document.getElementById('noticeAllBtn');
+        if (!main || !banner) return;
+        main.innerHTML = '<p>' + inbox_esc(inbox_t('Notices could not be loaded: ', '공지를 불러오지 못했습니다: ') + ((err && err.code) || '')) + '</p>';
+        if (all) all.style.display = 'none';
+        banner.style.display = 'block';
+    });
+}
+
+// ── 배너 — 고정 우선 1건(제목 + 본문 첫 140자) + 「전체 보기 (n)」. 공지가 없으면 숨긴다 ──
+function pn_draw() {
+    var banner = document.getElementById('noticeBanner'), main = document.getElementById('noticeMain'), all = document.getElementById('noticeAllBtn');
+    if (!banner || !main || !all) return;
+    var items = pn_state.items;
+    if (!items.length) { banner.style.display = 'none'; return; }
+    var top = items[0];
+    var body = pn_text(top, 'body').replace(/\s+/g, ' ').trim();
+    main.innerHTML = '<h3>' + (top.pinned ? '<i class="fas fa-thumbtack" style="color:#C8A96E;margin-right:6px;"></i>' : '') + inbox_esc(pn_text(top, 'title') || '-') + '</h3>'
+        + '<p>' + inbox_esc(body.length > 140 ? body.slice(0, 140) + '…' : body) + '</p>';
+    all.innerHTML = inbox_esc(inbox_t('View all (' + items.length + ')', '전체 보기 (' + items.length + ')'));
+    all.style.display = '';
+    banner.style.display = 'block';
+}
+
+// ── 전체 보기 모달 — 제목·본문(현재 언어)·날짜. 본문은 pn_bodyHtml ──
+function pn_openAll() {
+    var items = pn_state.items, html = '<h2>' + inbox_span('Notices', '공지사항') + '</h2>';
+    for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        html += '<div class="notice-item"><h3>' + (it.pinned ? '<i class="fas fa-thumbtack" style="color:#C8A96E;"></i>' : '') + inbox_esc(pn_text(it, 'title') || '-')
+            + '<small>' + inbox_esc(inbox_fmtDate(it.updatedAt || it.createdAt)) + '</small></h3>'
+            + '<p>' + pn_bodyHtml(pn_text(it, 'body')) + '</p></div>';
+    }
+    document.getElementById('noticeModalContent').innerHTML = html
+        + '<div class="inbox-actions"><button type="button" class="btn btn-secondary" id="noticeCloseBtn" ' + inbox_attr('Close', '닫기') + '>' + inbox_esc(inbox_t('Close', '닫기')) + '</button></div>';
+    document.getElementById('noticeCloseBtn').addEventListener('click', pn_close);
+    document.getElementById('noticeModal').classList.add('show');
+}
+function pn_close() { document.getElementById('noticeModal').classList.remove('show'); }
+
+// ── 문의 목록 — where fromUid==uid 만(규칙 read 분기와 동일), orderBy 없음. 실패는 숨기지 않는다(규칙 미게시면 permission-denied 안내) ──
+function sup_load(uid) {
+    sup_listMsg(inbox_t('Loading…', '불러오는 중…'), false);
+    db.collection('inquiries').where('fromUid', '==', uid).get().then(function (snap) {
+        var items = [];
+        snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
+        items.sort(function (a, b) { return inbox_millis(b.createdAt) - inbox_millis(a.createdAt); });   // 클라이언트 정렬 (복합 색인 회피)
+        sup_state.items = items;
+        sup_listMsg('', false);
+        sup_draw();
+    }).catch(function (err) {
+        console.error('[support] inquiries read failed', err);
+        var code = (err && err.code) || (err && err.message) || '';
+        sup_listMsg(code === 'permission-denied'
+            ? inbox_t('Could not load your inquiries (permission-denied) — the inquiries rule may not be published yet. Please contact office@archinode.org.', '문의 목록을 불러오지 못했습니다(permission-denied) — inquiries 규칙이 아직 게시되지 않았을 수 있습니다. office@archinode.org 로 문의해 주세요.')
+            : inbox_t('Could not load your inquiries: ', '문의 목록을 불러오지 못했습니다: ') + code, true);
+        sup_draw();
+    });
+}
+function sup_listMsg(text, isErr) { var el = document.getElementById('supListMsg'); if (!el) return; el.textContent = text || ''; el.classList.toggle('err', !!isErr); }
+function sup_msg(text, isErr) { var el = document.getElementById('supMsg'); if (!el) return; el.textContent = text || ''; el.classList.toggle('err', !!isErr); }
+function sup_statusBadge(status) { var m = SUP_STATUSES[status]; return m ? '<span class="status-badge ' + (status === 'answered' ? 'status-approved' : 'status-pending') + '" ' + inbox_attr(m.en, m.ko) + '>' + inbox_esc(inbox_t(m.en, m.ko)) + '</span>' : '<span class="status-badge status-pending">' + inbox_esc(status || '-') + '</span>'; }
+
+// ── 목록 + 탭 배지(answered 건수 — 답이 온 것을 눈에 띄게) ──
+function sup_draw() {
+    var list = document.getElementById('supList'), empty = document.getElementById('emptySupport'), badge = document.getElementById('supportBadge');
+    if (!list || !empty) return;
+    var items = sup_state.items, answered = 0, html = '';
+    for (var i = 0; i < items.length; i++) {
+        var it = items[i] || {};
+        if (it.status === 'answered') answered++;
+        html += '<div class="sup-item">'
+            + '<div class="sup-head">' + sup_statusBadge(it.status) + '<strong>' + inbox_esc(it.subject || '-') + '</strong><small>' + inbox_esc(inbox_fmtDate(it.createdAt)) + '</small></div>'
+            + '<div class="sup-body">' + pn_bodyHtml(it.body || '') + '</div>'
+            + (it.status === 'answered' && it.answer
+                ? '<div class="sup-answer"><div class="sup-answer-head">' + inbox_esc(inbox_t('ARCHINODE · ', 'ARCHINODE · ') + inbox_fmtDate(it.answeredAt)) + '</div>' + pn_bodyHtml(it.answer) + '</div>'
+                : '<div class="sup-wait">' + inbox_span('Waiting for a reply — we usually answer within 2 business days.', '답변 대기 중 — 보통 영업일 2일 안에 답합니다.') + '</div>')
+            + '</div>';
+    }
+    list.innerHTML = html;
+    empty.style.display = items.length ? 'none' : 'block';
+    if (badge) { badge.textContent = answered ? String(answered) : ''; badge.style.display = answered ? 'inline' : 'none'; }
+}
+
+// ── 보내기 — ★ 규칙 create 조건과 1:1: fromUid==auth.uid · status 'open' · subject 1~199자 · body 1~4999자 · createdAt serverTimestamp(==request.time) ──
+function sup_send(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (sup_state.sending) return;
+    var subjEl = document.getElementById('supSubject'), bodyEl = document.getElementById('supBody'), btn = document.getElementById('supSendBtn');
+    var subject = String(subjEl.value || '').trim(), body = String(bodyEl.value || '').trim();
+    if (!currentUser || !brandData) { sup_msg(inbox_t('Please wait until your brand data has loaded.', '브랜드 정보를 불러온 뒤 다시 시도해 주세요.'), true); return; }
+    if (!subject) { sup_msg(inbox_t('Please enter a subject.', '제목을 입력해 주세요.'), true); subjEl.focus(); return; }
+    if (subject.length >= 200) { sup_msg(inbox_t('Subject must be under 200 characters.', '제목은 200자 미만이어야 합니다.'), true); subjEl.focus(); return; }
+    if (!body) { sup_msg(inbox_t('Please enter your message.', '내용을 입력해 주세요.'), true); bodyEl.focus(); return; }
+    if (body.length >= 5000) { sup_msg(inbox_t('Message must be under 5000 characters.', '내용은 5000자 미만이어야 합니다.'), true); bodyEl.focus(); return; }
+    var uid = currentUser.uid;
+    var entry = { status: 'open', by: uid, byRole: 'brand', at: new Date().toISOString(), note: '등록' };
+    var doc = {
+        fromUid: uid,
+        fromRole: 'brand',
+        fromEmail: String(currentUser.email || ''),
+        fromName: String(brandData.brandName || ''),
+        subject: subject,
+        body: body,
+        status: 'open',
+        answer: '',
+        answeredAt: null,
+        answeredBy: '',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        history: [entry]
+    };
+    sup_state.sending = true; btn.disabled = true;
+    sup_msg(inbox_t('Sending…', '보내는 중…'), false);
+    db.collection('inquiries').add(doc).then(function (ref) {
+        sup_state.sending = false; btn.disabled = false;
+        subjEl.value = ''; bodyEl.value = '';
+        sup_msg(inbox_t('Sent. We will answer here and by email.', '보냈습니다. 답변은 여기와 이메일로 드립니다.'), false);
+        sup_state.items.unshift(Object.assign({ id: ref.id }, doc, { createdAt: new Date(), updatedAt: new Date() }));   // 로컬 반영 (다시 읽지 않는다)
+        sup_draw();
+    }).catch(function (err) {
+        sup_state.sending = false; btn.disabled = false;
+        console.error('[support] inquiry create failed', err);
+        var code = (err && err.code) || (err && err.message) || '';
+        sup_msg(code === 'permission-denied'
+            ? inbox_t('Could not send (permission-denied) — the inquiries rule may not be published yet. Please email office@archinode.org.', '보내지 못했습니다(permission-denied) — inquiries 규칙이 아직 게시되지 않았을 수 있습니다. office@archinode.org 로 메일 주세요.')
+            : inbox_t('Could not send: ', '보내지 못했습니다: ') + code, true);
+    });
+}
+
+// ── 연결 — 로그인 뒤 한 번 읽는다(위 onAuthStateChanged 는 손대지 않고 따로 건다). 폼 submit 은 form-throttle.js 의 5초 재제출 차단을 그대로 받는다 ──
+auth.onAuthStateChanged(function (u) { if (u) { pn_load(); sup_load(u.uid); } });
+document.getElementById('supportForm').addEventListener('submit', sup_send);
+document.getElementById('noticeAllBtn').addEventListener('click', pn_openAll);
+document.getElementById('noticeClose').addEventListener('click', pn_close);
+document.getElementById('noticeModal').addEventListener('click', function (e) { if (e.target === e.currentTarget) pn_close(); });
 </script>
 <script src="article-editor.js"></script>
 <script src="../form-throttle.js?v=20260630" defer></script>

@@ -359,3 +359,48 @@ articles: status ASC, createdAt DESC
   history:     [{ status: 'new', by: 'office@archinode.org', byRole: 'admin', at: '2026-09-12T…Z', note: 'manual entry' }]   // byRole 'admin' | 'brand', at 은 ISO 문자열(arrayUnion 이라 serverTimestamp 불가)
 }
 ```
+
+---
+
+## 10. notices 컬렉션 (2026-09-12 어드민 개편 5단계 — 공지사항. 계약서 4-4)
+
+**문서 ID:** 자동 생성 · **규칙:** `allow read: if isAdmin() || (isSignedIn() && resource.data.visible == true); allow create, update, delete: if isAdmin();` — 로그인 사용자는 노출 중인 공지만(넓히기). **사이트 공개 공지(비로그인)는 복귀 후** read 에 `|| resource.data.audience in ['site','all']` 를 더한다.
+**쓰는 곳:** `admin/js/view-notices.js`(운영 > 공지사항 — 「+ 공지 등록」 add, 수정·노출 토글 update, `logAdmin('notice.save')`). 삭제 없음(노출 off 로 숨긴다 — 확인창을 쓰지 않는다).
+**읽는 곳:** 어드민 `orderBy('createdAt','desc').limit(200)` 단일 필드 → 클라이언트 정렬(고정 → order → 최신) / 브랜드 포털 상단 배너 `where('visible','==',true)` **만**(규칙 read 분기와 동일 — orderBy·audience where 를 붙이면 복합 색인 필요) → 클라이언트에서 `audience in ['brand','all']` 필터·같은 정렬 → 1건 표시 + 「전체 보기」 모달.
+
+```javascript
+{
+  title_en: '', title_ko: '',           // 둘 다 필수(규정: 이중 언어)
+  body_en: '',  body_ko: '',            // 평문 — 줄바꿈만. HTML 아님: 표시는 escapeHtml + <br> (ntc_bodyHtml · 포털 pn_bodyHtml)
+  audience:  'brand',                   // 'brand' | 'site' | 'all' — 포털은 brand·all 만 보여준다. site 는 복귀 후 사이트 공지용
+  visible:   false,  pinned: false,     // 노출 / 고정(맨 위)
+  order:     0,                         // 작은 수 먼저 (같은 고정 여부 안에서)
+  createdAt: Timestamp, createdBy: 'office@archinode.org',   // serverTimestamp
+  updatedAt: Timestamp, updatedBy: 'office@archinode.org'
+}
+```
+
+---
+
+## 11. inquiries 컬렉션 (2026-09-12 어드민 개편 5단계 — 1:1 문의. 계약서 4-5)
+
+**문서 ID:** 자동 생성 · **규칙:** create `isSignedIn() && fromUid == request.auth.uid && status == 'open' && subject is string(1~199자) && body is string(1~4999자) && createdAt == request.time` / read `isAdmin() || (isSignedIn() && resource.data.fromUid == request.auth.uid)` / update·delete 어드민. `hasOnly` 없음 — create 에 다른 키(answer 빈 값 등)를 같이 보내도 된다.
+**쓰는 곳:** `brand-portal/dashboard.html` Support 탭 `sup_send()`(create — 보내는 키는 아래 전부, `fromRole:'brand'`, `fromName` = 브랜드명) · `admin/js/view-inquiries.js`(고객 > 1:1 문의 — 답변 저장 update: `status·answer·answeredAt·answeredBy·updatedAt·history` + `logAdmin('inquiry.answer')` + `mail` 1통 to `fromEmail`, 제목 `"Re: <subject> — ARCHINODE"`(190자 컷 — mail 규칙 subject < 200), 본문 답변 + 원문 인용 300자 + 포털 링크). 전문가(auth/profile) 문의 폼은 **복귀 후**(`fromRole:'professional'` 예약).
+**읽는 곳:** 어드민 `orderBy('createdAt','desc').limit(200)` 단일 필드 → 클라이언트 정렬(open 먼저 → 최신)·상태 필터 / 열린 건수 `where('status','==','open')` 한 번(`inq_loadOpenCount` — 사이드바 배지 + 대시보드 카드 「열린 문의」) / 포털 `where('fromUid','==',uid)` **만** → 클라이언트 정렬(규칙 read 분기와 동일).
+
+```javascript
+{
+  fromUid:   'uid',                     // == request.auth.uid (규칙)
+  fromRole:  'brand',                   // 'brand' | 'professional'(복귀 후)
+  fromEmail: 'name@brand.com',          // 답변 메일 수신자
+  fromName:  'Fritz Hansen',            // 브랜드명(또는 전문가 표시 이름)
+  subject:   '',                        // 1~199자 (규칙 size() < 200)
+  body:      '',                        // 1~4999자 (규칙 size() < 5000) — 외부 입력. 표시 시 escapeHtml + <br>
+  status:    'open',                    // 'open' → 'answered' (create 는 'open' 만)
+  answer:    '',  answeredAt: null,  answeredBy: '',   // 어드민 답변 (표시 시 escapeHtml + <br>)
+  createdAt: Timestamp,                 // serverTimestamp (= request.time, 규칙 검사)
+  updatedAt: Timestamp,
+  history:   [{ status: 'open', by: 'uid', byRole: 'brand', at: '2026-09-12T…Z', note: '등록' },
+              { status: 'answered', by: 'office@archinode.org', byRole: 'admin', at: '…', note: 'answered' }]   // at 은 ISO 문자열(arrayUnion 이라 serverTimestamp 불가)
+}
+```

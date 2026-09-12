@@ -137,6 +137,11 @@
 .adm-hist li small { color: #999; margin-left: 6px; }
 .adm-hist li div { margin-top: 3px; white-space: pre-wrap; }
 
+/* 5단계 — 사이드바 「1:1 문의」 열린 건수 배지(view-inquiries.js inq_setOpenCount) · 표 제목 말줄임 */
+.adm-item .adm-badge { margin-left: auto; background: #fee2e2; color: #dc2626; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; line-height: 1.4; }
+.adm-item.active .adm-badge { background: #dc2626; color: #fff; }
+.adm-ellip { display: inline-block; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+
 /* 규정집 뷰어 — 목차(왼쪽) + 본문. 본문은 DOMPurify 를 거친 마크다운 HTML */
 .adm-regs { border-radius: 10px; }
 .adm-reg-layout { display: flex; gap: 24px; align-items: flex-start; }
