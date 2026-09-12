@@ -88,6 +88,7 @@ brands(입점, status pending/approved/suspended/rejected + 사유) · products 
 - **`firebase-auth-compat.js` 없는 페이지에서 `firebase-config.js`가 throw**(BUG-1). Firestore 쓰는 페이지는 auth-compat까지 싣는다.
 - **카테고리 nav `../` 404**(2026-07-02) — 깊이별 상대경로 검사.
 - **매거진 자동 발행 스케줄**(Cowork, 편집팀 8인)이 옛 PC 절대경로로 돌고 있다 — 작업일지 A-⑤.
+- **매거진 자동 발행 템플릿이 `<style>` 잘린 채 복제**(A-013, 2026-09-12 브론즈 실측 41편 백지 → 화이트 `tools/fix-magazine-blank.js`로 복구) — 새 기사는 `</head><body>` 존재를 블랙이 검사. 파이프라인 템플릿(리포 밖)은 한울님.
 - **바깥 폴더 메모 docx에 평문 자격정보** — 옮겨 적지 말 것. 작업일지 A-⑦.
 - **`.ps1`은 UTF-8 BOM 필수** — PowerShell 5.1이 BOM 없는 한글 파일을 CP949로 읽어 따옴표·괄호를 삼킨다(2026-09-12 `deploy.ps1` 실측). Write 도구는 BOM 없이 쓰므로 저장 후 BOM으로 재저장.
 
