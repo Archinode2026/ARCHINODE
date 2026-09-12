@@ -37,8 +37,8 @@ var ADMIN_MENUS = [
         { id: 'notices',     en: 'Notices',      ko: '공지사항',  icon: 'fa-bullhorn',        kind: 'view', target: 'notices',     ready: false },   // 5단계
         { id: 'logs',        en: 'Activity Log', ko: '활동 로그', icon: 'fa-history',         kind: 'view', target: 'logs',        ready: true },    // 2단계 ✓ view-logs.js
         { id: 'review',      en: 'Review Board', ko: '검수관리',  icon: 'fa-clipboard-check', kind: 'tab',  target: 'review',      ready: true },
-        { id: 'regulations', en: 'Regulations',  ko: '규정집',    icon: 'fa-book-open',       kind: 'view', target: 'regulations', ready: false },   // 3단계
-        { id: 'settings',    en: 'Settings',     ko: '설정',      icon: 'fa-cog',             kind: 'view', target: 'settings',    ready: false }    // 3단계
+        { id: 'regulations', en: 'Regulations',  ko: '규정집',    icon: 'fa-book-open',       kind: 'view', target: 'regulations', ready: true },    // 3단계 ✓ view-regulations.js
+        { id: 'settings',    en: 'Settings',     ko: '설정',      icon: 'fa-cog',             kind: 'view', target: 'settings',    ready: true }     // 3단계 ✓ view-settings.js
     ] }
 ];
 
@@ -136,6 +136,8 @@ function adm_route() {
         if (view) view.classList.add('active');
         if (item.target === 'dashboard' && typeof dash_render === 'function') dash_render(view);
         if (item.target === 'logs' && typeof logs_render === 'function') logs_render(view);   // 2단계 활동 로그
+        if (item.target === 'settings' && typeof set_render === 'function') set_render(view);         // 3단계 설정
+        if (item.target === 'regulations' && typeof reg_render === 'function') reg_render(view);      // 3단계 규정집
     }
     adm_setActive(item.id);
 }

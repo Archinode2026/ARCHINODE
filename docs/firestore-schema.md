@@ -14,7 +14,8 @@ firestore/
 ├── products/        ← 제품 (자동 생성 ID)
 ├── articles/        ← 매거진 기사 (자동 생성 ID)
 ├── users/           ← 국내 전문가 계정 (Phase 2B, 문서 ID = Auth UID)
-└── adminLogs/       ← 어드민 활동 장부 (2026-09-12 개편 2단계, 어드민 전용, 덧붙이기만 — 7절)
+├── adminLogs/       ← 어드민 활동 장부 (2026-09-12 개편 2단계, 어드민 전용, 덧붙이기만 — 7절)
+└── settings/        ← 정책 값·사이트 정보 (2026-09-12 개편 3단계, 문서 1개 config, 읽기 공개·쓰기 어드민 — 8절)
 ```
 
 ---
@@ -302,3 +303,31 @@ articles: status ASC, createdAt DESC
 ```
 
 기간·종류 필터는 클라이언트에서. 뉴스레터·디지털 알림은 상태가 아니라 삭제라 `from:'subscribed', to:'deleted'` 로 적는다.
+
+---
+
+## 8. settings 컬렉션 (2026-09-12 어드민 개편 3단계 — 읽기 공개·쓰기 어드민, 문서 1개)
+
+**문서 ID:** `config` (고정, 1개) · **규칙:** `allow read: if true; allow write: if isAdmin();` — 개인정보 없음. 읽기를 공개로 두는 이유: 복귀 후 단계에서 공개 페이지가 읽게 하려면 어차피 필요(계약서 3장 3단계).
+**쓰는 곳:** `admin/js/view-settings.js`(운영 > 설정) — 「기본값 채우기」(문서 없을 때만, for-brands.html 752·757·501줄 문구) → 「저장」 `set(…, {merge:true})` + `logAdmin('settings.save')`.
+**읽는 곳:** `view-settings.js` · `view-dashboard.js`(adminNotice 상단 박스). **공개 페이지는 아직 읽지 않는다**(규정집 안건 1 결정 + 복귀 후 별도 단계).
+
+```javascript
+{
+  listing: {
+    freeUntilText_en: 'Free until Dec 2026, then EUR 10 / month',   // for-brands.html 752줄 그대로
+    freeUntilText_ko: '2026년 12월까지 무료, 이후 월 EUR 10',
+    founderText_en:   'Same EUR 10 / month, no upsell',              // 757줄 그대로
+    founderText_ko:   '동일 월 EUR 10, 추가 요금 없음',
+    freeUntil:        '2026-12-31',                                   // 501줄 "Free through December 2026" 에서 유추 — 규정집 안건 1 ④
+    pendingIssue:     '안건 1'                                        // 비어 있지 않으면 설정 화면이 각 칸 옆에 빨간 「안건 1 결정 대기」 표시. 결정 뒤 비운다
+  },
+  site: { operator: '비비들리바이브', ceo: '박승리', bizNo: '640-03-02879', email: 'office@archinode.org',
+          euDirector: 'Silvia Vandone', euEmail: 'silviavandone@hotmail.com', domain: 'archinodekr.com' },
+  adminNotice: '',          // 어드민끼리 보는 메모 한 칸 — 대시보드 상단 회색 박스(escapeHtml)
+  updatedAt: Timestamp,     // serverTimestamp
+  updatedBy: 'office@archinode.org'
+}
+```
+
+카테고리(10+69)·어드민 이메일(2개)은 **넣지 않는다** — 카테고리는 정적 페이지 79개와 1:1(브랜드 포털 `SUBCATEGORIES` 가 정본), 어드민 이메일은 `firestore.rules` `isAdmin()` 문자열 고정. 설정 화면 ③ 탭은 둘을 읽기 전용으로 보여만 준다(계약서 2-3).

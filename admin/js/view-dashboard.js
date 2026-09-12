@@ -22,7 +22,8 @@ function dash_render(el) {
     el = el || document.getElementById('tab-dashboard');
     if (!el) return;
 
-    var html = '<div class="adm-cards">';
+    var html = '<div class="adm-notice" id="dashNotice" style="display:none;"></div>'   // settings/config.adminNotice (3단계) — dash_renderNotice 가 채운다
+        + '<div class="adm-cards">';
     for (var i = 0; i < DASH_CARDS.length; i++) {
         var c = DASH_CARDS[i];
         html += '<a class="adm-card" href="' + escapeAttr(c.href) + '" data-card="' + escapeAttr(c.id) + '">'
@@ -41,6 +42,31 @@ function dash_render(el) {
 
     dash_loadCounts();
     dash_loadRecent();
+    dash_loadNotice();
+}
+
+// ── 어드민 메모 — settings/config.adminNotice (3단계). 비어 있으면 숨긴다. 읽기 실패는 박스에 작게 표시(조용한 실패 방지) ──
+function dash_loadNotice() {
+    if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) return;   // 로그인 전: loadAll() 끝에서 다시 부른다
+    db.collection('settings').doc('config').get()
+        .then(function (snap) { dash_renderNotice(snap.exists ? (snap.data() || {}).adminNotice : ''); })
+        .catch(function (err) {
+            console.warn('[dashboard] settings/config read failed', err);
+            var box = document.getElementById('dashNotice');
+            if (!box) return;
+            box.style.display = '';
+            box.className = 'adm-notice adm-notice-err';
+            box.textContent = t('Admin notice unavailable: ', '어드민 메모 읽기 실패: ') + ((err && err.code) || '');
+        });
+}
+// 메모 텍스트 → 회색 박스. textContent 로 넣는다(HTML 해석 없음). view-settings.js 저장 뒤에도 부른다
+function dash_renderNotice(text) {
+    var box = document.getElementById('dashNotice');
+    if (!box) return;
+    var s = String(text == null ? '' : text).trim();
+    box.className = 'adm-notice';
+    box.style.display = s ? '' : 'none';
+    box.innerHTML = s ? '<i class="fas fa-thumbtack"></i> <span>' + escapeHtml(s) + '</span>' : '';
 }
 
 // ── 최근 활동 20건 — adminLogs orderBy('at','desc') 단일 필드 (2단계). 실패는 자리에 표시한다 ──

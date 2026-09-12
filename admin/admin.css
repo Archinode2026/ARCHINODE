@@ -70,3 +70,68 @@
     #adminSidebar.open .adm-nav { display: block; }
     .adm-cards { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* SETTINGS · REGULATIONS (3단계 — view-settings.js · view-regulations.js) */
+/* 페이지 안 탭 — dashboard.html .tabs/.tab 과 같은 모양. .tab 이름은 안 쓴다(옛 탭 핸들러·해시 라우터가 .tabs .tab 을 훑는다) */
+.adm-subtabs { display: flex; gap: 0; margin: -8px 0 20px; border-bottom: 2px solid #eee; }
+.adm-subtab { padding: 12px 20px; font-size: 0.85rem; font-weight: 600; color: #999; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: inherit; transition: all 0.3s; }
+.adm-subtab:hover { color: #666; }
+.adm-subtab.active { color: #111; border-bottom-color: #C8A96E; }
+.adm-subpanel { display: none; }
+.adm-subpanel.active { display: block; }
+.adm-settings { border-radius: 10px; }
+.adm-set-intro { font-size: 0.82rem; color: #666; margin-bottom: 16px; line-height: 1.6; }
+.adm-set-warn { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 10px 14px; border-radius: 6px; }
+.adm-set-row { display: flex; gap: 16px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+.adm-set-row label { width: 220px; flex: 0 0 220px; font-size: 0.82rem; font-weight: 600; color: #444; padding-top: 8px; }
+.adm-set-ctl { flex: 1; min-width: 0; }
+.adm-set-ctl input, .adm-set-ctl textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.86rem; }
+.adm-set-ctl textarea { min-height: 70px; resize: vertical; }
+.adm-set-ctl input:focus, .adm-set-ctl textarea:focus { outline: none; border-color: #C8A96E; }
+.adm-set-hint { display: block; font-size: 0.74rem; color: #999; margin-top: 4px; }
+.adm-pending { display: inline-block; margin-top: 6px; font-size: 0.72rem; font-weight: 700; color: #dc2626; background: #fee2e2; padding: 2px 8px; border-radius: 10px; }
+.adm-set-actions { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+.adm-set-actions .act-btn { padding: 8px 18px; font-size: 0.82rem; }
+.adm-set-h4 { font-size: 0.9rem; font-weight: 700; color: #111; margin: 24px 0 8px; }
+.adm-set-list { list-style: none; padding: 0; font-size: 0.86rem; }
+.adm-set-list li { padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+.adm-cat-table td { vertical-align: top; }
+.adm-cat-sub { display: inline-block; font-size: 0.76rem; background: #f3f4f6; color: #444; padding: 3px 8px; border-radius: 4px; margin: 2px 4px 2px 0; }
+
+/* 대시보드 상단 어드민 메모 (settings/config.adminNotice) */
+.adm-notice { background: #f3f4f6; border: 1px solid #e5e7eb; border-left: 4px solid #C8A96E; color: #333; padding: 12px 16px; border-radius: 6px; font-size: 0.86rem; margin-bottom: 20px; white-space: pre-wrap; word-break: break-word; }
+.adm-notice i { color: #C8A96E; margin-right: 6px; }
+.adm-notice-err { border-left-color: #dc2626; color: #991b1b; }
+
+/* 규정집 뷰어 — 목차(왼쪽) + 본문. 본문은 DOMPurify 를 거친 마크다운 HTML */
+.adm-regs { border-radius: 10px; }
+.adm-reg-layout { display: flex; gap: 24px; align-items: flex-start; }
+.adm-reg-toc { width: 220px; flex: 0 0 220px; position: sticky; top: 72px; max-height: calc(100vh - 100px); overflow-y: auto; border-right: 1px solid #f0f0f0; padding-right: 12px; }
+.adm-reg-toc a { display: block; font-size: 0.78rem; color: #555; text-decoration: none; padding: 4px 0 4px 8px; border-left: 2px solid transparent; line-height: 1.4; }
+.adm-reg-toc a:hover { color: #111; border-left-color: #C8A96E; }
+.adm-reg-toc a.adm-reg-toc-h3 { padding-left: 20px; color: #888; font-size: 0.74rem; }
+.adm-reg-body { flex: 1; min-width: 0; font-size: 0.88rem; line-height: 1.7; color: #333; }
+.adm-reg-body h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 16px; color: #111; }
+.adm-reg-body h2 { font-size: 1.1rem; font-weight: 700; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #eee; color: #111; }
+.adm-reg-body h3 { font-size: 0.95rem; font-weight: 700; margin: 20px 0 8px; color: #222; }
+.adm-reg-body h4 { font-size: 0.88rem; font-weight: 700; margin: 14px 0 6px; }
+.adm-reg-body p, .adm-reg-body ul, .adm-reg-body ol, .adm-reg-body pre, .adm-reg-body blockquote { margin: 0 0 12px; }
+.adm-reg-body ul, .adm-reg-body ol { padding-left: 22px; }
+.adm-reg-body li { margin: 3px 0; }
+.adm-reg-body blockquote { border-left: 3px solid #C8A96E; padding: 4px 14px; color: #666; background: #fafafa; }
+.adm-reg-body code { font-family: Consolas, Menlo, monospace; font-size: 0.82em; background: #f3f4f6; padding: 1px 5px; border-radius: 3px; }
+.adm-reg-body pre { background: #f6f6f6; padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+.adm-reg-body pre code { background: none; padding: 0; }
+.adm-reg-body table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 0.82rem; display: block; overflow-x: auto; }
+.adm-reg-body th, .adm-reg-body td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align: left; vertical-align: top; }
+.adm-reg-body th { background: #f9fafb; font-size: 0.74rem; text-transform: none; letter-spacing: 0; }
+.adm-reg-body tr:hover { background: transparent; }
+.adm-reg-body a { color: #8a6a2a; }
+.adm-reg-body hr { border: none; border-top: 1px solid #eee; margin: 24px 0; }
+.adm-reg-body img { max-width: 100%; }
+@media (max-width: 768px) {
+    .adm-set-row { display: block; }
+    .adm-set-row label { width: auto; padding-top: 0; margin-bottom: 4px; }
+    .adm-reg-layout { display: block; }
+    .adm-reg-toc { width: auto; flex: none; position: static; max-height: none; border-right: none; border-bottom: 1px solid #f0f0f0; padding: 0 0 12px; margin-bottom: 16px; }
+}
