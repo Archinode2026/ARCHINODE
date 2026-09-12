@@ -7,33 +7,10 @@
 // 무엇을 하는가: 아래 COLLECTIONS 의 모든 문서를 읽어, 문자열 필드에 "테스트로 보이는 값"이 있는지 찾아
 // 콘솔에 목록으로 출력한다. 삭제는 하지 않는다 — 규정집 1-12 "테스트 데이터는 한울님이 정한 때 한 번에 정리".
 
-const keyPath = process.argv[2];
-if (!keyPath) {
-  console.error('사용법: node scan-test-data.js <서비스계정키파일경로>');
-  process.exit(1);
-}
-
-const path = require('path');
-let admin;
-try {
-  admin = require('firebase-admin');
-} catch (e) {
-  console.error('[중단] firebase-admin 이 없습니다. tools 폴더에서 `npm install` 을 먼저 실행하세요.');
-  process.exit(1);
-}
-
-const serviceAccount = require(path.resolve(keyPath));
-
-// 프로젝트가 다르면(실수로 다른 열쇠를 넣으면) 즉시 중단 — 방향 착오 방지.
-if (serviceAccount.project_id !== 'archinode-8ab04') {
-  console.error(`[중단] 이 열쇠는 프로젝트 "${serviceAccount.project_id}" 의 것입니다. archinode-8ab04 가 아닙니다.`);
-  process.exit(1);
-}
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  projectId: serviceAccount.project_id,
-});
+// 인증: tools/_cred.js (서비스 계정 키 → 없으면 Firebase CLI 로그인 재사용). `--key <경로>` 로 키를 지정할 수도 있다.
+const { initAdmin } = require('./_cred');
+const { admin, how, who, from } = initAdmin();
+console.log(`[인증] ${how} (${who}) · firebase-admin ← ${from}`);
 const db = admin.firestore();
 
 // 스캔할 컬렉션 — 루트 CLAUDE.md 5절의 전체 목록.
