@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "localId": "qa-bronze-0001",
+      "email": "qa-bronze@archinodekr.com",
+      "emailVerified": true,
+      "displayName": "[테스트-브론즈] qa-bronze",
+      "disabled": false
+    },
+    {
+      "localId": "qa-brand-0001",
+      "email": "qa-brand@archinodekr.com",
+      "emailVerified": true,
+      "displayName": "[테스트-브론즈] qa-brand",
+      "disabled": false
+    },
+    {
+      "localId": "qa-pro-0001",
+      "email": "qa-pro@archinodekr.com",
+      "emailVerified": true,
+      "displayName": "[테스트-브론즈] qa-pro",
+      "disabled": false
+    }
+  ]
+}
