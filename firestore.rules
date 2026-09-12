@@ -174,11 +174,15 @@ service cloud.firestore {
                     && request.resource.data.email is string && request.resource.data.email.size() > 5
                     && request.resource.data.message is string
                     && request.resource.data.createdAt == request.time;
-      // 읽기: 어드민, 또는 배정된 브랜드 본인 (포털은 where('brandId','==',uid) 로만 조회 — list 는 문서별 판정)
-      allow read: if isAdmin() || (isSignedIn() && resource.data.brandId == request.auth.uid);
+      // 읽기: 어드민, 또는 배정된 브랜드 본인 — 브랜드는 배정된 건만(2026-09-12 블랙 지적: 위조 brandId·spam 되돌림 노출 차단)
+      //       포털 조회는 where('brandId','==',uid).where('status','in',[...]) — 두 조건이 이 규칙과 정확히 같아야 list 판정이 통과한다
+      allow read: if isAdmin()
+                  || (isSignedIn() && resource.data.brandId == request.auth.uid
+                      && resource.data.status in ['assigned','contacted','closed']);
       // 수정: 어드민 전부 / 브랜드는 배정 건에서 status·brandNote·history·updatedAt 만, status 는 assigned·contacted·closed 만
       allow update: if isAdmin()
                     || (isSignedIn() && resource.data.brandId == request.auth.uid
+                        && resource.data.status in ['assigned','contacted','closed']
                         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','brandNote','history','updatedAt'])
                         && request.resource.data.status in ['assigned','contacted','closed']);
       // 삭제: 어드민만

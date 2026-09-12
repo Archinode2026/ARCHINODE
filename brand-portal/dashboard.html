@@ -1130,10 +1130,10 @@ function inbox_statusBadge(status) { var m = INBOX_STATUSES[status]; return m ? 
 function inbox_msg(text, isErr) { var el = document.getElementById('inboxMsg'); if (!el) return; el.textContent = text || ''; el.classList.toggle('err', !!isErr); }
 function inbox_find(id) { for (var i = 0; i < inbox_state.items.length; i++) if (inbox_state.items[i].id === id) return inbox_state.items[i]; return null; }
 
-// ── 읽기 — where 하나, orderBy 없음. 실패는 숨기지 않는다(규칙 미게시면 permission-denied 안내) ──
+// ── 읽기 — where brandId==uid + status in [assigned,contacted,closed](규칙 read 분기와 동일 — 2026-09-12 블랙 지적), orderBy 없음. 실패는 숨기지 않는다(규칙 미게시면 permission-denied 안내) ──
 function inbox_load(uid) {
     inbox_msg(inbox_t('Loading…', '불러오는 중…'), false);
-    db.collection('leads').where('brandId', '==', uid).get().then(function (snap) {
+    db.collection('leads').where('brandId', '==', uid).where('status', 'in', ['assigned', 'contacted', 'closed']).get().then(function (snap) {
         var items = [];
         snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
         items.sort(function (a, b) { return inbox_millis(b.createdAt) - inbox_millis(a.createdAt); });   // 클라이언트 정렬 (복합 색인 회피)

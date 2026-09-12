@@ -337,9 +337,9 @@ articles: status ASC, createdAt DESC
 
 ## 9. leads 컬렉션 (2026-09-12 어드민 개편 4a — 규칙에 "선언만" 있던 컬렉션을 활성. 계약서 4-3)
 
-**문서 ID:** 자동 생성 · **규칙:** create 누구나(4b 공개 폼 대비 — `type in ['quote','brand-inquiry','dealer']`·`status=='new'`·`name`·`email.size()>5`·`message`·`createdAt==request.time`) / read `isAdmin() || (isSignedIn() && resource.data.brandId == request.auth.uid)` / update 어드민 전부, 브랜드는 `diff().affectedKeys().hasOnly(['status','brandNote','history','updatedAt'])` + `status in ['assigned','contacted','closed']` / delete 어드민.
+**문서 ID:** 자동 생성 · **규칙:** create 누구나(4b 공개 폼 대비 — `type in ['quote','brand-inquiry','dealer']`·`status=='new'`·`name`·`email.size()>5`·`message`·`createdAt==request.time`) / read `isAdmin() || (isSignedIn() && resource.data.brandId == request.auth.uid && resource.data.status in ['assigned','contacted','closed'])` — 브랜드는 배정된 건만(2026-09-12 블랙 지적: 위조 brandId create·spam 되돌림이 포털에 노출되지 않게) / update 어드민 전부, 브랜드는 변경 전 `resource.data.status in ['assigned','contacted','closed']` + `diff().affectedKeys().hasOnly(['status','brandNote','history','updatedAt'])` + 변경 후 `status in ['assigned','contacted','closed']` / delete 어드민.
 **쓰는 곳:** `admin/js/view-leads.js`(고객 > 리드 인박스 — 「+ 수동 등록」 create, 배정·상태·adminNote update, `logAdmin('lead.create'|'lead.assign'|'lead.status')`, 배정 시 `mail` 1통 "New lead assigned — ARCHINODE") · `brand-portal/dashboard.html` Inbox 탭(브랜드 — status·brandNote·history·updatedAt **4키만** update). 공개 폼(brands/view·products/view·contact)은 **4b, 한울님 복귀 후**.
-**읽는 곳:** 어드민 `orderBy('createdAt','desc').limit(200)` 단일 필드 / 포털 `where('brandId','==',uid)` **orderBy 없이** 클라이언트 정렬(`brandId+createdAt` 복합 색인 회피).
+**읽는 곳:** 어드민 `orderBy('createdAt','desc').limit(200)` 단일 필드 / 포털 `where('brandId','==',uid).where('status','in',['assigned','contacted','closed'])` **orderBy 없이** 클라이언트 정렬(등식+in 조합은 단일 필드 색인 병합 — `brandId+createdAt` 복합 색인 회피). 규칙 read 분기와 두 조건이 정확히 같아야 list 판정이 통과한다.
 
 ```javascript
 {
