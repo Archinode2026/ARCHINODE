@@ -223,3 +223,13 @@ function admSearchLoadedKinds() {
     }
     return { loaded: loaded, missing: missing };
 }
+
+// ── 앱 설치(PWA)용 서비스워커 등록 (2026-09-12) — admin/sw.js 는 캐시를 하지 않는다(그 파일 주석 참고).
+//    6개 어드민 페이지가 전부 admin/ 안이라 상대경로 'sw.js' 가 같다. https·localhost 에서만 동작하고
+//    실패해도 어드민에는 영향이 없으므로 console.warn 만 남긴다(오류 던지지 않음).
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js', { scope: '/admin/' })
+            .catch(function (e) { console.warn('[ARCHINODE admin] 서비스워커 등록 실패', e); });
+    });
+}

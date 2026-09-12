@@ -11,6 +11,31 @@
      - ready:false → 아직 없는 화면. 사이드바에 «숨김». 화면이 생기는 단계에서 true 로.
    ───────────────────────────────────────────────────────────────────────── */
 
+// ── 앱 설치(PWA, 2026-09-12) — 브라우저가 주는 beforeinstallprompt 를 잡아 두었다가 「앱으로 설치」 클릭 때 prompt().
+//    이벤트가 안 오면(이미 설치·미지원 브라우저·iOS) 버튼은 숨긴 채로 둔다. 확인창 없음.
+var adm_installEvt = null;
+window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();          // 브라우저 기본 미니바 대신 우리 버튼으로
+    adm_installEvt = e;
+    adm_showInstallBtn(true);
+});
+window.addEventListener('appinstalled', function () { adm_installEvt = null; adm_showInstallBtn(false); });
+function adm_showInstallBtn(on) {
+    var btn = document.getElementById('admInstallBtn');
+    if (btn) btn.hidden = !on;
+}
+function adm_installApp() {
+    var evt = adm_installEvt;
+    if (!evt) { adm_showInstallBtn(false); return; }
+    adm_installEvt = null;       // prompt() 는 이벤트당 한 번만 허용
+    adm_showInstallBtn(false);
+    evt.prompt();
+    if (evt.userChoice) evt.userChoice.then(function (r) {
+        // 거절하면 버튼을 다시 보여 주지 않는다 — 다음 방문 때 브라우저가 새 이벤트를 주면 그때 다시 뜬다
+        if (typeof showToast === 'function') showToast(r && r.outcome === 'accepted' ? t('Installing app…', '앱을 설치합니다…') : t('Install cancelled', '설치를 취소했습니다'), r && r.outcome === 'accepted' ? 'success' : '');
+    });
+}
+
 var ADMIN_MENUS = [
     { key: 'top', en: '', ko: '', items: [
         { id: 'dashboard', en: 'Dashboard', ko: '대시보드', icon: 'fa-th-large', kind: 'view', target: 'dashboard', ready: true }
@@ -92,8 +117,12 @@ function adm_renderSidebar() {
         }
         html += '</div>';
     }
+    html += '<button type="button" class="adm-install" id="admInstallBtn" hidden>'
+        + '<i class="fas fa-download"></i> ' + tSpan('Install as app', '앱으로 설치') + '</button>';   // PWA 설치 버튼 — beforeinstallprompt 가 없으면 숨김
     html += '</nav>';
     aside.innerHTML = html;
+    document.getElementById('admInstallBtn').addEventListener('click', adm_installApp);
+    if (adm_installEvt) adm_showInstallBtn(true);
     adm_initSearch();   // 6단계 통합 검색 (searchAll 은 admin-core.js)
 
     // 모바일(≤768px) 접기/펼치기

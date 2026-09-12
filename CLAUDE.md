@@ -34,7 +34,7 @@
 ```
 ARCHINODE/
 ├── index, about, brands, categories, magazine, for-brands, list-your-brand, contact, ...  # 공개 페이지
-├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계, 활동 로그(`adminLogs`·`admin/js/view-logs.js`, 브랜드 `history[]`) — 2단계, 설정·규정집(`settings/config`·`view-settings.js`·`view-regulations.js` — cdnjs marked 12.0.2 + DOMPurify 3.1.6 버전 고정) — 3단계, 리드 인박스(`leads`·`view-leads.js` — 수동 등록·배정·상태·이력, 배정 시 `mail` 1통) — 4a단계, 전문가 회원(`users` 읽기 전용 `view-users.js` — 삭제·정지 없음, 좋아요 이름은 brands·products 캐시로 풀기, CSV) + 통합 검색(`admin-core.js` `searchAll`·`admRegisterCache` — 각 화면이 등록한 메모리 캐시만, 추가 읽기 없음; 사이드바 검색창은 `admin-nav.js`) — 6단계, 공지사항(`notices`·`view-notices.js` — 등록·수정·노출 토글, 삭제 없음, 본문 escapeHtml+`<br>`) + 1:1 문의(`inquiries`·`view-inquiries.js` — 답변 저장 시 `mail` 1통 + `logAdmin('inquiry.answer')`, 열린 건수 = 사이드바 배지 + 대시보드 카드 「열린 문의」) — 5단계)
+├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계, 활동 로그(`adminLogs`·`admin/js/view-logs.js`, 브랜드 `history[]`) — 2단계, 설정·규정집(`settings/config`·`view-settings.js`·`view-regulations.js` — cdnjs marked 12.0.2 + DOMPurify 3.1.6 버전 고정) — 3단계, 리드 인박스(`leads`·`view-leads.js` — 수동 등록·배정·상태·이력, 배정 시 `mail` 1통) — 4a단계, 전문가 회원(`users` 읽기 전용 `view-users.js` — 삭제·정지 없음, 좋아요 이름은 brands·products 캐시로 풀기, CSV) + 통합 검색(`admin-core.js` `searchAll`·`admRegisterCache` — 각 화면이 등록한 메모리 캐시만, 추가 읽기 없음; 사이드바 검색창은 `admin-nav.js`) — 6단계, 공지사항(`notices`·`view-notices.js` — 등록·수정·노출 토글, 삭제 없음, 본문 escapeHtml+`<br>`) + 1:1 문의(`inquiries`·`view-inquiries.js` — 답변 저장 시 `mail` 1통 + `logAdmin('inquiry.answer')`, 열린 건수 = 사이드바 배지 + 대시보드 카드 「열린 문의」) — 5단계, **PWA 설치형**(`admin/manifest.webmanifest`·`admin/sw.js` — 캐시 없음, scope `/admin/` 만, 등록은 `admin-core.js` 끝, 「앱으로 설치」 버튼은 `admin-nav.js` 사이드바 맨 아래 — 2026-09-12))
 ├── auth/             # 전문가 로그인·가입·프로필   ├── brand-portal/  # 브랜드 대시보드 + article-editor.js + Inbox 탭(배정 리드, 4a — update 키 status·brandNote·history·updatedAt 4개만) + 상단 공지 배너(`notices` visible==true 만 조회, brand/all 클라이언트 필터, 고정 우선 1건 + 「전체 보기」 모달) + Support 탭(`inquiries` create — 규칙 조건과 1:1, 내 문의 `where('fromUid','==',uid)` 만 + 답변 표시, 5단계)
 ├── brands/view.html  # 브랜드 상세 라우터           ├── products/view.html
 ├── categories/       # 10 대분류 + 69 서브          ├── magazine/, trend-report/
@@ -91,6 +91,7 @@ brands(입점, status pending/approved/suspended/rejected + 사유) · products 
 - **매거진 자동 발행 템플릿이 `<style>` 잘린 채 복제**(A-013, 2026-09-12 브론즈 실측 41편 백지 → 화이트 `tools/fix-magazine-blank.js`로 복구) — 새 기사는 `</head><body>` 존재를 블랙이 검사. 파이프라인 템플릿(리포 밖)은 한울님.
 - **바깥 폴더 메모 docx에 평문 자격정보** — 옮겨 적지 말 것. 작업일지 A-⑦.
 - **`.ps1`은 UTF-8 BOM 필수** — PowerShell 5.1이 BOM 없는 한글 파일을 CP949로 읽어 따옴표·괄호를 삼킨다(2026-09-12 `deploy.ps1` 실측). Write 도구는 BOM 없이 쓰므로 저장 후 BOM으로 재저장.
+- **서비스워커는 정식 오픈 전까지 캐시 금지(엑사 규칙)** — `admin/sw.js`는 설치 조건용으로만 두고 `fetch`를 가로채지 않는다(`respondWith` 없음). 캐시를 넣으면 배포해도 옛 화면이 남아 "새로고침해도 안 바뀐다"가 된다. 공개 페이지에는 manifest·sw를 붙이지 않는다(scope `/admin/`).
 
 ## 9. 실비아 (EU Director)
 

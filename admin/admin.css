@@ -20,6 +20,12 @@
 .adm-item:hover { background: #f7f7f7; color: #111; }
 .adm-item.active { color: #111; background: #faf6ee; border-left-color: #C8A96E; }
 .adm-item.active i { color: #C8A96E; }
+/* 앱 설치(PWA, 2026-09-12) — 사이드바 맨 아래 「앱으로 설치」. beforeinstallprompt 가 없으면 hidden */
+.adm-install[hidden] { display: none; }   /* .adm-install 의 display:flex 가 UA [hidden] 을 이기므로 명시 */
+.adm-install { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 24px); margin: 6px 12px 2px; padding: 8px 10px; background: #111; color: #fff; border: 1px solid #111; border-radius: 6px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.adm-install i { font-size: 0.8rem; color: #C8A96E; }
+.adm-install:hover { background: #C8A96E; border-color: #C8A96E; color: #111; }
+.adm-install:hover i { color: #111; }
 
 /* DASHBOARD CARDS */
 .adm-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }   /* 카드 9장(5단계) → 3열 (3+3+3) */

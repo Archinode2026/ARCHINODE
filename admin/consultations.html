@@ -7,11 +7,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Consultations | ARCHINODE Admin</title>
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
+<!-- 앱 설치(PWA, 2026-09-12). manifest+서비스워커(admin/sw.js, 캐시 없음)는 admin/ 범위만. iOS 는 apple-touch-icon. -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111111">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="admin.css?v=20260912b">
+<link rel="stylesheet" href="admin.css?v=20260912c">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -253,8 +257,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; co
 <div class="toast" id="toast"></div>
 
 <script src="../firebase-config.js"></script>
-<script src="js/admin-core.js?v=20260912b"></script>
-<script src="js/admin-nav.js?v=20260912b"></script>
+<script src="js/admin-core.js?v=20260912c"></script>
+<script src="js/admin-nav.js?v=20260912c"></script>
 <script>
 let currentStatus = 'pending';
 let allDocs = [];
