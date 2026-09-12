@@ -63,6 +63,45 @@ tr:hover { background: #fafafa; }
 .status-suspended { background: #fed7aa; color: #9a3412; }
 .status-rejected { background: #fee2e2; color: #991b1b; }
 
+/* REVIEW BOARD (검수관리 탭 — 2026-09-12, 정식 오픈 전 임시 도구) */
+.rv-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.rv-toolbar select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.82rem; background: #fff; }
+.rv-toolbar .rv-spacer { flex: 1; }
+.rv-msg { font-size: 0.8rem; color: #666; margin-bottom: 12px; min-height: 1em; }
+.rv-msg.err { color: #dc2626; }
+.act-add { background: #111; color: #fff; }
+.act-import { background: #f5edd8; color: #8a6a2a; }
+.status-rv-wait { background: #fef3c7; color: #92400e; }
+.status-rv-progress { background: #dbeafe; color: #1e40af; }
+.status-rv-hold { background: #f3f4f6; color: #555; }
+.status-rv-false { background: #e5e7eb; color: #6b7280; text-decoration: line-through; }
+.status-rv-verify { background: #f5edd8; color: #8a6a2a; }
+.status-rv-done { background: #d1fae5; color: #065f46; }
+.status-rv-redo { background: #fee2e2; color: #991b1b; }
+.prio-high { background: #fee2e2; color: #991b1b; }
+.prio-medium { background: #f5edd8; color: #8a6a2a; }
+.prio-low { background: #f3f4f6; color: #666; }
+.rv-ellip { display: inline-block; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+.rv-err { color: #dc2626; font-size: 0.8rem; margin-top: 10px; display: none; }
+.rv-form label { display: block; font-size: 0.82rem; font-weight: 600; color: #444; margin: 12px 0 6px; }
+.rv-form input, .rv-form select, .rv-form textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.86rem; }
+.rv-form textarea { min-height: 70px; resize: vertical; }
+.rv-form input:focus, .rv-form select:focus, .rv-form textarea:focus { outline: none; border-color: #C8A96E; }
+.rv-form .rv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.rv-form .rv-actions { margin-top: 18px; display: flex; gap: 8px; justify-content: flex-end; }
+.rv-detail dl { margin: 12px 0; }
+.rv-detail dt { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 12px; }
+.rv-detail dd { font-size: 0.88rem; color: #333; margin: 4px 0 0; white-space: pre-wrap; }
+.rv-detail details { margin: 14px 0; font-size: 0.82rem; }
+.rv-detail details summary { cursor: pointer; color: #666; font-weight: 600; }
+.rv-detail details pre { white-space: pre-wrap; background: #f7f7f7; padding: 10px; border-radius: 6px; margin-top: 8px; font-family: inherit; font-size: 0.8rem; color: #444; }
+.rv-history { list-style: none; margin: 8px 0 0; font-size: 0.8rem; color: #555; }
+.rv-history li { padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+.rv-history li small { color: #999; margin-left: 6px; }
+.rv-statusbar { margin-top: 18px; padding-top: 14px; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rv-statusbar select, .rv-statusbar input { padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.82rem; }
+.rv-statusbar input { flex: 1; min-width: 160px; }
+
 /* ACTION BUTTONS */
 .act-btn { padding: 5px 12px; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: inherit; margin-right: 4px; transition: opacity 0.3s; }
 .act-btn:hover { opacity: 0.8; }
@@ -153,6 +192,7 @@ tr:hover { background: #fafafa; }
         <div class="tab active" data-tab="brands" data-en="Brands" data-ko="브랜드">Brands <span class="count" id="brandCount"></span></div>
         <div class="tab" data-tab="products" data-en="Products" data-ko="제품">Products <span class="count" id="productCount"></span></div>
         <div class="tab" data-tab="articles" data-en="Articles" data-ko="아티클">Articles <span class="count" id="articleCount"></span></div>
+        <div class="tab" data-tab="review" data-en="Review Board" data-ko="검수관리">Review Board <span class="count" id="reviewCount"></span></div>
     </div>
 
     <!-- TAB: BRANDS -->
@@ -212,6 +252,44 @@ tr:hover { background: #fafafa; }
             </table>
         </div>
     </div>
+
+    <!-- TAB: REVIEW BOARD (검수관리 — 2026-09-12, 정식 오픈 전 임시 도구, reviewIssues 컬렉션) -->
+    <div class="tab-content" id="tab-review">
+        <div class="section-card">
+            <div class="rv-toolbar">
+                <select id="reviewFilter">
+                    <option value="open" data-en="Open only" data-ko="열린 것만">Open only</option>
+                    <option value="all" data-en="All" data-ko="전체">All</option>
+                    <option value="검토대기" data-en="Pending review" data-ko="검토대기">Pending review</option>
+                    <option value="진행중" data-en="In progress" data-ko="진행중">In progress</option>
+                    <option value="보류" data-en="On hold" data-ko="보류">On hold</option>
+                    <option value="오탐반려" data-en="Not a bug" data-ko="오탐반려">Not a bug</option>
+                    <option value="확인대기" data-en="Awaiting verification" data-ko="확인대기">Awaiting verification</option>
+                    <option value="확인완료" data-en="Verified" data-ko="확인완료">Verified</option>
+                    <option value="재수정요청" data-en="Needs rework" data-ko="재수정요청">Needs rework</option>
+                </select>
+                <div class="rv-spacer"></div>
+                <button class="act-btn act-import" id="reviewImportBtn" style="display:none;" data-en="Import 10 from ledger" data-ko="문서 대장 10건 가져오기">Import 10 from ledger</button>
+                <button class="act-btn act-add" id="reviewAddBtn" data-en="+ New issue" data-ko="+ 등록">+ New issue</button>
+            </div>
+            <div class="rv-msg" id="reviewMsg"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th data-en="No." data-ko="번호">No.</th>
+                        <th data-en="Screen" data-ko="화면">Screen</th>
+                        <th data-en="Problem" data-ko="문제">Problem</th>
+                        <th data-en="Priority" data-ko="우선">Priority</th>
+                        <th data-en="Status" data-ko="상태">Status</th>
+                        <th data-en="Reported" data-ko="등록일">Reported</th>
+                        <th data-en="By" data-ko="등록자">By</th>
+                        <th data-en="Actions" data-ko="작업">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="reviewTable"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- DETAIL MODAL -->
@@ -243,7 +321,7 @@ auth.onAuthStateChanged(async (user) => {
 
 // ── 전체 데이터 로드 ──
 async function loadAll() {
-    await Promise.all([loadBrands(), loadProducts(), loadArticles()]);
+    await Promise.all([loadBrands(), loadProducts(), loadArticles(), loadReview()]);
 }
 
 // ── 브랜드 상태별 액션 버튼 ──
@@ -625,6 +703,398 @@ async function updateDoc(collection, docId, status) {
     await db.collection(collection).doc(docId).update({ status: status });
     await loadAll();
 }
+
+// ══════════════════════════════════════════════════════════════════════
+// 검수관리 탭 — reviewIssues 컬렉션 (2026-09-12, 정식 오픈 전 임시 도구)
+// 지시서: docs/회의/2026-09-12-작업지시-검수관리탭.md
+// 확인창(confirm/prompt/alert) 없음 — 안내는 #reviewMsg / 폼 안 문구로.
+// 모든 출력은 escapeHtml, 라벨은 data-en/data-ko 짝 + 현재 언어 텍스트.
+// ══════════════════════════════════════════════════════════════════════
+const REVIEW_STATUSES = ['검토대기', '진행중', '보류', '오탐반려', '확인대기', '확인완료', '재수정요청'];
+const REVIEW_STATUS_META = {
+    '검토대기':   { cls: 'rv-wait',     en: 'Pending review' },
+    '진행중':     { cls: 'rv-progress', en: 'In progress' },
+    '보류':       { cls: 'rv-hold',     en: 'On hold' },
+    '오탐반려':   { cls: 'rv-false',    en: 'Not a bug' },
+    '확인대기':   { cls: 'rv-verify',   en: 'Awaiting verification' },
+    '확인완료':   { cls: 'rv-done',     en: 'Verified' },
+    '재수정요청': { cls: 'rv-redo',     en: 'Needs rework' }
+};
+const REVIEW_OPEN_FIRST = { '검토대기': true, '재수정요청': true, '확인대기': true };   // 목록 상단 우선
+const REVIEW_CLOSED = { '확인완료': true, '오탐반려': true };                          // 「열린 것만」에서 제외
+const REVIEW_PRIORITY = { High: 0, Medium: 1, Low: 2 };
+let reviewCache = [];   // [{ id, ...data }] — 컬렉션이 작아 클라이언트에서 정렬·필터 (복합 색인 없음)
+
+// lang.js는 동적으로 넣은 요소를 다시 훑지 않으므로, data-en/data-ko 짝과 현재 언어 텍스트를 함께 찍는다.
+function rvLang() { return document.documentElement.lang === 'ko' ? 'ko' : 'en'; }
+function rvT(en, ko) { return rvLang() === 'ko' ? ko : en; }
+function rvAttr(en, ko) { return `data-en="${escapeHtml(en)}" data-ko="${escapeHtml(ko)}"`; }
+function rvSpan(en, ko) { return `<span ${rvAttr(en, ko)}>${escapeHtml(rvT(en, ko))}</span>`; }
+
+function rvStatusBadge(status) {
+    const meta = REVIEW_STATUS_META[status] || { cls: 'rv-hold', en: String(status || '-') };
+    return `<span class="status status-${meta.cls}" ${rvAttr(meta.en, String(status || '-'))}>${escapeHtml(rvT(meta.en, String(status || '-')))}</span>`;
+}
+function rvPriorityBadge(p) {
+    const key = REVIEW_PRIORITY.hasOwnProperty(p) ? p : 'Medium';
+    return `<span class="status prio-${key.toLowerCase()}">${escapeHtml(key)}</span>`;
+}
+function rvDate(ts) {
+    try {
+        if (!ts) return '-';
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        if (isNaN(d.getTime())) return '-';
+        const p = n => String(n).padStart(2, '0');
+        return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    } catch (e) { return '-'; }
+}
+function rvDateTime(iso) {
+    try {
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return String(iso || '');
+        return d.toLocaleString();
+    } catch (e) { return String(iso || ''); }
+}
+function rvNoNum(no) { const m = /^A-(\d+)$/.exec(String(no || '')); return m ? parseInt(m[1], 10) : 0; }
+function rvSafeUrl(u) { return (u && /^https?:\/\//i.test(u)) ? u : ''; }   // 브랜드 website 가드와 같은 방식 (javascript: 차단)
+function rvMsg(en, ko, isErr) {
+    const el = document.getElementById('reviewMsg');
+    el.className = 'rv-msg' + (isErr ? ' err' : '');
+    el.innerHTML = (en || ko) ? rvSpan(en, ko) : '';
+}
+
+// ── 목록 로드 ──
+async function loadReview() {
+    try {
+        const snap = await db.collection('reviewIssues').get();
+        reviewCache = [];
+        snap.forEach(doc => { reviewCache.push(Object.assign({ id: doc.id }, doc.data())); });
+        rvMsg('', '');
+    } catch (e) {
+        reviewCache = [];
+        console.warn('reviewIssues load failed:', e);
+        rvMsg('Could not load the review board. Check that the reviewIssues block of firestore.rules is published in the console.',
+              '검수관리 목록을 못 불러왔습니다. firestore.rules의 reviewIssues 블록이 콘솔에 게시됐는지 확인하세요.', true);
+    }
+    document.getElementById('reviewImportBtn').style.display = reviewCache.length === 0 ? 'inline-block' : 'none';
+    renderReview();
+}
+
+// 정렬: 검토대기·재수정요청·확인대기 먼저 → High → Medium → Low → 최신순
+function rvSorted(list) {
+    return list.slice().sort((a, b) => {
+        const oa = REVIEW_OPEN_FIRST[a.status] ? 0 : 1;
+        const ob = REVIEW_OPEN_FIRST[b.status] ? 0 : 1;
+        if (oa !== ob) return oa - ob;
+        const pa = REVIEW_PRIORITY.hasOwnProperty(a.priority) ? REVIEW_PRIORITY[a.priority] : 1;
+        const pb = REVIEW_PRIORITY.hasOwnProperty(b.priority) ? REVIEW_PRIORITY[b.priority] : 1;
+        if (pa !== pb) return pa - pb;
+        const ta = (a.reportedAt && a.reportedAt.toMillis) ? a.reportedAt.toMillis() : 0;
+        const tb = (b.reportedAt && b.reportedAt.toMillis) ? b.reportedAt.toMillis() : 0;
+        if (ta !== tb) return tb - ta;
+        return rvNoNum(b.no) - rvNoNum(a.no);
+    });
+}
+
+function renderReview() {
+    const filter = document.getElementById('reviewFilter').value;
+    const tbody = document.getElementById('reviewTable');
+    const pending = reviewCache.filter(d => d.status === '검토대기').length;
+    const cnt = document.getElementById('reviewCount');
+    cnt.textContent = pending > 0 ? pending : '';
+    cnt.style.display = pending > 0 ? 'inline' : 'none';
+
+    const rows = rvSorted(reviewCache).filter(d => {
+        if (filter === 'all') return true;
+        if (filter === 'open') return !REVIEW_CLOSED[d.status];
+        return d.status === filter;
+    });
+
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="color:#999;text-align:center;padding:30px;">${rvSpan('No issues.', '등록된 건이 없습니다.')}</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = rows.map(d => {
+        const gap = String(d.gap || '');
+        const gapShort = gap.length > 60 ? gap.slice(0, 60) + '…' : gap;
+        return `
+            <tr>
+                <td><strong>${escapeHtml(d.no || '-')}</strong></td>
+                <td>${escapeHtml(d.area || '-')}${d.screen ? `<br><small style="color:#999;">${escapeHtml(d.screen)}</small>` : ''}</td>
+                <td><span class="rv-ellip" title="${escapeHtml(gap)}">${escapeHtml(gapShort)}</span></td>
+                <td>${rvPriorityBadge(d.priority)}</td>
+                <td>${rvStatusBadge(d.status)}</td>
+                <td>${escapeHtml(rvDate(d.reportedAt))}</td>
+                <td><small>${escapeHtml(d.reportedBy || '-')}</small></td>
+                <td><button class="act-btn act-view" onclick="viewReview('${escapeHtml(d.id)}')" ${rvAttr('View', '보기')}>${escapeHtml(rvT('View', '보기'))}</button></td>
+            </tr>`;
+    }).join('');
+}
+
+// ── [+ 등록] 폼 (기존 #modal 재사용) ──
+function openReviewForm() {
+    const field = (id, en, ko, tag, extra) => `
+        <label for="${id}">${rvSpan(en, ko)}</label>
+        ${tag === 'textarea' ? `<textarea id="${id}"></textarea>` : `<input type="text" id="${id}"${extra || ''}>`}`;
+    document.getElementById('modalContent').innerHTML = `
+        <h2>${rvSpan('New issue', '결함 등록')}</h2>
+        <div class="rv-form">
+            <div class="rv-grid">
+                <div>${field('rvArea', 'Menu / area *', '메뉴·영역 *')}</div>
+                <div>${field('rvScreen', 'Screen / path *', '화면·경로 *')}</div>
+            </div>
+            ${field('rvAction', 'What did you click? *', '무엇을 눌렀나 *')}
+            ${field('rvExpectation', 'What did you expect? *', '무엇을 기대했나 *')}
+            ${field('rvCurrent', 'What actually appeared? *', '실제로 뭐가 보였나 *')}
+            ${field('rvGap', 'So what is the problem? *', '그래서 뭐가 문제인가 *', 'textarea')}
+            <div class="rv-grid">
+                <div>
+                    <label for="rvPriority">${rvSpan('Priority', '우선순위')}</label>
+                    <select id="rvPriority">
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div>${field('rvPageUrl', 'Repro URL (optional)', '재현 주소 (선택)', 'input', ' placeholder="https://"')}</div>
+            </div>
+            ${field('rvTechNote', 'Dev note — technical terms go here only', '개발 메모 — 기술 용어는 여기에만', 'textarea')}
+            <div class="rv-err" id="rvFormErr">${rvSpan('Please fill in every field marked *.', '* 표시된 칸을 모두 채워 주세요.')}</div>
+            <div class="rv-actions">
+                <button class="act-btn" style="background:#f3f4f6;color:#555;" onclick="closeModal()" ${rvAttr('Cancel', '취소')}>${escapeHtml(rvT('Cancel', '취소'))}</button>
+                <button class="act-btn act-add" id="rvSaveBtn" onclick="saveReview()" ${rvAttr('Save', '저장')}>${escapeHtml(rvT('Save', '저장'))}</button>
+            </div>
+        </div>`;
+    document.getElementById('modal').classList.add('show');
+    document.getElementById('rvArea').focus();
+}
+
+async function saveReview() {
+    const v = id => document.getElementById(id).value.trim();
+    const data = {
+        area: v('rvArea'), screen: v('rvScreen'), action: v('rvAction'),
+        expectation: v('rvExpectation'), current: v('rvCurrent'), gap: v('rvGap'),
+        priority: v('rvPriority'), techNote: v('rvTechNote'), pageUrl: v('rvPageUrl')
+    };
+    const err = document.getElementById('rvFormErr');
+    const missing = ['area', 'screen', 'action', 'expectation', 'current', 'gap'].some(k => !data[k]);
+    if (missing) {
+        err.innerHTML = rvSpan('Please fill in every field marked *.', '* 표시된 칸을 모두 채워 주세요.');
+        err.style.display = 'block';
+        return;
+    }
+    if (!REVIEW_PRIORITY.hasOwnProperty(data.priority)) data.priority = 'Medium';
+    err.style.display = 'none';
+    const btn = document.getElementById('rvSaveBtn');
+    btn.disabled = true;
+    try {
+        // 발번: 저장 직전에 컬렉션을 다시 읽어 최대 번호 +1 (문서 대장이 A-010까지 썼으므로 최소 A-011)
+        const snap = await db.collection('reviewIssues').get();
+        let max = 10;
+        snap.forEach(doc => { max = Math.max(max, rvNoNum(doc.data().no)); });
+        const no = 'A-' + String(max + 1).padStart(3, '0');
+        const by = (auth.currentUser && auth.currentUser.email) || '';
+        await db.collection('reviewIssues').add(Object.assign(data, {
+            no: no,
+            status: '검토대기',
+            reportedBy: by,
+            reportedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            history: [{ status: '검토대기', by: by, at: new Date().toISOString(), note: '등록' }]
+        }));
+        closeModal();
+        await loadReview();
+        rvMsg('Registered as ' + no + '.', no + ' 번으로 등록했습니다.');
+    } catch (e) {
+        btn.disabled = false;
+        err.innerHTML = rvSpan('Save failed: ' + e.message, '저장 실패: ' + e.message);
+        err.style.display = 'block';
+    }
+}
+
+// ── [보기] 상세 + 상태 변경 ──
+function viewReview(id) {
+    const d = reviewCache.find(x => x.id === id);
+    if (!d) return;
+    const url = rvSafeUrl(d.pageUrl);
+    const hist = Array.isArray(d.history) ? d.history.slice().reverse() : [];   // 최신 위
+    const dd = (en, ko, val) => `<dt>${rvSpan(en, ko)}</dt><dd>${escapeHtml(val || '-')}</dd>`;
+    document.getElementById('modalContent').innerHTML = `
+        <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">${escapeHtml(d.no || '-')} ${rvPriorityBadge(d.priority)} ${rvStatusBadge(d.status)}</h2>
+        <div class="rv-detail">
+            <p style="font-size:0.85rem;color:#666;">${escapeHtml(d.area || '-')}${d.screen ? ' · ' + escapeHtml(d.screen) : ''}</p>
+            ${url ? `<p style="font-size:0.82rem;margin-top:6px;"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:#C8A96E;">${escapeHtml(url)}</a></p>` : ''}
+            <dl>
+                ${dd('What was clicked', '무엇을 눌렀나', d.action)}
+                ${dd('Expected', '무엇을 기대했나', d.expectation)}
+                ${dd('Actual', '실제로 뭐가 보였나', d.current)}
+                ${dd('Problem', '그래서 뭐가 문제인가', d.gap)}
+            </dl>
+            <p style="font-size:0.78rem;color:#999;">${rvSpan('Reported by', '등록자')} ${escapeHtml(d.reportedBy || '-')} · ${escapeHtml(rvDate(d.reportedAt))}</p>
+            <details><summary>${rvSpan('Dev note (technical)', '개발 메모 (기술 근거)')}</summary><pre>${escapeHtml(d.techNote || '-')}</pre></details>
+            <div style="font-size:0.75rem;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;">${rvSpan('History', '이력')}</div>
+            <ul class="rv-history">
+                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)} <small>${escapeHtml(rvDateTime(h.at))} · ${escapeHtml(h.by || '-')}</small>${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#999;">-</li>'}
+            </ul>
+            <div class="rv-statusbar">
+                <select id="rvNewStatus">
+                    ${REVIEW_STATUSES.map(s => `<option value="${escapeHtml(s)}"${s === d.status ? ' selected' : ''} ${rvAttr(REVIEW_STATUS_META[s].en, s)}>${escapeHtml(rvT(REVIEW_STATUS_META[s].en, s))}</option>`).join('')}
+                </select>
+                <input type="text" id="rvNote" maxlength="200" placeholder="${escapeHtml(rvT('Note (optional)', '메모 (선택)'))}" data-en-placeholder="Note (optional)" data-ko-placeholder="메모 (선택)">
+                <button class="act-btn act-add" id="rvStatusBtn" onclick="saveReviewStatus('${escapeHtml(d.id)}')" ${rvAttr('Save status', '상태 저장')}>${escapeHtml(rvT('Save status', '상태 저장'))}</button>
+            </div>
+            <div class="rv-err" id="rvStatusErr"></div>
+        </div>`;
+    document.getElementById('modal').classList.add('show');
+}
+
+async function saveReviewStatus(id) {
+    const status = document.getElementById('rvNewStatus').value;
+    const note = document.getElementById('rvNote').value.trim();
+    const err = document.getElementById('rvStatusErr');
+    if (REVIEW_STATUSES.indexOf(status) === -1) return;
+    const btn = document.getElementById('rvStatusBtn');
+    btn.disabled = true;
+    try {
+        const by = (auth.currentUser && auth.currentUser.email) || '';
+        await db.collection('reviewIssues').doc(id).update({
+            status: status,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            history: firebase.firestore.FieldValue.arrayUnion({ status: status, by: by, at: new Date().toISOString(), note: note })
+        });
+        await loadReview();
+        viewReview(id);   // 갱신된 상태·이력으로 다시 그림 (확인창 없음)
+    } catch (e) {
+        btn.disabled = false;
+        err.innerHTML = rvSpan('Save failed: ' + e.message, '저장 실패: ' + e.message);
+        err.style.display = 'block';
+    }
+}
+
+// ── [문서 대장 10건 가져오기] — docs/검수대장.md A-001~A-010 표 원문 (컬렉션이 비어 있을 때만) ──
+// 네 칸·우선·상태·개발 메모·이력은 표 문장 그대로. 표의 「화면」 열은 area에, screen은 비움(표에 경로 열이 없음).
+const REVIEW_SEED = [
+    { no: 'A-001', date: '2026-08-14', area: '홈 화면, 트렌드 리포트, 카테고리 전체',
+      action: '홈에 들어갔다',
+      expectation: '로그인한 브랜드라면 상단에 "대시보드" 단추가 보이고, 트렌드 리포트에는 최근 리포트 목록이 뜬다',
+      current: '화면은 뜨지만 로그인 상태가 상단에 반영되지 않고, 트렌드 리포트 목록은 빈 상태 안내로 가려진다',
+      gap: '홈에 올 때마다 뒤에서 오류가 두 번 나고, 브랜드가 리포트를 발행해도 목록에 안 뜬다. 5월 8일부터 잠복',
+      priority: 'High', status: '검토대기',
+      techNote: '`firebase-config.js:28` `firebase.auth()` 무가드 → auth-compat 없는 페이지에서 throw, 이하 `db`·`storage`·`isAdmin` 미정의. 권장 A안: storage와 같은 `typeof` 가드 1줄. 후속 `auth-ui.js` null 조기반환 확인. 출처 `archi-diary/bronze-2026-08-14.md` 3~4절',
+      history: '08-14 브론즈 등록 · 08-14 한울님 승인 대기(A안/B안) · 09-12 대장 이관' },
+    { no: 'A-002', date: '2026-08-14', area: '브랜드 온보딩 가이드',
+      action: '페이지를 열었다',
+      expectation: '조용히 뜬다',
+      current: '뜨긴 하지만 뒤에서 오류가 난다',
+      gap: '파이어베이스를 안 쓰는 안내 페이지가 파이어베이스 설정을 불러온다. 기능 영향 없음',
+      priority: 'Low', status: '검토대기',
+      techNote: '`brand-guide.html:324` `firebase-config.js` 로드 제거. A-001과 함께 처리 권장',
+      history: '08-14 브론즈 · 09-12 이관' },
+    { no: 'A-003', date: '2026-04-22', area: '브랜드 상세 페이지',
+      action: '브랜드 소개를 본다',
+      expectation: '브랜드가 적은 글이 글자 그대로 보인다',
+      current: '브랜드가 소개란에 HTML을 넣으면 그대로 실행될 수 있다',
+      gap: '입점 신청 쪽은 막았는데 보여주는 쪽이 아직 열려 있다. 엑사에서는 한 곳에서 시작한 같은 문제가 60곳으로 번졌다',
+      priority: 'Medium', status: '검토대기',
+      techNote: '`brands/view.html` innerHTML → textContent 또는 escapeHtml. 미완료업무 #2. 다음 단계 "XSS 출력 측 전수"의 첫 항목',
+      history: '04-22 화이트 · 09-12 이관' },
+    { no: 'A-004', date: '2026-07-03', area: '뉴스레터·입점 신청·자문 요청 폼',
+      action: '(봇이) 폼을 반복 제출한다',
+      expectation: '막힌다',
+      current: '5초 간격만 막고, 그 이상은 무제한',
+      gap: '봇 하나가 하루면 파이어베이스 무료 한도를 소진시켜 사이트 저장 기능이 멈출 수 있다',
+      priority: 'Medium', status: '보류',
+      techNote: 'reCAPTCHA v3 무료 도입, 폼 3곳. `pre-launch-audit-2026-07-03-v3.md` P3-신규-1. 다음 단계(제품 기능)로 분류됨',
+      history: '07-03 블랙 · 09-12 이관·보류(다음 단계)' },
+    { no: 'A-005', date: '2026-07-03', area: '브랜드 상세 페이지',
+      action: '그 브랜드가 쓴 매거진 글을 찾는다',
+      expectation: '브랜드 페이지에 그 브랜드의 글이 보인다',
+      current: '제품만 보이고 글은 안 보인다',
+      gap: '브랜드가 글을 써도 자기 페이지에서 안 보인다',
+      priority: 'Low', status: '보류',
+      techNote: '`brands/view.html`에 articles(brandId, approved) 조회 추가, 15~30분. 다음 단계',
+      history: '07-03 블랙 · 09-12 이관·보류(다음 단계)' },
+    { no: 'A-006', date: '2026-07-02', area: '검색·SNS 미리보기',
+      action: '링크를 카카오톡·슬랙에 붙였다',
+      expectation: '대표 이미지가 뜬다',
+      current: '37개 페이지는 벡터 이미지라 미리보기에 안 뜰 수 있다',
+      gap: '공유했을 때 이미지 없는 카드가 나온다',
+      priority: 'Low', status: '검토대기',
+      techNote: 'og:image가 SVG인 37페이지 → PNG로. `handoff-2026-07-02-final.md` 부록 B',
+      history: '07-02 · 09-12 이관' },
+    { no: 'A-007', date: '2026-08-14', area: '입점 신청(휴대폰 390px)',
+      action: '단추를 누른다',
+      expectation: '손가락으로 누르기 편하다',
+      current: '단추 5개 중 1개가 작다',
+      gap: '경미',
+      priority: 'Low', status: '검토대기',
+      techNote: '터치 타깃 44px 미만 1개. `bronze-2026-08-14.md` 5절 3항',
+      history: '08-14 브론즈 · 09-12 이관' },
+    { no: 'A-008', date: '2026-08-14', area: '입점 신청',
+      action: '언어 단추를 본다',
+      expectation: '영어 전용 페이지라 언어 단추가 없다',
+      current: '"EN ▾" 드롭다운이 남아 있다',
+      gap: '결함 아님(의도된 영어 단일 페이지). 숨기면 깔끔',
+      priority: 'Low', status: '보류',
+      techNote: '`list-your-brand.html` `data-langs="en"`, 미사용 `data-ko` 72개. brand-guide와 같은 방향으로 스위처 숨김',
+      history: '08-14 브론즈 관찰 · 09-12 이관' },
+    { no: 'A-009', date: '2026-09-12', area: '어드민 대시보드',
+      action: '브랜드를 정지했다가 복구한다',
+      expectation: '언제 누가 왜 정지·복구했는지 다 남는다',
+      current: '마지막 사유 하나만 남고 이전 것은 덮인다',
+      gap: '분쟁 시 이력을 못 본다',
+      priority: 'Low', status: '보류',
+      techNote: 'brands 문서에 `history[]` 배열(단번 검수판 패턴). 다음 단계',
+      history: '09-12 지휘 창 · 보류(다음 단계)' },
+    { no: 'A-010', date: '2026-09-12', area: '폼 4곳(입점·자문·원고·뉴스레터)',
+      action: '인터넷이 끊긴 채 제출한다',
+      expectation: '"연결이 느립니다" 같은 안내가 뜬다',
+      current: '"접수 중"에서 멈춘 채 아무 안내가 없다',
+      gap: '고객이 멈춘 건지 되는 중인지 모른다. 탭을 닫으면 접수가 사라진다',
+      priority: 'Medium', status: '보류',
+      techNote: 'Firestore 오프라인 쓰기는 대기 상태라 실패 갈래가 안 온다. 엑사 9/8 "조용한 실패" 수정 패턴(타임아웃 안내 + 롤백). 다음 단계. 실측 안 함(엑사·단번 사례로 추정)',
+      history: '09-12 지휘 창 · 보류(다음 단계)' }
+];
+
+async function importReviewSeed() {
+    const btn = document.getElementById('reviewImportBtn');
+    btn.disabled = true;
+    try {
+        // 클릭 시 비어 있는지 다시 확인 (다른 창에서 먼저 넣었을 수 있음)
+        const check = await db.collection('reviewIssues').limit(1).get();
+        if (!check.empty) {
+            rvMsg('The board already has entries — import skipped.', '이미 등록된 건이 있어 가져오기를 건너뜁니다.', true);
+            btn.style.display = 'none';
+            await loadReview();
+            return;
+        }
+        const batch = db.batch();
+        const now = new Date().toISOString();
+        REVIEW_SEED.forEach(s => {
+            const ref = db.collection('reviewIssues').doc();
+            batch.set(ref, {
+                no: s.no, area: s.area, screen: '', action: s.action, expectation: s.expectation,
+                current: s.current, gap: s.gap, priority: s.priority, status: s.status,
+                techNote: s.techNote, pageUrl: '',
+                reportedBy: '문서 대장 이관',
+                reportedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                history: [{ status: s.status, by: '문서 대장 이관', at: now,
+                            note: 'docs/검수대장.md에서 이관 · 등록일 ' + s.date + ' · 이력: ' + s.history }]
+            });
+        });
+        await batch.commit();
+        await loadReview();   // 가져온 뒤 버튼은 loadReview가 숨김 (컬렉션 비어있지 않음)
+        rvMsg('Imported 10 entries from docs/검수대장.md.', 'docs/검수대장.md의 10건을 가져왔습니다.');
+    } catch (e) {
+        btn.disabled = false;
+        rvMsg('Import failed: ' + e.message, '가져오기 실패: ' + e.message, true);
+    }
+}
+
+document.getElementById('reviewFilter').addEventListener('change', renderReview);
+document.getElementById('reviewAddBtn').addEventListener('click', openReviewForm);
+document.getElementById('reviewImportBtn').addEventListener('click', importReviewSeed);
 
 // ── 탭 전환 ──
 document.querySelectorAll('.tab').forEach(tab => {
