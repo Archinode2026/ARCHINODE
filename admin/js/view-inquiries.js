@@ -10,8 +10,9 @@
      → update({status:'answered', answer, answeredAt, answeredBy, updatedAt, history: arrayUnion})
      + mail 1통(보낸 사람 이메일, "Re: <subject> — ARCHINODE", 답변 + 포털 링크 — list-your-brand.html 의 mail.add 패턴)
      + logAdmin('inquiry.answer').
-   열린 건수 — where('status','==','open') 한 번(inq_loadOpenCount): 사이드바 배지 + 대시보드 카드 「열린 문의」(view-dashboard.js loader).
-   목록을 읽으면 admRegisterCache('inquiries') 로 통합 검색 캐시에 올린다(검수대장 A-041).
+   로그인 시 1회 선로드 — view-dashboard.js 가 inq_ensureLoaded() 를 부른다(view-users.js users_ensureLoaded 와 같은 방식, 브론즈 R12 A-041).
+     그 한 번의 목록 읽기에서 통합 검색 캐시(admRegisterCache('inquiries')) + 열린 건수(사이드바 배지 + 대시보드 카드 「열린 문의」) 둘 다 채운다.
+     열린 건수는 읽은 목록에서 센다(inq_pushOpenCount) — 200건이 꽉 차 안 읽은 문서가 남았을 때만 where('status','==','open') 한 번(inq_loadOpenCount).
    ★ 전역 `var`/`function` 만 (const/let 전역 금지 — 리스크 5). 접두어 inq_/inquiries_.
    ★ 제목·본문·이름·이메일은 브랜드가 쓴 외부 입력, 답변은 어드민 입력 — 출력은 예외 없이 escapeHtml/escapeAttr
      (표시 시 이스케이프로 통일 — 리스크 4). onclick 문자열 대신 data-* + 이벤트 위임.
@@ -36,7 +37,7 @@ var INQ_COLUMNS = [
     { en: '',        ko: '' }
 ];
 
-var inq_state = { items: [], lastDoc: null, hasMore: false, loading: false, error: false, status: '', authHooked: false, saving: false, openCount: null };
+var inq_state = { items: [], lastDoc: null, hasMore: false, loading: false, loaded: false, error: false, status: '', authHooked: false, saving: false, openCount: null };
 
 // ── 메타·조회 ──
 function inq_statusMeta(key) { for (var i = 0; i < INQ_STATUSES.length; i++) if (INQ_STATUSES[i].key === key) return INQ_STATUSES[i]; return null; }
@@ -73,7 +74,7 @@ function inquiries_render(el) {
             + '</div>';
         el.innerHTML = html;
         document.getElementById('inqStatus').addEventListener('change', function () { inq_state.status = this.value; inquiries_draw(); });
-        document.getElementById('inqRefreshBtn').addEventListener('click', function () { inquiries_load(false); inq_loadOpenCount(); });
+        document.getElementById('inqRefreshBtn').addEventListener('click', function () { inquiries_load(false); });   // 목록 읽기가 열린 건수까지 다시 센다(읽기 1회)
         document.getElementById('inqMoreBtn').addEventListener('click', function () { inquiries_load(true); });
         // [보기] — onclick 문자열 대신 data-inq-view + 위임 (리스크 4 ①)
         document.getElementById('inqTable').addEventListener('click', function (e) {
@@ -81,6 +82,12 @@ function inquiries_render(el) {
             if (b) inq_view(b.getAttribute('data-inq-view'));
         });
     }
+    if (inq_state.loaded && !inq_state.loading) inquiries_draw(); else inquiries_load(false);   // 로그인 시 선로드(inq_ensureLoaded)됐으면 다시 읽지 않는다
+}
+
+// ── 대시보드가 부른다(로그인 시 1회 선로드) — 아직 안 읽었으면 한 번만 읽는다(통합 검색 캐시 + 열린 건수 배지·카드). 화면이 없어도 동작 ──
+function inq_ensureLoaded() {
+    if (inq_state.loaded || inq_state.loading) { inq_pushOpenCount(); return; }
     inquiries_load(false);
 }
 
@@ -105,7 +112,7 @@ function inquiries_theadHtml() {
 function inquiries_load(more) {
     if (inq_state.loading) return;
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) { inquiries_waitAuth(); return; }   // 로그인 전 진입(#inquiries 직접 열기)
-    if (!more) { inq_state.items = []; inq_state.lastDoc = null; inq_state.hasMore = false; }
+    if (!more) { inq_state.items = []; inq_state.lastDoc = null; inq_state.hasMore = false; inq_state.openCount = null; }   // 새로고침이면 열린 건수도 다시 센다
     var q = db.collection('inquiries').orderBy('createdAt', 'desc').limit(INQ_PAGE_SIZE);
     if (more && inq_state.lastDoc) q = q.startAfter(inq_state.lastDoc);
     inq_state.loading = true;
@@ -117,6 +124,8 @@ function inquiries_load(more) {
         if (snap.size) inq_state.lastDoc = snap.docs[snap.docs.length - 1];
         inq_state.hasMore = snap.size === INQ_PAGE_SIZE;
         inq_state.loading = false;
+        inq_state.loaded = true;
+        inq_pushOpenCount();   // 열린 건수(배지·카드)는 이 읽기 결과에서 — 별도 where 없음
         inquiries_draw();
     }).catch(function (err) {
         inq_state.loading = false;
@@ -126,6 +135,7 @@ function inquiries_load(more) {
         inquiries_msg(code === 'permission-denied'
             ? t('Read failed (permission-denied) — check that the inquiries rule is published', '읽기 실패(permission-denied) — inquiries 규칙 게시 여부 확인')
             : t('Read failed: ', '읽기 실패: ') + code, true);
+        if (typeof dash_setNum === 'function') dash_setNum('inquiries', '!', t('Read failed: ', '읽기 실패: ') + code);   // 대시보드 카드에도 실패 표시(조용한 실패 방지)
         inquiries_draw();
     });
 }
@@ -330,8 +340,19 @@ function inq_sendAnswerMail(it, answer) {
     });
 }
 
-// ── 열린 건수 — where('status','==','open') 단일 필드 한 번. 사이드바 배지 + 대시보드 카드(view-dashboard.js loader 가 부른다) ──
-//    실패는 카드에 '!'(dash_setNum) 로 보인다(조용한 실패 방지). 배지는 0 이면 지운다.
+// ── 열린 건수 — 목록 읽기(inquiries_load) 결과에서 센다(별도 where 없음 — 읽기 1회, 브론즈 R12). 사이드바 배지 + 대시보드 카드 ──
+//    200건이 꽉 차(hasMore) 안 읽은 문서가 남았을 때만 inq_loadOpenCount 의 where 한 번으로 보정한다(캐시만 세면 적게 나온다).
+function inq_pushOpenCount() {
+    if (!inq_state.loaded) return;
+    if (inq_state.hasMore) {   // 안 읽은 문서가 남음 — 이미 where 로 센 값이 있으면 그대로(loadAll 마다 반복 조회 안 함), 없으면 한 번 센다
+        if (typeof inq_state.openCount === 'number') inq_setOpenCount(inq_state.openCount); else inq_loadOpenCount();
+        return;
+    }
+    var n = 0;
+    for (var i = 0; i < inq_state.items.length; i++) if (inq_state.items[i].status === 'open') n++;
+    inq_setOpenCount(n);
+}
+// where('status','==','open') 단일 필드 한 번 — 위 hasMore 보정용으로만 남긴다. 실패는 카드에 '!'(dash_setNum) 로 보인다(조용한 실패 방지). 배지는 0 이면 지운다.
 function inq_loadOpenCount() {
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) return;   // 로그인 전: loadAll() 끝의 dash_render 가 다시 부른다
     db.collection('inquiries').where('status', '==', 'open').get()

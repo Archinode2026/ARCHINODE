@@ -5,12 +5,14 @@
    대기 건수 카드 9개(4a: 「새 리드」 · 5: 「열린 문의」 · 6: 「회원」 추가) + 「최근 활동」(2단계: adminLogs 최신 20건 — view-logs.js 의 logs_tableHtml 재사용).
    카운트는 컬렉션마다 where('status','==',…) 단일 필드 한 번 — orderBy 를 붙이면
    복합 색인이 필요해지므로 붙이지 않는다(리스크 8). Firestore 쓰기 없음.
+   회원·1:1 문의는 카운트 쿼리 대신 그 화면의 목록을 로그인 시 1회 선로드(users_ensureLoaded·inq_ensureLoaded)해
+   카드 + 통합 검색 캐시를 같이 채운다(6단계 · 브론즈 R12 A-041).
    ★ 전역 `var`/`function` 만. 접두어 dash_.
    ───────────────────────────────────────────────────────────────────────── */
 
 var DASH_CARDS = [
     { id: 'leads',         en: 'New leads',             ko: '새 리드',          icon: 'fa-inbox',            coll: 'leads',             status: 'new',      href: 'dashboard.html#leads' },     // 4a단계
-    { id: 'inquiries',     en: 'Open inquiries',        ko: '열린 문의',        icon: 'fa-comment-dots',     coll: 'inquiries',         status: 'open',     href: 'dashboard.html#inquiries', loader: 'inq_loadOpenCount' },   // 5단계: view-inquiries.js 가 where 한 번으로 카드 + 사이드바 배지 둘 다 채운다
+    { id: 'inquiries',     en: 'Open inquiries',        ko: '열린 문의',        icon: 'fa-comment-dots',     coll: 'inquiries',         status: 'open',     href: 'dashboard.html#inquiries', loader: 'inq_ensureLoaded' },   // 5단계 → R12: view-inquiries.js 가 목록 1회 선로드로 카드 + 사이드바 배지 + 통합 검색 캐시를 채운다(A-041)
     { id: 'brands',        en: 'Brands pending',        ko: '브랜드 승인 대기', icon: 'fa-building',         coll: 'brands',            status: 'pending',  href: 'dashboard.html#brands' },
     { id: 'products',      en: 'Products to review',    ko: '제품 검토 대기',   icon: 'fa-box-open',         coll: 'products',          status: 'pending',  href: 'dashboard.html#products' },
     { id: 'articles',      en: 'Articles to review',    ko: '아티클 검토 대기', icon: 'fa-newspaper',        coll: 'articles',          status: 'pending',  href: 'dashboard.html#articles' },
@@ -101,7 +103,7 @@ function dash_loadCounts() {
             if (typeof users_ensureLoaded === 'function') users_ensureLoaded(); else dash_setNum(c.id, '-', 'view-users.js not loaded');
             return;
         }
-        if (c.loader) {   // 5단계 열린 문의 — 그 화면의 전역 function 이 where 한 번으로 카드(dash_setNum) + 사이드바 배지를 같이 채운다
+        if (c.loader) {   // 5단계 열린 문의 — 그 화면의 전역 function 이 목록 1회 선로드로 카드(dash_setNum) + 사이드바 배지 + 검색 캐시를 같이 채운다(이미 읽었으면 다시 읽지 않는다)
             if (typeof window[c.loader] === 'function') window[c.loader](); else dash_setNum(c.id, '-', c.loader + ' not loaded');
             return;
         }
