@@ -201,6 +201,7 @@ function leads_load(more) {
     leads_msg(t('Loading…', '불러오는 중…'), false);
     q.get().then(function (snap) {
         snap.forEach(function (d) { lead_state.items.push(Object.assign({ id: d.id }, d.data())); });
+        if (typeof admRegisterCache === 'function') admRegisterCache('leads', lead_state.items);   // 6단계 통합 검색 캐시(추가 읽기 없음)
         if (snap.size) lead_state.lastDoc = snap.docs[snap.docs.length - 1];
         lead_state.hasMore = snap.size === LEAD_PAGE_SIZE;
         lead_state.loading = false;

@@ -224,6 +224,8 @@ firestore/
 
 **industry 허용 값:** architect, interior, landscape, furniture, construction, dealer, developer, student, other
 
+**어드민 화면(2026-09-12 개편 6단계)**: `admin/js/view-users.js` 읽기 전용 — `orderBy('createdAt','desc')` 단일 필드 200건씩(「더 보기」). 위 필드 목록은 `auth/signup.html` 263행 `set()`·`auth/profile.html` 279·422행과 대조해 **일치 확인(정정 없음)**. 규칙 `read: isOwner(userId) || isAdmin()` 그대로(변경 없음). 삭제·정지 화면 없음(Auth 계정 삭제는 서버 코드 필요).
+
 ---
 
 ## 5. Firestore 보안 규칙 (권장)

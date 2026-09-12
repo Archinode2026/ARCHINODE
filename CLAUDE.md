@@ -34,7 +34,7 @@
 ```
 ARCHINODE/
 ├── index, about, brands, categories, magazine, for-brands, list-your-brand, contact, ...  # 공개 페이지
-├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계, 활동 로그(`adminLogs`·`admin/js/view-logs.js`, 브랜드 `history[]`) — 2단계, 설정·규정집(`settings/config`·`view-settings.js`·`view-regulations.js` — cdnjs marked 12.0.2 + DOMPurify 3.1.6 버전 고정) — 3단계, 리드 인박스(`leads`·`view-leads.js` — 수동 등록·배정·상태·이력, 배정 시 `mail` 1통) — 4a단계)
+├── admin/            # 어드민 대시보드 (brands/products/articles 탭, 옵션 B 정지·거절·복구, 검수관리 탭 — reviewIssues, 2026-09-12, 사이드바 셸(`admin/js/admin-core.js`·`admin-nav.js`·`view-*.js`, `admin.css`) — 2026-09-12 개편 1단계, 활동 로그(`adminLogs`·`admin/js/view-logs.js`, 브랜드 `history[]`) — 2단계, 설정·규정집(`settings/config`·`view-settings.js`·`view-regulations.js` — cdnjs marked 12.0.2 + DOMPurify 3.1.6 버전 고정) — 3단계, 리드 인박스(`leads`·`view-leads.js` — 수동 등록·배정·상태·이력, 배정 시 `mail` 1통) — 4a단계, 전문가 회원(`users` 읽기 전용 `view-users.js` — 삭제·정지 없음, 좋아요 이름은 brands·products 캐시로 풀기, CSV) + 통합 검색(`admin-core.js` `searchAll`·`admRegisterCache` — 각 화면이 등록한 메모리 캐시만, 추가 읽기 없음; 사이드바 검색창은 `admin-nav.js`) — 6단계)
 ├── auth/             # 전문가 로그인·가입·프로필   ├── brand-portal/  # 브랜드 대시보드 + article-editor.js + Inbox 탭(배정 리드, 4a — update 키 status·brandNote·history·updatedAt 4개만)
 ├── brands/view.html  # 브랜드 상세 라우터           ├── products/view.html
 ├── categories/       # 10 대분류 + 69 서브          ├── magazine/, trend-report/
@@ -51,7 +51,7 @@ ARCHINODE/
 | 파일 | 역할 |
 |---|---|
 | `firebase-config.js` | Firebase 초기화, `db`·`auth`·`storage`·`isAdmin()`. ★ 28줄 `firebase.auth()` 무가드 = BUG-1(검수대장 A-001) |
-| `admin/js/admin-core.js` | 어드민 공통 부품 — `escapeHtml`·**`escapeAttr`(속성용, A-011)**·`t/tAttr/tSpan`·`openModal/closeModal`·`showToast`·`fmtDate`·`safeUrl`·`logAdmin`(2단계 전 빈 함수)·`matchText`. 전역 `function`만(const/let 금지 — 별도 페이지 재선언 충돌) |
+| `admin/js/admin-core.js` | 어드민 공통 부품 — `escapeHtml`·**`escapeAttr`(속성용, A-011)**·`t/tAttr/tSpan`·`openModal/closeModal`·`showToast`·`fmtDate`·`safeUrl`·`logAdmin`(2단계 전 빈 함수)·`matchText`·**`downloadCSV(rows, filename)`·`admRegisterCache/admGetCache`·`searchAll`(6단계 — 뉴스레터·알림 페이지는 자기 `downloadCSV()`가 뒤 선언으로 이긴다)**. 전역 `function`만(const/let 금지 — 별도 페이지 재선언 충돌; `var`는 허용) |
 | `lang.js` / `auth-ui.js` | 다국어 토글 / 헤더 로그인 상태. 모든 공개 페이지가 로드 |
 | `cookie-consent.js` `analytics-loader.js` `sentry-loader.js` `form-throttle.js` | GDPR 배너 / GA4(동의 후, `GA_ID` 미설정) / Sentry(`DSN` 미설정) / 폼 5초 재제출 차단 |
 | `firestore.rules` | 프로덕션 규칙. **push로 반영 안 됨 — 콘솔 게시(한울님)** |

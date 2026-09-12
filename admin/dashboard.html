@@ -206,6 +206,8 @@ tr:hover { background: #fafafa; }
     <div class="tab-content" id="tab-regulations"></div>
     <!-- VIEW: LEAD INBOX (4a단계 — view-leads.js 가 그린다) -->
     <div class="tab-content" id="tab-leads"></div>
+    <!-- VIEW: PROFESSIONAL MEMBERS (6단계 — view-users.js 가 그린다, 읽기 전용) -->
+    <div class="tab-content" id="tab-users"></div>
 
     <!-- TABS -->
     <div class="tabs">
@@ -330,6 +332,7 @@ tr:hover { background: #fafafa; }
 <script src="js/view-settings.js?v=20260912"></script>
 <script src="js/view-regulations.js?v=20260912"></script>
 <script src="js/view-leads.js?v=20260912"></script>
+<script src="js/view-users.js?v=20260912"></script>
 <script src="../search.js"></script>
 <script src="../lang.js?v=20260630"></script>
 <script>
@@ -395,6 +398,7 @@ function brandActionButtons(b, docId) {
 // ── 브랜드 목록 ──
 async function loadBrands() {
     const snap = await db.collection('brands').orderBy('createdAt', 'desc').get();
+    admRegisterCache('brands', snap.docs.map(d => Object.assign({ id: d.id }, d.data())));   // 6단계 통합 검색 캐시 (admin-core.js)
     const tbody = document.getElementById('brandsTable');
     tbody.innerHTML = '';
     let total = 0, pending = 0;
@@ -663,6 +667,7 @@ function escapeHtml(text) {
 // ── 제품 목록 ──
 async function loadProducts() {
     const snap = await db.collection('products').orderBy('createdAt', 'desc').get();
+    admRegisterCache('products', snap.docs.map(d => Object.assign({ id: d.id }, d.data())));   // 6단계 통합 검색 캐시
     const tbody = document.getElementById('productsTable');
     tbody.innerHTML = '';
     let pending = 0;
@@ -695,6 +700,7 @@ async function loadProducts() {
 // ── 아티클 목록 ──
 async function loadArticles() {
     const snap = await db.collection('articles').orderBy('createdAt', 'desc').get();
+    admRegisterCache('articles', snap.docs.map(d => Object.assign({ id: d.id }, d.data())));   // 6단계 통합 검색 캐시
     const tbody = document.getElementById('articlesTable');
     tbody.innerHTML = '';
     let pending = 0;
@@ -821,6 +827,7 @@ async function loadReview() {
         rvMsg('Could not load the review board. Check that the reviewIssues block of firestore.rules is published in the console.',
               '검수관리 목록을 못 불러왔습니다. firestore.rules의 reviewIssues 블록이 콘솔에 게시됐는지 확인하세요.', true);
     }
+    admRegisterCache('reviewIssues', reviewCache);   // 6단계 통합 검색 캐시
     document.getElementById('reviewImportBtn').style.display = reviewCache.length === 0 ? 'inline-block' : 'none';
     renderReview();
 }

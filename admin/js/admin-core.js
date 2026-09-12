@@ -122,3 +122,104 @@ function matchText(hay, q) {
     }
     return true;
 }
+
+// ── CSV 내려받기 — admin/newsletter-subscribers.html 의 downloadCSV 를 일반화해 올린 것 (6단계, view-users.js 가 쓴다) ──
+//    rows = [[셀, …], …] (첫 행이 머리글). 쉼표·따옴표·줄바꿈은 따옴표로 감싼다. UTF-8 BOM(엑셀). 토스트는 호출자가.
+//    ★ 뉴스레터·디지털 알림 페이지는 자기 downloadCSV()(인자 없음) 를 계속 쓴다 — 뒤 `function` 선언이 이긴다.
+function downloadCSV(rows, filename) {
+    var csv = (rows || []).map(function (r) {
+        return (r || []).map(function (cell) {
+            var s = String(cell == null ? '' : cell);
+            if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) s = '"' + s.replace(/"/g, '""') + '"';
+            return s;
+        }).join(',');
+    }).join('\n');
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'archinode-export.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// ── 통합 검색 캐시 (6단계) — 각 화면이 이미 읽은 배열을 이름으로 등록한다. 검색은 이것만 뒤진다(추가 읽기 없음 — 리스크 7).
+//    dashboard.html loadBrands/loadProducts/loadArticles/loadReview · view-leads.js leads_load · view-users.js users_load 가 등록.
+//    `var` 는 별도 페이지가 같은 이름을 다시 선언해도 무해(const/let 만 SyntaxError — 리스크 5).
+var adm_caches = {};
+function admRegisterCache(name, arr) { adm_caches[String(name)] = Array.isArray(arr) ? arr : []; }
+function admGetCache(name) { return adm_caches.hasOwnProperty(String(name)) ? adm_caches[String(name)] : null; }
+
+// ── 검색 대상 정의 — 종류 뱃지 · 사이드바 항목(id) · 상세 함수 이름(없으면 화면만) · 라벨/부제/검색 본문 ──
+//    부제: 브랜드=국가/카테고리, 제품=브랜드·카테고리, 아티클=브랜드·태그, 리드=유형/상태, 회원=회사, 검수=상태.
+//    hay 에 이메일이 들어가는 건 검색용일 뿐 — 결과에는 이름·회사만 찍는다(개인정보는 상세에서).
+var ADM_SEARCH_SOURCES = [
+    { key: 'brands',       en: 'Brand',   ko: '브랜드', cls: 'adm-kind-brand',   menu: 'brands',   view: 'viewBrand',
+      label: function (d) { return d.brandName || d.id; },
+      sub:   function (d) { return [d.country, d.category].filter(Boolean).join(' / '); },
+      hay:   function (d) { return [d.brandName, d.country, d.category, d.contactName, d.email, d.slug, d.status].join(' '); } },
+    { key: 'products',     en: 'Product', ko: '제품',   cls: 'adm-kind-product', menu: 'products', view: '',
+      label: function (d) { return d.name || d.id; },
+      sub:   function (d) { return [d.brandName, d.category].filter(Boolean).join(' · '); },
+      hay:   function (d) { return [d.name, d.brandName, d.category, d.subcategory, d.collection, d.materials, d.status].join(' '); } },
+    { key: 'articles',     en: 'Article', ko: '아티클', cls: 'adm-kind-article', menu: 'articles', view: 'viewArticle',
+      label: function (d) { return d.title || d.id; },
+      sub:   function (d) { return [d.brandName, d.tag].filter(Boolean).join(' · '); },
+      hay:   function (d) { return [d.title, d.brandName, d.tag, d.status].join(' '); } },
+    { key: 'leads',        en: 'Lead',    ko: '리드',   cls: 'adm-kind-lead',    menu: 'leads',    view: 'lead_view',
+      label: function (d) { return (d.name || '-') + (d.company ? ' / ' + d.company : ''); },
+      sub:   function (d) { return [d.type, d.status].filter(Boolean).join(' / '); },
+      hay:   function (d) { return [d.name, d.company, d.email, d.phone, d.productName, d.brandName, d.type, d.status].join(' '); } },
+    { key: 'users',        en: 'Member',  ko: '회원',   cls: 'adm-kind-user',    menu: 'members',  view: 'usr_view',
+      label: function (d) { return d.displayName || d.id; },
+      sub:   function (d) { return d.company || ''; },
+      hay:   function (d) { return [d.displayName, d.company, d.jobTitle, d.industry, d.email].join(' '); } },
+    { key: 'reviewIssues', en: 'Review',  ko: '검수',   cls: 'adm-kind-review',  menu: 'review',   view: 'viewReview',
+      label: function (d) { return (d.no || '-') + ' ' + (d.area || ''); },
+      sub:   function (d) { return d.status || ''; },
+      hay:   function (d) { return [d.no, d.area, d.screen, d.action, d.gap, d.status].join(' '); } }
+];
+var ADM_SEARCH_MAX = 30;
+
+// ── 통합 검색 — 등록된 캐시만, 여러 단어 AND · 부분일치 · 대소문자 무시(matchText), 최대 30건.
+//    별도 페이지 컬렉션(자문·투고·뉴스레터·알림·아티클 카드형)은 ADMIN_MENUS 의 page 항목을 라벨로 맞춰 "이동" 항목 하나.
+//    반환: [{ kind, en, ko, cls, id, label, sub, menu, view, href, (page 만) labelKo, subKo }] — 값은 원문(이스케이프는 그리는 쪽 admin-nav.js 가 한다).
+function searchAll(q) {
+    var query = String(q == null ? '' : q).trim();
+    var out = [];
+    if (!query) return out;
+    for (var s = 0; s < ADM_SEARCH_SOURCES.length && out.length < ADM_SEARCH_MAX; s++) {
+        var src = ADM_SEARCH_SOURCES[s];
+        var list = admGetCache(src.key);
+        if (!list) continue;   // 그 화면을 아직 안 열었으면 건너뛴다(읽지 않는다)
+        for (var i = 0; i < list.length && out.length < ADM_SEARCH_MAX; i++) {
+            var d = list[i] || {};
+            if (!matchText(src.hay(d), query)) continue;
+            out.push({ kind: src.key, en: src.en, ko: src.ko, cls: src.cls, id: String(d.id || ''),
+                       label: String(src.label(d) || ''), sub: String(src.sub(d) || ''), menu: src.menu, view: src.view, href: '' });
+        }
+    }
+    if (typeof ADMIN_MENUS !== 'undefined' && out.length < ADM_SEARCH_MAX) {
+        for (var g = 0; g < ADMIN_MENUS.length && out.length < ADM_SEARCH_MAX; g++) {
+            var items = ADMIN_MENUS[g].items || [];
+            for (var k = 0; k < items.length && out.length < ADM_SEARCH_MAX; k++) {
+                var it = items[k];
+                if (it.kind !== 'page' || !it.ready) continue;
+                if (!matchText(it.en + ' ' + it.ko + ' ' + it.id, query)) continue;
+                out.push({ kind: 'page', en: 'Page', ko: '페이지', cls: 'adm-kind-page', id: it.id,
+                           label: it.en, labelKo: it.ko, sub: 'Go to page', subKo: '페이지로 이동', menu: it.id, view: '', href: it.target });
+            }
+        }
+    }
+    return out;
+}
+// 검색창 안내용 — 등록된 캐시 이름 목록(아직 안 연 화면은 검색에 안 잡힌다는 것을 사용자가 알게)
+function admSearchLoadedKinds() {
+    var loaded = [], missing = [];
+    for (var s = 0; s < ADM_SEARCH_SOURCES.length; s++) {
+        (admGetCache(ADM_SEARCH_SOURCES[s].key) ? loaded : missing).push(ADM_SEARCH_SOURCES[s]);
+    }
+    return { loaded: loaded, missing: missing };
+}

@@ -18,7 +18,7 @@ var ADMIN_MENUS = [
     { key: 'customer', en: 'Customers', ko: '고객', items: [
         { id: 'leads',     en: 'Lead Inbox',    ko: '리드 인박스', icon: 'fa-inbox',        kind: 'view', target: 'leads',     ready: true },    // 4a단계 ✓ view-leads.js
         { id: 'inquiries', en: '1:1 Inquiries', ko: '1:1 문의',    icon: 'fa-comment-dots', kind: 'view', target: 'inquiries', ready: false },   // 5단계
-        { id: 'members',   en: 'Professionals', ko: '전문가 회원', icon: 'fa-users',        kind: 'view', target: 'members',   ready: false }    // 6단계
+        { id: 'members',   en: 'Professionals', ko: '전문가 회원', icon: 'fa-users',        kind: 'view', target: 'users',     ready: true }     // 6단계 ✓ view-users.js
     ] },
     { key: 'brand', en: 'Brands', ko: '브랜드', items: [
         { id: 'brands',    en: 'Brands',          ko: '브랜드',      icon: 'fa-building',     kind: 'tab',  target: 'brands',    ready: true },
@@ -75,6 +75,7 @@ function adm_renderSidebar() {
     if (!aside) return;
     var html = '<button type="button" class="adm-toggle" id="admNavToggle" aria-label="Menu">'
         + '<i class="fas fa-bars"></i> ' + tSpan('Menu', '메뉴') + '</button>'
+        + adm_searchHtml()   // 6단계 통합 검색창
         + '<nav class="adm-nav">';
     for (var g = 0; g < ADMIN_MENUS.length; g++) {
         var group = ADMIN_MENUS[g];
@@ -93,6 +94,7 @@ function adm_renderSidebar() {
     }
     html += '</nav>';
     aside.innerHTML = html;
+    adm_initSearch();   // 6단계 통합 검색 (searchAll 은 admin-core.js)
 
     // 모바일(≤768px) 접기/펼치기
     document.getElementById('admNavToggle').addEventListener('click', function () {
@@ -139,6 +141,7 @@ function adm_route() {
         if (item.target === 'settings' && typeof set_render === 'function') set_render(view);         // 3단계 설정
         if (item.target === 'regulations' && typeof reg_render === 'function') reg_render(view);      // 3단계 규정집
         if (item.target === 'leads' && typeof leads_render === 'function') leads_render(view);        // 4a단계 리드 인박스
+        if (item.target === 'users' && typeof users_render === 'function') users_render(view);        // 6단계 전문가 회원
     }
     adm_setActive(item.id);
 }
@@ -164,6 +167,84 @@ function adm_init() {
             if (items[i].kind === 'page' && items[i].target.toLowerCase() === cur) { adm_setActive(items[i].id); break; }
         }
     }
+}
+
+// ── 통합 검색창 (2026-09-12 어드민 개편 6단계) — admin-core.js searchAll 이 등록된 캐시만 뒤진다(추가 읽기 없음).
+//    입력 300ms 디바운스 · 결과 최대 30건(ADM_SEARCH_MAX) · 클릭 → 사이드바 항목 활성(해시) + 상세 함수(있으면) · page 항목은 이동.
+//    값은 전부 Firestore/사용자 값 — escapeHtml/escapeAttr 예외 없음. onclick 문자열 대신 data-* + 위임.
+function adm_searchHtml() {
+    return '<div class="adm-search" id="admSearch">'
+        + '<i class="fas fa-search"></i>'
+        + '<input type="text" id="admSearchInput" autocomplete="off" aria-label="Search"'
+        + ' placeholder="' + escapeAttr(t('Search…', '검색…')) + '" data-en-placeholder="Search…" data-ko-placeholder="검색…">'
+        + '<div class="adm-search-results" id="admSearchResults" hidden></div>'
+        + '</div>';
+}
+function adm_initSearch() {
+    var input = document.getElementById('admSearchInput');
+    var box = document.getElementById('admSearchResults');
+    if (!input || !box || typeof searchAll !== 'function') return;
+    var timer = null;
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () { adm_drawSearch(input.value); }, 300);
+    });
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { input.value = ''; adm_hideSearch(); }
+        if (e.key === 'Enter') { var first = box.querySelector('.adm-sr-item'); if (first) first.click(); }
+    });
+    input.addEventListener('focus', function () { if (input.value.trim()) adm_drawSearch(input.value); });
+    box.addEventListener('click', function (e) {
+        var a = e.target.closest('.adm-sr-item');
+        if (!a) return;
+        e.preventDefault();
+        adm_goResult(a.dataset);
+    });
+    document.addEventListener('click', function (e) { if (!e.target.closest('#admSearch')) adm_hideSearch(); });
+}
+function adm_hideSearch() {
+    var box = document.getElementById('admSearchResults');
+    if (box) { box.hidden = true; box.innerHTML = ''; }
+}
+function adm_drawSearch(q) {
+    var box = document.getElementById('admSearchResults');
+    if (!box) return;
+    var query = String(q == null ? '' : q).trim();
+    if (!query) { adm_hideSearch(); return; }
+    var results = searchAll(query);
+    var html = '';
+    for (var i = 0; i < results.length; i++) {
+        var r = results[i];
+        html += '<a class="adm-sr-item" href="' + escapeAttr(r.href || ('dashboard.html#' + r.menu)) + '"'
+            + ' data-menu="' + escapeAttr(r.menu) + '" data-id="' + escapeAttr(r.id) + '" data-view="' + escapeAttr(r.view) + '" data-href="' + escapeAttr(r.href) + '">'
+            + '<span class="adm-kind ' + escapeAttr(r.cls) + '" ' + tAttr(r.en, r.ko) + '>' + escapeHtml(t(r.en, r.ko)) + '</span>'
+            + (r.labelKo ? '<span class="adm-sr-label" ' + tAttr(r.label, r.labelKo) + '>' + escapeHtml(t(r.label, r.labelKo)) + '</span>'
+                          : '<span class="adm-sr-label">' + escapeHtml(r.label) + '</span>')
+            + (r.subKo ? '<small class="adm-sr-sub" ' + tAttr(r.sub, r.subKo) + '>' + escapeHtml(t(r.sub, r.subKo)) + '</small>'
+                       : (r.sub ? '<small class="adm-sr-sub">' + escapeHtml(r.sub) + '</small>' : ''))
+            + '</a>';
+    }
+    // 바닥 줄 — 건수 + 아직 안 연 화면(캐시 없음 → 검색에 안 잡힌다는 것을 숨기지 않는다)
+    var foot = !results.length ? t('No results', '결과 없음')
+        : (results.length >= ADM_SEARCH_MAX ? t('Top ' + ADM_SEARCH_MAX + ' shown — narrow the search', '상위 ' + ADM_SEARCH_MAX + '건만 표시 — 검색어를 좁히세요')
+                                            : t(results.length + ' results', results.length + '건'));
+    var kinds = (typeof admSearchLoadedKinds === 'function') ? admSearchLoadedKinds() : { missing: [] };
+    if (kinds.missing.length) {
+        foot += ' · ' + t('Not loaded yet: ', '아직 안 연 화면: ') + kinds.missing.map(function (m) { return t(m.en, m.ko); }).join(', ');
+    }
+    html += '<div class="adm-sr-foot">' + escapeHtml(foot) + '</div>';
+    box.innerHTML = html;
+    box.hidden = false;
+}
+// 결과 클릭 — page 는 그 페이지로, 그 외는 dashboard 해시로 화면 활성 + 상세 함수(전역 function 이름, 없으면 화면만)
+function adm_goResult(ds) {
+    ds = ds || {};
+    if (ds.href) { location.href = ds.href; return; }
+    adm_hideSearch();
+    if (!adm_isDashboard()) { location.href = 'dashboard.html#' + ds.menu; return; }
+    if (location.hash === '#' + ds.menu) adm_route(); else location.hash = '#' + ds.menu;
+    var fn = (ds.view && typeof window[ds.view] === 'function') ? window[ds.view] : null;
+    if (fn && ds.id) fn(ds.id);
 }
 
 // 스크립트가 body 끝(인라인 스크립트 앞)에 실리므로 DOMContentLoaded 로 미룬다 —

@@ -169,3 +169,30 @@
     .adm-reg-layout { display: block; }
     .adm-reg-toc { width: auto; flex: none; position: static; max-height: none; border-right: none; border-bottom: 1px solid #f0f0f0; padding: 0 0 12px; margin-bottom: 16px; }
 }
+
+/* 통합 검색 (6단계 — admin-nav.js 검색창 + admin-core.js searchAll). 사이드바 위, 결과는 사이드바 밖으로 넓게 */
+.adm-search { position: relative; margin: 2px 12px 8px; }
+.adm-search > i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 0.78rem; pointer-events: none; }
+.adm-search input { width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #e5e5e5; border-radius: 6px; font-family: inherit; font-size: 0.82rem; background: #fafafa; }
+.adm-search input:focus { outline: none; border-color: #C8A96E; background: #fff; }
+.adm-search-results { position: absolute; left: 0; top: calc(100% + 4px); width: 420px; max-height: 60vh; overflow-y: auto; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 900; }
+.adm-sr-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; text-decoration: none; color: #222; font-size: 0.82rem; border-bottom: 1px solid #f5f5f5; }
+.adm-sr-item:hover { background: #faf6ee; }
+.adm-sr-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.adm-sr-sub { color: #999; font-size: 0.72rem; white-space: nowrap; max-width: 40%; overflow: hidden; text-overflow: ellipsis; }
+.adm-sr-foot { padding: 7px 12px; font-size: 0.72rem; color: #999; background: #fafafa; white-space: normal; }
+.adm-kind { display: inline-block; flex: 0 0 auto; padding: 2px 7px; border-radius: 4px; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; background: #f3f4f6; color: #444; }
+.adm-kind-brand   { background: #e0f2fe; color: #0369a1; }
+.adm-kind-product { background: #fef3c7; color: #92400e; }
+.adm-kind-article { background: #ede9fe; color: #5b21b6; }
+.adm-kind-lead    { background: #dbeafe; color: #1e40af; }
+.adm-kind-user    { background: #d1fae5; color: #065f46; }
+.adm-kind-review  { background: #fee2e2; color: #991b1b; }
+.adm-kind-page    { background: #f3f4f6; color: #666; }
+@media (max-width: 768px) {
+    .adm-search { margin: 8px 12px; }
+    .adm-search-results { position: static; width: auto; max-height: none; box-shadow: none; margin-top: 6px; }   /* 사이드바 overflow:hidden 에 잘리지 않게 */
+}
+
+/* PROFESSIONAL MEMBERS (6단계 — view-users.js, 읽기 전용). 표·모달은 리드 인박스 스타일 재사용 */
+.adm-users { border-radius: 10px; }

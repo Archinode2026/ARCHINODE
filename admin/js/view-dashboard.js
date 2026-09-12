@@ -15,7 +15,8 @@ var DASH_CARDS = [
     { id: 'articles',      en: 'Articles to review',    ko: '아티클 검토 대기', icon: 'fa-newspaper',        coll: 'articles',          status: 'pending',  href: 'dashboard.html#articles' },
     { id: 'consultations', en: 'Consultations pending', ko: '자문 요청 대기',   icon: 'fa-comments',         coll: 'consultations',     status: 'pending',  href: 'consultations.html' },
     { id: 'trend',         en: 'Trend submissions',     ko: '트렌드 투고 대기', icon: 'fa-lightbulb',        coll: 'trend-submissions', status: 'pending',  href: 'trend-submissions.html' },
-    { id: 'review',        en: 'Review issues open',    ko: '검수 검토대기',    icon: 'fa-clipboard-check',  coll: 'reviewIssues',      status: '검토대기', href: 'dashboard.html#review' }
+    { id: 'review',        en: 'Review issues open',    ko: '검수 검토대기',    icon: 'fa-clipboard-check',  coll: 'reviewIssues',      status: '검토대기', href: 'dashboard.html#review' },
+    { id: 'users',         en: 'Members',               ko: '전문가 회원',      icon: 'fa-users',            coll: 'users',             status: '',         href: 'dashboard.html#members', cache: true }   // 6단계: where 없음 — view-users.js 캐시 길이(200 꽉 차면 "200+")
 ];
 
 // ── 화면 그리기. el = #tab-dashboard. 로그인 전에는 자리만 그리고 읽지 않는다 ──
@@ -95,6 +96,10 @@ function dash_loadRecent() {
 function dash_loadCounts() {
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) return;   // 로그인 전: loadAll() 끝에서 다시 부른다
     DASH_CARDS.forEach(function (c) {
+        if (c.cache) {   // 6단계 회원 수 — 별도 카운트 쿼리 없이 users_load 결과(캐시)로. 이미 읽었으면 다시 읽지 않는다
+            if (typeof users_ensureLoaded === 'function') users_ensureLoaded(); else dash_setNum(c.id, '-', 'view-users.js not loaded');
+            return;
+        }
         db.collection(c.coll).where('status', '==', c.status).get()
             .then(function (snap) { dash_setNum(c.id, String(snap.size), ''); })
             .catch(function (err) {
