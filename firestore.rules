@@ -66,7 +66,7 @@ service cloud.firestore {
 
       // 수정:
       //   - 어드민: status를 4값 중 하나로만 변경 가능
-      //   - 본인: status·createdAt·brandName·approvedAt·statusReason·statusChangedAt·statusChangedBy 변경 금지
+      //   - 본인: status·createdAt·brandName·approvedAt·statusReason·statusChangedAt·statusChangedBy·history 변경 금지
       allow update: if (isAdmin()
                        && request.resource.data.status in ['pending','approved','suspended','rejected'])
                     || (isOwner(brandId)
@@ -76,7 +76,8 @@ service cloud.firestore {
                         && notChanging('approvedAt')
                         && notChanging('statusReason')
                         && notChanging('statusChangedAt')
-                        && notChanging('statusChangedBy'));
+                        && notChanging('statusChangedBy')
+                        && notChanging('history'));   // history 는 어드민만(2026-09-12 블랙 지적)
 
       // 삭제: 어드민만
       allow delete: if isAdmin();

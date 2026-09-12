@@ -54,7 +54,7 @@ var LOG_COLUMNS = [
     { en: 'Page',   ko: '화면' }
 ];
 
-var log_state = { items: [], lastDoc: null, hasMore: false, loading: false, period: 'all', kind: '', authHooked: false };
+var log_state = { items: [], lastDoc: null, hasMore: false, loading: false, error: false, period: 'all', kind: '', authHooked: false };   // error: 읽기 실패 안내를 logs_draw 요약문이 덮지 않게 (블랙 d1b18fc 지적)
 
 // ── 화면 그리기. el = #tab-logs. 뼈대는 한 번만, 이후 호출은 다시 읽기만 ──
 function logs_render(el) {
@@ -107,6 +107,7 @@ function logs_load(more) {
     var q = db.collection('adminLogs').orderBy('at', 'desc').limit(LOG_PAGE_SIZE);   // 단일 필드 — 복합 색인 불필요
     if (more && log_state.lastDoc) q = q.startAfter(log_state.lastDoc);
     log_state.loading = true;
+    log_state.error = false;
     logs_msg(t('Loading…', '불러오는 중…'), false);
     q.get().then(function (snap) {
         snap.forEach(function (d) { log_state.items.push(Object.assign({ id: d.id }, d.data())); });
@@ -116,12 +117,13 @@ function logs_load(more) {
         logs_draw();
     }).catch(function (err) {
         log_state.loading = false;
+        log_state.error = true;
         console.error('[adminLogs] read failed', err);
         var code = (err && err.code) || (err && err.message) || '';
         logs_msg(code === 'permission-denied'
             ? t('Read failed (permission-denied) — check that the adminLogs rule is published', '읽기 실패(permission-denied) — adminLogs 규칙 게시 여부 확인')
             : t('Read failed: ', '읽기 실패: ') + code, true);
-        logs_draw();
+        logs_draw();   // 표는 비우되(활동 없음) 오류문은 error 플래그로 유지
     });
 }
 
@@ -165,7 +167,7 @@ function logs_draw() {
         : '<tr><td colspan="' + LOG_COLUMNS.length + '" class="adm-muted">' + tSpan('No activity', '활동 없음') + '</td></tr>';
     var more = document.getElementById('logMoreBtn');
     if (more) more.style.display = log_state.hasMore ? '' : 'none';
-    if (!log_state.loading) {
+    if (!log_state.loading && !log_state.error) {   // 오류 상태면 요약문으로 덮지 않는다
         logs_msg(t('Showing ' + list.length + ' of ' + log_state.items.length + ' loaded', '불러온 ' + log_state.items.length + '건 중 ' + list.length + '건 표시')
             + (log_state.hasMore ? t(' — more available', ' — 더 있음') : ''), false);
     }
