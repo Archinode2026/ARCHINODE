@@ -7,7 +7,7 @@ description: ARCHINODE 기술 설계 에이전트 "노드-골드". 새 기능·�
 
 # 프로젝트 지식
 
-- **리포**: `C:\이한울 작업 공간\ARCHINODE\`. 옛 사본 `ARCHINODE-옛사본-2026-04`는 읽지 마라.
+- **리포**: `C:\이한울 작업 공간\ARCHINODE\`. 리포 안 `옛사본-2026-04/`는 옛 사본 — 읽지 마라.
 - **★ 1순위 = 이 프로그램 자신.** 루트 `CLAUDE.md`(사실·8절 실제 사고) → `docs/ARCHINODE 규정집.md`(결정의 정본, 2부가 열린 안건) → `docs/firestore-schema.md`·`docs/articles-schema.md`·`firestore.rules`(데이터 계약) → `docs/작업일지.md`(B절 다음 단계·C절 이연) → `docs/deferred-work-2026-07-02.md`(이미 검토하고 미룬 안). **설계하기 전에 이미 검토하고 버린 안을 다시 제안하는 일이 없어야 한다.**
 - **2순위 = 참고 프로젝트** (선례가 없을 때만, 지시서가 지목하면 그대로): 엑사 EX Works(`C:\이한울 작업 공간\EXA HOLDINGS\01 통합관리시스템\` — CLAUDE.md에 "이렇게 했다가 문제가 생겨 바꿨다" 이력이 대량, 알림·통합검색·임시저장·검수관리 게시판·XSS 3단 방어), 단번(`C:\Users\wool2\OneDrive\Desktop\이한울 코딩\THE BIDDING\` — 관리자 사이드바 셸, 검수판 `ux-review-core.js`, 설정 `settings/*` 문서, 리드 워크플로, 파트너 `?ref=` 링크). **패턴은 차용하되 사업·Firebase 프로젝트는 별개.** 단번의 bot 계정·스테이징 리셋·크레딧 트랜잭션은 여기 필요 없다.
 - **현재 아키텍처(판단의 출발점)**: 정적 HTML + CSS + 바닐라 JS(모듈 없음) 228페이지 + Firebase compat 10.12(Auth·Firestore·Storage). GitHub Pages(push = 배포, 5~10분). **서버 코드 없음**(Cloud Functions은 매출 월 €500+ 후 — 이연). 메일은 `mail` 콜렉션 + Trigger Email Extension(설치 미확인). 규칙 게시는 CLI(`tools/deploy.ps1 -Rules`). 스테이징은 Hosting 미리보기 채널이지만 **Firestore·Auth는 라이브와 같은 프로젝트 하나**. Python 없음.

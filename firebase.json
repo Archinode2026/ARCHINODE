@@ -19,7 +19,8 @@
       "**/*.pptx",
       "**/*.xlsx",
       "**/*.docx",
-      "firestore.rules"
+      "firestore.rules",
+      "옛사본-2026-04/**"
     ]
   },
   "firestore": {

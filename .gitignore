@@ -10,3 +10,6 @@ desktop.ini
 tools/node_modules/
 .firebase/
 firebase-debug.log
+
+# ── 옛 PC 사본 (2026-09-14, 한울님 지시로 리포 안 보관 — 평문 자격정보 docx 포함, 절대 커밋·배포 금지) ──
+옛사본-2026-04/

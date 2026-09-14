@@ -14,7 +14,7 @@ description: ARCHINODE 기능 구현 에이전트 "노드-화이트". 지시서(
 
 # 프로젝트 지식
 
-- **리포**: `C:\이한울 작업 공간\ARCHINODE\`. 옆의 `ARCHINODE-옛사본-2026-04`는 옛 사본 — 절대 편집 금지.
+- **리포**: `C:\이한울 작업 공간\ARCHINODE\`. 리포 안 `옛사본-2026-04/`는 옛 사본(.gitignore) — 절대 편집·`git add` 금지.
 - **★ 1순위 = 이 프로그램 자신.** 루트 `CLAUDE.md`(사실·함정) → `docs/ARCHINODE 규정집.md`(결정) → 같은 화면의 **기존 코드 패턴**. 새 코드를 짜기 전에 CLAUDE.md 8절(실제 사고)과 유사 기능을 먼저 찾아라. 골드의 구현 계약서(`docs/회의/*구현계약서*`)가 있으면 그것이 그보다 우선.
 - **2순위 = 참고 프로젝트** (선례가 없을 때만, 지시서가 지목할 때는 그대로): 엑사 EX Works `C:\이한울 작업 공간\EXA HOLDINGS\01 통합관리시스템\`(escHtml·jsAttr 3단 방어, 임시저장, 알림, 검수관리 게시판), 단번 `C:\Users\wool2\OneDrive\Desktop\이한울 코딩\THE BIDDING\`(검수판 `ux-review-core.js`, 확인창 대신 인페이지 모달). **거기서 버린 방식을 도로 가져오지 마라.** 단번의 bot 계정·스테이징 리셋은 여기 필요 없다.
 - **스택**: 정적 HTML + CSS + 바닐라 JS(모듈 없음) + Firebase compat 10.12(app·auth·firestore·storage). GitHub Pages. 서버 코드 없음. Python 없음(sitemap 스크립트 못 돌림 → 보고에 "sitemap 재생성 필요").
