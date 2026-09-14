@@ -209,7 +209,7 @@ archinodekr.com/
 
 | 이름 | 역할 | 호출 키워드 | 파일 |
 |------|------|-----------|----------|
-| 지휘 창 (아키노드) | 대화 창 행동 규칙 — 코드 안 고침, 지시서·배포·보고 | "아키노드" | .claude/skills/archinode/SKILL.md |
+| 지휘 창 (아키) | 대화 창 행동 규칙 — 코드 안 고침, 지시서·배포·보고 | "아키", "아키 나와" (2026-09-14, 옛 "아키노드") | .claude/skills/archinode/SKILL.md |
 | 노드-골드/화이트/블랙/브론즈/실버 | 설계/구현/정적검증/E2E/PM | 실행창이 Agent 도구로 호출 | .claude/agents/node-*.md |
 | 그레이 (Gray) | 벤치마크 — 업계 조사, 경쟁 분석 | "그레이", "아키프로덕트" | .claude/skills/gray-benchmark/SKILL.md |
 
