@@ -499,6 +499,27 @@
 <!-- Firebase -->
 <script src="firebase-config.js"></script>
 <script>
+// ── 유입경로 추적 (?ref=, 작업지시 7b) ──
+// 주소창 값이라 영문·숫자·하이픈만 허용하는 정규식으로 거른 뒤에만 sessionStorage에 저장한다.
+// 값이 없거나 형식이 안 맞으면 sessionStorage에 이미 있던 값을 그대로 둔다(덮어쓰지 않음) — 세션 안에서 유지.
+(function captureReferralSource() {
+    try {
+        const refParam = new URLSearchParams(location.search).get('ref');
+        if (refParam && /^[a-zA-Z0-9-]{1,40}$/.test(refParam)) {
+            sessionStorage.setItem('archinode_ref', refParam);
+        }
+    } catch (e) { /* 스토리지 차단 브라우저 — 조용히 넘어감(auth/token-entry.html 패턴) */ }
+})();
+
+// ── sessionStorage에서 유입경로 값 안전하게 읽기 ──
+function getReferralSource() {
+    try {
+        return sessionStorage.getItem('archinode_ref') || null;
+    } catch (e) {
+        return null;
+    }
+}
+
 // ── 임시 비밀번호 생성 (브랜드 slug + 날짜 + 랜덤 4자리) ──
 function generatePassword(brandName) {
     const now = new Date();
@@ -597,7 +618,8 @@ form.addEventListener('submit', async function(e) {
             position: escapeHtml(document.getElementById('position').value.trim()),
             email: email,
             phone: document.getElementById('phone').value.trim(),
-            referral: document.getElementById('referral').value,
+            referral: document.getElementById('referral').value,      // referral=수동 선택(드롭다운)
+            referralSource: getReferralSource(),  // referralSource=?ref= 자동 캡처
             status: 'pending',       // pending → approved → rejected
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             approvedAt: null,

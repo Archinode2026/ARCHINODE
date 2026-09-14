@@ -641,6 +641,7 @@ async function viewBrand(docId) {
         <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-value">${escapeHtml(b.phone || '-')}</div></div>
         <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(b.description || '-')}</div></div>
         <div class="detail-row"><div class="detail-label">Referral</div><div class="detail-value">${escapeHtml(b.referral || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Referral Source</div><div class="detail-value">${escapeHtml(b.referralSource || '-')}</div></div>
         <div style="margin-top:20px;">${actionsHtml}</div>`;
     document.getElementById('modal').classList.add('show');
 }
