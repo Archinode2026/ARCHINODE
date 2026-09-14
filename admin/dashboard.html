@@ -145,6 +145,13 @@ tr:hover { background: #fafafa; }
     .stats-row { grid-template-columns: repeat(2, 1fr); }
     table { font-size: 0.8rem; }
     th, td { padding: 8px 6px; }
+    /* A-038: 좁은 화면(322px 실측)에서 상단바 오른쪽(이메일·브랜드 로그인·로그아웃) 글자가
+       세로로 쪼개져 화면 위로 삐져나가는 문제 — 각 항목은 한 줄을 유지하고(nowrap),
+       다 안 들어가면 로고와 줄을 나눈다(wrap). style.css A-014와 같은 처방. */
+    .topbar { flex-wrap: wrap; height: auto; min-height: 56px; padding: 10px 16px; row-gap: 6px; }
+    .topbar .right { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+    .topbar .right > * { white-space: nowrap; }
+    .topbar .admin-email { max-width: 60vw; overflow: hidden; text-overflow: ellipsis; }
 }
 </style>
 </head>

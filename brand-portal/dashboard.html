@@ -183,6 +183,10 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
 @media (max-width: 768px) {
     .field-row { grid-template-columns: 1fr; }
     .product-grid { grid-template-columns: 1fr; }
+    /* A-039: 좁은 화면에서 탭("제품"·"브랜드 매거진" 등) 글자가 세로로 쪼개지는 문제 —
+       탭 폭을 고정 flex로 욱여넣지 않고 한 줄을 유지한 채(nowrap) 가로 스크롤을 허용한다. */
+    .tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tab { white-space: nowrap; flex: 0 0 auto; }
 }
 </style>
 </head>
