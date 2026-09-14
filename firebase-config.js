@@ -25,7 +25,8 @@ const firebaseConfig = {
 
 // Firebase 초기화
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+// Auth compat SDK는 일부 페이지에서만 로드되므로 조건부 초기화 (BUG-1, 검수대장 A-001)
+const auth = (typeof firebase.auth === 'function') ? firebase.auth() : null;
 const db = firebase.firestore();
 // Storage SDK는 일부 페이지에서만 로드되므로 조건부 초기화
 const storage = (typeof firebase.storage === 'function') ? firebase.storage() : null;

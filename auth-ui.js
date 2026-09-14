@@ -12,8 +12,8 @@
 // ═══════════════════════════════════════════════════════════
 
 (function() {
-    // Firebase 준비 대기
-    if (typeof auth === 'undefined') return;
+    // Firebase 준비 대기 (auth-compat 미로드 페이지에서는 firebase-config.js가 auth=null로 초기화함 — BUG-1)
+    if (typeof auth === 'undefined' || !auth) return;
 
     // 경로 깊이에 따른 base path 계산
     const pathParts = window.location.pathname.split('/').filter(Boolean);
