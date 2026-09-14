@@ -7,7 +7,7 @@ description: ARCHINODE 법무·개인정보 에이전트 "노드-네이비". 이
 
 # 프로젝트 지식
 
-- 리포 `C:\이한울 작업 공간\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE\`. 현행 문서: `terms.html`·`privacy.html`·`privacy-en.html`·`cookie-consent.js`(GDPR 배너). 운영 주체 표기 비비들리바이브(사업자 640-03-02879) — 법인 형태는 규정집 안건 5.
+- 리포 `C:\이한울 작업 공간\ARCHINODE\`. 현행 문서: `terms.html`·`privacy.html`·`privacy-en.html`·`cookie-consent.js`(GDPR 배너). 운영 주체 표기 비비들리바이브(사업자 640-03-02879) — 법인 형태는 규정집 안건 5.
 - **양면 데이터**: EU 브랜드(GDPR 대상 — 입점 신청 시 담당자 이름·이메일·전화) + 한국 전문가(개인정보보호법 — 가입·좋아요·프로필) + 리드(견적요청·문의 = 방문자 연락처를 **브랜드에게 제3자 제공** → 명시적 동의 체크 필수, 단번 규칙 동일).
 - 실비아 콜드메일(EU 브랜드 담당자에게 발송)은 B2B 마케팅 메일 — 수신 거부 안내·발신자 표기.
 - 요금·VAT: 규정집 1-2·안건 1, `docs/deferred-work-2026-07-02.md` P2-4(EU B2B reverse charge, 국내 부가세 10% 포함가, OSS 미해당).

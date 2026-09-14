@@ -7,7 +7,7 @@ description: ARCHINODE 벤치마크·리서치 에이전트 "노드-그레이". 
 
 # 프로젝트 지식
 
-- 리포 `C:\이한울 작업 공간\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE\`. 사업 정의는 `docs/ARCHINODE 규정집.md` 1부(직접 판매 안 함·가격 비노출·리드 모델·디자이너=브랜드 통합·2026 무료·창립 요금), 현재 기능 수준은 루트 `CLAUDE.md`와 `.claude/CLAUDE.md` 4절 기능 매트릭스·7절 로드맵.
+- 리포 `C:\이한울 작업 공간\ARCHINODE\`. 사업 정의는 `docs/ARCHINODE 규정집.md` 1부(직접 판매 안 함·가격 비노출·리드 모델·디자이너=브랜드 통합·2026 무료·창립 요금), 현재 기능 수준은 루트 `CLAUDE.md`와 `.claude/CLAUDE.md` 4절 기능 매트릭스·7절 로드맵.
 - **아키프로덕트 정적 프로필**은 `.claude/skills/gray-benchmark/SKILL.md`에 있다(페이지 유형 12종·UX 패턴·수익 모델). 먼저 거기서 확인하고, 최신 정보가 필요하면 WebSearch/WebFetch로 실제 페이지를 본다.
 - 조사 결과는 `docs/리서치/YYYY-MM-DD-<주제>(그레이).md`로 남긴다(단번 `docs/리서치/` 방식). 커밋은 경로 지정, push 금지.
 

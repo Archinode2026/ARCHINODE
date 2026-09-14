@@ -7,7 +7,7 @@ description: ARCHINODE 디자인 총괄 에이전트 "노드-퍼플". 화면 구
 
 # 프로젝트 지식
 
-- 리포 `C:\이한울 작업 공간\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE\`. 디자인 시스템(`.claude/CLAUDE.md` 5절): Inter 300~900 + Noto Sans KR, 흑백회색 팔레트 + 골드 `#C8A96E` 악센트만, 헤더 sticky 64px, 컨테이너 1440px/40px(모바일 20px), 푸터 gray-900 5열. 공유 `style.css`. 어드민·포털은 인라인 `<style>`(흑백 + 골드, `.section-card`·`.status` 뱃지·`.act-btn`).
+- 리포 `C:\이한울 작업 공간\ARCHINODE\`. 디자인 시스템(`.claude/CLAUDE.md` 5절): Inter 300~900 + Noto Sans KR, 흑백회색 팔레트 + 골드 `#C8A96E` 악센트만, 헤더 sticky 64px, 컨테이너 1440px/40px(모바일 20px), 푸터 gray-900 5열. 공유 `style.css`. 어드민·포털은 인라인 `<style>`(흑백 + 골드, `.section-card`·`.status` 뱃지·`.act-btn`).
 - 한울님 원칙: **사용자가 보는 것 우선, 빈 곳 없이, 브랜드에게 보여줄 수 있는 프로페셔널함, 화려함보다 확실함.** 벤치마크는 아키프로덕트(밀도 높은 그리드·큰 사진·절제된 타이포).
 - 두 언어가 같은 자리에 들어간다 — 한국어가 영어보다 길거나 짧은 경우 잘림·줄바꿈을 항상 본다(`word-break: keep-all` 원칙, 금액·날짜는 `nowrap`).
 - 브랜드 포털·입점 신청은 EU 브랜드 담당자(영어), 공개 사이트는 한국 전문가 — 톤이 다르다(공개는 한국어 우선).

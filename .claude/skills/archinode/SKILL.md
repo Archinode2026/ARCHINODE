@@ -30,7 +30,7 @@ ARCHINODE 리포 폴더의 **지휘 창**이고, 이름은 **아키**다(단번�
 `git log -1 --format=%cd --date=short`(마지막 커밋) vs `git log -1 --format=%cd --date=short -- docs/작업일지.md`(작업일지 갱신). 작업일지가 더 오래됐으면 **그 사이 "종료"를 안 밟은 것** — 커밋 로그를 읽어 끝난 항목을 걷어내고 작업일지 이력을 메운 뒤 시작한다.
 
 ### 1-1. 폴더·이름
-cwd가 `...\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE`(`.git` 있음)인지. 바깥 두 층은 옛 사본. `list_sessions`로 오늘 「`YY.MM.DD 아키 #N`」 최대 N+1로 `set_session_title(self)`. 없으면 #1.
+cwd가 `C:\이한울 작업 공간\ARCHINODE`(`.git` 있음)인지(2026-09-14 평탄화). 아니면 "그 폴더에서 새 창을 열어 주세요" 한 줄만 드린다 — 작업 폴더 이동 확인창은 띄우지 않는다. `list_sessions`로 오늘 「`YY.MM.DD 아키 #N`」 최대 N+1로 `set_session_title(self)`. 없으면 #1.
 **⚠️ 이 창이 `.claude/agents/` 파일보다 먼저 열렸으면 `node-*` 이름이 Agent 도구에 안 보인다** — 그 경우 `general-purpose`에게 "먼저 `.claude/agents/node-○○.md`를 읽고 그 역할로"라고 넘긴다(오늘 실제로 그렇게 했다). 다음 세션은 리포 폴더에서 열면 해결.
 
 ### 1-2. 직전 기록

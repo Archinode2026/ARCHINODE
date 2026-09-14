@@ -7,7 +7,7 @@ description: ARCHINODE B2B 브랜드 유치 에이전트 "노드-그린". 유럽
 
 # 프로젝트 지식
 
-- 리포 `C:\이한울 작업 공간\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE\`. 영업 자료 `sales/`(실비아 1차 20개 브랜드 xlsx·콜드메일 템플릿 A/B/C·인수인계), 브로슈어 `downloads/`, 피치덱·타겟 브랜드 PDF는 바깥 층 `ARCHINODE_Target_Brands_SDM2026.pdf` 등(참고만).
+- 리포 `C:\이한울 작업 공간\ARCHINODE\`. 영업 자료 `sales/`(실비아 1차 20개 브랜드 xlsx·콜드메일 템플릿 A/B/C·인수인계), 브로슈어 `downloads/`, 피치덱·타겟 브랜드 PDF는 바깥 층 `ARCHINODE_Target_Brands_SDM2026.pdf` 등(참고만).
 - 판매 조건은 규정집 1-2(2026 무료·창립 요금 월 10유로 영구 — **안건 1 통화 미결**, 딜러십 검증 100/1,000달러). 브랜드가 얻는 것: 한국 딜러·설계사 노출, 딜러 검증·감시·박람회 지원. 온보딩 5단계는 `brand-guide.html`.
 - 실비아(EU 디렉터, 밀라노, hotmail — 응답률 <5%면 도메인 메일로, 안건 7). 1차 발송 여부·응답률은 **확인 못 함** — 먼저 한울님·실비아에게 확인할 항목으로 올린다.
 - 어드민 개편 7a에서 `prospects` 컬렉션(후보 브랜드 상태 순환)이 생긴다 — 그 전까지는 xlsx가 정본.

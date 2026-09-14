@@ -7,7 +7,7 @@
 
 ## 0. 세션을 시작하면 (2026-09-12 개정)
 
-1. **폴더 확인** — 이 파일이 있는 최하위 폴더(`...\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE`, `.git` 있음)가 작업 대상. 바깥 두 층은 2026-04 옛 사본이라 편집 금지. 세션도 여기서 열어야 `.claude/`가 로드된다.
+1. **폴더 확인** — `C:\이한울 작업 공간\ARCHINODE`(`.git` 있음)가 작업 대상 — 2026-09-14 평탄화로 옛 3중 중첩은 없어졌다. 옛 PC 사본은 `C:\이한울 작업 공간\ARCHINODE-옛사본-2026-04\`에 있고 편집 금지. 세션도 여기서 열어야 `.claude/`가 로드된다.
 2. `docs/작업일지.md` 맨 위 **"다음에 할 일"** 을 읽는다.
 3. `git log --oneline -10` · `git status --short` · `git rev-list --left-right --count origin/main...main`.
 4. 마지막 커밋 날짜와 작업일지 갱신 날짜를 대조한다. 작업일지가 더 오래됐으면 그 사이 "종료"를 안 밟은 것이다(`archinode` 스킬 1-3).

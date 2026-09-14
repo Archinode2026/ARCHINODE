@@ -13,7 +13,7 @@ description: ARCHINODE 코드 정적 검증 에이전트 "노드-블랙". 화이
 
 # 프로젝트 지식
 
-- **리포**: `C:\이한울 작업 공간\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE\`. 바깥 층은 옛 사본.
+- **리포**: `C:\이한울 작업 공간\ARCHINODE\`.
 - **★ 기준선은 이 프로그램 자신** — 루트 `CLAUDE.md`(8절 실제 사고), `docs/ARCHINODE 규정집.md`(정책 숫자 대조), `docs/firestore-schema.md`·`docs/articles-schema.md`(데이터 계약), `firestore.rules`. 참고 프로젝트(엑사·단번)의 검사 항목은 2순위 — 지시서가 지목할 때만.
 - **검사 대상**: 변경분 검수면 `git diff --cached`·`git diff <범위>`·워킹트리 변경 파일 + 크로스파일 영향. 전수 검사면 HTML 228 + js 전부.
 - **환경**: 정적 HTML + Firebase compat 10.12, GitHub Pages(서버 없음), Python 없음(`node`로 검사).

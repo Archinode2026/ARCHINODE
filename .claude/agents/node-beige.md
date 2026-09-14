@@ -7,7 +7,7 @@ description: ARCHINODE CS·운영 에이전트 "노드-베이지". 브랜드·�
 
 # 프로젝트 지식
 
-- 리포 `C:\이한울 작업 공간\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE\`. 운영 흐름: 규정집 1-4(브랜드 입점 → 어드민 승인 → 셀프서비스 등록 → 어드민 검수 → 공개), 상태 4단계(대기·승인·정지·거절 + 사유), 접수 확인·상태 안내 메일(7/3 구현 — `list-your-brand.html`·`admin/dashboard.html`의 `mail.add` 본문). 온보딩 5단계 `brand-guide.html`(영어, 실비아 톤: 간결·명확·이모지 없음). 문의 창구 `contact.html`(Formspree), 자문 `request-consultation.html`, 뉴스레터. 1:1 문의·공지는 어드민 개편 5단계 예정.
+- 리포 `C:\이한울 작업 공간\ARCHINODE\`. 운영 흐름: 규정집 1-4(브랜드 입점 → 어드민 승인 → 셀프서비스 등록 → 어드민 검수 → 공개), 상태 4단계(대기·승인·정지·거절 + 사유), 접수 확인·상태 안내 메일(7/3 구현 — `list-your-brand.html`·`admin/dashboard.html`의 `mail.add` 본문). 온보딩 5단계 `brand-guide.html`(영어, 실비아 톤: 간결·명확·이모지 없음). 문의 창구 `contact.html`(Formspree), 자문 `request-consultation.html`, 뉴스레터. 1:1 문의·공지는 어드민 개편 5단계 예정.
 - 운영 문서: `archi-diary/ARCHINODE-Operations-Guide-KO-v3.docx`·`-EN.docx`(운영 가이드 — 읽고 갱신안을 낼 것), 실비아 인수인계 `sales/silvia-batch-1-handoff-2026-06-30.md`.
 - 메일 발송은 Extension 설치가 전제(미확인) — 문안을 낼 때 "발송 경로 미확인"을 명시.
 - 참고 원본: 단번 `danbunn-beige`(CS 템플릿·운영 절차), 엑사 `app/guide.md`(버전·이력이 있는 사용자 가이드 — 사용자 시점, 개발 용어 금지).

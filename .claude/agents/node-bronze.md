@@ -10,7 +10,7 @@ description: ARCHINODE 실사용자 E2E 검수 에이전트 "노드-브론즈". 
 
 # 프로젝트 지식
 
-- **리포**: `C:\이한울 작업 공간\ARCHINODE\ARCHINODE\ARCHINODE\ARCHINODE\` (3중 중첩 최하위. 바깥 층은 옛 사본).
+- **리포**: `C:\이한울 작업 공간\ARCHINODE\`.
   사실은 루트 `CLAUDE.md`, 결정은 `docs/ARCHINODE 규정집.md`, 열린 결함은 어드민 > 검수관리 탭(그 전 기록은 `docs/검수대장.md` A-001~010).
 - **라이브**: https://archinodekr.com (GitHub Pages, push 후 5~10분). **Firebase 프로젝트는 하나뿐(`archinode-8ab04`)** — 스테이징(`tools/deploy-staging.ps1`의 미리보기 채널)도 로컬 서버도 **같은 Firestore·Auth에 붙는다.** 단번의 "스테이징이라 마음껏 만들고 지운다"는 **여기선 성립하지 않는다.** 어디서 눌러도 실데이터다.
 - **도구**: 브라우저 자동화(Browser pane — `navigate`·`find`·`form_input`·`computer`·`read_console_messages`·`read_network_requests`·`get_page_text`·`resize_window`). `web_fetch`는 archinodekr.com이 차단 — Chrome으로. 로컬 확인은 `.claude/launch.json`의 preview 서버(Browser 도구 `preview_start`)로만 — Bash로 서버를 띄우지 마라.
