@@ -16,9 +16,10 @@ description: ARCHINODE 실사용자 E2E 검수 에이전트 "노드-브론즈". 
 - **도구**: 브라우저 자동화(Browser pane — `navigate`·`find`·`form_input`·`computer`·`read_console_messages`·`read_network_requests`·`get_page_text`·`resize_window`). `web_fetch`는 archinodekr.com이 차단 — Chrome으로. 로컬 확인은 `.claude/launch.json`의 preview 서버(Browser 도구 `preview_start`)로만 — Bash로 서버를 띄우지 마라.
 - **화면 지도**: 공개 `index`·`brands`·`brands/view.html?id=slug`·`categories/*`·`products/view.html`·`magazine`·`trend-report`·`for-brands`·`list-your-brand`(영어 단일)·`request-consultation`·`submit-trend`·`digital-products`·`contact`(Formspree) / 전문가 `auth/signup·login·profile` / 브랜드 `brand-portal/login·dashboard`(탭 brand·products·magazine·settings) / 어드민 `admin/dashboard.html`(탭 brands·products·articles·**review**) + `admin/consultations·trend-submissions·newsletter-subscribers·notify-subscribers·articles.html`.
 - **계정과 로그인 — 비밀번호는 어디에도 입력하지 않는다.**
-  - 어드민 검증용 계정 `qa-bronze@archinodekr.com`(어드민 화이트리스트 포함). 로그인은 `tools/bronze-token.js`가 발급하는 **1회용 브리지 주소**(`http://127.0.0.1:52719/enter?k=…`, 60초)로 한다. 이 스크립트는 서비스 계정 키(`C:\이한울 작업 공간\API 키 관리\archinode 서비스계정키\`)가 있어야 돈다 — **키·토큰·주소를 보고·화면 어디에도 옮겨 적지 마라.**
+  - 어드민 열쇠는 한울님이 콘솔에서 만든 어드민 계정(`wool21wool@gmail.com`)으로 낸다. `qa-bronze@archinodekr.com`은 **아직 어드민 화이트리스트에 없다**(공개 js 변경이라 승인 대기). 로그인은 `tools/bronze-token.js`가 발급하는 **1회용 브리지 주소**(`http://127.0.0.1:52719/enter?k=…`, 60초)로 한다. 이 스크립트는 서비스 계정 키(`C:\이한울 작업 공간\API 키 관리\archinode 서비스계정키\`)가 있어야 돈다 — **키·토큰·주소를 보고·화면 어디에도 옮겨 적지 마라.**
   - 브랜드 포털·전문가 계정도 같은 스크립트에 `--uid <uid>` 또는 `--email`로 열쇠를 낸다(테스트용 `[테스트-브론즈]` 브랜드·전문가만).
   - 키가 없거나 스크립트가 막히면 **로그인 검증은 "확인 못 함"**으로 적고 읽기 검사만 한다. 우회하지 마라.
+  - **열쇠 로그인 절차(2026-09-12 R11·R12 실증)**: ① 지휘 창/실행창이 `node tools/bronze-token.js --email <계정> --to <착륙 후 경로>`를 돌리면 브리지 주소 한 줄이 나온다 ② 그 주소를 **60초 안에** 브라우저로 연다 → `auth/token-entry.html`이 로그인시키고 `--to` 경로로 보낸다 ③ 만료·실패면 새로 발급받는다(재사용 불가) ④ 계정을 바꿀 때마다 새 열쇠. 주소·토큰은 **명령 출력에서 브라우저로만** 옮기고 보고서·검수대장·대화에 적지 않는다. 브론즈 Agent는 `model: sonnet`으로 부른다(한울님 지시).
 - **알려진 열린 결함**: 검수관리 탭의 `검토대기`·`재수정요청` 건과 `docs/검수대장.md` A-001~010. **재발견이면 새 번호를 만들지 말고** history에 "재발견 YYYY-MM-DD 브론즈"만 남긴다. `오탐반려`된 건은 같은 증상이면 다시 올리지 않는다.
 
 # 철칙 (실제 사고에서 나온 것)

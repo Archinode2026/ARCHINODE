@@ -92,6 +92,7 @@ brands(입점, status pending/approved/suspended/rejected + 사유) · products 
 - **매거진 자동 발행 템플릿이 `<style>` 잘린 채 복제**(A-013, 2026-09-12 브론즈 실측 41편 백지 → 화이트 `tools/fix-magazine-blank.js`로 복구) — 새 기사는 `</head><body>` 존재를 블랙이 검사. 파이프라인 템플릿(리포 밖)은 한울님.
 - **바깥 폴더 메모 docx에 평문 자격정보** — 옮겨 적지 말 것. 작업일지 A-⑦.
 - **`.ps1`은 UTF-8 BOM 필수** — PowerShell 5.1이 BOM 없는 한글 파일을 CP949로 읽어 따옴표·괄호를 삼킨다(2026-09-12 `deploy.ps1` 실측). Write 도구는 BOM 없이 쓰므로 저장 후 BOM으로 재저장.
+- **`where` + 다른 필드 `orderBy`는 복합 색인이 없으면 조용히 실패한다**(A-040, 2026-09-12) — 브랜드 포털 제품·글 목록이 4월부터 그 상태였을 가능성. 새 조회를 넣으면 `firestore.indexes.json`에 정의하고 `npx firebase-tools deploy --only firestore:indexes`(지휘 창). 브론즈는 콘솔의 `failed-precondition` 오류를 반드시 기록한다.
 - **서비스워커는 정식 오픈 전까지 캐시 금지(엑사 규칙)** — `admin/sw.js`는 설치 조건용으로만 두고 `fetch`를 가로채지 않는다(`respondWith` 없음). 캐시를 넣으면 배포해도 옛 화면이 남아 "새로고침해도 안 바뀐다"가 된다. 공개 페이지에는 manifest·sw를 붙이지 않는다(scope `/admin/`).
 
 ## 9. 실비아 (EU Director)
