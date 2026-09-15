@@ -221,10 +221,14 @@ function adm_activeId() {
 //    초기 언어(저장값 > ko)는 admin-core.js admInitLang(). 확인창 없음. lang.js 가 없으면 토스트로 알린다(조용한 실패 방지).
 function adm_langHtml() {
     var cur = admLang();
+    // ★ A-051(2026-09-15): 이 두 버튼은 "KO"/"EN" 고정 두 글자이지 번역 대상이 아니다.
+    //   tAttr()가 붙이는 data-en/data-ko 속성은 lang.js applyLanguage()(공개 페이지 공통, 161줄)가
+    //   "번역해야 할 글자"로 인식해 요소 텍스트를 통째로 그 값으로 덮어써 버린다 — 그래서 "KO"/"EN"이
+    //   전역 스캔 한 번에 "Korean"/"English"로 깨졌다. title 은 고정 문자열이라 lang.js 가 건드리지 않는다.
     return '<div class="adm-lang" role="group" aria-label="Language">'
-        + '<button type="button" class="adm-lang-btn' + (cur === 'ko' ? ' active' : '') + '" data-lang="ko" ' + tAttr('Korean', '한국어') + '>KO</button>'
+        + '<button type="button" class="adm-lang-btn' + (cur === 'ko' ? ' active' : '') + '" data-lang="ko" title="한국어">KO</button>'
         + '<span class="adm-lang-sep">|</span>'
-        + '<button type="button" class="adm-lang-btn' + (cur === 'en' ? ' active' : '') + '" data-lang="en" ' + tAttr('English', '영어') + '>EN</button>'
+        + '<button type="button" class="adm-lang-btn' + (cur === 'en' ? ' active' : '') + '" data-lang="en" title="English">EN</button>'
         + '</div>';
 }
 function adm_initLangToggle() {
