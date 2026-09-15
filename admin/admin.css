@@ -9,7 +9,7 @@
 .adm-main { flex: 1; min-width: 0; }
 
 /* SIDEBAR */
-#adminSidebar { width: 220px; flex: 0 0 220px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 10px 0; position: sticky; top: 72px; }
+#adminSidebar { width: 220px; flex: 0 0 220px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 10px 0; position: sticky; top: 72px; max-height: calc(100vh - 100px); overflow-y: auto; }
 #adminSidebar .adm-toggle { display: none; }
 .adm-nav { display: block; }
 .adm-group { padding: 4px 0; }
