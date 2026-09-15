@@ -356,6 +356,7 @@ async function loadBrand() {
         // slug로 브랜드 검색
         const snapshot = await db.collection('brands')
             .where('slug', '==', brandSlug)
+            .where('status', '==', 'approved')
             .limit(1)
             .get();
 
