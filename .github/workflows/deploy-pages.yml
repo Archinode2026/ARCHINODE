@@ -1,0 +1,68 @@
+name: Deploy public site to GitHub Pages
+
+# A-126 대응 (2026-09-16) — GitHub Pages가 리포 전체를 그대로 웹에 올리던 것을,
+# "공개해야 할 폴더만" 골라 배포하도록 바꾼다. docs/tools/scripts/.claude/CLAUDE.md는
+# git 추적은 그대로 유지(진행 중인 브론즈 마라톤이 계속 커밋해야 해서 건드리지 않음)하되,
+# 실제로 사이트로 나가는 산출물(_site)에서만 뺀다.
+#
+# ⚠️ 이 워크플로만 추가한다고 바로 적용되지 않는다 — 저장소 Settings > Pages >
+# Build and deployment > Source 를 "Deploy from a branch"에서 "GitHub Actions"로
+# 한울님이 직접 바꿔야 실제로 이 파이프라인이 사이트를 발행한다.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build public-only site (내부 문서 폴더 제외)
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='_site' \
+            --exclude='docs' \
+            --exclude='tools' \
+            --exclude='scripts' \
+            --exclude='.claude' \
+            --exclude='CLAUDE.md' \
+            --exclude='archi-diary' \
+            --exclude='옛사본-2026-04' \
+            --exclude='sales' \
+            --exclude='silvia' \
+            --exclude='node_modules' \
+            ./ ./_site/
+          echo "── _site 최상위 목록 (검증용) ──"
+          ls -la _site/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
