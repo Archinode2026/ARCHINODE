@@ -94,6 +94,8 @@ brands(입점, status pending/approved/suspended/rejected + 사유) · products 
 - **`.ps1`은 UTF-8 BOM 필수** — PowerShell 5.1이 BOM 없는 한글 파일을 CP949로 읽어 따옴표·괄호를 삼킨다(2026-09-12 `deploy.ps1` 실측). Write 도구는 BOM 없이 쓰므로 저장 후 BOM으로 재저장.
 - **`where` + 다른 필드 `orderBy`는 복합 색인이 없으면 조용히 실패한다**(A-040, 2026-09-12) — 브랜드 포털 제품·글 목록이 4월부터 그 상태였을 가능성. 새 조회를 넣으면 `firestore.indexes.json`에 정의하고 `npx firebase-tools deploy --only firestore:indexes`(지휘 창). 브론즈는 콘솔의 `failed-precondition` 오류를 반드시 기록한다.
 - **서비스워커는 정식 오픈 전까지 캐시 금지(엑사 규칙)** — `admin/sw.js`는 설치 조건용으로만 두고 `fetch`를 가로채지 않는다(`respondWith` 없음). 캐시를 넣으면 배포해도 옛 화면이 남아 "새로고침해도 안 바뀐다"가 된다. 공개 페이지에는 manifest·sw를 붙이지 않는다(scope `/admin/`).
+- **GitHub Pages는 리포 전체를 그대로 서빙한다**(A-126, 2026-09-16) — 빌드 폴더 분리가 없어 `.gitignore` 안 된 파일은 폴더 구분 없이 다 공개된다. `docs/`·`tools/`·`scripts/`·`.claude/`·루트 `CLAUDE.md`가 전부 `archinodekr.com/<경로>`로 그대로 열렸었다(검수대장 자신, DB 스키마, 내부 지침 포함). 응급조치로 `.github/workflows/deploy-pages.yml`(GitHub Actions로 배포 산출물만 걸러냄, git 추적은 안 건드림) 추가함 — 저장소 Settings > Pages > Source를 "GitHub Actions"로 바꿔야 적용된다. **새 내부 전용 폴더를 리포 안에 만들 때마다 이 문제를 다시 떠올릴 것.**
+- **`firestore.rules` CLI 배포는 자동 모드 분류기가 막는다**("Production Deploy" 사유, 2026-09-17 실측) — `firestore.indexes.json`(색인)은 CLI로 됐는데(8절 위 항목) **규칙은 안 된다.** 규칙을 콘솔에 게시해야 하는 이유가 하나 더 늘었다 — CLI 시도로 시간 쓰지 말고 바로 한울님께 콘솔 게시를 요청한다.
 
 ## 9. 실비아 (EU Director)
 
