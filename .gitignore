@@ -11,6 +11,9 @@ tools/node_modules/
 .firebase/
 firebase-debug.log
 
+# ── 로컬 미리보기 설정 (2026-09-17, 기기별 임시경로라 공유 무의미) ──
+.claude/launch.json
+
 # ── 옛 PC 사본 (2026-09-14, 한울님 지시로 리포 안 보관 — 평문 자격정보 docx 포함, 절대 커밋·배포 금지) ──
 옛사본-2026-04/
 
