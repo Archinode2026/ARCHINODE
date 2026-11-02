@@ -236,6 +236,87 @@
   </div>
 </div>
 
+<!-- BIM DATA REQUEST MODAL (A-096 BIM safeguard, 2026-11-02) -->
+<div class="rfq-overlay" id="bimOverlay" onclick="if(event.target===this) closeBimModal()">
+  <div class="rfq-box">
+    <button class="rfq-close" onclick="closeBimModal()">&times;</button>
+    <div id="bimFormWrap">
+      <h3 data-en="Request BIM / CAD / Catalog Data" data-ko="BIM / CAD / 카탈로그 데이터 요청">Request BIM / CAD / Catalog Data</h3>
+      <p class="rfq-sub" data-en="For spec-in and design review only. We'll email a secure 7-day download link once approved (usually within 24 hours)." data-ko="프로젝트 도면 반영·설계 검토 목적으로만 제공됩니다. 승인되면 7일간 유효한 다운로드 링크를 이메일로 보내드립니다(보통 영업일 기준 24시간 이내).">For spec-in and design review only. We'll email a secure 7-day download link once approved (usually within 24 hours).</p>
+      <form id="bimForm" onsubmit="return submitBimRequest(event)">
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+          <label for="bim_hp">Leave this field empty</label>
+          <input type="text" id="bim_hp" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="rfq-field">
+          <label for="bimName" data-en="Name" data-ko="이름">Name</label>
+          <input type="text" id="bimName" required autocomplete="name">
+        </div>
+        <div class="rfq-field">
+          <label for="bimCompany" data-en="Company (firm / studio)" data-ko="소속(설계사무소/디자인스튜디오)">Company (firm / studio)</label>
+          <input type="text" id="bimCompany" required autocomplete="organization">
+        </div>
+        <div class="rfq-field">
+          <label for="bimTitle" data-en="Title" data-ko="직함">Title</label>
+          <input type="text" id="bimTitle" autocomplete="organization-title">
+        </div>
+        <div class="rfq-field">
+          <label for="bimEmail" data-en="Work Email" data-ko="업무용 이메일">Work Email</label>
+          <input type="email" id="bimEmail" required autocomplete="email">
+        </div>
+        <div class="rfq-field">
+          <label for="bimPhone" data-en="Phone" data-ko="연락처">Phone</label>
+          <input type="tel" id="bimPhone" autocomplete="tel">
+        </div>
+        <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
+        <div class="rfq-field">
+          <label for="bimProjectName" data-en="Project Name (working title OK)" data-ko="프로젝트명(가칭 가능)">Project Name (working title OK)</label>
+          <input type="text" id="bimProjectName" required>
+        </div>
+        <div class="rfq-field">
+          <label for="bimProjectType" data-en="Project Type" data-ko="용도">Project Type</label>
+          <input type="text" id="bimProjectType" placeholder="e.g. Neighborhood facility, single-family house, office" data-en-placeholder="e.g. Neighborhood facility, single-family house, office" data-ko-placeholder="예: 근린생활, 단독주택, 오피스">
+        </div>
+        <div class="rfq-field">
+          <label for="bimProjectTimeline" data-en="Design / Construction Schedule" data-ko="착공 및 설계 일정">Design / Construction Schedule</label>
+          <input type="text" id="bimProjectTimeline">
+        </div>
+        <div class="rfq-field">
+          <label for="bimProjectScale" data-en="Scope / Approx. Area" data-ko="적용 면적 또는 대략적 규모">Scope / Approx. Area</label>
+          <input type="text" id="bimProjectScale">
+        </div>
+        <div class="rfq-field" style="margin-top:4px;">
+          <label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;font-size:0.82rem;color:#444;">
+            <input type="checkbox" id="bimAgreeData" required style="width:20px;height:20px;margin-top:2px;flex-shrink:0;">
+            <span><span data-en="I agree to the " data-ko="">I agree to the </span><a href="javascript:void(0)" onclick="document.getElementById('bimDataTermsDetail').open=true;return false;" data-en="BIM &amp; Technical Data Use Policy" data-ko="BIM 및 기술 데이터 이용 규정에 동의합니다">BIM &amp; Technical Data Use Policy</a><span data-en="." data-ko=""></span></span>
+          </label>
+          <details id="bimDataTermsDetail" style="margin-top:6px;font-size:0.76rem;color:#777;line-height:1.6;">
+            <summary data-en="Read the policy" data-ko="규정 전문 보기" style="cursor:pointer;color:#999;"></summary>
+            <p data-en="1. This BIM/CAD/3D data and technical specification sheet may only be downloaded and used for project spec-in, design review, and proposal purposes.&#10;2. You may not commercially reproduce, modify, reverse-engineer to manufacture similar products, or redistribute this data to third parties.&#10;3. Copyright and technical rights remain with the overseas manufacturer; unauthorized use or leakage may result in civil and criminal liability under applicable law." data-ko="1. 본 BIM/CAD/3D 데이터 및 기술 사양서는 오직 프로젝트 도면 반영(Spec-in), 설계 검토 및 제안서 작성 목적으로만 다운로드 및 사용이 허가됩니다.&#10;2. 사용자는 본 데이터를 바탕으로 제품의 상업적 복제, 무단 가공, 역설계(Reverse Engineering)를 통한 유사품 제조, 제3자 무단 재배포를 행할 수 없습니다.&#10;3. 데이터의 저작권 및 기술 권리는 해당 해외 제조사에 귀속되며, 허가되지 않은 도용 및 유출이 발생할 경우 관계 법령에 따른 민·형사상 책임을 질 수 있습니다." style="white-space:pre-line;"></p>
+          </details>
+        </div>
+        <div class="rfq-field">
+          <label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;font-size:0.82rem;color:#444;">
+            <input type="checkbox" id="bimAgreeShare" required style="width:20px;height:20px;margin-top:2px;flex-shrink:0;">
+            <span><span data-en="I agree to share this information with the manufacturer (third-party disclosure)." data-ko="제조사(제3자)에게 본 정보가 제공되는 것에 동의합니다.">I agree to share this information with the manufacturer (third-party disclosure).</span></span>
+          </label>
+          <details style="margin-top:6px;font-size:0.76rem;color:#777;line-height:1.6;">
+            <summary data-en="Read the disclosure" data-ko="제공 내역 보기" style="cursor:pointer;color:#999;"></summary>
+            <p data-en="Recipient: the product's manufacturer (Vendor). Purpose: BIM approval, technical/quote discussion, sample and technical support. Items: name, company, title, work email, phone, project overview. Retention: until the project discussion concludes (or as required by law)." data-ko="제공받는 자: 해당 제품의 해외 공식 제조사(Vendor). 제공 목적: BIM 데이터 승인, 기술 사양 및 견적 협의, 공식 샘플 및 기술 지원 제공. 제공 항목: 성명, 회사명, 직함, 업무용 이메일, 연락처, 프로젝트 개요. 보유 및 이용 기간: 프로젝트 상담 및 협의 완료 시까지(또는 관계 법령에 따른 보존 기간)." style="white-space:pre-line;"></p>
+          </details>
+        </div>
+        <button type="submit" class="rfq-submit" id="bimSubmitBtn" data-en="Submit Request" data-ko="신청서 제출">Submit Request</button>
+        <div class="rfq-error-msg" id="bimErrorMsg"></div>
+      </form>
+    </div>
+    <div id="bimSuccessWrap" style="display:none;" class="rfq-success">
+      <i class="fas fa-check-circle"></i>
+      <h3 data-en="Request Received" data-ko="신청이 접수되었습니다">Request Received</h3>
+      <p data-en="We'll review the copyright and project fit, then email a secure download link to your work email within 1 business day." data-ko="본 자재의 저작권 및 프로젝트 적합성 검토를 거쳐 영업일 기준 24시간 이내에 기재하신 업무용 이메일로 보안 다운로드 링크를 발송해 드립니다.">We'll review the copyright and project fit, then email a secure download link to your work email within 1 business day.</p>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
@@ -506,9 +587,9 @@ function renderProduct(p, related) {
                     <button type="button" class="btn btn-primary" onclick="openRfqModal('quote')"><i class="fas fa-file-invoice"></i> <span data-en="Request a Quote" data-ko="견적 요청">Request a Quote</span></button>
                     <button type="button" class="btn btn-secondary" onclick="openRfqModal('sample-request')"><i class="fas fa-box-open"></i> <span data-en="Request a Sample" data-ko="샘플 요청">Request a Sample</span></button>
                     <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> <span data-en="Request Info" data-ko="문의하기">Request Info</span></a>
-                    ${pCatalogPdf ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${pCatalogPdf}')"><i class="fas fa-file-pdf"></i> <span data-en="PDF Catalog" data-ko="PDF 카탈로그">PDF Catalog</span></button>` : ''}
-                    ${pBimFile ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${pBimFile}')"><i class="fas fa-cube"></i> <span data-en="BIM File" data-ko="BIM 파일">BIM File</span></button>` : ''}
-                    ${pModel3d ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${pModel3d}')"><i class="fas fa-vr-cardboard"></i> <span data-en="3D Model" data-ko="3D 모델">3D Model</span></button>` : ''}
+                    ${pCatalogPdf ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('catalog')"><i class="fas fa-file-pdf"></i> <span data-en="PDF Catalog" data-ko="PDF 카탈로그">PDF Catalog</span></button>` : ''}
+                    ${pBimFile ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('bim')"><i class="fas fa-cube"></i> <span data-en="BIM File" data-ko="BIM 파일">BIM File</span></button>` : ''}
+                    ${pModel3d ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('model3d')"><i class="fas fa-vr-cardboard"></i> <span data-en="3D Model" data-ko="3D 모델">3D Model</span></button>` : ''}
                 </div>
             </div>
         </div>
@@ -582,19 +663,122 @@ function openRfqModal(type) {
     document.getElementById('rfqOverlay').classList.add('active');
 }
 
-// ── 전문가 전용 자료실 게이팅 (CAD/BIM/카탈로그) ──
-function openSpecFile(url) {
-    if (auth.currentUser) {
-        window.open(url, '_blank', 'noopener,noreferrer');
+// ── 전문가 전용 자료실: BIM/CAD/카탈로그 요청 승인제 (2026-11-02, A-096 법적 장치) ──
+let bimRequestedFileType = '';
+
+function openBimModal(fileType) {
+    if (!auth.currentUser) {
+        const lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
+        const msg = lang === 'en'
+            ? 'Sign in or create a free account to request CAD/BIM/catalog files. Go to sign up now?'
+            : '로그인 또는 무료 회원가입 후 CAD/BIM/카탈로그 파일을 신청할 수 있어요. 지금 가입하러 갈까요?';
+        if (confirm(msg)) window.location.href = '../auth/signup.html';
         return;
     }
+    bimRequestedFileType = fileType;
+    document.getElementById('bimFormWrap').style.display = 'block';
+    document.getElementById('bimSuccessWrap').style.display = 'none';
+    document.getElementById('bimErrorMsg').style.display = 'none';
+    document.getElementById('bimForm').reset();
+    // 가입된 이메일을 기본값으로 채워 입력 수고를 덜어줌
+    const emailInput = document.getElementById('bimEmail');
+    if (emailInput && auth.currentUser.email) emailInput.value = auth.currentUser.email;
+    document.getElementById('bimOverlay').classList.add('active');
+}
+
+function closeBimModal() {
+    document.getElementById('bimOverlay').classList.remove('active');
+}
+
+async function submitBimRequest(e) {
+    e.preventDefault();
+    // 허니팟: 봇이 채우는 숨김 필드
+    if (document.getElementById('bim_hp').value.trim() !== '') return false;
+
+    const btn = document.getElementById('bimSubmitBtn');
+    const errorMsg = document.getElementById('bimErrorMsg');
+    errorMsg.style.display = 'none';
+
+    const agreeData = document.getElementById('bimAgreeData').checked;
+    const agreeShare = document.getElementById('bimAgreeShare').checked;
     const lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
-    const msg = lang === 'en'
-        ? 'Sign in or create a free account to download CAD/BIM/catalog files. Go to sign up now?'
-        : '로그인 또는 무료 회원가입 후 CAD/BIM/카탈로그 파일을 다운로드할 수 있어요. 지금 가입하러 갈까요?';
-    if (confirm(msg)) {
-        window.location.href = '../auth/signup.html';
+    if (!agreeData || !agreeShare) {
+        errorMsg.textContent = lang === 'en'
+            ? 'Please agree to both policies above to continue.'
+            : '위 두 가지 항목에 모두 동의해 주세요.';
+        errorMsg.style.display = 'block';
+        return false;
     }
+
+    btn.disabled = true;
+
+    const name = document.getElementById('bimName').value.trim();
+    const company = document.getElementById('bimCompany').value.trim();
+    const title = document.getElementById('bimTitle').value.trim();
+    const email = document.getElementById('bimEmail').value.trim();
+    const phone = document.getElementById('bimPhone').value.trim();
+    const projectName = document.getElementById('bimProjectName').value.trim();
+    const projectType = document.getElementById('bimProjectType').value.trim();
+    const projectTimeline = document.getElementById('bimProjectTimeline').value.trim();
+    const projectScale = document.getElementById('bimProjectScale').value.trim();
+
+    try {
+        await db.collection('bim-requests').add({
+            requesterUid: auth.currentUser.uid,
+            productId: currentProductDocId || '',
+            brandId: currentProductBrandId || '',
+            productName: currentProductName || '',
+            brandName: currentProductBrandName || '',
+            fileType: bimRequestedFileType || '',
+            name: escapeHtml(name),
+            company: escapeHtml(company),
+            title: escapeHtml(title),
+            email: email,
+            phone: escapeHtml(phone),
+            projectName: escapeHtml(projectName),
+            projectType: escapeHtml(projectType),
+            projectTimeline: escapeHtml(projectTimeline),
+            projectScale: escapeHtml(projectScale),
+            agreedDataTerms: true,
+            agreedThirdPartyShare: true,
+            status: 'pending',
+            fileUrl: '',
+            expiresAt: null,
+            hp: '',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        try {
+            await db.collection('mail').add({
+                to: 'office@archinode.org',
+                message: {
+                    subject: '[ARCHINODE] BIM 데이터 요청 — ' + (currentProductBrandName || '') + ' / ' + (currentProductName || ''),
+                    text: [
+                        'BIM/CAD/카탈로그 데이터 신규 요청',
+                        '',
+                        'Product: ' + (currentProductName || '-') + ' (' + (currentProductBrandName || '-') + ')',
+                        'File type: ' + (bimRequestedFileType || '-'),
+                        'Requester: ' + name + ' / ' + title + ' @ ' + company,
+                        'Email: ' + email,
+                        'Phone: ' + (phone || '-'),
+                        'Project: ' + projectName + ' (' + projectType + ')',
+                        'Timeline: ' + (projectTimeline || '-'),
+                        'Scale: ' + (projectScale || '-'),
+                        '',
+                        'Admin: https://archinodekr.com/admin/bim-requests.html'
+                    ].join('\n')
+                }
+            });
+        } catch (mailErr) { console.warn('Admin notification skipped:', mailErr); }
+
+        document.getElementById('bimFormWrap').style.display = 'none';
+        document.getElementById('bimSuccessWrap').style.display = 'block';
+    } catch (err) {
+        console.error('BIM request failed:', err);
+        errorMsg.textContent = (lang === 'en' ? 'Submission failed: ' : '제출에 실패했습니다: ') + err.message;
+        errorMsg.style.display = 'block';
+    }
+    btn.disabled = false;
+    return false;
 }
 
 function closeRfqModal() {
