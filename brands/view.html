@@ -98,6 +98,8 @@
   font-size: 4rem; font-weight: 900; color: var(--gray-300);
   letter-spacing: -0.02em;
 }
+.bp-hero-image.no-image { aspect-ratio: auto; min-height: 240px; max-height: 320px; }
+@media (max-width: 768px) { .bp-hero-image.no-image { min-height: 160px; max-height: 200px; } }
 .bp-hero-content h1 {
   font-size: 3.5rem; font-weight: 900; letter-spacing: -0.02em;
   line-height: 1.1; margin-bottom: 12px; color: var(--black);
@@ -492,6 +494,7 @@ function renderBrand(brand, products) {
         : logoUrl
             ? `<img loading="lazy" src="${logoUrl}" alt="${brand.brandName}" style="object-fit:contain;padding:40px;">`
             : `<span class="placeholder-logo">${brand.brandName.charAt(0)}</span>`;
+    const heroImageClass = (heroImage || logoUrl) ? 'bp-hero-image fade-in' : 'bp-hero-image fade-in no-image';
 
     // SNS links
     const snsLinks = [
@@ -562,7 +565,7 @@ function renderBrand(brand, products) {
     <!-- HERO SECTION -->
     <section class="bp-hero">
         <div class="container" style="display: contents;">
-            <div class="bp-hero-image fade-in">
+            <div class="${heroImageClass}">
                 ${heroHtml}
             </div>
             <div class="bp-hero-content fade-in">
