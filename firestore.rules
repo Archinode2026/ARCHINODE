@@ -47,6 +47,13 @@ service cloud.firestore {
       return !('hp' in request.resource.data) || request.resource.data.hp == '';
     }
 
+    // 브랜드 활성 상태 확인 (정지/거절/대기 브랜드가 배정된 리드 등에 계속 접근하는 것 차단)
+    // 2026-11-02 QA: 정지(suspended)된 브랜드가 이미 배정된 리드를 그대로 읽고 메모까지 저장할 수 있었음
+    function isApprovedBrand(uid) {
+      return isSignedIn() && request.auth.uid == uid &&
+        get(/databases/$(database)/documents/brands/$(uid)).data.status == 'approved';
+    }
+
     // ────────────────────────────────────────────────────────────────────
     // brands 컬렉션
     // 문서 ID = Firebase Auth UID
@@ -183,12 +190,15 @@ service cloud.firestore {
                     && request.resource.data.createdAt == request.time;
       // 읽기: 어드민, 또는 배정된 브랜드 본인 — 브랜드는 배정된 건만(2026-09-12 블랙 지적: 위조 brandId·spam 되돌림 노출 차단)
       //       포털 조회는 where('brandId','==',uid).where('status','in',[...]) — 두 조건이 이 규칙과 정확히 같아야 list 판정이 통과한다
+      //       2026-11-02: isApprovedBrand() 추가 — 정지(suspended)·거절(rejected)·대기(pending) 브랜드는
+      //       본인 UID가 일치해도 이미 배정된 고객 리드(이름·이메일·전화번호)를 더 이상 읽을 수 없다
       allow read: if isAdmin()
-                  || (isSignedIn() && resource.data.brandId == request.auth.uid
+                  || (isApprovedBrand(resource.data.brandId)
                       && resource.data.status in ['assigned','contacted','closed']);
       // 수정: 어드민 전부 / 브랜드는 배정 건에서 status·brandNote·history·updatedAt 만, status 는 assigned·contacted·closed 만
+      //       2026-11-02: isApprovedBrand() 추가 — 정지된 브랜드가 배정된 리드에 메모를 남기거나 상태를 바꾸는 것(응대 지속)을 차단
       allow update: if isAdmin()
-                    || (isSignedIn() && resource.data.brandId == request.auth.uid
+                    || (isApprovedBrand(resource.data.brandId)
                         && resource.data.status in ['assigned','contacted','closed']
                         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','brandNote','history','updatedAt'])
                         && request.resource.data.status in ['assigned','contacted','closed']);
