@@ -2113,6 +2113,8 @@ input, select, textarea { font-family: inherit; }
   padding: 6px 14px; border-radius: 4px; font-size: 0.78rem;
   cursor: pointer; font-family: inherit; white-space: nowrap;
   transition: background 0.2s;
+  /* A-007: 터치 타깃 44px 최소 확보(모바일) */
+  min-height: 44px; min-width: 44px;
 }
 .form-success .copy-btn:hover { background: #b8994e; }
 .form-success .copy-btn.copied { background: #10b981; }
