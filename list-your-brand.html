@@ -445,6 +445,32 @@
                 </select>
             </div>
 
+            <div class="vendor-terms-box" style="margin-top:28px;padding:18px 20px;background:#faf9f7;border:1px solid #e5e0d8;border-radius:6px;">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.85rem;line-height:1.6;color:#333;">
+                    <input type="checkbox" id="agreeVendorTerms" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;cursor:pointer;">
+                    <span data-en="I have read and agree to Article 9 (Brand Partner's Technical Data, Warranty and Indemnification) of the Terms of Service — covering CAD/BIM/catalog data I submit, the license I grant ARCHINODE to share it with verified Korean professionals, and my responsibility for its accuracy and third-party rights." data-ko="서비스 약관 제9조(브랜드 파트너의 기술자료 제공 및 보증·면책)를 읽고 동의합니다 — 제가 제출하는 CAD/BIM/카탈로그 자료, ARCHINODE가 이를 인증된 한국 전문가에게 제공할 수 있는 라이선스, 그리고 자료의 정확성 및 제3자 권리에 대한 제 책임을 포함합니다.">I have read and agree to Article 9 (Brand Partner's Technical Data, Warranty and Indemnification) of the Terms of Service — covering CAD/BIM/catalog data I submit, the license I grant ARCHINODE to share it with verified Korean professionals, and my responsibility for its accuracy and third-party rights.</span>
+                </label>
+                <details style="margin-top:10px;margin-left:26px;">
+                    <summary style="font-size:0.78rem;color:#8a7030;cursor:pointer;" data-en="Read Article 9 in full" data-ko="제9조 전체 보기">Read Article 9 in full</summary>
+                    <div style="margin-top:10px;font-size:0.76rem;line-height:1.7;color:#666;max-height:220px;overflow-y:auto;padding-right:6px;">
+                        <p data-en-html='1. &quot;Technical Data&quot; means CAD files, BIM files, 3D models, product catalogs, specification sheets, certification documents, and any other technical materials a Brand Partner uploads to or submits through the Platform.<br>
+2. A Brand Partner represents and warrants that it owns, or holds all necessary rights and licenses to, every item of Technical Data it submits, and that such Technical Data does not infringe the intellectual property, confidentiality, or other rights of any third party.<br>
+3. By submitting Technical Data, a Brand Partner grants the Company a non-exclusive, royalty-free license to store, display, and disclose that Technical Data to verified design/architecture professionals in Korea who request it through the Platform&apos;s request-and-approval process, solely for project evaluation and specification (&quot;spec-in&quot;).<br>
+4. A Brand Partner is solely responsible for the accuracy, completeness, and regulatory compliance of the Technical Data it submits.<br>
+5. A Brand Partner shall defend, indemnify, and hold harmless the Company from any claim, loss, or liability arising from infringing, inaccurate, or non-compliant Technical Data, or from unauthorized disclosure caused by the Brand Partner&apos;s own actions.<br>
+6. Access to approved Technical Data is limited through a time-limited request-and-approval mechanism; the Company does not guarantee a recipient&apos;s subsequent use and is not liable for misuse after lawful access is granted.<br>
+7. The Company may revoke a Brand Partner&apos;s ability to submit or display Technical Data where it reasonably believes this Article has been breached. See the <a href="terms.html" target="_blank" rel="noopener">full Terms of Service</a> for all articles.' data-ko-html='1. &quot;기술자료&quot;란 브랜드 파트너가 플랫폼에 업로드하거나 제출하는 CAD/BIM 파일, 3D 모델, 카탈로그, 사양서, 인증서류 등을 의미합니다.<br>
+2. 브랜드 파트너는 제출하는 모든 기술자료에 대한 권리를 보유하며, 제3자의 권리를 침해하지 않음을 보증합니다.<br>
+3. 기술자료 제출 시, 회사가 신청·승인 절차를 거친 인증된 한국 전문가에게 프로젝트 검토 목적으로 해당 자료를 제공할 수 있는 라이선스를 회사에 부여합니다.<br>
+4. 브랜드 파트너는 제출한 기술자료의 정확성·완전성·법규 준수에 대해 단독으로 책임을 집니다.<br>
+5. 브랜드 파트너는 기술자료의 권리침해·부정확·법규미준수 또는 자신의 행위로 인한 무단 유출로 발생하는 손해에 대해 회사를 면책해야 합니다.<br>
+6. 승인된 기술자료에 대한 접근은 시간제한 신청·승인 방식으로 제한되며, 회사는 수령인의 후속 사용을 보장하지 않고 적법한 접근 부여 이후의 오·남용에 대해 책임지지 않습니다.<br>
+7. 회사는 본 조 위반이 합리적으로 인정되는 경우 기술자료 제출·노출 권한을 중지할 수 있습니다. 전체 조항은 <a href="terms.html" target="_blank" rel="noopener">서비스 약관</a>을 참고하세요.'>1. &quot;Technical Data&quot; means CAD files, BIM files, 3D models, product catalogs, specification sheets, certification documents, and any other technical materials a Brand Partner uploads to or submits through the Platform.</p>
+                    </div>
+                </details>
+                <div class="vendor-terms-error" id="vendorTermsError" style="display:none;color:#c0392b;font-size:0.78rem;margin-top:8px;" data-en="Please agree to Article 9 to continue." data-ko="계속하려면 제9조에 동의해 주세요.">Please agree to Article 9 to continue.</div>
+            </div>
+
             <div class="form-submit">
                 <button type="submit" id="submitBtn" data-en="Submit Application" data-ko="신청서 제출">Submit Application</button>
             </div>
@@ -608,6 +634,18 @@ form.addEventListener('submit', async function(e) {
         return;
     }
 
+    // 공급사 약관(Vendor Terms) 제9조 동의 체크박스 — 미동의 시 제출 중단
+    const vendorTermsEl = document.getElementById('agreeVendorTerms');
+    const vendorTermsErrorEl = document.getElementById('vendorTermsError');
+    if (!vendorTermsEl || !vendorTermsEl.checked) {
+        vendorTermsErrorEl.style.display = 'block';
+        vendorTermsEl.focus();
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Application';
+        return;
+    }
+    vendorTermsErrorEl.style.display = 'none';
+
     const email = document.getElementById('email').value.trim();
     const brandName = document.getElementById('brandName').value.trim();
     const tempPassword = generatePassword(brandName);
@@ -637,6 +675,8 @@ form.addEventListener('submit', async function(e) {
             referral: document.getElementById('referral').value,      // referral=수동 선택(드롭다운)
             referralSource: getReferralSource(),  // referralSource=?ref= 자동 캡처
             status: 'pending',       // pending → approved → rejected
+            agreedVendorTerms: true,                  // 약관 제9조(기술자료 제공·보증·면책) 동의
+            agreedVendorTermsAt: firebase.firestore.FieldValue.serverTimestamp(),
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             approvedAt: null,
             products: [],
