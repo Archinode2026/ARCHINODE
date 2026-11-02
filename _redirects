@@ -1,0 +1,10 @@
+# 내부 운영 문서·도구 비공개 처리 (A-126 대응, 2026-11-02)
+/CLAUDE.md            /404.html   404
+/firestore.rules      /404.html   404
+/firebase.json        /404.html   404
+/firestore.indexes.json /404.html 404
+/docs/*               /404.html   404
+/tools/*              /404.html   404
+/scripts/*            /404.html   404
+/archi-diary/*         /404.html   404
+/.claude/*            /404.html   404
