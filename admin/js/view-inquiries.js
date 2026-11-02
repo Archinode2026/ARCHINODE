@@ -329,6 +329,7 @@ function inq_sendAnswerMail(it, answer) {
         'https://archinodekr.com'
     ];
     return db.collection('mail').add({
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
         to: to,
         message: {
             subject: inq_mailSubject(it.subject),

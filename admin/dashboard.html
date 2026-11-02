@@ -540,6 +540,7 @@ async function updateBrand(docId, newStatus) {
                 lines.push('ARCHINODE Team');
                 
                 await db.collection('mail').add({
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                     to: b.email,
                     message: {
                         subject: subject,

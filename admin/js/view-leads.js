@@ -523,6 +523,7 @@ function lead_sendAssignMail(item, brand) {
         'https://archinodekr.com'
     ]);
     return db.collection('mail').add({
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
         to: brand.email,
         message: {
             subject: 'New lead assigned — ARCHINODE',

@@ -336,6 +336,7 @@ async function approveRequest(id) {
 
     // 국내 신청자용 다운로드 안내 메일
     await db.collection('mail').add({
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
       to: d.email,
       message: {
         subject: '[archinodekr] 요청하신 ' + (d.brandName || '') + ' - ' + (d.productName || '') + ' BIM 데이터가 승인되었습니다.',
@@ -365,6 +366,7 @@ async function approveRequest(id) {
       var brandEmail = brandSnap.exists ? brandSnap.data().email : null;
       if (brandEmail) {
         await db.collection('mail').add({
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
           to: brandEmail,
           message: {
             subject: '[archinodekr Lead Alert] New BIM & Spec Request for ' + (d.productName || '') + ' in South Korea',

@@ -691,6 +691,7 @@ form.addEventListener('submit', async function(e) {
         try {
             // 브랜드에게 접수 확인 이메일
             await db.collection('mail').add({
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                 to: email,
                 message: {
                     subject: '[ARCHINODE] Your listing application has been received',
@@ -720,6 +721,7 @@ form.addEventListener('submit', async function(e) {
 
         try {
             await db.collection('mail').add({
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                 to: 'office@archinode.org',
                 message: {
                     subject: '[ARCHINODE] 신규 브랜드 입점 신청 - ' + brandName,

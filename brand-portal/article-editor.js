@@ -263,6 +263,7 @@
 
         try {
           await db.collection('mail').add({
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
             to: 'office@archinode.org',
             message: {
               subject: '[ARCHINODE] 매거진 원고 - ' + (brandData.brandName || 'Unknown') + ': ' + title,
