@@ -312,6 +312,30 @@
         }
       }
     });
+
+    // A-098: 검색 오버레이가 열려 있을 때 Tab 포커스가 뒤 화면 콘텐츠로 빠져나가지 않도록
+    // 포커스 트랩 — 오버레이 안에서만 포커스가 돌아간다. Esc는 기존 핸들러가 닫음.
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Search');
+    overlay.addEventListener('keydown', function(e) {
+      if (e.key !== 'Tab') return;
+      if (!overlay.classList.contains('active')) return;
+      var focusable = overlay.querySelectorAll('input, button, a[href], .search-result-item, [tabindex]:not([tabindex="-1"])');
+      focusable = Array.prototype.filter.call(focusable, function(el){
+        return !el.hasAttribute('disabled') && el.offsetParent !== null;
+      });
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   }
 
   // Run on DOM ready

@@ -49,14 +49,26 @@
             (isKo ? '자세히' : 'Manage / Learn more') + '</a>' +
         '</div>' +
       '</div>';
+    // A-097: 접근성 — 배너를 dialog 역할로 선언하고, 뜨자마자 "모두 수락" 버튼에 초점을 둬
+    // 키보드 사용자가 76번 Tab을 눌러야 닿던 문제를 해결한다. (dialog는 non-modal이라
+    // 포커스 트랩은 두지 않음 — 사용자가 원하면 Shift+Tab 또는 Tab으로 페이지로 돌아갈 수 있음.)
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-modal', 'false');
+    wrap.setAttribute('aria-labelledby', 'archi-cookie-title');
+    var titleEl = wrap.querySelector('h3');
+    if (titleEl) titleEl.id = 'archi-cookie-title';
+
     document.body.appendChild(wrap);
 
-    document.getElementById('cc-accept').onclick = function(){
+    var acceptBtn = document.getElementById('cc-accept');
+    acceptBtn.onclick = function(){
       saveConsent({ necessary: true, analytics: true, marketing: true, at: new Date().toISOString() });
     };
     document.getElementById('cc-necessary').onclick = function(){
       saveConsent({ necessary: true, analytics: false, marketing: false, at: new Date().toISOString() });
     };
+    // 포커스 이동(스크롤 방지)
+    try { acceptBtn.focus({ preventScroll: true }); } catch(e) { acceptBtn.focus(); }
   }
 
   if (document.readyState === 'loading') {

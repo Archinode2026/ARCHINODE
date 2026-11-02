@@ -206,6 +206,12 @@
       if (href !== null) el.setAttribute('href', href);
     });
 
+    // A-091: 접근성 — aria-label도 언어에 따라 바꿀 수 있도록 지원
+    document.querySelectorAll('[data-' + lang + '-aria-label]').forEach(function(el) {
+      var al = el.getAttribute('data-' + lang + '-aria-label');
+      if (al !== null) el.setAttribute('aria-label', al);
+    });
+
     document.querySelectorAll('[data-lang-only]').forEach(function(el) {
       var only = el.getAttribute('data-lang-only').split(',').map(function(s){ return s.trim().toLowerCase(); });
       el.style.display = (only.indexOf(lang) !== -1) ? '' : 'none';

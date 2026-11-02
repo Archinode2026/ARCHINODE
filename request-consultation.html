@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<link rel="canonical" href="https://archinodekr.com/request-consultation.html">
 <meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Request Consultation | ARCHINODE — 한국 건축자재 시장 진출 자문</title>
@@ -239,10 +240,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 </header>
 
 <div class="search-overlay" id="searchOverlay">
-  <span class="search-close" onclick="toggleSearch()">&times;</span>
+  <button type="button" class="search-close" onclick="toggleSearch()" aria-label="Close search" data-en-aria-label="Close search" data-ko-aria-label="검색 닫기" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;line-height:1;padding:0;font-family:inherit;">&times;</button>
   <div class="search-box">
     <input type="text" placeholder="Search brands, products, designers..." data-en-placeholder="Search brands, products, designers..." data-ko-placeholder="브랜드, 제품, 디자이너 검색...">
-    <button><i class="fas fa-arrow-right"></i></button>
+    <button aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-arrow-right"></i></button>
   </div>
 </div>
 
