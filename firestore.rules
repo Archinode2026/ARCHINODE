@@ -107,16 +107,17 @@ service cloud.firestore {
                   || isAdmin();
 
       // 생성: 인증된 사용자가 본인 brandId로만, status는 'pending' 강제
-      allow create: if isSignedIn()
-                    && request.resource.data.brandId == request.auth.uid
+      // 2026-11-02: isApprovedBrand() 추가 — 정지·거절·대기 브랜드는 신규 제품 등록 불가
+      allow create: if isApprovedBrand(request.resource.data.brandId)
                     && isNewStatusPending()
                     && request.resource.data.name is string
                     && request.resource.data.category is string;
 
       // 수정: 소유 브랜드 또는 어드민. status·brandId·createdAt 보호
+      // 2026-11-02: isApprovedBrand() 추가 — 정지(suspended)된 브랜드는 공개 노출 차단과 동일하게
+      // 자기 제품을 더 이상 수정할 수 없다(leads 인박스 건과 동일 패턴)
       allow update: if isAdmin()
-                    || (isSignedIn()
-                        && request.auth.uid == resource.data.brandId
+                    || (isApprovedBrand(resource.data.brandId)
                         && notChanging('status')
                         && notChanging('brandId')
                         && notChanging('createdAt')
@@ -138,15 +139,15 @@ service cloud.firestore {
 
       // 생성: 인증된 사용자가 본인 brandId로만, status는 'pending'
       // (어드민이 직접 발행 시에는 별도로 approved 가능 — 어드민은 update로 status 변경)
-      allow create: if isSignedIn()
-                    && request.resource.data.brandId == request.auth.uid
+      // 2026-11-02: isApprovedBrand() 추가 — 정지·거절·대기 브랜드는 신규 매거진 글 제출 불가
+      allow create: if isApprovedBrand(request.resource.data.brandId)
                     && isNewStatusPending()
                     && request.resource.data.title is string;
 
       // 수정: 소유 브랜드 또는 어드민. status·brandId·createdAt 보호
+      // 2026-11-02: isApprovedBrand() 추가 — 정지된 브랜드는 자기 매거진 글도 더 이상 수정할 수 없다
       allow update: if isAdmin()
-                    || (isSignedIn()
-                        && request.auth.uid == resource.data.brandId
+                    || (isApprovedBrand(resource.data.brandId)
                         && notChanging('status')
                         && notChanging('brandId')
                         && notChanging('createdAt')
