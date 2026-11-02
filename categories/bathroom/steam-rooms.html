@@ -288,7 +288,26 @@ function toggleSearch() {
   o.classList.toggle('active');
   if (o.classList.contains('active')) o.querySelector('input').focus();
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('searchOverlay').classList.remove('active'); });
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  // A-098/A-100: Esc 한 번으로 열린 검색 오버레이·카테고리 드롭다운·모바일 메뉴 모두 닫는다.
+  var searchOverlay = document.getElementById('searchOverlay');
+  if (searchOverlay && searchOverlay.classList.contains('active')) {
+    searchOverlay.classList.remove('active');
+    var mt = document.querySelector('.search-toggle');
+    if (mt) try { mt.focus(); } catch(err){}
+    return;
+  }
+  var mainNav = document.getElementById('mainNav');
+  if (mainNav && mainNav.classList.contains('active')) {
+    mainNav.classList.remove('active');
+    var mob = document.querySelector('.mobile-toggle');
+    if (mob) try { mob.focus(); } catch(err){}
+    return;
+  }
+  var catMenu = document.getElementById('catMenu');
+  if (catMenu && catMenu.classList.contains('active')) catMenu.classList.remove('active');
+});
 
 function toggleCatMenu() {
   const menu = document.getElementById('catMenu');

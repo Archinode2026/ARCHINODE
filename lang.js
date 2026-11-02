@@ -103,11 +103,11 @@
         + '<small>' + LANG_LABELS[l].short + '</small></a>';
     }).join('');
     var curShort = LANG_LABELS[currentLang] ? LANG_LABELS[currentLang].short : 'EN';
-    return '<button class="lang-switch-btn" type="button" onclick="toggleLangMenu(event)" aria-label="Language">'
+    return '<button class="lang-switch-btn" type="button" onclick="toggleLangMenu(event)" aria-label="Language" aria-haspopup="true" aria-expanded="false">'
       + '<span class="lang-current">' + curShort + '</span>'
-      + ' <i class="fas fa-chevron-down"></i>'
+      + ' <i class="fas fa-chevron-down" aria-hidden="true"></i>'
       + '</button>'
-      + '<div class="lang-menu" style="display:none;">' + menuItems + '</div>';
+      + '<div class="lang-menu" role="menu" aria-hidden="true" style="display:none;">' + menuItems + '</div>';
   }
 
   // A-062: 비동기로 나중에 끼워 넣어지는 조각(예: 카테고리 제품 목록의 빈 상태 안내)은
@@ -118,10 +118,20 @@
     applyLanguage(currentLang);
   };
 
+  function _syncLangMenuAria(menu, isOpen) {
+    menu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    var sw = menu.closest('.lang-switcher');
+    if (sw) {
+      var btn = sw.querySelector('.lang-switch-btn');
+      if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+  }
   window.toggleLangMenu = function(e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     document.querySelectorAll('.lang-menu').forEach(function(m) {
-      m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+      var open = m.style.display !== 'block';
+      m.style.display = open ? 'block' : 'none';
+      _syncLangMenuAria(m, open);
     });
   };
 
@@ -129,6 +139,7 @@
     if (!e.target.closest('.lang-switcher')) {
       document.querySelectorAll('.lang-menu').forEach(function(m) {
         m.style.display = 'none';
+        _syncLangMenuAria(m, false);
       });
     }
   });
