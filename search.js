@@ -7,6 +7,8 @@
   var searchInput = null;
   var resultsContainer = null;
   var isLoaded = false;
+  var brandIndex = null; // Firestore 승인 브랜드 목록 캐시 (A-072: 정적 search-index.json엔 brand 타입이 없음)
+  var brandIndexLoading = false;
 
   // Determine base path relative to current page
   function getBasePath() {
@@ -48,6 +50,60 @@
     xhr.send();
   }
 
+  // Load live brand index from Firestore (approved brands only).
+  // search-index.json has no 'brand' entries since the site moved brand
+  // pages from static files to Firestore-driven brands/view.html?id=slug,
+  // so brand name search is served from this live query instead.
+  function loadBrandIndex(callback) {
+    if (brandIndex !== null) { callback(); return; }
+    if (brandIndexLoading) {
+      // Another call is already loading; wait briefly then proceed with whatever we have.
+      setTimeout(function() { callback(); }, 300);
+      return;
+    }
+    if (typeof firebase === 'undefined' || typeof db === 'undefined') {
+      // Firebase not loaded on this page; degrade gracefully with no brand results.
+      brandIndex = [];
+      callback();
+      return;
+    }
+    brandIndexLoading = true;
+    db.collection('brands').where('status', '==', 'approved').get().then(function(snapshot) {
+      var list = [];
+      snapshot.forEach(function(doc) {
+        var b = doc.data();
+        if (!b.brandName || !b.slug) return;
+        list.push({
+          type: 'brand',
+          name_en: b.brandName,
+          name_ko: b.brandName,
+          desc_en: '',
+          desc_ko: '',
+          parent_en: '',
+          parent_ko: '',
+          country: b.country || '',
+          category: b.category || '',
+          url: 'brands/view.html?id=' + b.slug
+        });
+      });
+      brandIndex = list;
+      brandIndexLoading = false;
+      callback();
+    }).catch(function(err) {
+      console.warn('Failed to load brand index:', err);
+      brandIndex = [];
+      brandIndexLoading = false;
+      callback();
+    });
+  }
+
+  // Load both the static index and the live brand index, then run callback once.
+  function loadAllIndexes(callback) {
+    loadSearchIndex(function() {
+      loadBrandIndex(callback);
+    });
+  }
+
   // Search function
   function search(query) {
     if (!searchData || !query) return [];
@@ -56,9 +112,10 @@
 
     var results = [];
     var basePath = getBasePath();
+    var combined = searchData.concat(brandIndex || []);
 
-    for (var i = 0; i < searchData.length; i++) {
-      var item = searchData[i];
+    for (var i = 0; i < combined.length; i++) {
+      var item = combined[i];
       var score = 0;
       var nameEn = (item.name_en || '').toLowerCase();
       var nameKo = (item.name_ko || '').toLowerCase();
@@ -215,7 +272,7 @@
         renderResults([]);
         return;
       }
-      loadSearchIndex(function() {
+      loadAllIndexes(function() {
         var results = search(q);
         renderResults(results);
       });
@@ -225,7 +282,7 @@
     var searchToggleBtns = document.querySelectorAll('.search-toggle');
     for (var i = 0; i < searchToggleBtns.length; i++) {
       searchToggleBtns[i].addEventListener('click', function() {
-        loadSearchIndex(function() {});
+        loadAllIndexes(function() {});
         // Focus input after overlay opens
         setTimeout(function() {
           if (searchInput) searchInput.focus();
