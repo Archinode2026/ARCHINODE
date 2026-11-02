@@ -70,7 +70,7 @@
 /* MOBILE — 사이드바를 위로 올리고 접는다 */
 @media (max-width: 768px) {
     .adm-layout { display: block; }
-    #adminSidebar { width: auto; flex: none; position: static; padding: 0; margin-bottom: 16px; overflow: hidden; }
+    #adminSidebar { width: auto; flex: none; position: static; padding: 0; margin-bottom: 16px; overflow: hidden; max-height: none; }
     #adminSidebar .adm-toggle { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; background: #111; color: #fff; border: none; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-align: left; }
     #adminSidebar .adm-nav { display: none; }
     #adminSidebar.open .adm-nav { display: block; }
