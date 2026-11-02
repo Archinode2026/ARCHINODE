@@ -217,6 +217,22 @@
 
 .fade-in { opacity: 1; animation: fadeIn 0.6s ease-in; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.rfq-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9000; align-items:center; justify-content:center; padding:20px; }
+.rfq-overlay.active { display:flex; }
+.rfq-box { background:#fff; border-radius:10px; max-width:460px; width:100%; max-height:90vh; overflow-y:auto; padding:32px; position:relative; }
+.rfq-close { position:absolute; top:16px; right:16px; font-size:1.4rem; cursor:pointer; color:#999; background:none; border:none; }
+.rfq-box h3 { font-size:1.2rem; margin-bottom:4px; }
+.rfq-box .rfq-sub { color:#888; font-size:0.85rem; margin-bottom:20px; }
+.rfq-field { margin-bottom:14px; }
+.rfq-field label { display:block; font-size:0.82rem; color:#666; margin-bottom:4px; }
+.rfq-field input, .rfq-field textarea { width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:5px; font-size:0.95rem; font-family:inherit; }
+.rfq-field textarea { resize:vertical; min-height:70px; }
+.rfq-submit { width:100%; padding:13px; background:#000; color:#fff; border:none; border-radius:5px; font-size:0.95rem; cursor:pointer; margin-top:6px; }
+.rfq-submit:disabled { opacity:0.6; cursor:not-allowed; }
+.rfq-success { text-align:center; padding:20px 0; }
+.rfq-success i { font-size:2.4rem; color:#2e7d32; margin-bottom:12px; }
+.rfq-error-msg { color:#c62828; font-size:0.85rem; margin-top:8px; display:none; }
 </style>
 </head>
 <body>
@@ -291,6 +307,46 @@
   <div class="bp-loading" id="loadingState">
     <div class="spinner"></div>
     <p>Loading brand information...</p>
+  </div>
+</div>
+
+<!-- BRAND INQUIRY MODAL -->
+<div class="rfq-overlay" id="rfqOverlay" onclick="if(event.target===this) closeRfqModal()">
+  <div class="rfq-box">
+    <button class="rfq-close" onclick="closeRfqModal()">&times;</button>
+    <div id="rfqFormWrap">
+      <h3 data-en="Inquire with this Brand" data-ko="브랜드에 문의하기">Inquire with this Brand</h3>
+      <p class="rfq-sub" data-en="Tell them what you're looking for — they'll follow up directly." data-ko="찾으시는 내용을 알려주시면 브랜드가 직접 연락드려요.">Tell them what you're looking for — they'll follow up directly.</p>
+      <form id="rfqForm" onsubmit="return submitRfq(event)">
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+          <label for="rfq_hp">Leave this field empty</label>
+          <input type="text" id="rfq_hp" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="rfq-field">
+          <label for="rfqName" data-en="Name" data-ko="이름">Name</label>
+          <input type="text" id="rfqName" required autocomplete="name">
+        </div>
+        <div class="rfq-field">
+          <label for="rfqCompany" data-en="Company" data-ko="회사명">Company</label>
+          <input type="text" id="rfqCompany" autocomplete="organization">
+        </div>
+        <div class="rfq-field">
+          <label for="rfqEmail" data-en="Email" data-ko="이메일">Email</label>
+          <input type="email" id="rfqEmail" required autocomplete="email">
+        </div>
+        <div class="rfq-field">
+          <label for="rfqMessage" data-en="What are you looking for?" data-ko="어떤 것을 찾고 계신가요?">What are you looking for?</label>
+          <textarea id="rfqMessage" required></textarea>
+        </div>
+        <button type="submit" class="rfq-submit" id="rfqSubmitBtn" data-en="Send Inquiry" data-ko="문의 보내기">Send Inquiry</button>
+        <div class="rfq-error-msg" id="rfqErrorMsg"></div>
+      </form>
+    </div>
+    <div id="rfqSuccessWrap" style="display:none;" class="rfq-success">
+      <i class="fas fa-check-circle"></i>
+      <h3 data-en="Inquiry Sent" data-ko="문의가 전달됐습니다">Inquiry Sent</h3>
+      <p data-en="The brand will contact you directly by email." data-ko="브랜드가 이메일로 직접 연락드릴 거예요.">The brand will contact you directly by email.</p>
+    </div>
   </div>
 </div>
 
@@ -377,6 +433,7 @@ async function loadBrand() {
         const brand = doc.data();
         const brandId = doc.id;
         currentBrandDocId = brandId;
+        currentBrandName = brand.brandName || '';
 
         // 승인되지 않은 브랜드 체크
         if (brand.status !== 'approved') {
@@ -525,7 +582,8 @@ function renderBrand(brand, products) {
                         <span id="brandLikeLabel" data-en="Like" data-ko="좋아요">Like</span>
                         <span id="brandLikeCount" style="margin-left:4px;font-size:0.82rem;color:#999;">${brand.likeCount || 0}</span>
                     </button>
-                    ${website ? `<a href="${wsUrl}" target="_blank" class="btn btn-primary"><i class="fas fa-external-link-alt"></i> Visit Website</a>` : ''}
+                    <button type="button" class="btn btn-primary" onclick="openRfqModal()"><i class="fas fa-file-invoice"></i> Inquire</button>
+                    ${website ? `<a href="${wsUrl}" target="_blank" class="btn btn-secondary"><i class="fas fa-external-link-alt"></i> Visit Website</a>` : ''}
                     <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> Contact</a>
                 </div>
                 ${snsLinks ? `<div class="bp-social-links">${snsLinks}</div>` : ''}
@@ -619,6 +677,67 @@ loadBrand();
 
 // ── 브랜드 좋아요 기능 ──
 let currentBrandDocId = null;
+let currentBrandName = '';
+
+function openRfqModal() {
+    document.getElementById('rfqFormWrap').style.display = 'block';
+    document.getElementById('rfqSuccessWrap').style.display = 'none';
+    document.getElementById('rfqErrorMsg').style.display = 'none';
+    document.getElementById('rfqForm').reset();
+    document.getElementById('rfqOverlay').classList.add('active');
+}
+
+function closeRfqModal() {
+    document.getElementById('rfqOverlay').classList.remove('active');
+}
+
+async function submitRfq(e) {
+    e.preventDefault();
+    if (document.getElementById('rfq_hp').value.trim() !== '') return false;
+
+    const btn = document.getElementById('rfqSubmitBtn');
+    const errorMsg = document.getElementById('rfqErrorMsg');
+    errorMsg.style.display = 'none';
+    btn.disabled = true;
+
+    const name = document.getElementById('rfqName').value.trim();
+    const company = document.getElementById('rfqCompany').value.trim();
+    const email = document.getElementById('rfqEmail').value.trim();
+    const message = document.getElementById('rfqMessage').value.trim();
+
+    try {
+        await db.collection('leads').add({
+            type: 'brand-inquiry',
+            status: 'new',
+            brandId: currentBrandDocId || '',
+            brandName: currentBrandName,
+            productId: '',
+            productName: '',
+            name: name,
+            company: company,
+            email: email,
+            phone: '',
+            industry: '',
+            message: message,
+            source: 'brand-page',
+            userId: (auth.currentUser ? auth.currentUser.uid : ''),
+            adminNote: '',
+            brandNote: '',
+            hp: '',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            assignedAt: null
+        });
+        document.getElementById('rfqFormWrap').style.display = 'none';
+        document.getElementById('rfqSuccessWrap').style.display = 'block';
+    } catch (err) {
+        console.error('Inquiry submit error:', err);
+        errorMsg.textContent = 'Something went wrong. Please try again.';
+        errorMsg.style.display = 'block';
+    }
+    btn.disabled = false;
+    return false;
+}
 let isBrandLiked = false;
 
 auth.onAuthStateChanged(async (user) => {

@@ -174,7 +174,8 @@ service cloud.firestore {
     match /leads/{leadId} {
       // 생성: 누구나(4b 공개 폼 대비) — type·status=='new'·name·email·message·createdAt==request.time 검사
       //       (기존 조건 email·createdAt 에 type·status·name·message 를 더한 좁히기 — 4a 전에는 create 를 쓰는 곳이 없었다)
-      allow create: if request.resource.data.type in ['quote','brand-inquiry','dealer']
+      allow create: if passesHoneypot()
+                    && request.resource.data.type in ['quote','brand-inquiry','dealer','sample-request','sourcing']
                     && request.resource.data.status == 'new'
                     && request.resource.data.name is string && request.resource.data.name.size() > 0
                     && request.resource.data.email is string && request.resource.data.email.size() > 5

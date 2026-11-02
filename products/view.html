@@ -72,6 +72,22 @@
 
 /* CTA Buttons */
 .pp-cta { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:32px; }
+.rfq-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9000; align-items:center; justify-content:center; padding:20px; }
+.rfq-overlay.active { display:flex; }
+.rfq-box { background:#fff; border-radius:10px; max-width:460px; width:100%; max-height:90vh; overflow-y:auto; padding:32px; position:relative; }
+.rfq-close { position:absolute; top:16px; right:16px; font-size:1.4rem; cursor:pointer; color:#999; background:none; border:none; }
+.rfq-box h3 { font-size:1.2rem; margin-bottom:4px; }
+.rfq-box .rfq-sub { color:#888; font-size:0.85rem; margin-bottom:20px; }
+.rfq-field { margin-bottom:14px; }
+.rfq-field label { display:block; font-size:0.82rem; color:#666; margin-bottom:4px; }
+.rfq-field input, .rfq-field textarea, .rfq-field select { width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:5px; font-size:0.95rem; font-family:inherit; }
+.rfq-field textarea { resize:vertical; min-height:70px; }
+.rfq-submit { width:100%; padding:13px; background:#000; color:#fff; border:none; border-radius:5px; font-size:0.95rem; cursor:pointer; margin-top:6px; }
+.rfq-submit:disabled { opacity:0.6; cursor:not-allowed; }
+.rfq-success { text-align:center; padding:20px 0; }
+.rfq-success i { font-size:2.4rem; color:#2e7d32; margin-bottom:12px; }
+.rfq-error-msg { color:#c62828; font-size:0.85rem; margin-top:8px; display:none; }
+
 .pp-cta .btn { padding:14px 28px; font-size:0.88rem; font-weight:600; border:none; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:8px; text-decoration:none; }
 .pp-cta .btn-primary { background:var(--black); color:var(--white); }
 .pp-cta .btn-primary:hover { background:var(--gray-800); }
@@ -169,6 +185,50 @@
 
 <!-- PRODUCT CONTENT (rendered by JS) -->
 <div id="productContent" style="display:none;"></div>
+
+<!-- RFQ / SAMPLE REQUEST MODAL -->
+<div class="rfq-overlay" id="rfqOverlay" onclick="if(event.target===this) closeRfqModal()">
+  <div class="rfq-box">
+    <button class="rfq-close" onclick="closeRfqModal()">&times;</button>
+    <div id="rfqFormWrap">
+      <h3 id="rfqTitle" data-en="Request a Quote" data-ko="견적 요청">Request a Quote</h3>
+      <p class="rfq-sub" id="rfqSub" data-en="Tell the brand what you need — they'll follow up directly." data-ko="필요한 내용을 알려주시면 브랜드가 직접 연락드려요.">Tell the brand what you need — they'll follow up directly.</p>
+      <form id="rfqForm" onsubmit="return submitRfq(event)">
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+          <label for="rfq_hp">Leave this field empty</label>
+          <input type="text" id="rfq_hp" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="rfq-field">
+          <label for="rfqName" data-en="Name" data-ko="이름">Name</label>
+          <input type="text" id="rfqName" required autocomplete="name">
+        </div>
+        <div class="rfq-field">
+          <label for="rfqCompany" data-en="Company" data-ko="회사명">Company</label>
+          <input type="text" id="rfqCompany" autocomplete="organization">
+        </div>
+        <div class="rfq-field">
+          <label for="rfqEmail" data-en="Email" data-ko="이메일">Email</label>
+          <input type="email" id="rfqEmail" required autocomplete="email">
+        </div>
+        <div class="rfq-field" id="rfqShippingField" style="display:none;">
+          <label for="rfqShipping" data-en="Shipping Address" data-ko="배송지 주소">Shipping Address</label>
+          <input type="text" id="rfqShipping" autocomplete="street-address">
+        </div>
+        <div class="rfq-field">
+          <label for="rfqMessage" id="rfqMessageLabel" data-en="Project / quantity / desired timeline" data-ko="프로젝트 · 수량 · 희망 납기">Project / quantity / desired timeline</label>
+          <textarea id="rfqMessage" required></textarea>
+        </div>
+        <button type="submit" class="rfq-submit" id="rfqSubmitBtn" data-en="Send Request" data-ko="요청 보내기">Send Request</button>
+        <div class="rfq-error-msg" id="rfqErrorMsg"></div>
+      </form>
+    </div>
+    <div id="rfqSuccessWrap" style="display:none;" class="rfq-success">
+      <i class="fas fa-check-circle"></i>
+      <h3 data-en="Request Sent" data-ko="요청이 전달됐습니다">Request Sent</h3>
+      <p data-en="The brand will contact you directly by email." data-ko="브랜드가 이메일로 직접 연락드릴 거예요.">The brand will contact you directly by email.</p>
+    </div>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -285,6 +345,9 @@ async function loadProduct() {
 }
 
 function renderProduct(p, related) {
+    currentProductBrandId = p.brandId || '';
+    currentProductBrandName = p.brandName || '';
+    currentProductName = p.name || '';
     const catLabel = p.category || '';
     const subLabel = p.subcategory ? p.subcategory.replace(/-/g, ' ') : '';
 
@@ -373,7 +436,9 @@ function renderProduct(p, related) {
                         <span id="likeLabel" data-en="Like" data-ko="좋아요">Like</span>
                         <span id="likeCount" style="margin-left:4px;font-size:0.82rem;color:#999;">${p.likeCount || 0}</span>
                     </button>
-                    <a href="../contact.html" class="btn btn-primary"><i class="fas fa-envelope"></i> <span data-en="Request Info" data-ko="문의하기">Request Info</span></a>
+                    <button type="button" class="btn btn-primary" onclick="openRfqModal('quote')"><i class="fas fa-file-invoice"></i> <span data-en="Request a Quote" data-ko="견적 요청">Request a Quote</span></button>
+                    <button type="button" class="btn btn-secondary" onclick="openRfqModal('sample-request')"><i class="fas fa-box-open"></i> <span data-en="Request a Sample" data-ko="샘플 요청">Request a Sample</span></button>
+                    <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> <span data-en="Request Info" data-ko="문의하기">Request Info</span></a>
                     ${p.catalogPdf ? `<a href="${p.catalogPdf}" target="_blank" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> <span data-en="PDF Catalog" data-ko="PDF 카탈로그">PDF Catalog</span></a>` : ''}
                 </div>
             </div>
@@ -403,6 +468,107 @@ loadProduct();
 // ── 좋아요 기능 ──
 let currentProductDocId = null;
 let isLiked = false;
+
+// ── 견적요청 / 샘플요청 (RFQ) ──
+let currentProductBrandId = '';
+let currentProductBrandName = '';
+let currentProductName = '';
+let rfqType = 'quote';
+
+const RFQ_COPY = {
+    'quote': {
+        titleEn: 'Request a Quote', titleKo: '견적 요청',
+        subEn: "Tell the brand what you need — they'll follow up directly.", subKo: '필요한 내용을 알려주시면 브랜드가 직접 연락드려요.',
+        msgLabelEn: 'Project / quantity / desired timeline', msgLabelKo: '프로젝트 · 수량 · 희망 납기',
+        showShipping: false
+    },
+    'sample-request': {
+        titleEn: 'Request a Sample', titleKo: '샘플 요청',
+        subEn: 'Request a physical sample — the brand will arrange shipping.', subKo: '실물 샘플을 요청하시면 브랜드가 배송을 준비해요.',
+        msgLabelEn: 'Notes (optional)', msgLabelKo: '참고 사항 (선택)',
+        showShipping: true
+    }
+};
+
+function openRfqModal(type) {
+    rfqType = type;
+    const copy = RFQ_COPY[type];
+    const lang = document.documentElement.lang === 'en' ? 'En' : 'Ko';
+    document.getElementById('rfqTitle').textContent = copy['title' + lang];
+    document.getElementById('rfqTitle').setAttribute('data-en', copy.titleEn);
+    document.getElementById('rfqTitle').setAttribute('data-ko', copy.titleKo);
+    document.getElementById('rfqSub').textContent = copy['sub' + lang];
+    document.getElementById('rfqSub').setAttribute('data-en', copy.subEn);
+    document.getElementById('rfqSub').setAttribute('data-ko', copy.subKo);
+    document.getElementById('rfqMessageLabel').textContent = copy['msgLabel' + lang];
+    document.getElementById('rfqMessageLabel').setAttribute('data-en', copy.msgLabelEn);
+    document.getElementById('rfqMessageLabel').setAttribute('data-ko', copy.msgLabelKo);
+    document.getElementById('rfqMessage').required = (type === 'quote');
+    document.getElementById('rfqShippingField').style.display = copy.showShipping ? 'block' : 'none';
+    document.getElementById('rfqFormWrap').style.display = 'block';
+    document.getElementById('rfqSuccessWrap').style.display = 'none';
+    document.getElementById('rfqErrorMsg').style.display = 'none';
+    document.getElementById('rfqForm').reset();
+    document.getElementById('rfqOverlay').classList.add('active');
+}
+
+function closeRfqModal() {
+    document.getElementById('rfqOverlay').classList.remove('active');
+}
+
+async function submitRfq(e) {
+    e.preventDefault();
+    // 허니팟: 봇이 채우는 숨김 필드
+    if (document.getElementById('rfq_hp').value.trim() !== '') return false;
+
+    const btn = document.getElementById('rfqSubmitBtn');
+    const errorMsg = document.getElementById('rfqErrorMsg');
+    errorMsg.style.display = 'none';
+    btn.disabled = true;
+
+    const name = document.getElementById('rfqName').value.trim();
+    const company = document.getElementById('rfqCompany').value.trim();
+    const email = document.getElementById('rfqEmail').value.trim();
+    const shipping = document.getElementById('rfqShipping').value.trim();
+    const message = document.getElementById('rfqMessage').value.trim();
+
+    try {
+        const data = {
+            type: rfqType,
+            status: 'new',
+            brandId: currentProductBrandId,
+            brandName: currentProductBrandName,
+            productId: currentProductDocId || '',
+            productName: currentProductName,
+            name: name,
+            company: company,
+            email: email,
+            phone: '',
+            industry: '',
+            message: message,
+            source: 'product-page',
+            userId: (auth.currentUser ? auth.currentUser.uid : ''),
+            adminNote: '',
+            brandNote: '',
+            hp: '',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            assignedAt: null
+        };
+        if (rfqType === 'sample-request') data.shippingAddress = shipping;
+
+        await db.collection('leads').add(data);
+
+        document.getElementById('rfqFormWrap').style.display = 'none';
+        document.getElementById('rfqSuccessWrap').style.display = 'block';
+    } catch (err) {
+        console.error('RFQ submit error:', err);
+        errorMsg.textContent = 'Something went wrong. Please try again.';
+        errorMsg.style.display = 'block';
+    }
+    btn.disabled = false;
+    return false;
+}
 
 auth.onAuthStateChanged(async (user) => {
     if (!user || !currentProductDocId) return;
