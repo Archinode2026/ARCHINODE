@@ -73,6 +73,31 @@ $rulesChanged = (git diff --name-only $range | Where-Object { $_ -eq 'firestore.
 Write-Host "[확인] 브랜치 main · 미커밋 0 · 올릴 커밋 $ahead 개 · 대조할 정적 파일 $($changed.Count) 개" -ForegroundColor Cyan
 if ($ahead -gt 0) { git log --oneline $range | ForEach-Object { Write-Host "       $_" } }
 
+# ── 1.5 어드민 JS/CSS 캐시 스탬프 확인 (A-033) ──
+# admin/js/*.js 또는 admin/admin.css 가 바뀐 커밋인데, admin/*.html 안의 해당 <script>/<link>
+# ?v= 캐시 스탬프가 같은 커밋 범위에서 안 올라갔으면 경고. 방문자(관리자) 브라우저가 캐시된
+# 옛 파일을 계속 쓰면서 새 함수를 못 찾아 화면이 멈추는 사고(6단계에서 실제 발생)를 막기 위함.
+$adminAssetsChanged = git diff --name-only $range | Where-Object { $_ -match '^admin/js/.*\.js$' -or $_ -eq 'admin/admin.css' }
+if ($adminAssetsChanged) {
+    $htmlVersionDiff = git diff $range -- 'admin/*.html' | Select-String -Pattern '^\+.*\?v=\d+'
+    if (-not $htmlVersionDiff) {
+        Write-Host ''
+        Write-Host '#################################################################' -ForegroundColor Yellow
+        Write-Host '#  경고: admin/js 또는 admin/admin.css 가 바뀌었는데                #' -ForegroundColor Yellow
+        Write-Host '#  admin/*.html 의 ?v= 캐시 스탬프는 안 올라간 것 같습니다.          #' -ForegroundColor Yellow
+        Write-Host '#  관리자 브라우저가 캐시된 옛 파일을 계속 쓸 수 있습니다.           #' -ForegroundColor Yellow
+        Write-Host '#  바뀐 파일:                                                      #' -ForegroundColor Yellow
+        $adminAssetsChanged | ForEach-Object { Write-Host "#    $_" -ForegroundColor Yellow }
+        Write-Host '#################################################################' -ForegroundColor Yellow
+        Write-Host ''
+        $confirm = Read-Host '그래도 계속 진행하시겠습니까? (?v= 값을 안 올렸다면 N 권장) (y/N)'
+        if ($confirm -ne 'y' -and $confirm -ne 'Y') {
+            Write-Host '[중단] admin/*.html 의 관련 <script src>/<link> ?v= 값을 올린 뒤 다시 커밋하고 실행하세요.' -ForegroundColor Red
+            exit 1
+        }
+    }
+}
+
 # ── 2. firestore.rules — -Rules 면 CLI로 게시, 아니면 경고 ──
 if ($Rules) {
     Write-Host '[규칙] firestore.rules 를 Firebase 에 게시합니다 (프로젝트 archinode-8ab04). 넓히기/좁히기를 컬렉션마다 나눠 판단했습니까?' -ForegroundColor Yellow
