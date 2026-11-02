@@ -87,6 +87,10 @@ input, select, textarea { font-family: inherit; }
   text-transform: uppercase;
 }
 .main-nav { display: flex; align-items: center; gap: 6px; }
+/* A-069: 1024~1200px 안팎의 좁은 데스크톱·태블릿 폭에서 flex 항목이 기본값대로
+   줄어들며 글자까지 줄바꿈되어(특히 "List Your Brand"가 세로 4줄로) 옆 버튼과
+   겹쳐 보이던 문제. 줄바꿈을 막고 더 줄어들지 않게 고정해, 안 들어가면
+   nav 전체가 살짝 넘치더라도 글자가 깨지지 않게 한다. */
 .main-nav > a {
   font-size: 0.85rem;
   font-weight: 500;
@@ -94,6 +98,8 @@ input, select, textarea { font-family: inherit; }
   padding: 8px 16px;
   letter-spacing: 0.01em;
   transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .main-nav > a:hover { color: var(--black); }
 .main-nav > a.active-nav { color: var(--black); font-weight: 700; }
@@ -105,11 +111,13 @@ input, select, textarea { font-family: inherit; }
   font-size: 0.8rem !important;
   letter-spacing: 0.02em;
   transition: background 0.2s !important;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .nav-cta:hover { background: var(--gray-800) !important; }
 
 /* CATEGORIES DROPDOWN */
-.nav-dropdown { position: relative; }
+.nav-dropdown { position: relative; flex-shrink: 0; }
 .nav-dropdown-trigger {
   font-size: 0.85rem;
   font-weight: 600;
@@ -123,6 +131,7 @@ input, select, textarea { font-family: inherit; }
   border: none;
   font-family: inherit;
   transition: color 0.2s;
+  white-space: nowrap;
 }
 .nav-dropdown-trigger i {
   font-size: 0.6rem;
