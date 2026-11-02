@@ -519,10 +519,10 @@ function renderBrand(brand, products) {
 
     // SNS links
     const snsLinks = [
-        instagram ? `<a href="${instagram}" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>` : '',
-        linkedin ? `<a href="${linkedin}" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>` : '',
-        pinterest ? `<a href="${pinterest}" target="_blank" title="Pinterest"><i class="fab fa-pinterest-p"></i></a>` : '',
-        youtube ? `<a href="${youtube}" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>` : '',
+        instagram ? `<a href="${instagram}" target="_blank" title="Instagram" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>` : '',
+        linkedin ? `<a href="${linkedin}" target="_blank" title="LinkedIn" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>` : '',
+        pinterest ? `<a href="${pinterest}" target="_blank" title="Pinterest" rel="noopener noreferrer"><i class="fab fa-pinterest-p"></i></a>` : '',
+        youtube ? `<a href="${youtube}" target="_blank" title="YouTube" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>` : '',
     ].filter(Boolean).join('');
 
     // Gallery HTML
@@ -605,12 +605,12 @@ function renderBrand(brand, products) {
                     ${country ? `<strong>Country:</strong> ${country}<br>` : ''}
                     ${founded ? `<strong>Founded:</strong> ${founded}<br>` : ''}
                     ${headquarters ? `<strong>HQ:</strong> ${headquarters}<br>` : ''}
-                    ${website ? `<strong>Website:</strong> <a href="${wsUrl}" target="_blank" style="color:var(--gray-700);">${website}</a>` : ''}
+                    ${website ? `<strong>Website:</strong> <a href="${wsUrl}" target="_blank" style="color:var(--gray-700);" rel="noopener noreferrer">${website}</a>` : ''}
                 </div>
                 ${certifications.length > 0 ? `
                 <div class="bp-cert-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
                     ${certifications.map(cert => `
-                        <a href="${cert.fileUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;font-size:0.78rem;color:#333;text-decoration:none;">
+                        <a href="${cert.fileUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;font-size:0.78rem;color:#333;text-decoration:none;" rel="noopener noreferrer">
                             <i class="fas fa-certificate" style="color:#C8A96E;"></i>${cert.name}
                         </a>
                     `).join('')}
@@ -622,7 +622,7 @@ function renderBrand(brand, products) {
                         <span id="brandLikeCount" style="margin-left:4px;font-size:0.82rem;color:#999;">${brand.likeCount || 0}</span>
                     </button>
                     <button type="button" class="btn btn-primary" onclick="openRfqModal()"><i class="fas fa-file-invoice"></i> Inquire</button>
-                    ${website ? `<a href="${wsUrl}" target="_blank" class="btn btn-secondary"><i class="fas fa-external-link-alt"></i> Visit Website</a>` : ''}
+                    ${website ? `<a href="${wsUrl}" target="_blank" class="btn btn-secondary" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> Visit Website</a>` : ''}
                     <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> Contact</a>
                 </div>
                 ${snsLinks ? `<div class="bp-social-links">${snsLinks}</div>` : ''}
@@ -686,7 +686,7 @@ function renderBrand(brand, products) {
                 <div style="display:flex;flex-direction:column;gap:12px;">
                     ${dealer.contact ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-phone" style="width:18px;color:#C8A96E;"></i> ${dealer.contact}</div>` : ''}
                     ${dealer.email ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-envelope" style="width:18px;color:#C8A96E;"></i> <a href="mailto:${dealer.email}" style="color:#333;">${dealer.email}</a></div>` : ''}
-                    ${dealer.website ? `<div style="font-size:0.88rem;"><a href="${escapeHtml(dealer.website.startsWith('http') ? dealer.website : 'https://'+dealer.website)}" target="_blank" style="color:#C8A96E;font-weight:600;"><i class="fas fa-external-link-alt" style="width:18px;"></i> <span data-en="Visit Dealer Website" data-ko="딜러 웹사이트 방문">Visit Dealer Website</span></a></div>` : ''}
+                    ${dealer.website ? `<div style="font-size:0.88rem;"><a href="${escapeHtml(dealer.website.startsWith('http') ? dealer.website : 'https://'+dealer.website)}" target="_blank" style="color:#C8A96E;font-weight:600;" rel="noopener noreferrer"><i class="fas fa-external-link-alt" style="width:18px;"></i> <span data-en="Visit Dealer Website" data-ko="딜러 웹사이트 방문">Visit Dealer Website</span></a></div>` : ''}
                 </div>
             </div>
         </section>` : ''}

@@ -390,7 +390,7 @@ async function loadAll() {
 function brandActionButtons(b, docId) {
     const viewBtn = `<button class="act-btn act-view" onclick="viewBrand('${docId}')">View</button>`;
     const pageBtn = (b.status === 'approved' && b.slug)
-        ? `<a class="act-btn" href="../brands/view.html?id=${b.slug}" target="_blank" style="text-decoration:none;background:#e0f2fe;color:#0369a1;">Page</a>`
+        ? `<a class="act-btn" href="../brands/view.html?id=${b.slug}" target="_blank" style="text-decoration:none;background:#e0f2fe;color:#0369a1;" rel="noopener noreferrer">Page</a>`
         : '';
 
     if (b.status === 'pending') {

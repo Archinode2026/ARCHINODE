@@ -557,7 +557,7 @@ function openRfqModal(type) {
 // ── 전문가 전용 자료실 게이팅 (CAD/BIM/카탈로그) ──
 function openSpecFile(url) {
     if (auth.currentUser) {
-        window.open(url, '_blank');
+        window.open(url, '_blank', 'noopener,noreferrer');
         return;
     }
     const lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
