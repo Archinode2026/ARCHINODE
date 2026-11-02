@@ -216,12 +216,21 @@ function render() {
     html += '<tr>'
       + '<td><a href="mailto:' + escapeAttr(d.email || '') + '">' + escapeHtml(d.email || '—') + '</a></td>'
       + '<td>' + formatDate(d.createdAt) + '</td>'
-      + '<td style="text-align:right;"><button class="del-btn" onclick="deleteSubscriber(\'' + d.id + '\', \'' + escapeAttr(d.email || '') + '\')">Delete</button></td>'
+      + '<td style="text-align:right;"><button class="del-btn" data-id="' + escapeAttr(d.id || '') + '" data-email="' + escapeAttr(d.email || '') + '">Delete</button></td>'
       + '</tr>';
   });
   html += '</tbody></table></div>';
   container.innerHTML = html;
 }
+
+// A-026: onclick="fn('...')" 문자열 조합 방식은 HTML 엔티티가 파서에서 디코딩된 뒤
+// 그 결과가 인라인 핸들러의 JS 소스로 다시 쓰이기 때문에, 이메일에 작은따옴표가 있으면
+// 핸들러 자체가 깨진다. data-* 속성 + 이벤트 위임으로 전환해 이 문제를 원천적으로 피한다.
+document.getElementById('contentArea').addEventListener('click', function(e) {
+  var btn = e.target.closest('.del-btn');
+  if (!btn) return;
+  deleteSubscriber(btn.getAttribute('data-id'), btn.getAttribute('data-email'));
+});
 
 window.deleteSubscriber = function(id, email) {
   if (!confirm('정말 ' + email + ' 를 목록에서 삭제하시겠습니까?')) return;
