@@ -27,7 +27,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 // Auth compat SDK는 일부 페이지에서만 로드되므로 조건부 초기화 (BUG-1, 검수대장 A-001)
 const auth = (typeof firebase.auth === 'function') ? firebase.auth() : null;
-const db = firebase.firestore();
+// A-056: Firestore SDK가 안 실린 페이지(예: auth/reset-password.html)에서 매번 TypeError가 나던 문제. auth와 같은 패턴으로 가드.
+const db = (typeof firebase.firestore === 'function') ? firebase.firestore() : null;
 // Storage SDK는 일부 페이지에서만 로드되므로 조건부 초기화
 const storage = (typeof firebase.storage === 'function') ? firebase.storage() : null;
 

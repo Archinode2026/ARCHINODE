@@ -36,12 +36,15 @@ function tSpan(en, ko) { return '<span ' + tAttr(en, ko) + '>' + escapeHtml(t(en
 //      같은 브라우저의 공개 페이지도 이 저장값을 읽으므로 IP 감지를 건너뛴다 — 어드민 본인 브라우저에 한한 영향.
 //    document.documentElement.lang 도 지금 맞춘다 — admin-nav 의 사이드바(t())가 lang.js 의 DOMContentLoaded 보다 먼저 그려지기 때문.
 function admInitLang() {
+    // A-036: 과거엔 public localStorage 키('archinode-lang')에 쓰다 보니, 어드민을 한 번만 열면
+    // 같은 브라우저의 공개 페이지가 IP 감지(해외 IP → en)를 영구 건너뛰고 항상 한국어로만 보이게 됐다.
+    // 이제 어드민은 자기 전용 키('archinode-admin-lang')만 쓰고, lang.js의 공개 흐름은 건드리지 않는다.
     var saved = null;
-    try { saved = localStorage.getItem('archinode-lang'); } catch (e) {}
+    try { saved = localStorage.getItem('archinode-admin-lang') || localStorage.getItem('archinode-lang'); } catch (e) {}
     if (saved !== 'en' && saved !== 'ko') {
         saved = 'ko';
-        try { localStorage.setItem('archinode-lang', 'ko'); } catch (e) {}
     }
+    try { localStorage.setItem('archinode-admin-lang', saved); } catch (e) {}
     document.documentElement.lang = saved;
 }
 admInitLang();

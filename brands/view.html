@@ -732,8 +732,9 @@ function showError(title, message) {
         <i class="fas fa-building"></i>
         <h2>${title}</h2>
         <p>${message}</p>
-        <a href="../brands.html"><i class="fas fa-arrow-left"></i> &nbsp;All Brands</a>
+        <a href="../brands.html"><i class="fas fa-arrow-left"></i> &nbsp;<span data-en="All Brands" data-ko="전체 브랜드">All Brands</span></a>
     </div>`;
+    if (window.applyLang) window.applyLang();
 }
 
 // ── 실행 ──

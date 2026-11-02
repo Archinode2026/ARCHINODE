@@ -526,7 +526,8 @@ function changeImg(url, el) {
 function showError(title, msg) {
     loadingDiv.style.display = 'none';
     contentDiv.style.display = 'block';
-    contentDiv.innerHTML = `<div class="pp-error"><i class="fas fa-cube"></i><h2>${title}</h2><p>${msg}</p><a href="../categories.html"><i class="fas fa-arrow-left"></i> Browse Categories</a></div>`;
+    contentDiv.innerHTML = `<div class="pp-error"><i class="fas fa-cube"></i><h2>${title}</h2><p>${msg}</p><a href="../categories.html"><i class="fas fa-arrow-left"></i> <span data-en="Browse Categories" data-ko="카테고리 보기">Browse Categories</span></a></div>`;
+    if (window.applyLang) window.applyLang();
 }
 
 loadProduct();

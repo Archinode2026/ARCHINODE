@@ -344,6 +344,8 @@ function inq_sendAnswerMail(it, answer) {
 //    200건이 꽉 차(hasMore) 안 읽은 문서가 남았을 때만 inq_loadOpenCount 의 where 한 번으로 보정한다(캐시만 세면 적게 나온다).
 function inq_pushOpenCount() {
     if (!inq_state.loaded) return;
+    // A-044: 새로고침 중(loading=true)일 때는 items가 잠깐 비워져 있어 0을 세버린다 — 깜빡임 원인. 읽기 완료까지 건너뛴다.
+    if (inq_state.loading) return;
     if (inq_state.hasMore) {   // 안 읽은 문서가 남음 — 이미 where 로 센 값이 있으면 그대로(loadAll 마다 반복 조회 안 함), 없으면 한 번 센다
         if (typeof inq_state.openCount === 'number') inq_setOpenCount(inq_state.openCount); else inq_loadOpenCount();
         return;
