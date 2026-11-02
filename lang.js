@@ -192,6 +192,12 @@
       if (ph !== null) el.placeholder = ph;
     });
 
+    // A-076: 언어별로 다른 링크로 보내야 하는 경우 (예: 개인정보처리방침 한/영 별도 파일)
+    document.querySelectorAll('[data-' + lang + '-href]').forEach(function(el) {
+      var href = el.getAttribute('data-' + lang + '-href');
+      if (href !== null) el.setAttribute('href', href);
+    });
+
     document.querySelectorAll('[data-lang-only]').forEach(function(el) {
       var only = el.getAttribute('data-lang-only').split(',').map(function(s){ return s.trim().toLowerCase(); });
       el.style.display = (only.indexOf(lang) !== -1) ? '' : 'none';
