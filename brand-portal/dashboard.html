@@ -431,6 +431,29 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
                 <span class="save-msg" id="brandSaveMsg"><i class="fas fa-check"></i> Saved!</span>
             </form>
         </div>
+
+        <div class="section-card">
+            <h2><i class="fas fa-certificate"></i> <span data-en="Certifications" data-ko="인증서">Certifications</span></h2>
+            <p style="font-size:0.8rem;color:#999;margin-bottom:16px;" data-en="Upload certifications (CE, eco-labels, fire safety, etc.) so Korean architects can verify your brand's compliance." data-ko="CE·친환경·화재안전 등 인증서를 업로드하면 한국 건축가가 브랜드의 적합성을 바로 확인할 수 있어요.">Upload certifications (CE, eco-labels, fire safety, etc.) so Korean architects can verify your brand's compliance.</p>
+
+            <div id="certList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label data-en="Certification Name" data-ko="인증명">Certification Name</label>
+                    <input type="text" id="certName" placeholder="e.g. CE Marking">
+                </div>
+                <div class="field">
+                    <label data-en="Issuer (optional)" data-ko="발급기관 (선택)">Issuer (optional)</label>
+                    <input type="text" id="certIssuer" placeholder="e.g. TUV Rheinland">
+                </div>
+            </div>
+            <div class="field">
+                <label data-en="Certificate File (PDF or image)" data-ko="인증서 파일 (PDF 또는 이미지)">Certificate File (PDF or image)</label>
+                <input type="file" id="certFile" accept="application/pdf,image/*">
+            </div>
+            <button type="button" class="btn btn-secondary" id="addCertBtn"><i class="fas fa-plus"></i> <span data-en="Add Certification" data-ko="인증서 추가">Add Certification</span></button>
+        </div>
     </div>
 
     <!-- TAB: PRODUCTS -->
@@ -934,6 +957,9 @@ function populateDashboard() {
     document.getElementById('editPinterest').value = brandData.pinterest || '';
     document.getElementById('editYoutube').value = brandData.youtube || '';
 
+    // Certifications
+    renderCertList(brandData.certifications || []);
+
     // Korean dealer info
     const dealer = brandData.koreanDealer || {};
     document.getElementById('editDealerName').value = dealer.name || '';
@@ -963,6 +989,66 @@ document.querySelectorAll('.tab').forEach(tab => {
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
     });
 });
+
+// ── 인증서 관리 ──
+function renderCertList(certs) {
+    const wrap = document.getElementById('certList');
+    if (!certs || certs.length === 0) {
+        wrap.innerHTML = '<p style="color:#999;font-size:0.85rem;">No certifications added yet.</p>';
+        return;
+    }
+    wrap.innerHTML = certs.map((cert, i) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f9f9f9;border-radius:6px;">
+            <div>
+                <a href="${cert.fileUrl}" target="_blank" style="font-weight:600;color:#000;text-decoration:none;"><i class="fas fa-file-certificate" style="margin-right:6px;color:#C8A96E;"></i>${cert.name}</a>
+                ${cert.issuer ? `<span style="color:#999;font-size:0.8rem;margin-left:8px;">${cert.issuer}</span>` : ''}
+            </div>
+            <button type="button" onclick="deleteCertification(${i})" style="background:none;border:none;color:#c62828;cursor:pointer;font-size:0.9rem;"><i class="fas fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+document.getElementById('addCertBtn').addEventListener('click', async () => {
+    const name = document.getElementById('certName').value.trim();
+    const issuer = document.getElementById('certIssuer').value.trim();
+    const file = document.getElementById('certFile').files[0];
+    if (!name) { alert('Certification name is required'); return; }
+    if (!file) { alert('Please choose a certificate file'); return; }
+
+    const btn = document.getElementById('addCertBtn');
+    btn.disabled = true;
+    btn.textContent = 'Uploading...';
+
+    try {
+        const ref = storage.ref(`certifications/${currentUser.uid}/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        const fileUrl = await ref.getDownloadURL();
+
+        const newCert = { name, issuer, fileUrl, issuedAt: new Date().toISOString().slice(0, 7) };
+        const updatedCerts = [...(brandData.certifications || []), newCert];
+
+        await db.collection('brands').doc(currentUser.uid).update({ certifications: updatedCerts });
+        brandData.certifications = updatedCerts;
+        renderCertList(updatedCerts);
+
+        document.getElementById('certName').value = '';
+        document.getElementById('certIssuer').value = '';
+        document.getElementById('certFile').value = '';
+    } catch (err) {
+        console.error('Certification upload error:', err);
+        alert('Upload failed. Please try again.');
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-plus"></i> Add Certification';
+});
+
+async function deleteCertification(index) {
+    if (!confirm('Remove this certification?')) return;
+    const updatedCerts = (brandData.certifications || []).filter((_, i) => i !== index);
+    await db.collection('brands').doc(currentUser.uid).update({ certifications: updatedCerts });
+    brandData.certifications = updatedCerts;
+    renderCertList(updatedCerts);
+}
 
 // ── 브랜드 정보 저장 ──
 document.getElementById('brandInfoForm').addEventListener('submit', async (e) => {

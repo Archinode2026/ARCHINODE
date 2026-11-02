@@ -473,6 +473,7 @@ function renderBrand(brand, products) {
     const headquarters = brand.headquarters || '';
     const website = brand.website || '';
     const brandStory = brand.brandStory || '';
+    const certifications = brand.certifications || [];
     const heroImage = brand.heroImage || '';
     const logoUrl = brand.logoUrl || '';
     const gallery1 = brand.gallery1 || '';
@@ -576,6 +577,14 @@ function renderBrand(brand, products) {
                     ${headquarters ? `<strong>HQ:</strong> ${headquarters}<br>` : ''}
                     ${website ? `<strong>Website:</strong> <a href="${wsUrl}" target="_blank" style="color:var(--gray-700);">${website}</a>` : ''}
                 </div>
+                ${certifications.length > 0 ? `
+                <div class="bp-cert-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+                    ${certifications.map(cert => `
+                        <a href="${cert.fileUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;font-size:0.78rem;color:#333;text-decoration:none;">
+                            <i class="fas fa-certificate" style="color:#C8A96E;"></i>${cert.name}
+                        </a>
+                    `).join('')}
+                </div>` : ''}
                 <div class="bp-cta-group">
                     <button class="btn-like" id="brandLikeBtn" onclick="toggleBrandLike()" title="Like">
                         <i class="far fa-heart" id="brandLikeIcon"></i>
