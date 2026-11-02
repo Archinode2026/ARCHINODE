@@ -775,6 +775,16 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
 let currentUser = null;
 let brandData = null;
 
+// A-030: 브랜드 포털에서 사용자 입력(제품명·설명·태그·article content 등)을 그대로
+// innerHTML에 꽂던 자리를 안전하게 하기 위한 공용 헬퍼. XSS 방지를 위해 모든 사용자
+// 입력을 textContent로 안전하게 인코딩한 뒤 돌려준다.
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 // ── 카테고리 → 서브카테고리 매핑 ──
 const SUBCATEGORIES = {
   Furniture: [
@@ -1268,13 +1278,18 @@ async function loadProducts() {
     snap.forEach(doc => {
         const p = doc.data();
         const statusClass = p.status === 'approved' ? 'status-approved' : p.status === 'rejected' ? 'status-rejected' : 'status-pending';
+        const pName = escapeHtml(p.name || '');
+        const pImageUrl = escapeHtml(p.imageUrl || '');
+        const pCollection = escapeHtml(p.collection || '');
+        const pMaterials = escapeHtml(p.materials || '');
+        const pStatus = escapeHtml(p.status || '');
         grid.innerHTML += `
             <div class="product-card">
-                <div class="img-area">${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : 'No image'}</div>
+                <div class="img-area">${p.imageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : 'No image'}</div>
                 <div class="info">
-                    <h4>${p.name}</h4>
-                    <p>${p.collection || ''} ${p.materials ? '· ' + p.materials : ''}</p>
-                    <span class="status-badge ${statusClass}" style="margin-top:8px;">${p.status}</span>
+                    <h4>${pName}</h4>
+                    <p>${pCollection} ${p.materials ? '· ' + pMaterials : ''}</p>
+                    <span class="status-badge ${statusClass}" style="margin-top:8px;">${pStatus}</span>
                 </div>
             </div>`;
     });
@@ -1296,14 +1311,18 @@ async function loadArticles() {
     snap.forEach(doc => {
         const a = doc.data();
         const statusClass = a.status === 'approved' ? 'status-approved' : a.status === 'rejected' ? 'status-rejected' : 'status-pending';
+        const aTitle = escapeHtml(a.title || '');
+        const aTag = escapeHtml(a.tag || '');
+        const aContent = escapeHtml((a.content || '').substring(0, 100));
+        const aStatus = escapeHtml(a.status || '');
         list.innerHTML += `
             <div style="padding:16px;border:1px solid #eee;border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
                 <div>
-                    <strong style="font-size:0.92rem;">${a.title}</strong>
-                    <span style="font-size:0.75rem;color:#C8A96E;margin-left:8px;">${a.tag}</span>
-                    <p style="font-size:0.8rem;color:#999;margin-top:4px;">${a.content.substring(0, 100)}...</p>
+                    <strong style="font-size:0.92rem;">${aTitle}</strong>
+                    <span style="font-size:0.75rem;color:#C8A96E;margin-left:8px;">${aTag}</span>
+                    <p style="font-size:0.8rem;color:#999;margin-top:4px;">${aContent}...</p>
                 </div>
-                <span class="status-badge ${statusClass}">${a.status}</span>
+                <span class="status-badge ${statusClass}">${aStatus}</span>
             </div>`;
     });
 }

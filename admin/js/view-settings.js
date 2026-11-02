@@ -157,7 +157,7 @@ function set_load() {
     if (set_state.loading) return;
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) { set_waitAuth(); return; }   // 로그인 전 진입(#settings 직접 열기)
     set_state.loading = true;
-    set_msg(t('Loading…', '불러오는 중…'), false);
+    set_msg('Loading…', '불러오는 중…', false);
     db.collection('settings').doc('config').get().then(function (snap) {
         set_state.loading = false;
         set_state.exists = snap.exists;
@@ -181,7 +181,7 @@ function set_load() {
 function set_waitAuth() {
     if (set_state.authHooked || typeof auth === 'undefined') return;
     set_state.authHooked = true;
-    set_msg(t('Sign in required', '로그인 필요'), false);
+    set_msg('Sign in required', '로그인 필요', false);
     var un = auth.onAuthStateChanged(function (u) {
         if (!u) return;
         if (typeof un === 'function') un();
@@ -237,7 +237,7 @@ function set_drawUpdated() {
 // ── 「기본값 채우기」 — 문서가 없을 때만. 입력 칸만 채우고 저장은 「저장」 버튼으로(set) ──
 function set_fillDefaults() {
     set_fillForm(SET_DEFAULTS);
-    set_msg(t('Defaults filled from for-brands.html text — press Save to create the document.', 'for-brands.html 문구로 채웠습니다 — 「저장」을 누르면 문서가 만들어집니다.'), false);
+    set_msg('Defaults filled from for-brands.html text — press Save to create the document.', 'for-brands.html 문구로 채웠습니다 — 「저장」을 누르면 문서가 만들어집니다.', false);
 }
 
 // ── 입력 칸 → 문서 객체 (listing·site·adminNotice 만 — 카테고리·어드민 이메일은 넣지 않는다, 계약서 2-3) ──
@@ -306,10 +306,24 @@ function set_save() {
     });
 }
 
-function set_msg(text, isErr) {
+function set_msg(enOrText, koOrIsErr, maybeIsErr) {
     var el = document.getElementById('setMsg');
     if (!el) return;
-    el.textContent = text || '';
+    var isErr;
+    if (typeof koOrIsErr === 'string') {
+        // bilingual mode (A-029): logs_msg(en, ko, isErr)
+        var en = enOrText, ko = koOrIsErr;
+        isErr = maybeIsErr;
+        el.setAttribute('data-en', en);
+        el.setAttribute('data-ko', ko);
+        el.textContent = admLang() === 'ko' ? ko : en;
+    } else {
+        // single-string mode (backward compat)
+        el.removeAttribute('data-en');
+        el.removeAttribute('data-ko');
+        el.textContent = enOrText || '';
+        isErr = koOrIsErr;
+    }
     el.classList.toggle('err', !!isErr);
 }
 

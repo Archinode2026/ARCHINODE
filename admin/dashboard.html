@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="admin.css?v=20260912f">
+<link rel="stylesheet" href="admin.css?v=20261102a">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -340,22 +340,22 @@ tr:hover { background: #fafafa; }
 </div>
 
 <script src="../firebase-config.js"></script>
-<script src="js/admin-core.js?v=20260912f"></script>
-<script src="js/admin-nav.js?v=20260912f"></script>
-<script src="js/view-dashboard.js?v=20260912f"></script>
-<script src="js/view-logs.js?v=20260912f"></script>
-<script src="js/view-settings.js?v=20260912f"></script>
-<script src="js/view-regulations.js?v=20260912f"></script>
-<script src="js/view-leads.js?v=20260912f"></script>
-<script src="js/view-users.js?v=20260912f"></script>
-<script src="js/view-notices.js?v=20260912f"></script>
-<script src="js/view-inquiries.js?v=20260912f"></script>
+<script src="js/admin-core.js?v=20261102a"></script>
+<script src="js/admin-nav.js?v=20261102a"></script>
+<script src="js/view-dashboard.js?v=20261102a"></script>
+<script src="js/view-logs.js?v=20261102a"></script>
+<script src="js/view-settings.js?v=20261102a"></script>
+<script src="js/view-regulations.js?v=20261102a"></script>
+<script src="js/view-leads.js?v=20261102a"></script>
+<script src="js/view-users.js?v=20261102a"></script>
+<script src="js/view-notices.js?v=20261102a"></script>
+<script src="js/view-inquiries.js?v=20261102a"></script>
 <script src="../search.js"></script>
 <script src="../lang.js?v=20260630"></script>
 <script>
 // ── 인증 확인 (관리자만) ──
 auth.onAuthStateChanged(async (user) => {
-    if (!user) { window.location.href = '../brand-portal/login.html'; return; }
+    if (!user) { window.location.href = '../auth/login.html?next=/admin/dashboard.html'; return; }
     if (!isAdmin(user.email)) {
         alert('Access denied. Admin only.');
         await auth.signOut();
@@ -1202,7 +1202,7 @@ function closeModal() { document.getElementById('modal').classList.remove('show'
 // ── 로그아웃 ──
 document.getElementById('logoutBtn').addEventListener('click', async () => {
     await auth.signOut();
-    window.location.href = '../brand-portal/login.html';
+    window.location.href = '../auth/login.html';
 });
 </script>
 </body>

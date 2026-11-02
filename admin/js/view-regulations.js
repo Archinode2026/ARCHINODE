@@ -71,7 +71,7 @@ function reg_show(key) {
 function reg_load(f) {
     if (reg_state.loading === f.key) return;
     reg_state.loading = f.key;
-    reg_msg(t('Loading…', '불러오는 중…'), false);
+    reg_msg('Loading…', '불러오는 중…', false);
     document.getElementById('regBody').innerHTML = '';
     document.getElementById('regToc').innerHTML = '';
     fetch(encodeURI(f.path)).then(function (r) {
@@ -168,9 +168,23 @@ function reg_onLinkClick(e) {
     e.preventDefault();   // 상대 경로(admin/ 기준으로 깨짐)·그 밖의 스킴은 열지 않는다
 }
 
-function reg_msg(text, isErr) {
+function reg_msg(enOrText, koOrIsErr, maybeIsErr) {
     var el = document.getElementById('regMsg');
     if (!el) return;
-    el.textContent = text || '';
+    var isErr;
+    if (typeof koOrIsErr === 'string') {
+        // bilingual mode (A-029): logs_msg(en, ko, isErr)
+        var en = enOrText, ko = koOrIsErr;
+        isErr = maybeIsErr;
+        el.setAttribute('data-en', en);
+        el.setAttribute('data-ko', ko);
+        el.textContent = admLang() === 'ko' ? ko : en;
+    } else {
+        // single-string mode (backward compat)
+        el.removeAttribute('data-en');
+        el.removeAttribute('data-ko');
+        el.textContent = enOrText || '';
+        isErr = koOrIsErr;
+    }
     el.classList.toggle('err', !!isErr);
 }

@@ -116,7 +116,7 @@ function logs_load(more) {
     if (more && log_state.lastDoc) q = q.startAfter(log_state.lastDoc);
     log_state.loading = true;
     log_state.error = false;
-    logs_msg(t('Loading…', '불러오는 중…'), false);
+    logs_msg('Loading…', '불러오는 중…', false);
     q.get().then(function (snap) {
         snap.forEach(function (d) { log_state.items.push(Object.assign({ id: d.id }, d.data())); });
         if (snap.size) log_state.lastDoc = snap.docs[snap.docs.length - 1];
@@ -139,7 +139,7 @@ function logs_load(more) {
 function logs_waitAuth() {
     if (log_state.authHooked || typeof auth === 'undefined') return;
     log_state.authHooked = true;
-    logs_msg(t('Sign in required', '로그인 필요'), false);
+    logs_msg('Sign in required', '로그인 필요', false);
     var un = auth.onAuthStateChanged(function (u) {
         if (!u) return;
         if (typeof un === 'function') un();
@@ -181,10 +181,24 @@ function logs_draw() {
     }
 }
 
-function logs_msg(text, isErr) {
+function logs_msg(enOrText, koOrIsErr, maybeIsErr) {
     var el = document.getElementById('logMsg');
     if (!el) return;
-    el.textContent = text || '';
+    var isErr;
+    if (typeof koOrIsErr === 'string') {
+        // bilingual mode (A-029): logs_msg(en, ko, isErr)
+        var en = enOrText, ko = koOrIsErr;
+        isErr = maybeIsErr;
+        el.setAttribute('data-en', en);
+        el.setAttribute('data-ko', ko);
+        el.textContent = admLang() === 'ko' ? ko : en;
+    } else {
+        // single-string mode (backward compat)
+        el.removeAttribute('data-en');
+        el.removeAttribute('data-ko');
+        el.textContent = enOrText || '';
+        isErr = koOrIsErr;
+    }
     el.classList.toggle('err', !!isErr);
 }
 
