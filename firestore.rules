@@ -42,6 +42,11 @@ service cloud.firestore {
       return request.resource.data[field] == resource.data[field];
     }
 
+    // 허니팟 스팸 방지: 공개 폼의 숨겨진 'hp' 필드가 비어있어야 함(봇은 보통 모든 필드를 채움)
+    function passesHoneypot() {
+      return !('hp' in request.resource.data) || request.resource.data.hp == '';
+    }
+
     // ────────────────────────────────────────────────────────────────────
     // brands 컬렉션
     // 문서 ID = Firebase Auth UID
@@ -61,6 +66,7 @@ service cloud.firestore {
       // 생성: 인증된 사용자가 본인 UID 문서만, status는 'pending' 강제
       allow create: if isOwner(brandId)
                     && isNewStatusPending()
+                    && passesHoneypot()
                     && request.resource.data.brandName is string
                     && request.resource.data.email is string;
 
@@ -226,7 +232,8 @@ service cloud.firestore {
     // ────────────────────────────────────────────────────────────────────
     match /consultations/{consultId} {
       // 생성: 누구나 (방문자 폼 제출). 필수 필드 검증 + status 'pending' 강제
-      allow create: if request.resource.data.companyName is string
+      allow create: if passesHoneypot()
+                    && request.resource.data.companyName is string
                     && request.resource.data.contactName is string
                     && request.resource.data.email is string
                     && request.resource.data.email.size() > 5
@@ -247,7 +254,8 @@ service cloud.firestore {
     // 방문자 이메일만 단순 수집. 출시 시 1회 알림 발송용.
     // ────────────────────────────────────────────────────────────────────
     match /digital-products-notify/{docId} {
-      allow create: if request.resource.data.email is string
+      allow create: if passesHoneypot()
+                    && request.resource.data.email is string
                     && request.resource.data.email.size() > 5
                     && request.resource.data.createdAt == request.time;
       allow read, update, delete: if isAdmin();
@@ -260,7 +268,8 @@ service cloud.firestore {
     // 한울님이 6/15에 Firebase Console에 직접 게시한 룰을 이 파일에 동기화 (2026-06-23).
     // ────────────────────────────────────────────────────────────────────
     match /newsletter-subscribers/{docId} {
-      allow create: if request.resource.data.email is string
+      allow create: if passesHoneypot()
+                    && request.resource.data.email is string
                     && request.resource.data.email.size() > 5
                     && request.resource.data.source is string
                     && request.resource.data.createdAt == request.time;

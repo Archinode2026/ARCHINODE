@@ -1035,6 +1035,10 @@ input, select, textarea { font-family: inherit; }
     <h2 class="fade-in" data-en="Stay Updated" data-ko="소식 받기">Stay Updated</h2>
     <p class="fade-in" data-en="Subscribe to receive the latest from global design brands entering Korea." data-ko="한국에 진출하는 글로벌 디자인 브랜드의 최신 소식을 받아보세요.">Subscribe to receive the latest from global design brands entering Korea.</p>
     <form class="newsletter-form fade-in" action="javascript:void(0);" onsubmit="return window.subscribeNewsletter(event, 'home')">
+      <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+        <label>Leave this field empty</label>
+        <input type="text" name="hp_newsletter" class="hp-newsletter" tabindex="-1" autocomplete="off">
+      </div>
       <input type="email" placeholder="Your email address" required>
       <button type="submit">Subscribe</button>
     </form>
@@ -1226,6 +1230,9 @@ document.querySelectorAll('.product-wish').forEach(btn => {
 window.subscribeNewsletter = async function(e, source) {
   e.preventDefault();
   var form = e.target;
+  // 봇 스팸 방지: 허니팟 필드가 채워져 있으면 조용히 중단
+  var hp = form.querySelector('.hp-newsletter');
+  if (hp && hp.value.trim() !== '') { return false; }
   var input = form.querySelector('input[type="email"]');
   var btn = form.querySelector('button[type="submit"]');
   var email = (input.value || '').trim();
@@ -1238,6 +1245,7 @@ window.subscribeNewsletter = async function(e, source) {
     await firebase.firestore().collection('newsletter-subscribers').add({
       email: email,
       source: source || 'unknown',
+      hp: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     try {

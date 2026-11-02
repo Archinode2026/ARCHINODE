@@ -465,6 +465,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     <h2 class="fade-in" data-en="Get European trends in your inbox" data-ko="유럽 트렌드를 이메일로 받아보세요">Get European trends in your inbox</h2>
     <p class="fade-in" data-en="New trend reports from European brands, delivered as they publish. No noise — only reports that pass our editorial review." data-ko="유럽 브랜드가 발행하는 새 브랜드 매거진를 메일로 보내드립니다. 편집부 검수를 통과한 글만.">New trend reports from European brands, delivered as they publish. No noise — only reports that pass our editorial review.</p>
     <form class="newsletter-form fade-in" action="javascript:void(0);" onsubmit="return window.subscribeNewsletter(event, 'trend-report')">
+      <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+        <label>Leave this field empty</label>
+        <input type="text" name="hp_newsletter" class="hp-newsletter" tabindex="-1" autocomplete="off">
+      </div>
       <input type="email" placeholder="Enter your email address" required data-en-placeholder="Enter your email address" data-ko-placeholder="이메일 주소를 입력하세요">
       <button type="submit" data-en="Subscribe" data-ko="구독">Subscribe</button>
     </form>
@@ -645,6 +649,9 @@ fadeEls.forEach(el => fadeObserver.observe(el));
 window.subscribeNewsletter = async function(e, source) {
   e.preventDefault();
   var form = e.target;
+  // 봇 스팸 방지: 허니팟 필드가 채워져 있으면 조용히 중단
+  var hp = form.querySelector('.hp-newsletter');
+  if (hp && hp.value.trim() !== '') { return false; }
   var input = form.querySelector('input[type="email"]');
   var btn = form.querySelector('button[type="submit"]');
   var email = (input.value || '').trim();
@@ -657,6 +664,7 @@ window.subscribeNewsletter = async function(e, source) {
     await firebase.firestore().collection('newsletter-subscribers').add({
       email: email,
       source: source || 'unknown',
+      hp: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     try {

@@ -292,6 +292,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
       <form id="consultForm" onsubmit="return submitConsult(event)">
 
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+          <label for="hp_website">Leave this field empty</label>
+          <input type="text" id="hp_website" name="hp_website" tabindex="-1" autocomplete="off">
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label for="companyName" data-en="Company / Studio Name" data-ko="회사 · 스튜디오 명">Company / Studio Name <span class="req">*</span></label>
@@ -458,6 +463,10 @@ function escapeHtml(str) {
 
 async function submitConsult(e) {
   e.preventDefault();
+  // 봇 스팸 방지: 허니팟 필드가 채워져 있으면 조용히 중단
+  if (document.getElementById('hp_website').value.trim() !== '') {
+    return false;
+  }
   const submitBtn = document.getElementById('submitBtn');
   const errorDiv = document.getElementById('formError');
   errorDiv.style.display = 'none';
@@ -505,6 +514,7 @@ async function submitConsult(e) {
       reviewerNote: null,
       triageNote: null,
       reviewedAt: null,
+      hp: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     try {

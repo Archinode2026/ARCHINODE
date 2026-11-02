@@ -417,6 +417,10 @@
     <h2 data-en="Be first to know when products launch" data-ko="출시 시 가장 먼저 알림 받기">Be first to know when products launch</h2>
     <p data-en="ARCHINODE Digital Products launch starting Q3 2026. Leave your email and we'll send a single notification when the first product goes live — no marketing spam." data-ko="ARCHINODE 디지털 상품은 2026년 하반기부터 순차 출시됩니다. 이메일을 남기시면 첫 상품 출시 시 1회 알림만 보내드립니다 — 마케팅 스팸 없음.">ARCHINODE Digital Products launch starting Q3 2026. Leave your email and we'll send a single notification when the first product goes live — no marketing spam.</p>
     <form class="dp-notify-form" id="notifyForm" onsubmit="return submitNotify(event)">
+      <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+        <label for="hp_notify">Leave this field empty</label>
+        <input type="text" id="hp_notify" name="hp_notify" tabindex="-1" autocomplete="off">
+      </div>
       <input type="email" id="notifyEmail" placeholder="your@email.com" required>
       <button type="submit" data-en="Notify Me" data-ko="알림 신청">Notify Me</button>
     </form>
@@ -521,6 +525,10 @@ function buyProduct(productId) {
 // Notify form — Firestore digital-products-notify 컬렉션에 저장 (단순 이메일 collect)
 async function submitNotify(e) {
   e.preventDefault();
+  // 봇 스팸 방지: 허니팟 필드가 채워져 있으면 조용히 중단
+  if (document.getElementById('hp_notify').value.trim() !== '') {
+    return false;
+  }
   const email = document.getElementById('notifyEmail').value.trim();
   const btn = e.target.querySelector('button');
   btn.disabled = true;
@@ -529,6 +537,7 @@ async function submitNotify(e) {
     const dbRef = firebase.firestore();
     await dbRef.collection('digital-products-notify').add({
       email: email,
+      hp: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     document.getElementById('notifyForm').style.display = 'none';

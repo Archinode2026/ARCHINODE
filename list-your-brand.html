@@ -240,6 +240,10 @@
         <div class="form-error" id="formError"></div>
 
         <form id="brandForm">
+            <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+                <label for="hp_website">Leave this field empty</label>
+                <input type="text" id="hp_website" name="hp_website" tabindex="-1" autocomplete="off">
+            </div>
             <!-- Brand Info -->
             <div class="form-row">
                 <div class="form-group">
@@ -579,6 +583,10 @@ const submitBtn = document.getElementById('submitBtn');
 
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
+    // 봇 스팸 방지: 허니팟 필드(실사용자에게는 안 보임)가 채워져 있으면 조용히 중단
+    if (document.getElementById('hp_website').value.trim() !== '') {
+        return;
+    }
     errorDiv.style.display = 'none';
     submitBtn.disabled = true;
     submitBtn.textContent = 'Creating your account...';
@@ -624,7 +632,8 @@ form.addEventListener('submit', async function(e) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             approvedAt: null,
             products: [],
-            magazineArticles: []
+            magazineArticles: [],
+            hp: ''
         });
 
         // 3. 로그아웃 (관리자 세션 방지)
