@@ -728,6 +728,7 @@ async function loadProducts() {
                 <td>${p.imageUrl ? `<img loading="lazy" src="${escapeHtml(p.imageUrl)}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
                 <td><span class="status status-${p.status}">${p.status}</span></td>
                 <td>
+                    <button class="act-btn act-view" onclick="viewProduct('${doc.id}')">View</button>
                     ${p.status === 'pending' ? `
                         <button class="act-btn act-approve" onclick="updateDoc('products','${doc.id}','approved')">Approve</button>
                         <button class="act-btn act-reject" onclick="updateDoc('products','${doc.id}','rejected')">Reject</button>
@@ -739,6 +740,61 @@ async function loadProducts() {
     document.getElementById('statPendingProducts').textContent = pending;
     document.getElementById('productCount').textContent = pending > 0 ? pending : '';
     document.getElementById('productCount').style.display = pending > 0 ? 'inline' : 'none';
+}
+
+// ── 제품 상세 보기 (A-044/A-045와 같은 갈래, 2026-11-02 QA: 승인 전 사진·치수·가격·설명을
+// 전혀 볼 방법이 없어 이름만 보고 승인/거절해야 했던 문제 — 아티클 viewArticle()과 같은 패턴) ──
+async function viewProduct(docId) {
+    const doc = await db.collection('products').doc(docId).get();
+    if (!doc.exists) {
+        closeModal();
+        alert('This product no longer exists — the list may be out of date. Reloading the list now.');
+        await loadProducts();
+        return;
+    }
+    const p = doc.data();
+
+    // 갤러리: images[] 배열이 있으면 전부, 없으면 단일 썸네일(imageUrl)이라도 보여준다
+    const gallery = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.imageUrl ? [p.imageUrl] : []);
+    const galleryHtml = gallery.length > 0
+        ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">${gallery.map(url =>
+              `<img loading="lazy" src="${escapeHtml(url)}" style="width:120px;height:120px;object-fit:cover;border-radius:6px;border:1px solid #eee;">`
+          ).join('')}</div>`
+        : `<p style="color:#999;font-size:0.85rem;margin-bottom:16px;">No images uploaded.</p>`;
+
+    const priceLabel = p.priceRange ? (p.priceRange === 'Contact' ? 'Contact for price' : p.priceRange) : '-';
+    const supplyLabels = { direct: 'Direct', 'dealer-seeking': 'Dealer seeking', 'dealer-appointed': 'Dealer appointed' };
+    const supplyLabel = p.supplyType ? (supplyLabels[p.supplyType] || p.supplyType) : '-';
+
+    // 소유 브랜드가 자유 문자열로 채우는 필드라 href에 그대로 쓰면 javascript: 등 XSS 벡터가 될 수 있다(A-003 패턴) — http(s)만 허용
+    const filesHtml = ['catalogPdf', 'bimFile', 'model3d'].map(key => {
+        const labelMap = { catalogPdf: 'Catalog PDF', bimFile: 'BIM file', model3d: '3D model' };
+        const url = p[key] && /^https?:\/\//i.test(p[key]) ? p[key] : null;
+        return url
+            ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="margin-right:12px;">${labelMap[key]}</a>`
+            : `<span style="color:#ccc;margin-right:12px;">${labelMap[key]} (none)</span>`;
+    }).join('');
+
+    const actionsHtml = p.status === 'pending' ? `
+        <button class="act-btn act-approve" onclick="updateDoc('products','${docId}','approved');closeModal();">Approve</button>
+        <button class="act-btn act-reject" onclick="updateDoc('products','${docId}','rejected');closeModal();">Reject</button>
+    ` : '';
+
+    document.getElementById('modalContent').innerHTML = `
+        <h2>${escapeHtml(p.name)}</h2>
+        <p style="color:#C8A96E;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(p.brandName || '-')} · <span class="status status-${escapeHtml(p.status || '')}">${escapeHtml(p.status || '')}</span></p>
+        ${galleryHtml}
+        <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${escapeHtml(p.category || '-')}${p.subcategory ? ' / ' + escapeHtml(p.subcategory) : ''}</div></div>
+        <div class="detail-row"><div class="detail-label">Designer</div><div class="detail-value">${escapeHtml(p.designer || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Materials</div><div class="detail-value">${escapeHtml(p.materials || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Dimensions</div><div class="detail-value">${escapeHtml(p.dimensions || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Price Range</div><div class="detail-value">${escapeHtml(priceLabel)}</div></div>
+        <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(p.description || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">MOQ / Lead Time</div><div class="detail-value">${escapeHtml(p.moq || '-')} / ${escapeHtml(p.leadTime || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Supply Type</div><div class="detail-value">${escapeHtml(supplyLabel)}</div></div>
+        <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value">${filesHtml}</div></div>
+        <div style="margin-top:20px;">${actionsHtml}</div>`;
+    document.getElementById('modal').classList.add('show');
 }
 
 // ── 아티클 목록 ──
