@@ -55,6 +55,7 @@
                     <p style="font-size:0.9rem;" data-en="No products listed yet. Brands can register their products through the brand portal." data-ko="아직 등록된 제품이 없습니다. 브랜드 포털을 통해 제품을 등록할 수 있습니다.">No products listed yet. Brands can register their products through the brand portal.</p>
                     <a href="${base}list-your-brand.html" style="display:inline-block;margin-top:20px;padding:10px 24px;background:#000;color:#fff;font-size:0.82rem;font-weight:600;text-decoration:none;" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
                 </div>`;
+                if (window.applyLang) window.applyLang();   // A-062: 비동기로 끼워넣는 조각이라 언어 재적용 필요
                 return;
             }
 
@@ -77,10 +78,12 @@
 
             html += '</div>';
             container.innerHTML = html;
+            if (window.applyLang) window.applyLang();   // A-062: 비동기로 끼워넣는 조각이라 언어 재적용 필요
 
         } catch (err) {
             console.error('Error loading products:', err);
-            container.innerHTML = '<p style="text-align:center;color:#a3a3a3;padding:40px;">Unable to load products.</p>';
+            container.innerHTML = '<p style="text-align:center;color:#a3a3a3;padding:40px;" data-en="Unable to load products." data-ko="제품을 불러올 수 없습니다.">Unable to load products.</p>';
+            if (window.applyLang) window.applyLang();
         }
     }
 

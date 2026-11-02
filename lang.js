@@ -110,6 +110,14 @@
       + '<div class="lang-menu" style="display:none;">' + menuItems + '</div>';
   }
 
+  // A-062: 비동기로 나중에 끼워 넣어지는 조각(예: 카테고리 제품 목록의 빈 상태 안내)은
+  // DOMContentLoaded 때 한 번 도는 applyLanguage()의 손길이 닿지 않는다. 그런 코드가
+  // innerHTML을 채운 직후 이 함수를 불러서 현재 언어를 다시 적용할 수 있게 공개한다.
+  // (일부 페이지에 이미 "if (window.applyLang) window.applyLang();" 방어 호출이 있었음)
+  window.applyLang = function() {
+    applyLanguage(currentLang);
+  };
+
   window.toggleLangMenu = function(e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     document.querySelectorAll('.lang-menu').forEach(function(m) {
