@@ -1047,6 +1047,7 @@ input, select, textarea { font-family: inherit; }
       <input type="email" placeholder="Your email address" required>
       <button type="submit">Subscribe</button>
     </form>
+    <div class="newsletter-msg" id="newsletterMsg" style="display:none;font-size:0.85rem;margin-top:14px;"></div>
   </div>
 </section>
 
@@ -1236,13 +1237,27 @@ document.querySelectorAll('.product-wish').forEach(btn => {
 window.subscribeNewsletter = async function(e, source) {
   e.preventDefault();
   var form = e.target;
+  // A-077: 브라우저 기본 alert()는 페이지 전체를 막는 모달이라 사이트의 다른 폼들
+  // (digital-products.html #notifyMsg 등)과 다르게 어색했다. 같은 방식으로 폼 바로
+  // 아래 인라인 안내 문구를 보여주도록 통일.
+  var msgEl = document.getElementById('newsletterMsg');
+  function showMsg(text, isError) {
+    if (!msgEl) { if (isError) console.error(text); return; }
+    msgEl.textContent = text;
+    msgEl.style.color = isError ? '#c0392b' : '#2e7d32';
+    msgEl.style.display = 'block';
+  }
+  var curLang = document.documentElement.lang === 'ko' ? 'ko' : 'en';
   // 봇 스팸 방지: 허니팟 필드가 채워져 있으면 조용히 중단
   var hp = form.querySelector('.hp-newsletter');
   if (hp && hp.value.trim() !== '') { return false; }
   var input = form.querySelector('input[type="email"]');
   var btn = form.querySelector('button[type="submit"]');
   var email = (input.value || '').trim();
-  if (!email || email.indexOf('@') < 1) { alert('Please enter a valid email.'); return false; }
+  if (!email || email.indexOf('@') < 1) {
+    showMsg(curLang === 'ko' ? '올바른 이메일 주소를 입력해 주세요.' : 'Please enter a valid email.', true);
+    return false;
+  }
   var origText = btn.textContent;
   btn.disabled = true;
   btn.textContent = '...';
@@ -1271,11 +1286,11 @@ window.subscribeNewsletter = async function(e, source) {
         });
     } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
 
-    alert('Thank you for subscribing!');
+    showMsg(curLang === 'ko' ? '구독해 주셔서 감사합니다!' : 'Thank you for subscribing!', false);
     form.reset();
   } catch (err) {
     console.error('Subscribe failed:', err);
-    alert('Subscription failed: ' + err.message);
+    showMsg((curLang === 'ko' ? '구독에 실패했습니다: ' : 'Subscription failed: ') + err.message, true);
   } finally {
     btn.disabled = false;
     btn.textContent = origText;
