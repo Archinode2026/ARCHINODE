@@ -9,6 +9,7 @@
 <meta property="og:title" content="List Your Brand | ARCHINODE">
 <meta property="og:description" content="Register your brand on ARCHINODE — the fastest way to enter Korea's architecture and design market.">
 <meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -375,9 +376,10 @@
                 <input type="text" id="website" name="website" required autocomplete="url" placeholder="https://yourbrand.com">
             </div>
 
-            <div class="form-group">
-                <label data-en="Category " data-ko="카테고리 "><span class="req">*</span> <small style="color:#999;font-weight:400;" data-en="(Select all that apply)" data-ko="(해당하는 항목을 모두 선택하세요)"></small></label>
-                <div class="category-grid" id="categoryGrid">
+            <fieldset class="form-group" style="border:none;padding:0;margin:0 0 20px;">
+                <legend data-en="Category *" data-ko="카테고리 *" style="display:block;margin-bottom:8px;font-size:0.85rem;color:#999;">Category *</legend>
+                <small style="color:#999;font-weight:400;display:block;margin:-6px 0 10px;" data-en="(Select all that apply)" data-ko="(해당하는 항목을 모두 선택하세요)">(Select all that apply)</small>
+                <div class="category-grid" id="categoryGrid" role="group" aria-label="Category">
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Bathroom"><span>Bathroom</span></label>
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Construction"><span>Construction</span></label>
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Decor"><span>Decor</span></label>
@@ -389,7 +391,7 @@
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Outdoor"><span>Outdoor</span></label>
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Wellness"><span>Wellness</span></label>
                 </div>
-            </div>
+            </fieldset>
             <div class="form-group">
                 <label data-en="Product Type" data-ko="제품 유형"></label>
                 <input type="text" id="productType" placeholder="e.g. Faucets, Tiles, Sofas">

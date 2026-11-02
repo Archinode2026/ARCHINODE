@@ -775,7 +775,7 @@ input, select, textarea { font-family: inherit; }
   background: var(--black);
   border-radius: 50%;
 }
-.timeline-item h4 {
+.timeline-item .timeline-period, .timeline-item h4 {
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--gray-400);
@@ -2138,3 +2138,27 @@ input, select, textarea { font-family: inherit; }
 }
 .form-success .copy-btn:hover { background: #b8994e; }
 .form-success .copy-btn.copied { background: #10b981; }
+
+/* ===== A-135: PRINT STYLES ===== */
+@media print {
+  /* 화면 전용 요소 전부 숨기기 */
+  .header, .announcement-bar, .search-overlay, .hero-dots, .hero-pause-btn,
+  .scroll-top, .mobile-toggle, .footer-social, #archi-cookie-banner,
+  .cta-listing, .nav-cta, .search-toggle, .lang-switcher, .lang-switcher-floating,
+  button[onclick*="copy"], .copy-btn, .product-wish, .btn-like {
+    display: none !important;
+  }
+  body { background: #fff; color: #000; }
+  .page-hero, .hero { min-height: auto; padding: 0; background: none !important; }
+  .page-hero-bg, .hero-slide-bg { display: none; }
+  .container, .page-hero-content, .page-hero-inner { max-width: 100%; padding: 0; }
+  a { color: #000; text-decoration: underline; }
+  /* 외부 링크는 괄호에 URL을 같이 인쇄 */
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #666; }
+  /* 페이지 넘김 깔끔하게 */
+  h1, h2, h3, h4 { page-break-after: avoid; }
+  img, figure { page-break-inside: avoid; max-width: 100% !important; }
+  .article-body { font-size: 11pt; line-height: 1.5; }
+  .footer { border-top: 1px solid #ccc; padding-top: 8px; margin-top: 24px; font-size: 9pt; color: #666; }
+  .footer-grid, .footer-col ul li a { color: #666; }
+}

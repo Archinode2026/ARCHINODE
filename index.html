@@ -838,7 +838,7 @@ input, select, textarea { font-family: inherit; }
 <div class="search-overlay" id="searchOverlay">
   <button type="button" class="search-close" onclick="toggleSearch()" aria-label="Close search" data-en-aria-label="Close search" data-ko-aria-label="검색 닫기" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;line-height:1;padding:0;font-family:inherit;">&times;</button>
   <div class="search-box">
-    <input type="text" placeholder="Search brands, products, designers..." data-en-placeholder="Search brands, products, designers..." data-ko-placeholder="브랜드, 제품, 디자이너 검색...">
+    <input type="text" placeholder="Search brands, products, designers..." data-en-placeholder="Search brands, products, designers..." data-ko-placeholder="브랜드, 제품, 디자이너 검색..." aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색">
     <button aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-arrow-right"></i></button>
   </div>
 </div>
@@ -1056,7 +1056,7 @@ input, select, textarea { font-family: inherit; }
         <label>Leave this field empty</label>
         <input type="text" name="hp_newsletter" class="hp-newsletter" tabindex="-1" autocomplete="off">
       </div>
-      <input type="email" placeholder="Your email address" required>
+      <input type="email" placeholder="Your email address" required aria-label="Email address" data-en-aria-label="Email address" data-ko-aria-label="이메일 주소">
       <button type="submit">Subscribe</button>
     </form>
     <div class="newsletter-msg" id="newsletterMsg" style="display:none;font-size:0.85rem;margin-top:14px;"></div>
@@ -1144,6 +1144,26 @@ input, select, textarea { font-family: inherit; }
 </button>
 
 <script>
+// A-129: 홈페이지 JSON-LD의 SearchAction 약속(?q=...) 지원 — 쿼리가 있으면 검색 오버레이 열고 입력
+(function handleSearchQuery(){
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var q = params.get('q');
+    if (!q) return;
+    // 검색 오버레이가 로드된 뒤에 작동
+    setTimeout(function(){
+      var overlay = document.getElementById('searchOverlay');
+      var input = overlay && overlay.querySelector('.search-box input');
+      if (!overlay || !input) return;
+      overlay.classList.add('active');
+      input.value = q;
+      input.focus();
+      // search.js의 input 리스너가 결과를 렌더링하도록 input 이벤트 트리거
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }, 50);
+  } catch(e) {}
+})();
+
 /* ===== HERO SLIDER ===== */
 const slides = document.querySelectorAll('.hero-slide');
 const dots = document.querySelectorAll('.hero-dot');
