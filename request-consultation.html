@@ -484,18 +484,22 @@ async function submitConsult(e) {
   const agreeContact = document.getElementById('agreeContact').checked;
 
   if (!agreeContact) {
-    errorDiv.textContent = 'Please confirm the contact consent to submit.';
+    var curLang1 = (function(){ try { return localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en'; } catch(e) { return 'en'; } })();
+    errorDiv.textContent = curLang1 === 'ko' ? '제출하려면 연락처 수집 동의에 체크해 주세요.' : 'Please confirm the contact consent to submit.';
     errorDiv.style.display = 'block';
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return false;
   }
   if (description.length < 100) {
-    errorDiv.textContent = 'Please provide at least 100 characters in the description so we can prepare properly.';
+    var curLang2 = (function(){ try { return localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en'; } catch(e) { return 'en'; } })();
+    errorDiv.textContent = curLang2 === 'ko' ? '충분히 준비할 수 있도록 상황 설명을 100자 이상 적어 주세요.' : 'Please provide at least 100 characters in the description so we can prepare properly.';
     errorDiv.style.display = 'block';
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return false;
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Submitting...';
+  submitBtn.textContent = (function(){ try { return (localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en') === 'ko' ? '제출 중...' : 'Submitting...'; } catch(e) { return 'Submitting...'; } })();
 
   try {
     const dbRef = firebase.firestore();
@@ -521,21 +525,21 @@ async function submitConsult(e) {
         await dbRef.collection('mail').add({
             to: 'office@archinode.org',
             message: {
-                subject: '[ARCHINODE] 컨설팅 요청 - ' + (data.companyName || 'Unknown'),
+                subject: '[ARCHINODE] 컨설팅 요청 - ' + (companyName || 'Unknown'),
                 text: [
                     '컨설팅 요청이 접수되었습니다.',
                     '',
-                    'Company: ' + (data.companyName || '-'),
-                    'Contact: ' + (data.contactName || '-'),
-                    'Email: ' + (data.email || '-'),
-                    'Phone: ' + (data.phone || '-'),
-                    'Country: ' + (data.country || '-'),
-                    'Category: ' + (data.category || '-'),
-                    'Timing: ' + (data.timing || '-'),
-                    'Budget: ' + (data.budget || '-'),
+                    'Company: ' + (companyName || '-'),
+                    'Contact: ' + (contactName || '-'),
+                    'Email: ' + (email || '-'),
+                    'Phone: ' + (phone || '-'),
+                    'Country: ' + (country || '-'),
+                    'Category: ' + (category || '-'),
+                    'Timing: ' + (timing || '-'),
+                    'Budget: ' + (budget || '-'),
                     '',
                     'Description:',
-                    (data.description || '-').substring(0, 800),
+                    (description || '-').substring(0, 800),
                     '',
                     'Admin inbox: https://archinodekr.com/admin/consultations.html'
                 ].join('\n')
@@ -551,8 +555,9 @@ async function submitConsult(e) {
     console.error(err);
     errorDiv.textContent = 'Failed to submit: ' + (err.message || 'Unknown error') + '. Please try again or email office@archinode.org directly.';
     errorDiv.style.display = 'block';
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Send Request';
+    submitBtn.textContent = (function(){ try { return (localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en') === 'ko' ? '요청 보내기' : 'Send Request'; } catch(e) { return 'Send Request'; } })();
   }
   return false;
 }
