@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sourcing Inquiry — 자재 소싱 문의 | ARCHINODE</title>
+<meta name="description" content="어떤 유럽 브랜드가 맞는지 아직 모르시나요? 필요한 자재·용도를 알려주시면 ARCHINODE가 맞는 브랜드를 찾아 연결해 드립니다.">
+<meta property="og:title" content="Sourcing Inquiry | ARCHINODE">
+<meta property="og:description" content="필요한 자재·용도를 알려주시면 맞는 유럽 브랜드를 찾아 연결해 드립니다.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<!-- ANNOUNCEMENT BAR -->
+<div class="announcement-bar">
+  <span data-en="2026 Brand Listing — " data-ko="2026 브랜드 입점 — ">2026 Brand Listing — </span><strong data-en="Now Free" data-ko="지금 무료">Now Free</strong> &nbsp;|&nbsp; <span data-en="List your brand on ARCHINODE at no cost." data-ko="ARCHINODE에 무료로 브랜드를 등록하세요.">List your brand on ARCHINODE at no cost.</span> <a href="list-your-brand.html" data-en="Learn more →" data-ko="자세히 보기 →">Learn more &rarr;</a>
+</div>
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container">
+    <a href="index.html" class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger" onclick="toggleCatMenu()" data-en="Categories" data-ko="카테고리">Categories <i class="fas fa-chevron-down"></i></button>
+        <div class="nav-dropdown-menu" id="catMenu">
+            <a href="categories/furniture.html"><span>Furniture</span><small>가구</small></a>
+            <a href="categories/bathroom.html"><span>Bathroom</span><small>욕실</small></a>
+            <a href="categories/outdoor.html"><span>Outdoor</span><small>아웃도어</small></a>
+            <a href="categories/lighting.html"><span>Lighting</span><small>조명</small></a>
+            <a href="categories/kitchen.html"><span>Kitchen</span><small>주방</small></a>
+            <a href="categories/office.html"><span>Office</span><small>오피스</small></a>
+            <a href="categories/finishes.html"><span>Finishes</span><small>마감재</small></a>
+            <a href="categories/wellness.html"><span>Wellness</span><small>웰니스</small></a>
+            <a href="categories/decor.html"><span>Decor</span><small>데코</small></a>
+            <a href="categories/construction.html"><span>Construction</span><small>건축자재</small></a>
+        </div>
+      </div>
+      <a href="brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
+      <a href="trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a>
+      <a href="about.html" data-en="About" data-ko="소개">About</a>
+      <a href="list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+    </nav>
+    <div class="header-actions">
+      <a href="brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
+      <button class="search-toggle" onclick="toggleSearch()" aria-label="Search"><i class="fas fa-search"></i></button>
+      <a href="auth/profile.html" aria-label="Saved"><i class="far fa-bookmark"></i></a>
+      <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
+      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+  <span class="search-close" onclick="toggleSearch()">&times;</span>
+  <div class="search-box">
+    <input type="text" placeholder="Search brands, products, designers...">
+    <button><i class="fas fa-arrow-right"></i></button>
+  </div>
+</div>
+
+<section class="page-hero" style="min-height:300px;">
+  <img loading="lazy" class="page-hero-bg" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80" alt="Sourcing Inquiry">
+  <div class="page-hero-content">
+    <div class="page-hero-inner">
+      <span class="page-hero-tag" data-en="Not Sure Which Brand Yet?" data-ko="아직 브랜드를 못 정하셨나요?">Not Sure Which Brand Yet?</span>
+      <h1 data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</h1>
+      <p data-en="Tell us what you need — we'll match you with the right European brand." data-ko="필요한 내용을 알려주시면 맞는 유럽 브랜드를 찾아 연결해 드려요.">Tell us what you need — we'll match you with the right European brand.</p>
+    </div>
+  </div>
+</section>
+
+<div class="breadcrumb">
+  <div class="container">
+    <div class="breadcrumb-list">
+      <a href="index.html" data-en="Home" data-ko="홈">Home</a>
+      <span class="sep">/</span>
+      <span class="current" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</span>
+    </div>
+  </div>
+</div>
+
+<section style="padding:60px 0;">
+  <div class="container" style="max-width:640px;">
+    <div id="sourcingFormWrap">
+      <p style="line-height:1.8;color:#666;margin-bottom:30px;" data-en="Browsing by brand isn't always easy when you don't know the market yet. Describe what you're looking for and our team will privately match you with brands on ARCHINODE that fit — no public posting, no spam to multiple vendors." data-ko="아직 시장을 잘 모를 때는 브랜드별로 찾아보기가 쉽지 않아요. 찾으시는 내용을 알려주시면 저희가 ARCHINODE에 입점한 브랜드 중 맞는 곳을 비공개로 연결해 드려요 — 공개 게시나 여러 업체에 스팸처럼 뿌려지지 않습니다.">Browsing by brand isn't always easy when you don't know the market yet. Describe what you're looking for and our team will privately match you with brands on ARCHINODE that fit — no public posting, no spam to multiple vendors.</p>
+
+      <form id="sourcingForm" onsubmit="return submitSourcing(event)" style="display:flex;flex-direction:column;gap:16px;">
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+          <label for="src_hp">Leave this field empty</label>
+          <input type="text" id="src_hp" tabindex="-1" autocomplete="off">
+        </div>
+        <div>
+          <label for="srcName" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Name *" data-ko="이름 *">Name *</label>
+          <input type="text" id="srcName" required autocomplete="name" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
+        </div>
+        <div>
+          <label for="srcCompany" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Company" data-ko="회사명">Company</label>
+          <input type="text" id="srcCompany" autocomplete="organization" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
+        </div>
+        <div>
+          <label for="srcEmail" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Email *" data-ko="이메일 *">Email *</label>
+          <input type="email" id="srcEmail" required autocomplete="email" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
+        </div>
+        <div>
+          <label for="srcCategory" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Category" data-ko="카테고리">Category</label>
+          <select id="srcCategory" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;background:#fff;">
+            <option value="" data-en="Not sure yet" data-ko="아직 모르겠어요">Not sure yet</option>
+            <option value="Furniture" data-en="Furniture" data-ko="가구">Furniture</option>
+            <option value="Bathroom" data-en="Bathroom" data-ko="욕실">Bathroom</option>
+            <option value="Outdoor" data-en="Outdoor" data-ko="아웃도어">Outdoor</option>
+            <option value="Lighting" data-en="Lighting" data-ko="조명">Lighting</option>
+            <option value="Kitchen" data-en="Kitchen" data-ko="주방">Kitchen</option>
+            <option value="Office" data-en="Office" data-ko="오피스">Office</option>
+            <option value="Finishes" data-en="Finishes" data-ko="마감재">Finishes</option>
+            <option value="Wellness" data-en="Wellness" data-ko="웰니스">Wellness</option>
+            <option value="Decor" data-en="Decor" data-ko="데코">Decor</option>
+            <option value="Construction" data-en="Construction" data-ko="건축자재">Construction</option>
+          </select>
+        </div>
+        <div>
+          <label for="srcMessage" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="What are you looking for? *" data-ko="어떤 것을 찾고 계신가요? *">What are you looking for? *</label>
+          <textarea id="srcMessage" required rows="5" placeholder="e.g. Natural stone cladding for a 200㎡ office lobby, delivery by Q2 2027" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;resize:vertical;"></textarea>
+        </div>
+        <button type="submit" id="srcSubmitBtn" style="padding:14px 32px;background:#000;color:#fff;border:none;border-radius:4px;font-size:1rem;cursor:pointer;font-family:inherit;align-self:flex-start;" data-en="Send Inquiry" data-ko="문의 보내기">Send Inquiry <i class="fas fa-arrow-right"></i></button>
+        <div id="srcErrorMsg" style="color:#c62828;font-size:0.85rem;display:none;"></div>
+      </form>
+    </div>
+
+    <div id="sourcingSuccessWrap" style="display:none;text-align:center;padding:40px 0;">
+      <i class="fas fa-check-circle" style="font-size:3rem;color:#2e7d32;margin-bottom:16px;"></i>
+      <h2 style="margin-bottom:8px;" data-en="Thanks — we're on it" data-ko="감사합니다 — 확인 중이에요">Thanks — we're on it</h2>
+      <p style="color:#666;" data-en="Our team will review your request and privately introduce you to matching brands." data-ko="저희 팀이 요청을 검토한 후, 맞는 브랜드를 비공개로 소개해 드릴게요.">Our team will review your request and privately introduce you to matching brands.</p>
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "ARCHINODE",
+  "alternateName": "아키노드",
+  "url": "https://archinodekr.com",
+  "logo": "https://archinodekr.com/favicon-512x512.png",
+  "description": "Connecting global architecture & design brands with the Korean market",
+  "email": "office@archinode.org",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "내손로 13, 103동 804호",
+    "addressLocality": "의왕시",
+    "addressRegion": "경기도",
+    "addressCountry": "KR"
+  },
+  "sameAs": []
+}
+</script>
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></div>
+        <p>Connecting global architecture &amp; design brands with the Korean market.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+          <a href="#"><i class="fab fa-pinterest-p"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Categories" data-ko="카테고리">Categories</h4>
+        <ul>
+          <li><a href="categories/furniture.html">Furniture</a></li>
+          <li><a href="categories/bathroom.html">Bathroom</a></li>
+          <li><a href="categories/outdoor.html">Outdoor</a></li>
+          <li><a href="categories/lighting.html">Lighting</a></li>
+          <li><a href="categories/kitchen.html">Kitchen</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="More Categories" data-ko="카테고리 더보기">More Categories</h4>
+        <ul>
+          <li><a href="categories/office.html">Office</a></li>
+          <li><a href="categories/finishes.html">Finishes</a></li>
+          <li><a href="categories/wellness.html">Wellness</a></li>
+          <li><a href="categories/decor.html">Decor</a></li>
+          <li><a href="categories/construction.html">Construction</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Services" data-ko="서비스">Services</h4>
+        <ul>
+          <li><a href="list-your-brand.html">Brand Listing</a></li>
+          <li><a href="sourcing-inquiry.html">Sourcing Inquiry</a></li>
+          <li><a href="magazine.html">Magazine</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Company" data-ko="회사">Company</h4>
+        <ul>
+          <li><a href="about.html">About ARCHINODE</a></li>
+          <li><a href="magazine.html">Magazine</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business-info" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;margin-top:40px;margin-bottom:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
+      상호: 비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
+      주소: 경기도 의왕시 내손로 13, 103동 804호 &nbsp;|&nbsp; 이메일: office@archinode.org
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 ARCHINODE. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="terms.html" data-en="Terms" data-ko="이용약관">Terms</a>
+        <a href="privacy.html" data-en="Privacy Policy" data-ko="개인정보처리방침">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Top">
+  <i class="fas fa-chevron-up"></i>
+</button>
+<script src="firebase-config.js"></script>
+<script>
+const header = document.getElementById('header');
+const scrollTopBtn = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 50);
+  scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+});
+function toggleSearch() {
+  const o = document.getElementById('searchOverlay');
+  o.classList.toggle('active');
+  if (o.classList.contains('active')) o.querySelector('input').focus();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('searchOverlay').classList.remove('active'); });
+function toggleCatMenu() {
+  const menu = document.getElementById('catMenu');
+  menu.classList.toggle('active');
+}
+document.addEventListener('click', function(e) {
+  const dropdown = document.querySelector('.nav-dropdown');
+  if (dropdown && !dropdown.contains(e.target)) {
+    document.getElementById('catMenu').classList.remove('active');
+  }
+});
+function toggleMobile() { document.getElementById('mainNav').classList.toggle('active'); }
+const fadeEls = document.querySelectorAll('.fade-in');
+const fadeObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); fadeObs.unobserve(e.target); }});
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+fadeEls.forEach(el => fadeObs.observe(el));
+
+// ── 소싱 문의 제출 ──
+async function submitSourcing(e) {
+  e.preventDefault();
+  if (document.getElementById('src_hp').value.trim() !== '') return false;
+
+  const btn = document.getElementById('srcSubmitBtn');
+  const errorMsg = document.getElementById('srcErrorMsg');
+  errorMsg.style.display = 'none';
+  btn.disabled = true;
+
+  const name = document.getElementById('srcName').value.trim();
+  const company = document.getElementById('srcCompany').value.trim();
+  const email = document.getElementById('srcEmail').value.trim();
+  const category = document.getElementById('srcCategory').value;
+  const message = document.getElementById('srcMessage').value.trim();
+
+  try {
+    await db.collection('leads').add({
+      type: 'sourcing',
+      status: 'new',
+      brandId: '',
+      brandName: '',
+      productId: '',
+      productName: '',
+      name: name,
+      company: company,
+      email: email,
+      phone: '',
+      industry: '',
+      category: category,
+      message: message,
+      source: 'sourcing-page',
+      userId: (typeof auth !== 'undefined' && auth.currentUser ? auth.currentUser.uid : ''),
+      adminNote: '',
+      brandNote: '',
+      hp: '',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      assignedAt: null
+    });
+    document.getElementById('sourcingFormWrap').style.display = 'none';
+    document.getElementById('sourcingSuccessWrap').style.display = 'block';
+  } catch (err) {
+    console.error('Sourcing inquiry error:', err);
+    errorMsg.textContent = 'Something went wrong. Please try again.';
+    errorMsg.style.display = 'block';
+  }
+  btn.disabled = false;
+  return false;
+}
+</script>
+<script src="search.js"></script>
+<script src="lang.js?v=20260630"></script>
+<script src="auth-ui.js"></script>
+<script src="cookie-consent.js?v=20260630" defer></script>
+<script src="analytics-loader.js?v=20260630" defer></script>
+<script src="sentry-loader.js?v=20260630" defer></script>
+<script src="form-throttle.js?v=20260630" defer></script>
+</body>
+</html>
