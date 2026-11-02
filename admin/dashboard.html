@@ -618,6 +618,15 @@ function openReasonModal(opts) {
 // ── 브랜드 상세 보기 ──
 async function viewBrand(docId) {
     const doc = await db.collection('brands').doc(docId).get();
+    // R20/R19 재검증: 존재하지 않는 문서(삭제됨/목록이 낡음)를 열면 doc.data()가 undefined를 돌려줘
+    // 아래에서 바로 TypeError가 나며, 모달은 조용히 실패하고 직전에 열어본 다른 브랜드 내용이 그대로 남아
+    // 담당자가 지금 보는 것으로 착각할 위험이 있었다. 존재 확인 후 안내하고 모달을 닫는다.
+    if (!doc.exists) {
+        closeModal();
+        alert('This brand no longer exists — the list may be out of date. Reloading the list now.');
+        await loadAll();
+        return;
+    }
     const b = doc.data();
 
     let statusHistoryHtml = '';
@@ -766,6 +775,15 @@ async function loadArticles() {
 // ── 아티클 상세 보기 ──
 async function viewArticle(docId) {
     const doc = await db.collection('articles').doc(docId).get();
+    // R20 재검증과 동일한 문제: 존재하지 않는 글을 열면 doc.data()가 undefined라
+    // "Cannot read properties of undefined (reading 'title')"로 조용히 실패하고
+    // 직전에 보던 다른 글 내용이 그대로 남아 지금 것으로 착각할 위험이 있었다.
+    if (!doc.exists) {
+        closeModal();
+        alert('This article no longer exists — the list may be out of date. Reloading the list now.');
+        await loadAll();
+        return;
+    }
     const a = doc.data();
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(a.title)}</h2>
