@@ -25,7 +25,7 @@ EXCLUDE_DIRS = {
     "admin", "auth", "brand-portal", "scripts", "downloads",
 }
 EXCLUDE_FILES = {
-    "404.html", "privacy-en.html",  # 다국어 페이지 중 en 별도 파일
+    "404.html",  # A-076(2026-11-02): privacy-en.html은 포함(언어별 분기 지원됨)
 }
 
 # priority 결정
