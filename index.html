@@ -624,6 +624,11 @@ input, select, textarea { font-family: inherit; }
   transition: all 0.2s;
 }
 .newsletter-form button:hover { background: var(--gray-800); }
+@media (max-width: 360px) {
+  .newsletter-form { flex-direction: column; }
+  .newsletter-form input { border-right: 1px solid var(--gray-300); }
+  .newsletter-form button { width: 100%; }
+}
 
 /* ===== FOOTER ===== */
 .footer { background: var(--gray-900); color: var(--white); padding: 80px 0 0; }
