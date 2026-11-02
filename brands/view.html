@@ -404,6 +404,14 @@
 <script src="../lang.js?v=20260630"></script>
 <script src="../auth-ui.js"></script>
 <script>
+// XSS 방어: 사용자(브랜드)가 입력한 텍스트를 화면에 넣기 전 이스케이프 (A-003)
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
 // ── URL에서 브랜드 slug 가져오기 ──
 const params = new URLSearchParams(window.location.search);
 const brandSlug = params.get('id');
@@ -467,33 +475,46 @@ async function loadBrand() {
 
 // ── 브랜드 페이지 렌더링 ──
 function renderBrand(brand, products) {
-    const categoryLabel = brand.category || 'Brand';
-    const description = brand.description || '';
-    const tagline = brand.tagline || '';
-    const country = brand.country || '';
-    const founded = brand.founded || '';
-    const headquarters = brand.headquarters || '';
+    const brandName = escapeHtml(brand.brandName || '');
+    const categoryLabel = escapeHtml(brand.category || 'Brand');
+    const description = escapeHtml(brand.description || '');
+    const tagline = escapeHtml(brand.tagline || '');
+    const country = escapeHtml(brand.country || '');
+    const founded = escapeHtml(brand.founded || '');
+    const headquarters = escapeHtml(brand.headquarters || '');
     const website = brand.website || '';
     const brandStory = brand.brandStory || '';
-    const certifications = brand.certifications || [];
-    const heroImage = brand.heroImage || '';
-    const logoUrl = brand.logoUrl || '';
-    const gallery1 = brand.gallery1 || '';
-    const gallery2 = brand.gallery2 || '';
-    const gallery3 = brand.gallery3 || '';
-    const instagram = brand.instagram || '';
-    const linkedin = brand.linkedin || '';
-    const pinterest = brand.pinterest || '';
-    const youtube = brand.youtube || '';
-    const dealer = brand.koreanDealer || {};
-    const wsUrl = website.startsWith('http') ? website : 'https://' + website;
+    const certifications = (brand.certifications || []).map(cert => ({
+        name: escapeHtml(cert.name || ''),
+        issuer: escapeHtml(cert.issuer || ''),
+        fileUrl: escapeHtml(cert.fileUrl || '')
+    }));
+    const heroImage = escapeHtml(brand.heroImage || '');
+    const logoUrl = escapeHtml(brand.logoUrl || '');
+    const gallery1 = escapeHtml(brand.gallery1 || '');
+    const gallery2 = escapeHtml(brand.gallery2 || '');
+    const gallery3 = escapeHtml(brand.gallery3 || '');
+    const instagram = escapeHtml(brand.instagram || '');
+    const linkedin = escapeHtml(brand.linkedin || '');
+    const pinterest = escapeHtml(brand.pinterest || '');
+    const youtube = escapeHtml(brand.youtube || '');
+    const dealerRaw = brand.koreanDealer || {};
+    const dealer = {
+        name: escapeHtml(dealerRaw.name || ''),
+        address: escapeHtml(dealerRaw.address || ''),
+        showroom: escapeHtml(dealerRaw.showroom || ''),
+        contact: escapeHtml(dealerRaw.contact || ''),
+        email: escapeHtml(dealerRaw.email || ''),
+        website: dealerRaw.website || ''
+    };
+    const wsUrl = escapeHtml(website.startsWith('http') ? website : 'https://' + website);
 
     // Hero image or logo or placeholder
     const heroHtml = heroImage
-        ? `<img loading="lazy" src="${heroImage}" alt="${brand.brandName}">`
+        ? `<img loading="lazy" src="${heroImage}" alt="${brandName}">`
         : logoUrl
-            ? `<img loading="lazy" src="${logoUrl}" alt="${brand.brandName}" style="object-fit:contain;padding:40px;">`
-            : `<span class="placeholder-logo">${brand.brandName.charAt(0)}</span>`;
+            ? `<img loading="lazy" src="${logoUrl}" alt="${brandName}" style="object-fit:contain;padding:40px;">`
+            : `<span class="placeholder-logo">${brandName.charAt(0)}</span>`;
     const heroImageClass = (heroImage || logoUrl) ? 'bp-hero-image fade-in' : 'bp-hero-image fade-in no-image';
 
     // SNS links
@@ -512,10 +533,10 @@ function renderBrand(brand, products) {
         <section class="bp-gallery-section">
             <div class="bp-section-header fade-in">
                 <h2 class="bp-section-title">Gallery</h2>
-                <p class="bp-section-desc">${brand.brandName}의 브랜드 이미지</p>
+                <p class="bp-section-desc">${brandName}의 브랜드 이미지</p>
             </div>
             <div class="bp-gallery-grid">
-                ${galleryImages.map(img => `<div class="bp-gallery-item fade-in"><img loading="lazy" src="${img}" alt="${brand.brandName}"></div>`).join('')}
+                ${galleryImages.map(img => `<div class="bp-gallery-item fade-in"><img loading="lazy" src="${img}" alt="${brandName}"></div>`).join('')}
             </div>
         </section>`;
     }
@@ -523,25 +544,31 @@ function renderBrand(brand, products) {
     // Products HTML
     let productsHtml = '';
     if (products.length > 0) {
-        const productCards = products.map(p => `
-            <a href="../products/view.html?id=${p.slug || ''}" class="product-card fade-in" style="text-decoration:none;color:inherit;">
+        const productCards = products.map(p => {
+            const pName = escapeHtml(p.name || 'Untitled Product');
+            const pMaterials = escapeHtml(p.materials || '');
+            const pDimensions = escapeHtml(p.dimensions || '');
+            const pImageUrl = escapeHtml(p.imageUrl || '');
+            const pSlug = escapeHtml(p.slug || '');
+            return `
+            <a href="../products/view.html?id=${pSlug}" class="product-card fade-in" style="text-decoration:none;color:inherit;">
                 <div class="product-card-image">
-                    ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:2rem;"><i class="fas fa-cube"></i></div>'}
+                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:2rem;"><i class="fas fa-cube"></i></div>'}
                 </div>
                 <div class="product-card-content">
-                    <span class="product-card-brand">${brand.brandName}</span>
-                    <h3 class="product-card-name">${p.name || 'Untitled Product'}</h3>
-                    ${p.materials ? `<p class="product-card-specs"><strong>Materials:</strong> ${p.materials}</p>` : ''}
-                    ${p.dimensions ? `<p class="product-card-specs"><strong>Dimensions:</strong> ${p.dimensions}</p>` : ''}
+                    <span class="product-card-brand">${brandName}</span>
+                    <h3 class="product-card-name">${pName}</h3>
+                    ${pMaterials ? `<p class="product-card-specs"><strong>Materials:</strong> ${pMaterials}</p>` : ''}
+                    ${pDimensions ? `<p class="product-card-specs"><strong>Dimensions:</strong> ${pDimensions}</p>` : ''}
                 </div>
             </a>
-        `).join('');
+        `; }).join('');
 
         productsHtml = `
         <section class="bp-products-section">
             <div class="bp-section-header fade-in">
                 <h2 class="bp-section-title">Products</h2>
-                <p class="bp-section-desc">${brand.brandName}의 제품 라인업</p>
+                <p class="bp-section-desc">${brandName}의 제품 라인업</p>
             </div>
             <div class="products-grid">${productCards}</div>
         </section>`;
@@ -556,7 +583,7 @@ function renderBrand(brand, products) {
                 <h2 class="bp-section-title">Brand Story</h2>
             </div>
             <div class="bp-story-content fade-in">
-                ${brandStory.split('\n').filter(p => p.trim()).map(p => `<p>${p}</p>`).join('')}
+                ${brandStory.split('\n').filter(p => p.trim()).map(p => `<p>${escapeHtml(p)}</p>`).join('')}
             </div>
         </section>`;
     }
@@ -570,8 +597,8 @@ function renderBrand(brand, products) {
             </div>
             <div class="bp-hero-content fade-in">
                 <span class="bp-hero-badge">${categoryLabel}</span>
-                ${logoUrl && heroImage ? `<img loading="lazy" src="${logoUrl}" alt="${brand.brandName}" style="height:48px;object-fit:contain;margin-bottom:12px;">` : ''}
-                <h1>${brand.brandName}</h1>
+                ${logoUrl && heroImage ? `<img loading="lazy" src="${logoUrl}" alt="${brandName}" style="height:48px;object-fit:contain;margin-bottom:12px;">` : ''}
+                <h1>${brandName}</h1>
                 ${tagline ? `<p class="bp-hero-subtitle" style="font-style:italic;color:var(--gray-500);">"${tagline}"</p>` : ''}
                 ${description ? `<p class="bp-hero-subtitle">${description.substring(0, 250)}${description.length > 250 ? '...' : ''}</p>` : ''}
                 <div class="bp-hero-meta">
@@ -608,7 +635,7 @@ function renderBrand(brand, products) {
         <section class="bp-info-bar">
             <div class="bp-info-item">
                 <span class="bp-info-label">Brand</span>
-                <span class="bp-info-value">${brand.brandName}</span>
+                <span class="bp-info-value">${brandName}</span>
             </div>
             <div class="bp-info-item">
                 <span class="bp-info-label">Country</span>
@@ -630,7 +657,7 @@ function renderBrand(brand, products) {
         <!-- DESCRIPTION (if no story) -->
         ${!brandStory && description ? `
         <section class="bp-description">
-            <h2>About ${brand.brandName}</h2>
+            <h2>About ${brandName}</h2>
             <p>${description}</p>
         </section>` : ''}
 
@@ -648,7 +675,7 @@ function renderBrand(brand, products) {
                     <i class="fas fa-handshake" style="color:#C8A96E;"></i>
                     <span data-en="Korean Official Dealer" data-ko="한국 공식 딜러">Korean Official Dealer</span>
                 </h2>
-                <p class="bp-section-desc" data-en="Official dealer & distributor in Korea" data-ko="한국 내 공식 딜러 및 유통사">${brand.brandName}의 한국 공식 딜러를 통해 제품을 문의하실 수 있습니다.</p>
+                <p class="bp-section-desc" data-en="Official dealer & distributor in Korea" data-ko="한국 내 공식 딜러 및 유통사">${brandName}의 한국 공식 딜러를 통해 제품을 문의하실 수 있습니다.</p>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
                 <div style="display:flex;flex-direction:column;gap:12px;">
@@ -659,15 +686,15 @@ function renderBrand(brand, products) {
                 <div style="display:flex;flex-direction:column;gap:12px;">
                     ${dealer.contact ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-phone" style="width:18px;color:#C8A96E;"></i> ${dealer.contact}</div>` : ''}
                     ${dealer.email ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-envelope" style="width:18px;color:#C8A96E;"></i> <a href="mailto:${dealer.email}" style="color:#333;">${dealer.email}</a></div>` : ''}
-                    ${dealer.website ? `<div style="font-size:0.88rem;"><a href="${dealer.website.startsWith('http') ? dealer.website : 'https://'+dealer.website}" target="_blank" style="color:#C8A96E;font-weight:600;"><i class="fas fa-external-link-alt" style="width:18px;"></i> <span data-en="Visit Dealer Website" data-ko="딜러 웹사이트 방문">Visit Dealer Website</span></a></div>` : ''}
+                    ${dealer.website ? `<div style="font-size:0.88rem;"><a href="${escapeHtml(dealer.website.startsWith('http') ? dealer.website : 'https://'+dealer.website)}" target="_blank" style="color:#C8A96E;font-weight:600;"><i class="fas fa-external-link-alt" style="width:18px;"></i> <span data-en="Visit Dealer Website" data-ko="딜러 웹사이트 방문">Visit Dealer Website</span></a></div>` : ''}
                 </div>
             </div>
         </section>` : ''}
 
         <!-- CTA -->
         <section class="bp-cta-section">
-            <h2>Interested in ${brand.brandName}?</h2>
-            <p>${brand.brandName} 제품에 대한 문의나 한국 시장 유통에 관심이 있으시면 ARCHINODE 팀에게 연락해주세요.</p>
+            <h2>Interested in ${brandName}?</h2>
+            <p>${brandName} 제품에 대한 문의나 한국 시장 유통에 관심이 있으시면 ARCHINODE 팀에게 연락해주세요.</p>
             <a href="../contact.html" class="bp-cta-button"><i class="fas fa-envelope"></i> &nbsp;Contact ARCHINODE</a>
         </section>
     </div>`;

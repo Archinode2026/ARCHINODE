@@ -299,6 +299,14 @@
 <script src="../lang.js?v=20260630"></script>
 <script src="../auth-ui.js"></script>
 <script>
+// XSS 방어: 사용자(브랜드)가 입력한 텍스트를 화면에 넣기 전 이스케이프 (A-003)
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
 const params = new URLSearchParams(window.location.search);
 const productSlug = params.get('id');
 const contentDiv = document.getElementById('productContent');
@@ -348,20 +356,43 @@ function renderProduct(p, related) {
     currentProductBrandId = p.brandId || '';
     currentProductBrandName = p.brandName || '';
     currentProductName = p.name || '';
-    const catLabel = p.category || '';
+
+    // 이스케이프된 표시용 필드 (원본 p는 그대로 두고, 화면엔 아래 변수만 사용)
+    const pName = escapeHtml(p.name || '');
+    const pBrandName = escapeHtml(p.brandName || '');
+    const pBrandSlug = escapeHtml(p.brandSlug || '');
+    const pDesigner = escapeHtml(p.designer || '');
+    const pMaterials = escapeHtml(p.materials || '');
+    const pDimensions = escapeHtml(p.dimensions || '');
+    const pWeight = escapeHtml(p.weight || '');
+    const pColors = escapeHtml((p.colors || []).join(', '));
+    const pFinishes = escapeHtml((p.finishes || []).join(', '));
+    const pCollection = escapeHtml(p.collection || '');
+    const pMoq = escapeHtml(p.moq || '');
+    const pLeadTime = escapeHtml(p.leadTime || '');
+    const pDescription = escapeHtml(p.description || '');
+    const pImageUrl = escapeHtml(p.imageUrl || '');
+    const pCatalogPdf = escapeHtml(p.catalogPdf || '');
+    const pBimFile = escapeHtml(p.bimFile || '');
+    const pModel3d = escapeHtml(p.model3d || '');
+    const pImages = (p.images || []).map(img => escapeHtml(img));
+    const catLabel = escapeHtml(p.category || '');
+    const catLabelLower = (p.category || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
     const subLabel = p.subcategory ? p.subcategory.replace(/-/g, ' ') : '';
+    const subLabelEsc = escapeHtml(subLabel);
+    const subcategorySlug = (p.subcategory || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
 
     // Specs rows
     const specs = [];
-    if (p.designer) specs.push(['Designer', p.designer]);
-    if (p.materials) specs.push(['Materials', p.materials]);
-    if (p.dimensions) specs.push(['Dimensions', p.dimensions]);
-    if (p.weight) specs.push(['Weight', p.weight]);
-    if (p.colors && p.colors.length) specs.push(['Colors', p.colors.join(', ')]);
-    if (p.finishes && p.finishes.length) specs.push(['Finishes', p.finishes.join(', ')]);
-    if (p.collection) specs.push(['Collection', p.collection]);
-    if (p.moq) specs.push(['MOQ', p.moq]);
-    if (p.leadTime) specs.push(['Lead Time', p.leadTime]);
+    if (pDesigner) specs.push(['Designer', pDesigner]);
+    if (pMaterials) specs.push(['Materials', pMaterials]);
+    if (pDimensions) specs.push(['Dimensions', pDimensions]);
+    if (pWeight) specs.push(['Weight', pWeight]);
+    if (pColors) specs.push(['Colors', pColors]);
+    if (pFinishes) specs.push(['Finishes', pFinishes]);
+    if (pCollection) specs.push(['Collection', pCollection]);
+    if (pMoq) specs.push(['MOQ', pMoq]);
+    if (pLeadTime) specs.push(['Lead Time', pLeadTime]);
     const supplyLabels = { 'direct': 'Direct shipment from HQ', 'dealer-appointed': 'Through appointed Korean dealer', 'dealer-seeking': 'Seeking a Korean dealer' };
     if (p.supplyType && supplyLabels[p.supplyType]) specs.push(['Supply', supplyLabels[p.supplyType]]);
 
@@ -384,17 +415,22 @@ function renderProduct(p, related) {
             <div class="container">
                 <h2 class="pp-related-title" data-en="Related Products" data-ko="관련 제품">Related Products</h2>
                 <div class="pp-related-grid">
-                    ${related.map(r => `
-                        <a href="view.html?id=${r.slug || ''}" class="pp-rel-card">
+                    ${related.map(r => {
+                        const rSlug = escapeHtml(r.slug || '');
+                        const rName = escapeHtml(r.name || '');
+                        const rBrandName = escapeHtml(r.brandName || '');
+                        const rImageUrl = escapeHtml(r.imageUrl || '');
+                        return `
+                        <a href="view.html?id=${rSlug}" class="pp-rel-card">
                             <div class="pp-rel-card-img">
-                                ${r.imageUrl ? `<img loading="lazy" src="${r.imageUrl}" alt="${r.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);"><i class="fas fa-cube" style="font-size:2rem;"></i></div>'}
+                                ${rImageUrl ? `<img loading="lazy" src="${rImageUrl}" alt="${rName}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);"><i class="fas fa-cube" style="font-size:2rem;"></i></div>'}
                             </div>
                             <div class="pp-rel-card-body">
-                                <div class="pp-rel-card-brand">${r.brandName}</div>
-                                <div class="pp-rel-card-name">${r.name}</div>
+                                <div class="pp-rel-card-brand">${rBrandName}</div>
+                                <div class="pp-rel-card-name">${rName}</div>
                             </div>
                         </a>
-                    `).join('')}
+                    `; }).join('')}
                 </div>
             </div>
         </section>`;
@@ -405,9 +441,9 @@ function renderProduct(p, related) {
         <!-- BREADCRUMB -->
         <div class="pp-breadcrumb">
             <a href="../index.html" data-en="Home" data-ko="홈">Home</a> &nbsp;/&nbsp;
-            ${catLabel ? `<a href="../categories/${catLabel.toLowerCase()}.html">${catLabel}</a> &nbsp;/&nbsp;` : ''}
-            ${subLabel ? `<a href="../categories/${catLabel.toLowerCase()}/${p.subcategory}.html" style="text-transform:capitalize;">${subLabel}</a> &nbsp;/&nbsp;` : ''}
-            <span>${p.name}</span>
+            ${catLabel ? `<a href="../categories/${catLabelLower}.html">${catLabel}</a> &nbsp;/&nbsp;` : ''}
+            ${subLabel ? `<a href="../categories/${catLabelLower}/${subcategorySlug}.html" style="text-transform:capitalize;">${subLabelEsc}</a> &nbsp;/&nbsp;` : ''}
+            <span>${pName}</span>
         </div>
 
         <!-- PRODUCT LAYOUT -->
@@ -415,23 +451,23 @@ function renderProduct(p, related) {
             <!-- IMAGE -->
             <div class="pp-gallery">
                 <div class="pp-main-image">
-                    ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}" id="mainImg">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:3rem;"><i class="fas fa-cube"></i></div>'}
+                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}" id="mainImg">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:3rem;"><i class="fas fa-cube"></i></div>'}
                 </div>
-                ${p.images && p.images.length > 0 ? `
+                ${pImages.length > 0 ? `
                 <div class="pp-thumbs">
-                    <div class="pp-thumb active" onclick="changeImg('${p.imageUrl}',this)"><img loading="lazy" src="${p.imageUrl}" alt="Main"></div>
-                    ${p.images.map(img => `<div class="pp-thumb" onclick="changeImg('${img}',this)"><img loading="lazy" src="${img}" alt="${p.name}"></div>`).join('')}
+                    <div class="pp-thumb active" onclick="changeImg('${pImageUrl}',this)"><img loading="lazy" src="${pImageUrl}" alt="Main"></div>
+                    ${pImages.map(img => `<div class="pp-thumb" onclick="changeImg('${img}',this)"><img loading="lazy" src="${img}" alt="${pName}"></div>`).join('')}
                 </div>` : ''}
             </div>
 
             <!-- INFO -->
             <div class="pp-info">
-                <a href="../brands/view.html?id=${p.brandSlug || ''}" class="pp-brand-link">${p.brandName}</a>
-                <h1 class="pp-name">${p.name}</h1>
-                ${p.collection ? `<div class="pp-collection">${p.collection}</div>` : ''}
-                ${catLabel ? `<a href="../categories/${catLabel.toLowerCase()}.html" class="pp-category-tag">${catLabel}${subLabel ? ' / ' + subLabel : ''}</a>` : ''}
+                <a href="../brands/view.html?id=${pBrandSlug}" class="pp-brand-link">${pBrandName}</a>
+                <h1 class="pp-name">${pName}</h1>
+                ${pCollection ? `<div class="pp-collection">${pCollection}</div>` : ''}
+                ${catLabel ? `<a href="../categories/${catLabelLower}.html" class="pp-category-tag">${catLabel}${subLabel ? ' / ' + subLabelEsc : ''}</a>` : ''}
                 ${priceHtml}
-                ${p.description ? `<div class="pp-description">${p.description}</div>` : ''}
+                ${pDescription ? `<div class="pp-description">${pDescription}</div>` : ''}
                 ${specsHtml}
 
                 <div class="pp-cta">
@@ -443,9 +479,9 @@ function renderProduct(p, related) {
                     <button type="button" class="btn btn-primary" onclick="openRfqModal('quote')"><i class="fas fa-file-invoice"></i> <span data-en="Request a Quote" data-ko="견적 요청">Request a Quote</span></button>
                     <button type="button" class="btn btn-secondary" onclick="openRfqModal('sample-request')"><i class="fas fa-box-open"></i> <span data-en="Request a Sample" data-ko="샘플 요청">Request a Sample</span></button>
                     <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> <span data-en="Request Info" data-ko="문의하기">Request Info</span></a>
-                    ${p.catalogPdf ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${p.catalogPdf}')"><i class="fas fa-file-pdf"></i> <span data-en="PDF Catalog" data-ko="PDF 카탈로그">PDF Catalog</span></button>` : ''}
-                    ${p.bimFile ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${p.bimFile}')"><i class="fas fa-cube"></i> <span data-en="BIM File" data-ko="BIM 파일">BIM File</span></button>` : ''}
-                    ${p.model3d ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${p.model3d}')"><i class="fas fa-vr-cardboard"></i> <span data-en="3D Model" data-ko="3D 모델">3D Model</span></button>` : ''}
+                    ${pCatalogPdf ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${pCatalogPdf}')"><i class="fas fa-file-pdf"></i> <span data-en="PDF Catalog" data-ko="PDF 카탈로그">PDF Catalog</span></button>` : ''}
+                    ${pBimFile ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${pBimFile}')"><i class="fas fa-cube"></i> <span data-en="BIM File" data-ko="BIM 파일">BIM File</span></button>` : ''}
+                    ${pModel3d ? `<button type="button" class="btn btn-secondary" onclick="openSpecFile('${pModel3d}')"><i class="fas fa-vr-cardboard"></i> <span data-en="3D Model" data-ko="3D 모델">3D Model</span></button>` : ''}
                 </div>
             </div>
         </div>
