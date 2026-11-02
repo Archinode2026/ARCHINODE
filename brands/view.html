@@ -462,6 +462,24 @@ async function loadBrand() {
         document.getElementById('metaDesc').setAttribute('content', brandOgDesc);
         document.getElementById('breadcrumbName').textContent = brand.brandName;
 
+        // A-096: 브랜드 상세 화면에 구조화 데이터(JSON-LD)가 아예 없던 문제 — Brand/Organization 스키마 주입
+        (function injectBrandJsonLd() {
+            var ld = {
+                '@context': 'https://schema.org',
+                '@type': 'Brand',
+                'name': brand.brandName || '',
+                'description': brandOgDesc,
+                'url': 'https://archinodekr.com/brands/view.html?id=' + (brand.slug || brandId)
+            };
+            if (brand.logoUrl) ld.logo = brand.logoUrl;
+            if (brand.country) ld.foundingLocation = { '@type': 'Place', 'name': brand.country };
+            if (brand.website) ld.sameAs = [brand.website];
+            var script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(ld);
+            document.head.appendChild(script);
+        })();
+
         // 승인된 제품 가져오기 (최상위 products 컬렉션에서)
         const productsSnap = await db.collection('products')
             .where('brandId', '==', brandId)

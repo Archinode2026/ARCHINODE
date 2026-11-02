@@ -193,6 +193,25 @@ async function loadArticle() {
         // A-093: og:title/og:description도 함께 갱신 — 카카오톡/슬랙 등 메신저 미리보기용
         document.getElementById('ogTitle').setAttribute('content', article.title + ' | ARCHINODE Magazine');
         document.getElementById('ogDesc').setAttribute('content', (article.excerpt || article.content || '').substring(0, 160));
+
+        // A-096: 매거진 기사 상세 화면(동적 템플릿)에 구조화 데이터(JSON-LD)가 아예 없던 문제 — Article 스키마 주입
+        (function injectArticleJsonLd() {
+            var pubDate = article.publishedAt ? article.publishedAt.toDate() : (article.createdAt ? article.createdAt.toDate() : new Date());
+            var ld = {
+                '@context': 'https://schema.org',
+                '@type': 'Article',
+                'headline': article.title || '',
+                'description': (article.excerpt || article.content || '').substring(0, 160),
+                'author': { '@type': 'Organization', 'name': 'ARCHINODE Editorial' },
+                'datePublished': pubDate.toISOString().substring(0, 10),
+                'publisher': { '@type': 'Organization', 'name': 'ARCHINODE' }
+            };
+            if (article.coverImage || article.imageUrl) ld.image = article.coverImage || article.imageUrl;
+            var script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(ld);
+            document.head.appendChild(script);
+        })();
         renderArticle(article);
     } catch (err) {
         console.error('Error loading article:', err);

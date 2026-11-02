@@ -337,6 +337,24 @@ async function loadProduct() {
         document.getElementById('ogTitle').setAttribute('content', product.name + ' | ' + product.brandName + ' | ARCHINODE');
         document.getElementById('ogDesc').setAttribute('content', (product.description || '').substring(0, 160));
 
+        // A-096: 제품 상세 화면에 구조화 데이터(JSON-LD)가 아예 없던 문제 — Product 스키마 주입
+        (function injectProductJsonLd() {
+            var ld = {
+                '@context': 'https://schema.org',
+                '@type': 'Product',
+                'name': product.name || '',
+                'description': (product.description || '').substring(0, 500),
+                'brand': { '@type': 'Brand', 'name': product.brandName || '' },
+                'url': 'https://archinodekr.com/products/view.html?id=' + (product.slug || currentProductDocId)
+            };
+            if (product.imageUrl) ld.image = product.imageUrl;
+            if (product.materials) ld.material = product.materials;
+            var script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(ld);
+            document.head.appendChild(script);
+        })();
+
         // 같은 서브카테고리 관련 제품 (최대 4개)
         let related = [];
         if (product.subcategory) {

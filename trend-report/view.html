@@ -147,6 +147,25 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#1a1a1a; backgroun
     document.getElementById('ogDesc').setAttribute('content', ogDescText);
     document.getElementById('metaDesc').setAttribute('content', ogDescText);
     if (a.coverImage) { document.getElementById('ogImage').setAttribute('content', a.coverImage); }
+
+    // A-096: 브랜드 매거진 글 상세 화면에 구조화 데이터(JSON-LD)가 아예 없던 문제 — Article 스키마 주입
+    (function injectArticleJsonLd() {
+        var pubDate = a.publishedAt && a.publishedAt.toDate ? a.publishedAt.toDate() : new Date();
+        var ld = {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            'headline': a.title || '',
+            'description': ogDescText,
+            'author': { '@type': 'Organization', 'name': a.brandName || 'ARCHINODE Editorial' },
+            'datePublished': pubDate.toISOString().substring(0, 10),
+            'publisher': { '@type': 'Organization', 'name': 'ARCHINODE' }
+        };
+        if (a.coverImage) ld.image = a.coverImage;
+        var script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.textContent = JSON.stringify(ld);
+        document.head.appendChild(script);
+    })();
     document.getElementById('bcTitle').textContent = a.title || '—';
     document.getElementById('aTag').textContent = a.tag || '';
     document.getElementById('aTitle').textContent = a.title || '—';
