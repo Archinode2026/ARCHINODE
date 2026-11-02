@@ -176,6 +176,8 @@
       subcategory: { en: 'Subcategory', ko: '서브카테고리' },
       brand: { en: 'Brand', ko: '브랜드' },
       magazine: { en: 'Magazine', ko: '매거진' },
+      article: { en: 'Magazine', ko: '매거진' },               // A-073: 인덱스는 article로 저장, 표시는 Magazine
+      'trend-report': { en: 'Brand Magazine', ko: '브랜드 매거진' },
       page: { en: 'Page', ko: '페이지' }
     };
     var l = labels[type] || { en: type, ko: type };
@@ -189,6 +191,8 @@
       subcategory: 'fas fa-tag',
       brand: 'fas fa-building',
       magazine: 'fas fa-newspaper',
+      article: 'fas fa-newspaper',
+      'trend-report': 'fas fa-chart-line',
       page: 'fas fa-file'
     };
     return icons[type] || 'fas fa-link';

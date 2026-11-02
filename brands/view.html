@@ -288,7 +288,7 @@
 <div class="search-overlay" id="searchOverlay">
   <span class="search-close" onclick="toggleSearch()">&times;</span>
   <div class="search-box">
-    <input type="text" placeholder="Search brands, products, designers...">
+    <input type="text" placeholder="Search brands, products, designers..." data-en-placeholder="Search brands, products, designers..." data-ko-placeholder="브랜드, 제품, 디자이너 검색...">
     <button><i class="fas fa-arrow-right"></i></button>
   </div>
 </div>
@@ -310,8 +310,10 @@
 <div id="brandContent">
   <!-- Loading State -->
   <div class="bp-loading" id="loadingState">
+    <!-- A-080: SEO/스크린리더용 정적 h1(JS 실행 전에도 페이지에 h1이 존재하도록) — 로드 완료 시 replaced -->
+    <h1 style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;" data-en="Brand on ARCHINODE" data-ko="ARCHINODE 브랜드 상세">Brand on ARCHINODE</h1>
     <div class="spinner"></div>
-    <p>Loading brand information...</p>
+    <p data-en="Loading brand information..." data-ko="브랜드 정보 로딩 중...">Loading brand information...</p>
   </div>
 </div>
 
