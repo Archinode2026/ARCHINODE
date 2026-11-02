@@ -284,6 +284,10 @@ input, select, textarea { font-family: inherit; }
     margin-bottom: 8px;
   }
   .nav-cta { text-align: center; }
+  /* A-113: 모바일 터치 타깃 44px 최소 — 푸터 링크·헤더 아이콘 버튼 */
+  .footer-col ul li { margin-bottom: 4px; }
+  .footer-col ul li a { display: inline-block; padding: 10px 4px; min-height: 44px; line-height: 1.2; }
+  .header-actions a, .header-actions button { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 4px 6px; }
 }
 
 /* SEARCH OVERLAY */
@@ -311,6 +315,10 @@ input, select, textarea { font-family: inherit; }
   font-weight: 300;
 }
 .search-box input::placeholder { color: rgba(255,255,255,0.4); }
+/* A-114: 키보드 접근성 — 검색 입력칸 포커스 시각 표시 */
+.search-box input:focus { border-bottom-color: #C8A96E; box-shadow: 0 2px 0 0 #C8A96E; }
+.search-box input:focus-visible { outline: 2px solid #C8A96E; outline-offset: 2px; }
+.search-box button:focus-visible { outline: 2px solid #C8A96E; outline-offset: 4px; border-radius: 4px; }
 .search-box button { position: absolute; right: 30px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--white); }
 .search-close { position: absolute; top: 40px; right: 40px; color: var(--white); font-size: 1.8rem; cursor: pointer; }
 
@@ -495,7 +503,7 @@ input, select, textarea { font-family: inherit; }
 .footer-col ul li { margin-bottom: 12px; }
 .footer-col ul li a {
   font-size: 0.8rem;
-  color: var(--gray-500);
+  color: #a3a3a3; /* A-112: 어두운 배경(#0a0a0a) 대비 WCAG AA 통과하도록 #737373→#a3a3a3 */
   transition: color 0.2s;
 }
 .footer-col ul li a:hover { color: var(--white); }
@@ -521,6 +529,18 @@ input, select, textarea { font-family: inherit; }
   transition: opacity 0.7s ease, transform 0.7s ease;
 }
 .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* A-120: 움직임 최소화 설정 존중 — 모든 애니메이션·전환을 최소화 */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in { opacity: 1; transform: none; transition: none; }
+  .fade-in.visible { transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 /* SCROLL TO TOP */
 .scroll-top {

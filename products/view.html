@@ -163,7 +163,7 @@
       <a href="../list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
     </nav>
     <div class="header-actions">
-      <a href="../brand-portal/login.html" style="font-size:0.82rem;color:#C8A96E;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
+      <a href="../brand-portal/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
       <button class="search-toggle" onclick="toggleSearch()" aria-label="Search"><i class="fas fa-search"></i></button>
       <a href="../auth/profile.html" aria-label="Saved"><i class="far fa-bookmark"></i></a>
       <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
@@ -688,7 +688,12 @@ async function toggleLike() {
     const user = auth.currentUser;
     if (!user) {
         // 비로그인 → 로그인 안내
-        if (confirm('좋아요를 누르려면 로그인이 필요합니다.\nLog in to like this product.\n\n로그인 페이지로 이동할까요?')) {
+        // A-116: 사이트 디자인·현재 언어에 맞는 확인창(기본 confirm/alert 대신)
+        var lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
+        var msg = lang === 'en'
+            ? 'Log in to like this product. Go to the sign-in page?'
+            : '좋아요를 누르려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?';
+        if (confirm(msg)) {
             window.location.href = '../auth/login.html';
         }
         return;
@@ -698,7 +703,8 @@ async function toggleLike() {
     // users 컬렉션에 문서가 없으면 brands 계정일 수 있음
     const userDoc = await db.collection('users').doc(user.uid).get();
     if (!userDoc.exists) {
-        alert('전문가 계정으로 로그인해주세요.\nPlease log in with a professional account.');
+        var lang2 = document.documentElement.lang === 'en' ? 'en' : 'ko';
+        alert(lang2 === 'en' ? 'Please log in with a professional account.' : '전문가 계정으로 로그인해 주세요.');
         return;
     }
 

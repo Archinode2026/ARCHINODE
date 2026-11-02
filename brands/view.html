@@ -836,7 +836,11 @@ function updateBrandLikeUI() {
 async function toggleBrandLike() {
     const user = auth.currentUser;
     if (!user) {
-        if (confirm('좋아요를 누르려면 로그인이 필요합니다.\nLog in to like this brand.\n\n로그인 페이지로 이동할까요?')) {
+        var lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
+        var msg = lang === 'en'
+            ? 'Log in to like this brand. Go to the sign-in page?'
+            : '좋아요를 누르려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?';
+        if (confirm(msg)) {
             window.location.href = '../auth/login.html';
         }
         return;
@@ -844,7 +848,8 @@ async function toggleBrandLike() {
     if (!currentBrandDocId) return;
     const userDoc = await db.collection('users').doc(user.uid).get();
     if (!userDoc.exists) {
-        alert('전문가 계정으로 로그인해주세요.\nPlease log in with a professional account.');
+        var lang2 = document.documentElement.lang === 'en' ? 'en' : 'ko';
+        alert(lang2 === 'en' ? 'Please log in with a professional account.' : '전문가 계정으로 로그인해 주세요.');
         return;
     }
     const btn = document.getElementById('brandLikeBtn');

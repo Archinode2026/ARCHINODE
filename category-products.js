@@ -69,9 +69,9 @@
                         ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s;">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#d4d4d4;font-size:2rem;"><i class="fas fa-cube"></i></div>'}
                     </div>
                     <div style="padding:16px;">
-                        <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#737373;margin-bottom:4px;">${p.brandName}</div>
-                        <div style="font-size:0.88rem;font-weight:600;color:#000;margin-bottom:4px;">${p.name}</div>
-                        ${p.materials ? `<div style="font-size:0.78rem;color:#a3a3a3;">${p.materials}</div>` : ''}
+                        <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#737373;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.brandName}</div>
+                        <div style="font-size:0.88rem;font-weight:600;color:#000;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3;">${p.name}</div>
+                        ${p.materials ? `<div style="font-size:0.78rem;color:#a3a3a3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.materials}</div>` : ''}
                     </div>
                 </a>`;
             });
