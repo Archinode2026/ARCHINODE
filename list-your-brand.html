@@ -243,12 +243,12 @@
             <!-- Brand Info -->
             <div class="form-row">
                 <div class="form-group">
-                    <label data-en="Brand Name " data-ko="브랜드명 "><span class="req">*</span></label>
-                    <input type="text" id="brandName" required placeholder="Your brand name">
+                    <label for="brandName" data-en="Brand Name " data-ko="브랜드명 "><span class="req">*</span></label>
+                    <input type="text" id="brandName" name="brandName" required autocomplete="organization" placeholder="Your brand name">
                 </div>
                 <div class="form-group">
-                    <label data-en="Country " data-ko="국가 "><span class="req">*</span></label>
-                    <select id="country" required>
+                    <label for="country" data-en="Country " data-ko="국가 "><span class="req">*</span></label>
+                    <select id="country" name="country" required autocomplete="country-name">
                         <option value="" disabled selected>Select country</option>
                         <option value="Afghanistan">Afghanistan</option>
                         <option value="Albania">Albania</option>
@@ -361,8 +361,8 @@
             </div>
 
             <div class="form-group">
-                <label data-en="Brand Website " data-ko="브랜드 웹사이트 "><span class="req">*</span></label>
-                <input type="text" id="website" required placeholder="https://yourbrand.com">
+                <label for="website" data-en="Brand Website " data-ko="브랜드 웹사이트 "><span class="req">*</span></label>
+                <input type="text" id="website" name="website" required autocomplete="url" placeholder="https://yourbrand.com">
             </div>
 
             <div class="form-group">

@@ -129,16 +129,16 @@
         <h2 style="font-size:1.5rem;margin-bottom:20px;" data-en="Send a Message" data-ko="메시지 보내기">Send a Message</h2>
         <form action="https://formspree.io/f/xgodynvd" method="POST" style="display:flex;flex-direction:column;gap:16px;">
           <div>
-            <label style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Name *" data-ko="이름 *">Name *</label>
-            <input type="text" name="name" required style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
+            <label for="contactName" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Name *" data-ko="이름 *">Name *</label>
+            <input type="text" id="contactName" name="name" required autocomplete="name" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
           </div>
           <div>
-            <label style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Email *" data-ko="이메일 *">Email *</label>
-            <input type="email" name="email" required style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
+            <label for="contactEmail" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Email *" data-ko="이메일 *">Email *</label>
+            <input type="email" id="contactEmail" name="email" required autocomplete="email" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
           </div>
           <div>
-            <label style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Subject" data-ko="제목">Subject</label>
-            <select name="subject" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;background:#fff;">
+            <label for="contactSubject" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Subject" data-ko="제목">Subject</label>
+            <select id="contactSubject" name="subject" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;background:#fff;">
               <option value="Brand Listing" data-en="Brand Listing Inquiry" data-ko="브랜드 입점 문의">Brand Listing Inquiry</option>
               <option value="Dealership" data-en="Dealership Inquiry" data-ko="딜러십 문의">Dealership Inquiry</option>
               <option value="Partnership" data-en="Partnership" data-ko="파트너십">Partnership</option>
@@ -147,8 +147,8 @@
             </select>
           </div>
           <div>
-            <label style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Message *" data-ko="메시지 *">Message *</label>
-            <textarea name="message" required rows="5" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;resize:vertical;"></textarea>
+            <label for="contactMessage" style="display:block;font-size:0.85rem;color:#999;margin-bottom:4px;" data-en="Message *" data-ko="메시지 *">Message *</label>
+            <textarea id="contactMessage" name="message" required rows="5" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;resize:vertical;"></textarea>
           </div>
           <button type="submit" style="padding:14px 32px;background:#000;color:#fff;border:none;border-radius:4px;font-size:1rem;cursor:pointer;font-family:inherit;align-self:flex-start;" data-en="Send Message" data-ko="보내기">Send Message <i class="fas fa-arrow-right"></i></button>
           <!-- Formspree 연동: form ID xgodynvd, office@archinode.org 수신 -->
