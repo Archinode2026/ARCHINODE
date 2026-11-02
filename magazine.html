@@ -455,7 +455,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 <section class="articles-section">
   <div class="container">
     <h2 class="section-title fade-in" data-en="Latest Articles" data-ko="최신 기사">Latest Articles</h2>
-    <div class="articles-grid">
+    <div class="articles-grid" id="articlesGrid">
       <a href="magazine/seoul-daylight-setback-easing-ordinance-2026.html" class="article-card fade-in">
         <div class="article-card-img">
           <img loading="lazy" src="https://images.unsplash.com/photo-1503594384566-461fe158e797?w=600&q=80" alt="4만 4천 건의 위반건축물 서울시 일조사선 완화 건축 조례 통과 ARCHINODE 매거진 2026">
@@ -1742,8 +1742,61 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
       </a>
 
     </div>
+
+    <div id="loadMoreWrap" style="text-align:center;margin-top:40px;">
+      <button id="loadMoreBtn" type="button" data-en="Load More Articles" data-ko="기사 더 보기"
+        style="padding:14px 36px;background:#000;color:#fff;border:none;border-radius:4px;font-size:0.95rem;cursor:pointer;font-family:inherit;">
+        Load More Articles
+      </button>
+      <p id="loadMoreCount" style="margin-top:12px;color:#888;font-size:0.85rem;"></p>
+    </div>
   </div>
 </section>
+
+<script>
+(function() {
+  var PAGE_SIZE = 24;
+  var grid = document.getElementById('articlesGrid');
+  if (!grid) return;
+  var cards = Array.prototype.slice.call(grid.children).filter(function(el) {
+    return el.classList && el.classList.contains('article-card');
+  });
+  var btn = document.getElementById('loadMoreBtn');
+  var countLabel = document.getElementById('loadMoreCount');
+  var shown = 0;
+
+  function updateCountLabel() {
+    if (!countLabel) return;
+    var lang = (document.documentElement.lang === 'en') ? 'en' : 'ko';
+    countLabel.textContent = (lang === 'en')
+      ? ('Showing ' + shown + ' of ' + cards.length + ' articles')
+      : (cards.length + '개 중 ' + shown + '개 표시 중');
+  }
+
+  function reveal() {
+    var next = Math.min(shown + PAGE_SIZE, cards.length);
+    for (var i = shown; i < next; i++) {
+      cards[i].style.display = '';
+      cards[i].classList.add('visible'); // IntersectionObserver가 숨김 상태였던 카드를 못 감지할 수 있어 직접 보장
+    }
+    shown = next;
+    updateCountLabel();
+    if (shown >= cards.length) {
+      var wrap = document.getElementById('loadMoreWrap');
+      if (wrap) wrap.style.display = 'none';
+    }
+  }
+
+  // 초기 상태: PAGE_SIZE개만 보이고 나머지는 숨김 (페이지 높이·렌더링 비용 절감)
+  cards.forEach(function(c, i) { c.style.display = (i < PAGE_SIZE) ? '' : 'none'; });
+  shown = Math.min(PAGE_SIZE, cards.length);
+  updateCountLabel();
+  if (cards.length <= PAGE_SIZE && document.getElementById('loadMoreWrap')) {
+    document.getElementById('loadMoreWrap').style.display = 'none';
+  }
+  if (btn) btn.addEventListener('click', reveal);
+})();
+</script>
 
 <!-- NEWSLETTER -->
 <section class="mag-newsletter">
