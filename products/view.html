@@ -360,6 +360,10 @@ function renderProduct(p, related) {
     if (p.colors && p.colors.length) specs.push(['Colors', p.colors.join(', ')]);
     if (p.finishes && p.finishes.length) specs.push(['Finishes', p.finishes.join(', ')]);
     if (p.collection) specs.push(['Collection', p.collection]);
+    if (p.moq) specs.push(['MOQ', p.moq]);
+    if (p.leadTime) specs.push(['Lead Time', p.leadTime]);
+    const supplyLabels = { 'direct': 'Direct shipment from HQ', 'dealer-appointed': 'Through appointed Korean dealer', 'dealer-seeking': 'Seeking a Korean dealer' };
+    if (p.supplyType && supplyLabels[p.supplyType]) specs.push(['Supply', supplyLabels[p.supplyType]]);
 
     const specsHtml = specs.length > 0 ? `
         <div class="pp-specs">
@@ -440,6 +444,8 @@ function renderProduct(p, related) {
                     <button type="button" class="btn btn-secondary" onclick="openRfqModal('sample-request')"><i class="fas fa-box-open"></i> <span data-en="Request a Sample" data-ko="샘플 요청">Request a Sample</span></button>
                     <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> <span data-en="Request Info" data-ko="문의하기">Request Info</span></a>
                     ${p.catalogPdf ? `<a href="${p.catalogPdf}" target="_blank" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> <span data-en="PDF Catalog" data-ko="PDF 카탈로그">PDF Catalog</span></a>` : ''}
+                    ${p.bimFile ? `<a href="${p.bimFile}" target="_blank" class="btn btn-secondary"><i class="fas fa-cube"></i> <span data-en="BIM File" data-ko="BIM 파일">BIM File</span></a>` : ''}
+                    ${p.model3d ? `<a href="${p.model3d}" target="_blank" class="btn btn-secondary"><i class="fas fa-vr-cardboard"></i> <span data-en="3D Model" data-ko="3D 모델">3D Model</span></a>` : ''}
                 </div>
             </div>
         </div>

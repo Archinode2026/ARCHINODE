@@ -543,7 +543,48 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
                         <img loading="lazy" id="prodPreviewImg" style="max-height:200px;border-radius:6px;">
                     </div>
                 </div>
-                <div style="display:flex;gap:12px;">
+
+                <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+                <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;color:#333;" data-en="Spec Package (CAD/BIM/Catalog)" data-ko="스펙 패키지 (CAD/BIM/카탈로그)"><i class="fas fa-drafting-compass" style="margin-right:6px;color:#C8A96E;"></i>Spec Package (CAD/BIM/Catalog)</h4>
+                <p style="font-size:0.78rem;color:#999;margin-bottom:12px;" data-en="Architects can drop these straight into their drawings." data-ko="건축가가 도면에 바로 반영할 수 있는 파일이에요.">Architects can drop these straight into their drawings.</p>
+                <div class="field-row">
+                    <div class="field">
+                        <label data-en="Catalog PDF" data-ko="카탈로그 PDF">Catalog PDF</label>
+                        <input type="file" id="prodCatalogFile" accept="application/pdf">
+                    </div>
+                    <div class="field">
+                        <label data-en="BIM / Revit File" data-ko="BIM / Revit 파일">BIM / Revit File</label>
+                        <input type="file" id="prodBimFile">
+                    </div>
+                </div>
+                <div class="field">
+                    <label data-en="3D Model File" data-ko="3D 모델 파일">3D Model File</label>
+                    <input type="file" id="prodModel3dFile">
+                </div>
+
+                <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+                <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;color:#333;" data-en="Trade Conditions" data-ko="거래조건"><i class="fas fa-handshake" style="margin-right:6px;color:#C8A96E;"></i>Trade Conditions</h4>
+                <div class="field-row">
+                    <div class="field">
+                        <label data-en="MOQ (Minimum Order Quantity)" data-ko="최소 발주 수량(MOQ)">MOQ (Minimum Order Quantity)</label>
+                        <input type="text" id="prodMoq" placeholder="e.g. 100 units">
+                    </div>
+                    <div class="field">
+                        <label data-en="Lead Time" data-ko="리드타임">Lead Time</label>
+                        <input type="text" id="prodLeadTime" placeholder="e.g. 8-10 weeks">
+                    </div>
+                </div>
+                <div class="field">
+                    <label data-en="Supply Method" data-ko="공급 방식">Supply Method</label>
+                    <select id="prodSupplyType">
+                        <option value="">Select</option>
+                        <option value="direct" data-en="Direct shipment from HQ" data-ko="본사 직접 납품">Direct shipment from HQ</option>
+                        <option value="dealer-appointed" data-en="Through appointed Korean dealer" data-ko="지정 한국 딜러 경유">Through appointed Korean dealer</option>
+                        <option value="dealer-seeking" data-en="Seeking a Korean dealer" data-ko="한국 딜러 모집 중">Seeking a Korean dealer</option>
+                    </select>
+                </div>
+
+                <div style="display:flex;gap:12px;margin-top:16px;">
                     <button type="button" class="btn btn-primary" id="submitProduct">Submit for Review</button>
                     <button type="button" class="btn btn-secondary" id="cancelProduct">Cancel</button>
                 </div>
@@ -1148,6 +1189,14 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     btn.disabled = true;
     btn.textContent = 'Uploading...';
 
+    async function uploadIfPresent(inputId, folder) {
+        const file = document.getElementById(inputId).files[0];
+        if (!file) return '';
+        const ref = storage.ref(`${folder}/${currentUser.uid}/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        return await ref.getDownloadURL();
+    }
+
     let imageUrl = '';
     const imageFile = document.getElementById('prodImage').files[0];
     if (imageFile) {
@@ -1159,6 +1208,10 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     const category = document.getElementById('prodCategory').value;
     const subcategory = document.getElementById('prodSubcategory').value;
     if (!category || !subcategory) { alert('Category and subcategory are required'); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+
+    const catalogPdf = await uploadIfPresent('prodCatalogFile', 'products-specs');
+    const bimFile = await uploadIfPresent('prodBimFile', 'products-specs');
+    const model3d = await uploadIfPresent('prodModel3dFile', 'products-specs');
 
     await db.collection('products').add({
         brandId: currentUser.uid,
@@ -1176,6 +1229,12 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
         priceRange: document.getElementById('prodPrice').value,
         imageUrl: imageUrl,
         images: [],
+        catalogPdf: catalogPdf,
+        bimFile: bimFile,
+        model3d: model3d,
+        moq: document.getElementById('prodMoq').value.trim(),
+        leadTime: document.getElementById('prodLeadTime').value.trim(),
+        supplyType: document.getElementById('prodSupplyType').value,
         status: 'pending',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
