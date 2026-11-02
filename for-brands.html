@@ -490,6 +490,15 @@ a { text-decoration: none; color: inherit; }
   </div>
 </header>
 
+<div class="search-overlay" id="searchOverlay">
+  <span class="search-close" onclick="toggleSearch()">&times;</span>
+  <div class="search-box">
+    <input type="text" placeholder="Search brands, products, designers...">
+    <button><i class="fas fa-arrow-right"></i></button>
+  </div>
+</div>
+
+
 <!-- HERO -->
 <section class="fb-hero">
     <div class="fb-hero-inner">
@@ -839,6 +848,27 @@ a { text-decoration: none; color: inherit; }
   </div>
 </footer>
 <script src="search.js"></script>
+<script>
+function toggleSearch() {
+  const o = document.getElementById('searchOverlay');
+  if (!o) return;
+  o.classList.toggle('active');
+  if (o.classList.contains('active')) o.querySelector('input').focus();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { const o = document.getElementById('searchOverlay'); if (o) o.classList.remove('active'); } });
+function toggleCatMenu() {
+  const menu = document.getElementById('catMenu');
+  if (menu) menu.classList.toggle('active');
+}
+document.addEventListener('click', function(e) {
+  const dropdown = document.querySelector('.nav-dropdown');
+  if (dropdown && !dropdown.contains(e.target)) {
+    const menu = document.getElementById('catMenu');
+    if (menu) menu.classList.remove('active');
+  }
+});
+function toggleMobile() { const n = document.getElementById('mainNav'); if (n) n.classList.toggle('active'); }
+</script>
 <script src="lang.js?v=20260630"></script>
 <script src="auth-ui.js"></script>
 <script src="cookie-consent.js?v=20260630" defer></script>
