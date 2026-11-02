@@ -19,6 +19,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="style.css">
+<style>
+.contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; }
+@media (max-width:768px) { .contact-grid { grid-template-columns:1fr; gap:30px; } }
+</style>
 </head>
 <body>
 <!-- ANNOUNCEMENT BAR -->
@@ -93,7 +97,7 @@
 
 <section style="padding:60px 0;">
   <div class="container" style="max-width:1000px;">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;">
+    <div class="contact-grid">
 
       <div>
         <h2 style="font-size:1.5rem;margin-bottom:20px;" data-en="Get in Touch" data-ko="문의하기">Get in Touch</h2>
