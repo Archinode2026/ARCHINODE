@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta name="description" content="Brand page on ARCHINODE">
+<meta name="description" id="metaDesc" content="Brand page on ARCHINODE">
 <meta charset="UTF-8">
+<meta property="og:title" id="ogTitle" content="Brand | ARCHINODE">
+<meta property="og:description" id="ogDesc" content="Brand page on ARCHINODE">
 <meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">Brand | ARCHINODE</title>
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
@@ -450,8 +454,12 @@ async function loadBrand() {
             return;
         }
 
-        // 페이지 타이틀 업데이트
+        // 페이지 타이틀 업데이트 (A-093: og:title/og:description/meta description도 함께 갱신 — 카카오톡/슬랙 등 메신저 미리보기용)
+        var brandOgDesc = (brand.tagline || brand.description || 'ARCHINODE에 입점한 브랜드').toString().substring(0, 160);
         document.getElementById('pageTitle').textContent = brand.brandName + ' | ARCHINODE';
+        document.getElementById('ogTitle').setAttribute('content', brand.brandName + ' | ARCHINODE');
+        document.getElementById('ogDesc').setAttribute('content', brandOgDesc);
+        document.getElementById('metaDesc').setAttribute('content', brandOgDesc);
         document.getElementById('breadcrumbName').textContent = brand.brandName;
 
         // 승인된 제품 가져오기 (최상위 products 컬렉션에서)
