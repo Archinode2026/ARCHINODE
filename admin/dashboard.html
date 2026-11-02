@@ -363,14 +363,26 @@ auth.onAuthStateChanged(async (user) => {
         return;
     }
     document.getElementById('adminEmail').textContent = user.email;
-    await loadAll();
+    try {
+        await loadAll();
+    } catch (err) {
+        // A-023: 섹션 하나가 못 읽혀도(예: Firestore 규칙 미게시로 permission-denied)
+        // 대시보드 전체가 "Loading…"에 영원히 멈춰있지 않도록, 여기서 반드시 잡는다.
+        console.error('loadAll() failed:', err);
+    }
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('adminContent').style.display = 'block';
 });
 
 // ── 전체 데이터 로드 ──
 async function loadAll() {
-    await Promise.all([loadBrands(), loadProducts(), loadArticles(), loadReview()]);
+    const results = await Promise.allSettled([loadBrands(), loadProducts(), loadArticles(), loadReview()]);
+    const names = ['brands', 'products', 'articles', 'review'];
+    results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+            console.error('loadAll(): ' + names[i] + ' failed to load:', r.reason);
+        }
+    });
     dash_render(document.getElementById('tab-dashboard'));   // 대시보드 카드 카운트 갱신 (1단계 셸)
 }
 
