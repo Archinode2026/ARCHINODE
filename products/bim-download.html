@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://archinodekr.com/products/bim-download.html">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="BIM Data Download | ARCHINODE">
+<meta property="og:description" content="Time-limited BIM/CAD data download for verified ARCHINODE requests.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
+<meta property="og:type" content="website">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIM Data Download | ARCHINODE</title>
+<meta name="description" content="Time-limited BIM/CAD data download for verified ARCHINODE requests.">
+<link rel="icon" type="image/x-icon" href="../favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="../style.css">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<style>
+.bd-wrap { max-width: 640px; margin: 0 auto; padding: 80px 24px 100px; min-height: 50vh; }
+.bd-state { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:16px; padding: 60px 20px; }
+.bd-state .spinner { width:40px; height:40px; border:3px solid var(--gray-200); border-top-color:var(--black); border-radius:50%; animation:bdspin 0.8s linear infinite; }
+@keyframes bdspin { to { transform:rotate(360deg); } }
+.bd-state i { font-size:3rem; color:var(--gray-300); }
+.bd-state h2 { font-size:1.5rem; font-weight:800; }
+.bd-state p { font-size:0.92rem; color:var(--gray-500); max-width:420px; line-height:1.6; }
+.bd-card { background:var(--gray-50,#f7f7f7); border:1px solid var(--gray-200,#e5e5e5); border-radius:8px; padding:36px 32px; text-align:center; }
+.bd-card .bd-icon { font-size:2.6rem; color:#10b981; margin-bottom:16px; }
+.bd-card h2 { font-size:1.3rem; font-weight:800; margin-bottom:8px; }
+.bd-card .bd-sub { font-size:0.85rem; color:var(--gray-500); margin-bottom:24px; }
+.bd-meta { background:#fff; border:1px solid var(--gray-200,#e5e5e5); border-radius:6px; padding:16px 20px; margin-bottom:24px; text-align:left; font-size:0.84rem; color:#444; line-height:1.9; }
+.bd-meta strong { color:#111; }
+.bd-download-btn { display:inline-flex; align-items:center; gap:8px; background:var(--black); color:var(--white); padding:14px 32px; font-size:0.9rem; font-weight:700; text-decoration:none; border-radius:4px; transition:background 0.2s; }
+.bd-download-btn:hover { background:#C8A96E; }
+.bd-expiry-note { font-size:0.76rem; color:#b45309; margin-top:16px; }
+.bd-legal { font-size:0.74rem; color:var(--gray-500); margin-top:28px; text-align:left; line-height:1.7; border-top:1px solid var(--gray-200,#e5e5e5); padding-top:18px; }
+.bd-legal li { margin-bottom:6px; }
+.bd-back-link { display:inline-block; margin-top:28px; font-size:0.82rem; color:var(--gray-500); text-decoration:none; }
+.bd-back-link:hover { color:var(--black); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container">
+    <a href="../index.html" class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></a>
+    <nav class="main-nav" id="mainNav">
+      <a href="../brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="../magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
+      <a href="../about.html" data-en="About" data-ko="소개">About</a>
+      <a href="../list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+    </nav>
+    <div class="header-actions">
+      <a href="../auth/profile.html" aria-label="Saved"><i class="far fa-bookmark"></i></a>
+      <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
+      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<div class="bd-wrap">
+  <!-- A-080 패턴: JS 실행 전에도 존재하는 정적 h1 -->
+  <h1 style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;">BIM Data Download</h1>
+
+  <div id="bdContent">
+    <div class="bd-state" id="bdLoading">
+      <div class="spinner"></div>
+      <p data-en="Verifying your access..." data-ko="접근 권한을 확인하는 중입니다...">Verifying your access...</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <p>&copy; 2026 ARCHINODE. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="../terms.html">Terms</a>
+        <a href="../privacy.html" data-en-href="../privacy-en.html" data-ko-href="../privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="../firebase-config.js"></script>
+<script src="../lang.js?v=20260630"></script>
+<script src="../auth-ui.js"></script>
+<script>
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+const bdParams = new URLSearchParams(window.location.search);
+const bdReqId = bdParams.get('req');
+const bdContent = document.getElementById('bdContent');
+
+function bdShowState(iconClass, titleEn, titleKo, bodyEn, bodyKo, extraHtml) {
+    bdContent.innerHTML =
+        '<div class="bd-state">'
+        + '<i class="' + iconClass + '"></i>'
+        + '<h2 data-en="' + escapeHtml(titleEn) + '" data-ko="' + escapeHtml(titleKo) + '">' + escapeHtml(titleEn) + '</h2>'
+        + '<p data-en="' + escapeHtml(bodyEn) + '" data-ko="' + escapeHtml(bodyKo) + '">' + escapeHtml(bodyEn) + '</p>'
+        + (extraHtml || '')
+        + '<a class="bd-back-link" href="../auth/profile.html" data-en="Back to My Account" data-ko="마이페이지로 돌아가기">Back to My Account</a>'
+        + '</div>';
+    if (typeof applyLang === 'function') applyLang();
+}
+
+function bdFormatDate(ts) {
+    if (!ts) return '-';
+    var d = ts.toDate ? ts.toDate() : new Date(ts);
+    var p = function(n) { return n < 10 ? '0' + n : '' + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+async function bdLoad() {
+    if (!bdReqId) {
+        bdShowState('fas fa-circle-exclamation', 'Invalid Link', '잘못된 링크입니다',
+            'This download link is missing a request ID.', '다운로드 링크에 요청 ID가 없습니다.');
+        return;
+    }
+
+    auth.onAuthStateChanged(async function(user) {
+        if (!user) {
+            location.replace('../auth/login.html?next=' + encodeURIComponent(location.pathname + location.search));
+            return;
+        }
+
+        try {
+            const snap = await db.collection('bim-requests').doc(bdReqId).get();
+
+            if (!snap.exists) {
+                bdShowState('fas fa-circle-exclamation', 'Request Not Found', '요청을 찾을 수 없습니다',
+                    'This BIM data request no longer exists.', '해당 BIM 데이터 요청을 찾을 수 없습니다.');
+                return;
+            }
+
+            const d = snap.data();
+
+            if (d.status !== 'approved') {
+                bdShowState('fas fa-hourglass-half', 'Not Yet Approved', '아직 승인되지 않았습니다',
+                    'Your request is still ' + (d.status || 'pending') + '. We will email you once it is approved.',
+                    '요청이 아직 ' + (d.status === 'rejected' ? '반려' : '검토') + ' 상태입니다. 승인되면 이메일로 안내드립니다.');
+                return;
+            }
+
+            const expiresAt = d.expiresAt ? (d.expiresAt.toDate ? d.expiresAt.toDate() : new Date(d.expiresAt)) : null;
+            if (expiresAt && expiresAt.getTime() < Date.now()) {
+                bdShowState('fas fa-clock', 'Link Expired', '다운로드 링크가 만료되었습니다',
+                    'This time-limited download link has expired. Please contact us to request a new link.',
+                    '시간제한 다운로드 링크가 만료되었습니다. 새 링크가 필요하시면 문의해 주세요.',
+                    '<a class="bd-download-btn" style="margin-top:8px;" href="../contact.html" data-en="Contact Us" data-ko="문의하기">Contact Us</a>');
+                return;
+            }
+
+            if (!d.fileUrl) {
+                bdShowState('fas fa-circle-exclamation', 'File Unavailable', '파일을 찾을 수 없습니다',
+                    'The requested file could not be located. Please contact us.', '요청하신 파일을 찾을 수 없습니다. 문의해 주세요.');
+                return;
+            }
+
+            const fileLabel = { catalog: 'PDF Catalog', bim: 'BIM File', model3d: '3D Model' }[d.fileType] || (d.fileType || 'File');
+
+            bdContent.innerHTML =
+                '<div class="bd-card">'
+                + '<div class="bd-icon"><i class="fas fa-circle-check"></i></div>'
+                + '<h2 data-en="Your download is ready" data-ko="다운로드가 준비되었습니다">Your download is ready</h2>'
+                + '<p class="bd-sub" data-en="Verified access to the requested technical data." data-ko="요청하신 기술 자료에 대한 승인된 접근입니다.">Verified access to the requested technical data.</p>'
+                + '<div class="bd-meta">'
+                + '<div><strong data-en="Product" data-ko="제품">Product</strong>: ' + escapeHtml(d.productName || '-') + ' (' + escapeHtml(d.brandName || '-') + ')</div>'
+                + '<div><strong data-en="File" data-ko="파일">File</strong>: ' + escapeHtml(fileLabel) + '</div>'
+                + '<div><strong data-en="Project" data-ko="프로젝트">Project</strong>: ' + escapeHtml(d.projectName || '-') + '</div>'
+                + '<div><strong data-en="Link valid until" data-ko="링크 유효기간">Link valid until</strong>: ' + bdFormatDate(d.expiresAt) + '</div>'
+                + '</div>'
+                + '<a class="bd-download-btn" href="' + escapeHtml(d.fileUrl) + '" target="_blank" rel="noopener noreferrer" data-en="Download File" data-ko="파일 다운로드"><i class="fas fa-download"></i> <span data-en="Download File" data-ko="파일 다운로드">Download File</span></a>'
+                + '<div class="bd-expiry-note" data-en="This link expires 7 days after approval and cannot be renewed automatically." data-ko="이 링크는 승인 후 7일간 유효하며 자동으로 연장되지 않습니다.">This link expires 7 days after approval and cannot be renewed automatically.</div>'
+                + '<ul class="bd-legal">'
+                + '<li data-en="This data may be used only for design review and spec-in of the project stated in your request." data-ko="본 자료는 신청 시 명시한 프로젝트의 설계 검토 및 사양 반영(Spec-in) 목적으로만 사용할 수 있습니다.">This data may be used only for design review and spec-in of the project stated in your request.</li>'
+                + '<li data-en="Redistribution to third parties, commercial reproduction, or reverse engineering is strictly prohibited." data-ko="제3자 재배포, 상업적 복제, 역설계는 엄격히 금지됩니다.">Redistribution to third parties, commercial reproduction, or reverse engineering is strictly prohibited.</li>'
+                + '</ul>'
+                + '</div>';
+            if (typeof applyLang === 'function') applyLang();
+        } catch (err) {
+            console.error(err);
+            bdShowState('fas fa-lock', 'Access Denied', '접근 권한이 없습니다',
+                'You do not have permission to view this request, or it belongs to a different account.',
+                '이 요청에 대한 접근 권한이 없거나 다른 계정으로 신청된 요청입니다.');
+        }
+    });
+}
+
+bdLoad();
+</script>
+</body>
+</html>
