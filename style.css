@@ -2207,8 +2207,8 @@ input, select, textarea { font-family: inherit; }
   --navy-mid:  #2a3646;   /* 하단 네이비 구간 안의 한 단 밝은 톤 */
   /* 섹션 교차 배경 — 화이트 / 베이지 / 연그레이 (A-168) */
   --band-white: #fdfbf7;
-  --band-beige: #f4efe6;
-  --band-grey:  #ecebe6;
+  --band-beige: #f8f3ea;   /* A-173: #f4efe6 은 탁해 보여 한 단 맑게 */
+  --band-grey:  #f2f1ed;
   --navy-gold: #c9a36a;   /* 네이비 위에서 --accent 는 대비가 모자라 밝은 금색을 쓴다 */
   --radius:    4px;          /* 승리 선택: B안 */
 
@@ -2459,14 +2459,33 @@ body.home .promo-foot a { color: var(--accent); border-bottom: 1px solid current
 
 /* ── 원형 카테고리 (A-172) — 제품 그리드 위의 진입 동선 ──────────────
    가로로 넘치면 스크롤. 스크롤바는 숨기되 키보드·터치 스크롤은 살아 있다 */
-body.home .cat-circles {
-  display: flex; gap: clamp(16px, 2.1vw, 36px);
-  overflow-x: auto; -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; padding-bottom: 4px;
+body.home .cat-rail {
+  display: flex; align-items: flex-start; gap: 12px;
   margin-bottom: clamp(44px, 5vw, 78px);
 }
+body.home .cat-rail-btn {
+  flex: 0 0 auto; width: 38px; height: 38px; margin-top: clamp(22px, 2.6vw, 38px);
+  border: 1px solid var(--gray-300); border-radius: 50%;
+  background: var(--band-white); color: var(--gray-700);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; transition: background .25s, color .25s, border-color .25s, opacity .25s;
+}
+body.home .cat-rail-btn:hover:not(:disabled) { background: var(--deep); color: #fdfbf7; border-color: var(--deep); }
+body.home .cat-rail-btn:disabled { opacity: .3; cursor: default; }
+body.home .cat-circles {
+  --cgap: clamp(14px, 1.8vw, 30px);
+  flex: 1 1 auto; min-width: 0;
+  display: flex; gap: var(--cgap);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding-bottom: 4px;
+  /* 손으로 끌었을 때만 가볍게 붙인다. 화살표는 스크립트가 칸 경계로 보낸다 */
+  scroll-snap-type: x proximity;
+}
+body.home .cat-circle { scroll-snap-align: start; }
 body.home .cat-circles::-webkit-scrollbar { display: none; }
-body.home .cat-circle { flex: 0 0 auto; width: clamp(82px, 7.6vw, 116px); text-align: center; }
+body.home .cat-circle { flex: 0 0 calc((100% - 9 * var(--cgap)) / 10); text-align: center; }
+@media (max-width: 1100px) { body.home .cat-circle { flex: 0 0 96px; } }
+@media (max-width: 640px)  { body.home .cat-circle { flex: 0 0 82px; } }
 body.home .cat-circle-img {
   display: block; width: 100%; aspect-ratio: 1; border-radius: 50%;
   overflow: hidden; background: var(--band-white);
@@ -2542,7 +2561,7 @@ body.home .cat-card-overlay span { font-size: 0.76rem; color: rgba(253,251,247,.
 }
 
 /* ── 알약 버튼 (A-170) ── 채도 낮은 브라운-그레이. 본문 위 2차 동선용 */
-body.home .cat-more { margin-top: clamp(30px, 3.4vw, 52px); display: flex; }
+body.home .cat-more { margin-top: clamp(30px, 3.4vw, 52px); display: flex; justify-content: center; }
 body.home .pill-btn,
 .pill-btn {
   display: inline-flex; align-items: center; gap: 10px;
@@ -2668,6 +2687,9 @@ html[lang="ko"] body.home .cta-listing h2 { letter-spacing: -0.005em; }
 /* 인라인 규칙이 `margin: 0 auto` 로 가운데를 잡고 있어 좌측 기준선이 무너진다 */
 /* max-width 로 일찍 접히면 오른쪽이 비어 보인다 — 칼럼 폭을 그대로 쓴다 */
 body.home .cta-listing p { color: var(--gray-700); max-width: none; margin: 18px 0 38px; }
+/* 제안 문장은 한 덩어리로 — 중간에서 꺾이지 않게 */
+.nowrap { white-space: nowrap; }
+@media (max-width: 520px) { .nowrap { white-space: normal; } }
 body.home .cta-btn { background: var(--deep); color: #fdfbf7; padding: 14px 32px; font-size: 0.82rem; }
 body.home .cta-btn:hover { background: var(--accent); color: #fdfbf7; }
 body.home .cta-free-tag { color: var(--gray-600); }
