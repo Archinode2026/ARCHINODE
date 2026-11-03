@@ -617,6 +617,7 @@ input, select, textarea { font-family: inherit; }
 }
 .newsletter-form input {
   flex: 1;
+  min-width: 0; /* flex 아이템 기본 min-width:auto 때문에 입력칸이 안 줄어 버튼이 밀려나갔다 */
   padding: 14px 20px;
   border: 1px solid var(--gray-300);
   border-right: none;
@@ -635,7 +636,7 @@ input, select, textarea { font-family: inherit; }
   transition: all 0.2s;
 }
 .newsletter-form button:hover { background: var(--gray-800); }
-@media (max-width: 360px) {
+@media (max-width: 440px) {
   .newsletter-form { flex-direction: column; }
   .newsletter-form input { border-right: 1px solid var(--gray-300); }
   .newsletter-form button { width: 100%; }
