@@ -2870,3 +2870,35 @@ body.home .korea-network > .container > div:last-child > div {
   text-align: left !important; padding: 22px 0 !important;
   color: var(--gray-600) !important; font-size: 1rem !important; letter-spacing: 0.06em;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   다른 페이지 확장용 유틸 (A-177) — 2026-11-03
+   메인에 적용한 밴드 리듬을 다른 페이지에서도 쓸 수 있게 클래스로 꺼내 둔다.
+   아직 어디에도 붙이지 않았다. 섹션에 클래스 하나만 얹으면 된다.
+   자세한 적용 순서는 docs/디자인-시스템.md 참고.
+   ────────────────────────────────────────────────────────────────────────── */
+.band-white { background: var(--band-white); }
+.band-beige { background: var(--band-beige); }
+.band-grey  { background: var(--band-grey); }
+/* 본문 섹션의 세로 리듬. 띠처럼 얕게 깔 때는 .band-pad-sm */
+.band-pad    { padding: var(--sec-y) 0; }
+.band-pad-sm { padding: clamp(32px, 3.4vw, 54px) 0; }
+/* 섹션 제목 — 메인의 .section-title 과 같은 서체·크기 */
+.band-title {
+  font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
+  font-size: var(--t-h2); line-height: 1.14; letter-spacing: -0.012em;
+  color: var(--black); margin: 0;
+}
+html[lang="ko"] .band-title { letter-spacing: -0.005em; }
+/* 사진 타일 — 메인 제품 그리드와 같은 모서리·호버 */
+.band-tile {
+  position: relative; display: block; overflow: hidden; border-radius: var(--radius);
+  transition: transform .5s cubic-bezier(.2,.6,.2,1), box-shadow .5s cubic-bezier(.2,.6,.2,1);
+}
+.band-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .9s cubic-bezier(.2,.6,.2,1); }
+.band-tile:hover { transform: translateY(-8px); box-shadow: 0 18px 38px -16px rgba(51,46,39,.38); }
+.band-tile:hover img { transform: scale(1.04); }
+@media (prefers-reduced-motion: reduce) {
+  .band-tile, .band-tile img { transition: none; }
+  .band-tile:hover { transform: none; box-shadow: none; }
+}
