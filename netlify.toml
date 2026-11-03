@@ -1,6 +1,15 @@
 [build]
   publish = "."
 
+# 2026-11-03 A-151: Netlify 시크릿 스캐너(smart detection)가 firebase-config.js 의
+# Firebase 웹 API 키(AIza...)를 "비밀키처럼 생겼다"는 이유로 잡아 빌드가 실패했다.
+# 이 키는 Firebase 설계상 공개 값이다 — 프로젝트를 식별할 뿐이고 접근 통제는
+# Firestore 보안 규칙이 한다. 따라서 이 값 하나만 예외로 둔다.
+# 환경변수 기반 스캔(RECAPTCHA_SECRET_KEY 등)은 그대로 살아 있다.
+# ※ Firebase 콘솔에서 웹 API 키를 재발급하면 아래 값도 함께 갱신해야 한다.
+[build.environment]
+  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIzaSyBkCqq4V1KIkKjiIH46nZd-0cJaSVPSg9k"
+
 # A-004(2026-11-03): reCAPTCHA v3 서버 검증용 Netlify Function.
 # 비밀 키(RECAPTCHA_SECRET_KEY)는 Netlify 대시보드 환경변수로만 설정 — 이 파일/레포에는 절대 없음.
 [functions]
