@@ -679,7 +679,7 @@ function openBimModal(fileType) {
         const msg = lang === 'en'
             ? 'Sign in or create a free account to request CAD/BIM/catalog files. Go to sign up now?'
             : '로그인 또는 무료 회원가입 후 CAD/BIM/카탈로그 파일을 신청할 수 있어요. 지금 가입하러 갈까요?';
-        if (confirm(msg)) window.location.href = '../auth/signup.html';
+        if (confirm(msg)) window.location.href = '../auth/signup.html?type=member';
         return;
     }
     bimRequestedFileType = fileType;

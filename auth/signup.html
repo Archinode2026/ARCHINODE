@@ -75,6 +75,18 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; mi
 .divider span { padding: 0 14px; font-size: 0.78rem; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
 
 .benefits { background: #fafaf7; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+        /* 2026-11-03 A-148: 가입 유형 선택(회원 / 브랜드) */
+        .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0 8px; }
+        .role-card { display: block; text-align: left; background: #fff; border: 1px solid #e3e3e3; border-radius: 10px;
+            padding: 22px 20px; cursor: pointer; font-family: inherit; transition: all 0.18s; text-decoration: none; }
+        .role-card:hover { border-color: #C8A96E; box-shadow: 0 4px 16px rgba(200,169,110,0.16); transform: translateY(-2px); }
+        .role-card i { font-size: 1.35rem; color: #C8A96E; margin-bottom: 10px; display: block; }
+        .role-card .role-title { font-size: 0.98rem; font-weight: 700; color: #111; margin-bottom: 6px; }
+        .role-card .role-desc { font-size: 0.8rem; color: #777; line-height: 1.5; }
+        .role-card .role-go { font-size: 0.78rem; font-weight: 600; color: #C8A96E; margin-top: 12px; display: block; }
+        .role-back { display: inline-block; margin-bottom: 18px; font-size: 0.8rem; color: #999; text-decoration: none; }
+        .role-back:hover { color: #111; }
+        @media (max-width: 560px) { .role-grid { grid-template-columns: 1fr; } }
 .benefits h3 { font-size: 0.85rem; font-weight: 700; color: #333; margin-bottom: 10px; }
 .benefits ul { list-style: none; padding: 0; }
 .benefits li { font-size: 0.82rem; color: #666; padding: 4px 0; }
@@ -100,7 +112,35 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; mi
 <div class="auth-container">
     <div class="auth-box">
         <h1 data-en="Join ARCHINODE" data-ko="ARCHINODE 가입">Join ARCHINODE</h1>
-        <p class="subtitle" data-en="Create your free account to explore global architecture & design brands, save favorites, and connect with brands directly." data-ko="무료 계정을 만들어 글로벌 건축·디자인 브랜드를 탐색하고, 즐겨찾기를 저장하고, 브랜드와 직접 소통하세요.">Create your free account to explore global architecture & design brands, save favorites, and connect with brands directly.</p>
+        <p class="subtitle" id="signupSubtitle" data-en="First, tell us which account you need." data-ko="먼저 어떤 계정이 필요한지 선택해 주세요.">First, tell us which account you need.</p>
+
+        <!-- 2026-11-03 A-148: 가입 유형을 먼저 고르게 한다. 기존에는 브랜드 입점 경로가
+             카드 맨 아래 작은 링크(그것도 '브랜드 포털' = 로그인)에만 있어 찾기 어려웠다. -->
+        <div id="roleChooser">
+            <div class="role-grid">
+                <button type="button" class="role-card" onclick="chooseRole('member')">
+                    <i class="fas fa-user"></i>
+                    <div class="role-title" data-en="I'm a professional" data-ko="회원으로 가입">I'm a professional</div>
+                    <div class="role-desc" data-en="Architects, designers, dealers and developers. Browse brands, save them to your list, and contact them directly." data-ko="건축가·디자이너·딜러·시행사. 브랜드를 둘러보고 내 리스트에 저장하고 직접 문의하세요.">Architects, designers, dealers and developers.</div>
+                    <span class="role-go" data-en="Create a free account →" data-ko="무료 계정 만들기 →">Create a free account →</span>
+                </button>
+                <a class="role-card" href="../list-your-brand.html">
+                    <i class="fas fa-building"></i>
+                    <div class="role-title" data-en="We're a brand" data-ko="브랜드로 입점 신청">We're a brand</div>
+                    <div class="role-desc" data-en="European design and building product brands entering the Korean market. Apply to list your brand." data-ko="한국 시장 진출을 준비하는 유럽 디자인·건축자재 브랜드. 입점을 신청하세요." >European design and building product brands.</div>
+                    <span class="role-go" data-en="Apply to list →" data-ko="입점 신청하기 →">Apply to list →</span>
+                </a>
+            </div>
+            <div class="auth-links">
+                <span data-en="Already have an account?" data-ko="이미 계정이 있으신가요?">Already have an account?</span>
+                <a href="login.html" data-en="Log in" data-ko="로그인">Log in</a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="../brand-portal/login.html" data-en="Brand log in" data-ko="브랜드 로그인">Brand log in</a>
+            </div>
+        </div>
+
+        <div id="memberSignup" style="display:none;">
+        <a href="#" class="role-back" onclick="backToRoles(event)" data-en="← Choose a different account type" data-ko="← 다른 가입 유형 선택">← Choose a different account type</a>
 
         <div class="benefits">
             <h3 data-en="Free membership includes:" data-ko="무료 멤버십 혜택:">Free membership includes:</h3>
@@ -189,14 +229,60 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; mi
             <a href="login.html" data-en="Log in" data-ko="로그인">Log in</a>
             &nbsp;&nbsp;|&nbsp;&nbsp;
             <span data-en="Are you a brand?" data-ko="브랜드이신가요?">Are you a brand?</span>
-            <a href="../brand-portal/login.html" data-en="Brand Portal" data-ko="브랜드 포털">Brand Portal</a>
+            <a href="../list-your-brand.html" data-en="Apply to list" data-ko="입점 신청">Apply to list</a>
         </div>
+        </div><!-- /#memberSignup -->
     </div>
 </div>
 
 <script src="../firebase-config.js"></script>
 <script src="../lang.js?v=20260630"></script>
 <script>
+// ── 가입 유형 선택 (2026-11-03 A-148) ──
+// 부제목은 lang.js 가 data-en/data-ko 를 읽어 다시 칠하므로, 문구를 바꿀 때
+// 속성까지 같이 갱신해야 언어 전환 후에도 유지된다.
+const SIGNUP_SUBTITLE = {
+    chooser: {
+        en: "First, tell us which account you need.",
+        ko: "먼저 어떤 계정이 필요한지 선택해 주세요."
+    },
+    member: {
+        en: "Create your free account to explore global brands, save them to your list, and contact them directly.",
+        ko: "무료 계정을 만들어 글로벌 브랜드를 탐색하고, 내 리스트에 저장하고, 직접 문의하세요."
+    }
+};
+function setSignupSubtitle(which) {
+    const el = document.getElementById('signupSubtitle');
+    const t = SIGNUP_SUBTITLE[which];
+    if (!el || !t) return;
+    el.setAttribute('data-en', t.en);
+    el.setAttribute('data-ko', t.ko);
+    el.textContent = document.documentElement.lang === 'en' ? t.en : t.ko;
+}
+function chooseRole(role) {
+    if (role !== 'member') return;
+    document.getElementById('roleChooser').style.display = 'none';
+    document.getElementById('memberSignup').style.display = '';
+    setSignupSubtitle('member');
+    try { history.replaceState(null, '', location.pathname + '?type=member'); } catch (e) {}
+    const first = document.getElementById('signupName');
+    if (first) first.focus();
+}
+function backToRoles(e) {
+    if (e) e.preventDefault();
+    document.getElementById('memberSignup').style.display = 'none';
+    document.getElementById('roleChooser').style.display = '';
+    setSignupSubtitle('chooser');
+    try { history.replaceState(null, '', location.pathname); } catch (err) {}
+}
+// ?type=member 로 들어오면 선택 단계를 건너뛴다(제품 상세의 가입 유도 등)
+(function () {
+    var t = null;
+    try { t = new URLSearchParams(window.location.search).get('type'); } catch (e) {}
+    if (t === 'member') chooseRole('member');
+    else setSignupSubtitle('chooser');
+})();
+
 // ── 세션 유지 ──
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
 
