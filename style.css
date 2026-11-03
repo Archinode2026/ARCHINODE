@@ -2197,6 +2197,11 @@ input, select, textarea { font-family: inherit; }
 
   --rule:      #ede7dc;
   --deep:      #403a30;
+  /* 네이비 — 하단(CTA 밴드·푸터)에만 쓴다. 헤더/본문은 웜 톤 유지 */
+  --navy:      #253040;
+  --navy-deep: #1c2533;   /* 최하단 바 */
+  --navy-soft: #334155;   /* 구분선·호버 */
+  --navy-gold: #c9a36a;   /* 네이비 위에서 --accent 는 대비가 모자라 밝은 금색을 쓴다 */
   --radius:    4px;          /* 승리 선택: B안 */
 
   --t-display: clamp(2.7rem, 6vw, 5.4rem);
@@ -2238,9 +2243,10 @@ select, textarea { border-radius: var(--radius); }
   border-bottom: 1px solid var(--rule);
 }
 .logo { font-size: 1.16rem; font-weight: 600; letter-spacing: 0.1em; color: var(--black); }
-.logo-sub {
+body .logo-sub {
   font-family: 'Inter','Noto Sans KR',sans-serif;
-  font-size: 0.58rem; font-weight: 400; letter-spacing: 0.26em; color: var(--gray-500);
+  font-size: 0.58rem; font-weight: 400; letter-spacing: 0.26em;
+  color: var(--gray-600);   /* A-164: gray-500 은 크림 위 3.01:1 로 AA 미달 */
 }
 .main-nav { gap: 26px; }
 .main-nav > a, .nav-dropdown-trigger {
@@ -2275,15 +2281,49 @@ select, textarea { border-radius: var(--radius); }
 }
 .link-more:hover { color: var(--accent); border-color: var(--accent); }
 
-/* 푸터 — 전 페이지 공통 */
-.footer { background: var(--deep); color: rgba(253,251,247,.6); }
-.footer a { color: rgba(253,251,247,.72); }
-.footer a:hover { color: var(--accent); }
-.footer h4 {
+/* 푸터 — 전 페이지 공통. index.html 은 head 안에 같은 규칙을 인라인으로 또 갖고
+   있어서(link 뒤에 오므로 인라인이 이긴다) `body` 를 붙여 명시도를 올린다 */
+body .footer {
+  background: var(--navy); color: rgba(237,242,247,.62);
+  position: relative; z-index: 0;   /* 최하단 바의 풀블리드 배경을 담을 스태킹 컨텍스트 */
+  overflow: hidden;                 /* -50vw 가 가로 스크롤을 만들지 않도록 잘라낸다 */
+  padding: clamp(64px, 6vw, 92px) 0 0;
+}
+body .footer a { color: rgba(237,242,247,.78); }
+body .footer a:hover { color: var(--navy-gold); }
+body .footer h4 {
   font-family: 'Inter','Noto Sans KR',sans-serif;
   font-size: 0.67rem; font-weight: 500; letter-spacing: 0.22em;
-  text-transform: uppercase; color: rgba(253,251,247,.42);
+  text-transform: uppercase; color: rgba(237,242,247,.56);
+  margin-bottom: 22px;
 }
+body .footer .footer-grid {
+  border-bottom: 1px solid rgba(237,242,247,.10);
+  padding-bottom: clamp(44px, 4.5vw, 64px);
+  gap: clamp(32px, 3.4vw, 56px);
+}
+body .footer .footer-brand .logo { color: #fdfbf7; }
+body .footer .footer-brand .logo-sub,
+body .footer .footer-brand p { color: rgba(237,242,247,.58); }
+body .footer .footer-col ul li { margin-bottom: 11px; }
+body .footer .footer-col ul li a { font-size: 0.82rem; line-height: 1.6; color: rgba(237,242,247,.78); }
+/* 소셜 — 테두리 상자를 걷어내고 아이콘만 남긴다 */
+body .footer .footer-social { gap: 20px; }
+body .footer .footer-social a {
+  width: auto; height: auto; border: none; font-size: 1.06rem;
+  color: rgba(237,242,247,.62); transition: color .25s;
+}
+body .footer .footer-social a:hover { color: #fdfbf7; }
+/* 최하단 바 — 한 단 더 어둡게, 화면 끝까지 */
+body .footer .footer-bottom { position: relative; padding: 20px 0; }
+body .footer .footer-bottom::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: -50vw; right: -50vw;
+  background: var(--navy-deep); z-index: -1;
+}
+body .footer .footer-bottom p,
+body .footer .footer-bottom-links a { font-size: .72rem; color: rgba(237,242,247,.52); }
+body .footer .footer-bottom-links a:hover { color: var(--navy-gold); }
+body .footer .footer-business-info { color: rgba(237,242,247,.42) !important; }
 
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -2488,7 +2528,7 @@ body.home .service-item p { margin: 0; font-size: 0.86rem; line-height: 1.8; col
 }
 
 /* ── CTA 밴드 ── */
-body.home .cta-listing { background: var(--deep); color: var(--white); text-align: left; }
+body.home .cta-listing { background: var(--navy); color: var(--white); text-align: left; }
 body.home .cta-listing h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
   font-size: var(--t-h2); line-height: 1.14; margin: 0; max-width: 20ch;
@@ -2498,11 +2538,21 @@ html[lang="ko"] body.home .cta-listing h2 { letter-spacing: -0.005em; }
 body.home .cta-listing p { color: rgba(253,251,247,.7); max-width: 52ch; }
 
 /* ── 뉴스레터 ── */
-body.home .newsletter { border-top: 1px solid var(--rule); background: var(--white); }
+/* 뉴스레터 — 네이비 CTA 와 네이비 푸터 사이에 끼는 크림 밴드.
+   본문 섹션용 --sec-y(최대 158px)는 이 띠에 과해서 따로 조인다 */
+body.home .newsletter {
+  border-top: 1px solid var(--rule); background: var(--gray-100);
+  padding: clamp(52px, 5vw, 78px) 0; text-align: left;
+}
 body.home .newsletter h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
   font-size: var(--t-h2); line-height: 1.14; letter-spacing: -0.012em;
+  margin: 0 0 10px;
 }
+body.home .newsletter p { margin: 0 0 26px; max-width: 46ch; color: var(--gray-700); }
+body.home .newsletter-form { margin: 0; max-width: 520px; }
+body.home .newsletter-msg { text-align: left; }
+@media (max-width: 440px) { body.home .newsletter-form { max-width: none; } }
 html[lang="ko"] body.home .newsletter h2 { letter-spacing: -0.005em; }
 
 /* ── 히어로 정렬 보정 ──────────────────────────────────────────────────
@@ -2578,30 +2628,30 @@ body.home .editorial-card-side p { color: var(--gray-700) !important; font-size:
 body.home .editorial-card-side span { color: var(--accent) !important; }
 body.home .editorial-card-side i { color: var(--accent) !important; font-size: 1.05rem !important; margin-bottom: 16px !important; }
 
-/* 한국 네트워크 — 인라인 스타일로 중앙정렬·산세리프가 박혀 있어 덮는다 */
-body.home section[style*="#fafafa"] {
+/* 한국 네트워크 — 인라인 스타일을 걷어내고 클래스로 잡는다(A-163) */
+body.home .korea-network {
   background: var(--gray-100) !important;
   padding: var(--sec-y) 0 !important;
   border-top: 1px solid var(--rule) !important;
   border-bottom: none !important;
 }
-body.home section[style*="#fafafa"] > .container > div:first-child { text-align: left !important; margin-bottom: clamp(38px,4.2vw,62px) !important; }
-body.home section[style*="#fafafa"] h2 {
+body.home .korea-network > .container > div:first-child { text-align: left !important; margin-bottom: clamp(38px,4.2vw,62px) !important; }
+body.home .korea-network h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif !important; font-weight: 500 !important;
   font-size: var(--t-h2) !important; line-height: 1.14 !important;
   color: var(--black) !important; letter-spacing: -0.012em !important; max-width: 22ch;
 }
-html[lang="ko"] body.home section[style*="#fafafa"] h2 { letter-spacing: -0.005em !important; }
-body.home section[style*="#fafafa"] p { color: var(--gray-700) !important; margin: 20px 0 0 !important; max-width: 54ch !important; line-height: 1.85 !important; }
+html[lang="ko"] body.home .korea-network h2 { letter-spacing: -0.005em !important; }
+body.home .korea-network p { color: var(--gray-700) !important; margin: 20px 0 0 !important; max-width: 54ch !important; line-height: 1.85 !important; }
 /* 라벨 — 다른 섹션의 eyebrow 와 같은 어휘로 */
-body.home section[style*="#fafafa"] > .container > div:first-child > div:first-child {
+body.home .korea-network > .container > div:first-child > div:first-child {
   display: inline-flex !important; align-items: center; gap: 11px;
   font-weight: 500 !important; letter-spacing: 0.22em !important; color: var(--accent) !important;
   margin-bottom: 20px !important;
 }
-body.home section[style*="#fafafa"] > .container > div:first-child > div:first-child::before {
+body.home .korea-network > .container > div:first-child > div:first-child::before {
   content: ''; flex: 0 0 24px; height: 1px; background: var(--accent); opacity: .55;
 }
 /* 파트너 로고 자리 — 가운데 몰린 것을 좌측 기준선에 맞춘다 */
-body.home section[style*="#fafafa"] > .container > div:last-child { margin: 0 !important; max-width: none !important; }
-body.home section[style*="#fafafa"] > .container > div:last-child > div { text-align: left !important; padding: 18px 0 !important; color: var(--gray-500) !important; }
+body.home .korea-network > .container > div:last-child { margin: 0 !important; max-width: none !important; }
+body.home .korea-network > .container > div:last-child > div { text-align: left !important; padding: 18px 0 !important; color: var(--gray-500) !important; }

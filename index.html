@@ -21,7 +21,7 @@
 html { scroll-behavior: smooth; font-size: 16px; }
 body {
   font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #1a1a1a;
+  color: #332e27;
   background: #fdfbf7;
   line-height: 1.6;
   overflow-x: hidden;
@@ -36,16 +36,18 @@ input, select, textarea { font-family: inherit; }
 :root {
   --black: #332e27;
   --white: #fdfbf7;
-  --gray-50: #fafafa;
-  --gray-100: #f5f5f5;
-  --gray-200: #e5e5e5;
-  --gray-300: #d4d4d4;
-  --gray-400: #a3a3a3;
-  --gray-500: #737373;
-  --gray-600: #525252;
-  --gray-700: #404040;
-  --gray-800: #262626;
-  --gray-900: #171717;
+  /* A-163: style.css 의 웜 램프와 값을 맞춘다. 이 인라인 :root 가 link 뒤에 와서
+     style.css 를 이기기 때문에, 여기가 쿨그레이면 메인만 다른 색이 된다 */
+  --gray-50:  #f7f3ec;
+  --gray-100: #f4efe6;
+  --gray-200: #ede7dc;
+  --gray-300: #ddd5c7;
+  --gray-400: #b5ab9b;
+  --gray-500: #9a9183;
+  --gray-600: #7a7164;
+  --gray-700: #5d564c;
+  --gray-800: #464037;
+  --gray-900: #403a30;
   --accent: #332e27;
   --accent-hover: #333333;
   --max-width: 1440px;
@@ -955,7 +957,7 @@ input, select, textarea { font-family: inherit; }
 </section>
 
 <!-- KOREAN NETWORK & PATRONAGE (2026-07-04 실비아 지적) -->
-<section style="background:#fafafa;padding:70px 24px;border-top:1px solid #eee;border-bottom:1px solid #eee;">
+<section class="korea-network">
   <div class="container">
     <div style="text-align:center;margin-bottom:32px;">
       <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.2em;color:#C8A96E;text-transform:uppercase;margin-bottom:12px;" data-en="Korean Network" data-ko="한국 네트워크">Korean Network</div>

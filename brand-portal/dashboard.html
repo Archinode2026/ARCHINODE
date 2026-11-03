@@ -19,7 +19,7 @@
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; color: #333; }
+body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; color: #333; }
 
 /* TOPBAR */
 .topbar { background: #0a0a0a; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
@@ -145,7 +145,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
 .inbox-msg.err { color: #dc2626; }
 .inbox-table { width: 100%; border-collapse: collapse; }
 .inbox-table th { text-align: left; padding: 10px 12px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f0f0; }
-.inbox-table td { padding: 12px; font-size: 0.86rem; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+.inbox-table td { padding: 12px; font-size: 0.86rem; border-bottom: 1px solid #f4efe6; vertical-align: middle; }
 .inbox-table tr:hover { background: #fafafa; }
 .inbox-sub { display: block; font-size: 0.72rem; color: #999; margin-top: 2px; word-break: break-all; }
 .inbox-ellip { display: inline-block; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
@@ -168,7 +168,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
 .inbox-actions { margin-top: 14px; display: flex; gap: 8px; justify-content: flex-end; }
 .inbox-hist-head { margin-top: 16px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
 .inbox-hist { list-style: none; margin: 8px 0 0; font-size: 0.8rem; color: #555; }
-.inbox-hist li { padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+.inbox-hist li { padding: 6px 0; border-bottom: 1px solid #f4efe6; }
 .inbox-hist li small { color: #999; margin-left: 6px; }
 .inbox-hist li div { margin-top: 3px; white-space: pre-wrap; }
 
@@ -1051,7 +1051,7 @@ function renderCertList(certs) {
     wrap.innerHTML = certs.map((cert, i) => `
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f9f9f9;border-radius:6px;">
             <div>
-                <a href="${cert.fileUrl}" target="_blank" style="font-weight:600;color:#000;text-decoration:none;" rel="noopener noreferrer"><i class="fas fa-file-certificate" style="margin-right:6px;color:#C8A96E;"></i>${cert.name}</a>
+                <a href="${cert.fileUrl}" target="_blank" style="font-weight:600;color:#332e27;text-decoration:none;" rel="noopener noreferrer"><i class="fas fa-file-certificate" style="margin-right:6px;color:#C8A96E;"></i>${cert.name}</a>
                 ${cert.issuer ? `<span style="color:#999;font-size:0.8rem;margin-left:8px;">${cert.issuer}</span>` : ''}
             </div>
             <button type="button" onclick="deleteCertification(${i})" style="background:none;border:none;color:#c62828;cursor:pointer;font-size:0.9rem;"><i class="fas fa-trash"></i></button>

@@ -30,20 +30,22 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 /* ===== VARIABLES ===== */
 :root {
-  --black: #000000;
-  --white: #ffffff;
-  --gray-50: #fafafa;
-  --gray-100: #f5f5f5;
-  --gray-200: #e5e5e5;
-  --gray-300: #d4d4d4;
-  --gray-400: #a3a3a3;
-  --gray-500: #737373;
-  --gray-600: #525252;
-  --gray-700: #404040;
-  --gray-800: #262626;
-  --gray-900: #171717;
-  --accent: #000000;
-  --accent-hover: #333333;
+  --black: #332e27;
+  --white: #fdfbf7;
+  /* A-163: style.css 의 웜 램프와 값을 맞춘다. 이 인라인 :root 가 link 뒤에 와서
+     style.css 를 이기기 때문에, 여기가 옛 값이면 이 페이지만 다른 색이 된다 */
+  --gray-50:  #f7f3ec;
+  --gray-100: #f4efe6;
+  --gray-200: #ede7dc;
+  --gray-300: #ddd5c7;
+  --gray-400: #b5ab9b;
+  --gray-500: #9a9183;
+  --gray-600: #7a7164;
+  --gray-700: #5d564c;
+  --gray-800: #464037;
+  --gray-900: #403a30;
+  --accent: #a07c4a;
+  --accent-hover: #8a6a3d;
   --max-width: 1440px;
   --header-height: 64px;
 }
@@ -1945,7 +1947,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
     <div id="loadMoreWrap" style="text-align:center;margin-top:40px;">
       <button id="loadMoreBtn" type="button" data-en="Load More Articles" data-ko="기사 더 보기"
-        style="padding:14px 36px;background:#000;color:#fff;border:none;border-radius:4px;font-size:0.95rem;cursor:pointer;font-family:inherit;">
+        style="padding:14px 36px;background:#332e27;color:#fff;border:none;border-radius:4px;font-size:0.95rem;cursor:pointer;font-family:inherit;">
         Load More Articles
       </button>
       <p id="loadMoreCount" style="margin-top:12px;color:#888;font-size:0.85rem;"></p>
