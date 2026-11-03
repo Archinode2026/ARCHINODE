@@ -483,20 +483,31 @@ async function updateBrand(docId, newStatus) {
     });
     if (reason === null) return;
 
+    // A-027(2026-11-03): brands.history[]는 과거 모든 상태변경(사유·어드민 이메일 포함)을 영구히
+    // 쌓는 순수 어드민 감사 기록이라 — status=='approved'가 되는 순간 전체 문서가 공개 read 대상이
+    // 되면서 그대로 노출됨(실측 확인: wool21wool@gmail.com 등). brand-portal에서 브랜드 본인이
+    // 자기 statusReason을 읽는 정당한 용도가 있어 그 필드는 공개 문서에 남기되(approved로 돌아가면
+    // 즉시 비워 "정지 중일 때만 보이는" 원래 의도대로 되돌림), history[]만 어드민 전용 서브컬렉션
+    // brands/{id}/internal/moderation 으로 분리한다.
     const updateData = {
         status: newStatus,
-        statusReason: reason || '',
+        // approved로 복귀하면 이전 정지/거절 사유를 공개 문서에서 비운다 — 정지/거절 상태일 때는
+        // isOwner·isAdmin만 읽을 수 있어 안전하지만, approved가 되는 순간 공개로 노출되기 때문
+        statusReason: newStatus === 'approved' ? '' : (reason || ''),
         statusChangedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        statusChangedBy: (auth.currentUser && auth.currentUser.uid) || '',
-        // 2단계: 상태 이력 덧붙이기 (검수대장 A-009) — 같은 update 한 번에. reviewIssues 의 history 패턴과 동일
-        history: firebase.firestore.FieldValue.arrayUnion({ status: newStatus, by: (auth.currentUser && auth.currentUser.email) || '', at: new Date().toISOString(), note: reason || '' })
+        statusChangedBy: (auth.currentUser && auth.currentUser.uid) || ''
     };
     if (newStatus === 'approved') {
         updateData.approvedAt = firebase.firestore.FieldValue.serverTimestamp();
     }
+    const moderationUpdate = {
+        // 2단계: 상태 이력 덧붙이기 (검수대장 A-009) — reviewIssues 의 history 패턴과 동일
+        history: firebase.firestore.FieldValue.arrayUnion({ status: newStatus, by: (auth.currentUser && auth.currentUser.email) || '', at: new Date().toISOString(), note: reason || '' })
+    };
 
     try {
         await db.collection('brands').doc(docId).update(updateData);
+        await db.collection('brands').doc(docId).collection('internal').doc('moderation').set(moderationUpdate, { merge: true });
         logAdmin({ action: 'brand.status', target: { col: 'brands', id: docId, label: brandName }, from: prevStatus, to: newStatus, note: reason || '' });   // 2단계: 활동 로그
         
         // 상태 변경 시 브랜드에게 이메일 알림 (approve/suspend/reject/restore)
@@ -630,6 +641,16 @@ async function viewBrand(docId) {
     }
     const b = doc.data();
 
+    // A-027(2026-11-03): history[](어드민 이메일 포함, 영구 누적)만 공개 brands 문서에서 빼서
+    // 어드민 전용 서브컬렉션 brands/{id}/internal/moderation 으로 분리했다. statusReason/
+    // statusChangedAt은 brand-portal에서 브랜드 본인도 읽어야 해서 여전히 메인 문서(b)에 있다
+    // (approved로 복귀 시 statusReason은 비워지므로 공개 노출되지 않는다).
+    let mod = {};
+    try {
+        const modDoc = await db.collection('brands').doc(docId).collection('internal').doc('moderation').get();
+        if (modDoc.exists) mod = modDoc.data();
+    } catch (e) { console.warn('[viewBrand] moderation 조회 실패', e); }
+
     let statusHistoryHtml = '';
     if (b.statusReason) {
         statusHistoryHtml += `<div class="detail-row"><div class="detail-label">Last Reason</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(b.statusReason)}</div></div>`;
@@ -641,8 +662,8 @@ async function viewBrand(docId) {
         } catch (e) {}
     }
 
-    // 2단계: 상태 이력 (brands.history[] — 최신 위로, reviewIssues 와 같은 패턴). 없으면 안내 한 줄. 값은 전부 escapeHtml/escapeAttr.
-    const hist = Array.isArray(b.history) ? b.history.slice().reverse() : [];
+    // 2단계: 상태 이력 (brands/{id}/internal/moderation 의 history[] — 최신 위로, reviewIssues 와 같은 패턴). 없으면 안내 한 줄. 값은 전부 escapeHtml/escapeAttr.
+    const hist = Array.isArray(mod.history) ? mod.history.slice().reverse() : [];
     const histRows = hist.length
         ? hist.map(h => `<li><span class="status status-${escapeAttr(h.status || '')}">${escapeHtml(h.status || '')}</span> · ${escapeHtml(h.by || '')} · ${escapeHtml(fmtDate(h.at))}${h.note ? '<small>' + escapeHtml(h.note) + '</small>' : ''}</li>`).join('')
         : `<li class="adm-muted">${tSpan('No history yet', '이력 없음')}</li>`;
@@ -915,7 +936,8 @@ function rvDateTime(iso) {
         return d.toLocaleString();
     } catch (e) { return String(iso || ''); }
 }
-function rvNoNum(no) { const m = /^A-(\d+)$/.exec(String(no || '')); return m ? parseInt(m[1], 10) : 0; }
+// 2026-11-03: "R-" 신규 + 과거 "A-"(아직 이전 안 된 문서) 둘 다 정렬 가능하게 접두사 양쪽 허용
+function rvNoNum(no) { const m = /^[AR]-(\d+)$/.exec(String(no || '')); return m ? parseInt(m[1], 10) : 0; }
 function rvSafeUrl(u) { return (u && /^https?:\/\//i.test(u)) ? u : ''; }   // 브랜드 website 가드와 같은 방식 (javascript: 차단)
 function rvMsg(en, ko, isErr) {
     const el = document.getElementById('reviewMsg');
@@ -1049,11 +1071,15 @@ async function saveReview() {
     const btn = document.getElementById('rvSaveBtn');
     btn.disabled = true;
     try {
-        // 발번: 저장 직전에 컬렉션을 다시 읽어 최대 번호 +1 (문서 대장이 A-010까지 썼으므로 최소 A-011)
+        // 발번: 저장 직전에 컬렉션을 다시 읽어 최대 번호 +1.
+        // 2026-11-03 QA: 원래 "A-"를 썼는데, 정식 장부 docs/검수대장.md도 독립적으로 "A-"를
+        // 매겨서 같은 번호가 서로 다른 결함을 가리키는 충돌이 발생했다(검수관리는 CLAUDE.md상
+        // "오픈 전 임시 트리아지 도구", 정식 기록은 검수대장.md뿐). 접두사를 "R-"로 분리해
+        // 두 번호 체계가 앞으로 절대 겹치지 않게 한다. 기존 A-00x 문서들은 별도로 라벨만 R-00x로 이전.
         const snap = await db.collection('reviewIssues').get();
-        let max = 10;
+        let max = 0;
         snap.forEach(doc => { max = Math.max(max, rvNoNum(doc.data().no)); });
-        const no = 'A-' + String(max + 1).padStart(3, '0');
+        const no = 'R-' + String(max + 1).padStart(3, '0');
         const by = (auth.currentUser && auth.currentUser.email) || '';
         await db.collection('reviewIssues').add(Object.assign(data, {
             no: no,

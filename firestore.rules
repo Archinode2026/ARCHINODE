@@ -96,6 +96,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // brands/{brandId}/internal — 2026-11-03 QA A-027: 정지·거절 사유(statusReason)와 상태변경
+    // 이력(history[], 관리자 이메일 포함)이 brands 본문 필드로 있으면 status=='approved'인 순간
+    // 전체 문서가 공개 read 대상이 되어 과거 사유·어드민 이메일이 그대로 노출됨(실측 확인:
+    // 승인된 브랜드 2건에서 wool21wool@gmail.com과 내부 QA 메모가 공개로 읽힘). 이 서브컬렉션으로
+    // 분리해 어드민만 읽고 쓸 수 있게 한다 — 공개 brands 문서에는 더 이상 이 필드들을 쓰지 않는다.
+    match /brands/{brandId}/internal/{docId} {
+      allow read, write: if isAdmin();
+    }
+
     // ────────────────────────────────────────────────────────────────────
     // products 컬렉션
     // 문서 ID = 자동 생성
