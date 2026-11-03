@@ -665,6 +665,15 @@ fadeEls.forEach(el => fadeObserver.observe(el));
 
 <!-- Newsletter Subscribe handler (글로벌 함수) -->
 <script>
+// A-010(2026-11-03): Firestore 쓰기는 오프라인/연결 불안정 시 reject 없이 큐에서 무한 대기한다 —
+// try/catch/finally가 있어도 실패 갈래를 못 타 버튼이 "..."에서 멈춘 것처럼 보였다.
+function archinodeWithTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise(function(_, reject) { setTimeout(function () { reject(new Error('ARCHINODE_TIMEOUT')); }, ms); })
+  ]);
+}
+
 window.subscribeNewsletter = async function(e, source) {
   e.preventDefault();
   var form = e.target;
@@ -694,12 +703,12 @@ window.subscribeNewsletter = async function(e, source) {
   btn.textContent = '...';
   try {
     if (typeof firebase === 'undefined') throw new Error('Firebase SDK not loaded');
-    await firebase.firestore().collection('newsletter-subscribers').add({
+    await archinodeWithTimeout(firebase.firestore().collection('newsletter-subscribers').add({
       email: email,
       source: source || 'unknown',
       hp: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    }), 15000);
     try {
         await firebase.firestore().collection('mail').add({
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
@@ -722,7 +731,11 @@ window.subscribeNewsletter = async function(e, source) {
     form.reset();
   } catch (err) {
     console.error('Subscribe failed:', err);
-    showMsg((curLang === 'ko' ? '구독에 실패했습니다: ' : 'Subscription failed: ') + err.message, true);
+    if (err.message === 'ARCHINODE_TIMEOUT') {
+      showMsg(curLang === 'ko' ? '연결이 느리거나 끊긴 것 같습니다. 네트워크를 확인하고 다시 시도해 주세요.' : 'Your connection seems slow or offline. Please check your network and try again.', true);
+    } else {
+      showMsg((curLang === 'ko' ? '구독에 실패했습니다: ' : 'Subscription failed: ') + err.message, true);
+    }
   } finally {
     btn.disabled = false;
     btn.textContent = origText;

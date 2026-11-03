@@ -6,6 +6,15 @@
   let blocks = [];
   const $ = id => document.getElementById(id);
 
+  // A-010(2026-11-03): Firestore 쓰기는 오프라인/연결 불안정 시 reject 없이 큐에서 무한 대기한다 —
+  // try/catch/finally가 있어도 실패 갈래를 못 타 "Submitting..." 버튼에서 멈춘 것처럼 보였다.
+  function archinodeWithTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('ARCHINODE_TIMEOUT')), ms))
+    ]);
+  }
+
   // ── 렌더 ──
   function render() {
     const cont = $('artBlocks');
@@ -247,7 +256,7 @@
             : { type: 'image', url: b.url, alt: b.alt || '', caption: b.caption || '' }
           );
 
-        await db.collection('articles').add({
+        await archinodeWithTimeout(db.collection('articles').add({
           brandId: currentUser.uid,
           brandName: brandData.brandName || '',
           title: title,
@@ -259,7 +268,7 @@
           lang: $('artLang') ? $('artLang').value : 'en',
           status: 'pending',
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        }), 15000);
 
         try {
           await db.collection('mail').add({
@@ -292,7 +301,9 @@
           if (typeof loadArticles === 'function') loadArticles();
         }, 1500);
       } catch (e) {
-        msg.textContent = 'Submit failed: ' + e.message;
+        msg.textContent = (e.message === 'ARCHINODE_TIMEOUT')
+          ? 'Connection seems slow or offline. Please check your network and try again.'
+          : 'Submit failed: ' + e.message;
         msg.style.color = '#c00';
       } finally {
         btn.disabled = false; btn.textContent = 'Submit for Review';

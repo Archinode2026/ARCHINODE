@@ -475,6 +475,15 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
+// A-010(2026-11-03): Firestore 쓰기는 오프라인/연결 불안정 시 reject 없이 큐에서 무한 대기한다 —
+// try/catch가 있어도 실패 갈래를 못 타 "제출 중..."에서 멈춘 것처럼 보였다. 타임아웃으로 명시적 실패 유도.
+function archinodeWithTimeout(promise, ms) {
+    return Promise.race([
+        promise,
+        new Promise(function(_, reject) { setTimeout(function () { reject(new Error('ARCHINODE_TIMEOUT')); }, ms); })
+    ]);
+}
+
 async function submitConsult(e) {
   e.preventDefault();
   // 봇 스팸 방지: 허니팟 필드가 채워져 있으면 조용히 중단
@@ -517,7 +526,7 @@ async function submitConsult(e) {
 
   try {
     const dbRef = firebase.firestore();
-    await dbRef.collection('consultations').add({
+    await archinodeWithTimeout(dbRef.collection('consultations').add({
       companyName: escapeHtml(companyName),
       contactName: escapeHtml(contactName),
       email: email,
@@ -534,7 +543,7 @@ async function submitConsult(e) {
       reviewedAt: null,
       hp: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    }), 15000);
     try {
         await dbRef.collection('mail').add({
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
@@ -568,7 +577,9 @@ async function submitConsult(e) {
     document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth' });
   } catch (err) {
     console.error(err);
-    errorDiv.textContent = 'Failed to submit: ' + (err.message || 'Unknown error') + '. Please try again or email office@archinode.org directly.';
+    errorDiv.textContent = (err.message === 'ARCHINODE_TIMEOUT')
+      ? 'Your connection seems slow or offline. Please check your network and try again.'
+      : 'Failed to submit: ' + (err.message || 'Unknown error') + '. Please try again or email office@archinode.org directly.';
     errorDiv.style.display = 'block';
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     submitBtn.disabled = false;

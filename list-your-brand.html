@@ -610,6 +610,16 @@ async function getUniqueSlug(baseSlug) {
     }
 }
 
+// A-010(2026-11-03): 오프라인/연결 불안정 상태에서 Firestore 쓰기는 기본적으로 큐에 쌓여 '영원히 대기'할
+// 뿐 reject 되지 않는다 — 그래서 try/catch가 있어도 실패 갈래를 영영 안 타고 "접수 중..." 버튼에서 멈춘
+// 것처럼 보였다. 핵심 쓰기 호출에 타임아웃을 씌워 일정 시간 안에 안 끝나면 명시적으로 실패시킨다.
+function archinodeWithTimeout(promise, ms) {
+    return Promise.race([
+        promise,
+        new Promise(function(_, reject) { setTimeout(function () { reject(new Error('ARCHINODE_TIMEOUT')); }, ms); })
+    ]);
+}
+
 // ── 폼 제출 처리 ──
 const form = document.getElementById('brandForm');
 const errorDiv = document.getElementById('formError');
@@ -653,14 +663,14 @@ form.addEventListener('submit', async function(e) {
 
     try {
         // 0. slug 중복 체크
-        const slug = await getUniqueSlug(baseSlug);
+        const slug = await archinodeWithTimeout(getUniqueSlug(baseSlug), 15000);
 
         // 1. Firebase Auth 계정 생성
-        const userCredential = await auth.createUserWithEmailAndPassword(email, tempPassword);
+        const userCredential = await archinodeWithTimeout(auth.createUserWithEmailAndPassword(email, tempPassword), 15000);
         const uid = userCredential.user.uid;
 
         // 2. Firestore에 브랜드 데이터 저장 (XSS 방어: 텍스트 필드 이스케이프)
-        await db.collection('brands').doc(uid).set({
+        await archinodeWithTimeout(db.collection('brands').doc(uid).set({
             brandName: escapeHtml(brandName),
             slug: slug,
             country: document.getElementById('country').value.trim(),
@@ -682,7 +692,7 @@ form.addEventListener('submit', async function(e) {
             products: [],
             magazineArticles: [],
             hp: ''
-        });
+        }), 15000);
 
         // 3. 로그아웃 (관리자 세션 방지)
         await auth.signOut();
@@ -758,7 +768,10 @@ form.addEventListener('submit', async function(e) {
         submitBtn.textContent = 'Submit Application';
         errorDiv.style.display = 'block';
 
-        if (error.code === 'auth/email-already-in-use') {
+        if (error.message === 'ARCHINODE_TIMEOUT') {
+            // A-010: 오프라인/연결 불안정 전용 안내 — 일반 오류와 구분해 재시도를 유도
+            errorDiv.textContent = 'Your connection seems slow or offline. Please check your network and try again. If you already received a confirmation, you don\'t need to resubmit.';
+        } else if (error.code === 'auth/email-already-in-use') {
             errorDiv.textContent = 'This email is already registered. If you already have an account, please log in at the Brand Portal.';
         } else if (error.code === 'auth/invalid-email') {
             errorDiv.textContent = 'Please enter a valid email address.';
