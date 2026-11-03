@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -22,7 +22,7 @@ html { scroll-behavior: smooth; font-size: 16px; }
 body {
   font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
   color: #1a1a1a;
-  background: #ffffff;
+  background: #fdfbf7;
   line-height: 1.6;
   overflow-x: hidden;
 }
@@ -34,8 +34,8 @@ input, select, textarea { font-family: inherit; }
 
 /* ===== VARIABLES ===== */
 :root {
-  --black: #000000;
-  --white: #ffffff;
+  --black: #332e27;
+  --white: #fdfbf7;
   --gray-50: #fafafa;
   --gray-100: #f5f5f5;
   --gray-200: #e5e5e5;
@@ -46,7 +46,7 @@ input, select, textarea { font-family: inherit; }
   --gray-700: #404040;
   --gray-800: #262626;
   --gray-900: #171717;
-  --accent: #000000;
+  --accent: #332e27;
   --accent-hover: #333333;
   --max-width: 1440px;
   --header-height: 64px;
@@ -283,12 +283,12 @@ input, select, textarea { font-family: inherit; }
 .hero-dot.active { background: var(--white); }
 .hero-dot:focus-visible { outline: 2px solid #C8A96E; outline-offset: 4px; }
 .hero-pause-btn {
-  background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3);
+  background: transparent; color: #fdfbf7; border: 1px solid rgba(255,255,255,0.3);
   border-radius: 50%; width: 32px; height: 32px; cursor: pointer; margin-left: 12px;
   display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
 }
 .hero-pause-btn:focus-visible { outline: 2px solid #C8A96E; outline-offset: 2px; }
-.hero-pause-btn:hover { border-color: #fff; }
+.hero-pause-btn:hover { border-color: #fdfbf7; }
 
 @media (max-width: 768px) {
   .hero h1 { font-size: 2.4rem; }
@@ -791,7 +791,7 @@ input, select, textarea { font-family: inherit; }
 }
 </script>
 </head>
-<body>
+<body class="home">
 
 <!-- ANNOUNCEMENT BAR -->
 <div class="announcement-bar">
@@ -1006,6 +1006,16 @@ input, select, textarea { font-family: inherit; }
         </div>
       </a>
     </div>
+  </div>
+</section>
+
+<!-- PHOTO BAND (2026-11-03 리디자인 A-159): 섹션 사이에 전면 사진 하나.
+     기존 히어로 슬라이드와 같은 자료를 쓴다. 매거진에서 챕터가 바뀔 때의 장치. -->
+<section class="photo-band">
+  <img loading="lazy" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1800&q=80" alt="">
+  <div class="container">
+    <span class="eyebrow" data-en="Milan · Seoul" data-ko="밀라노 · 서울">Milan · Seoul</span>
+    <h2 data-en="One standard, from drawing to site." data-ko="도면에서 현장까지, 하나의 기준으로.">도면에서 현장까지, 하나의 기준으로.</h2>
   </div>
 </section>
 
