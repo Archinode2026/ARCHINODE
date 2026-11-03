@@ -116,6 +116,21 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; mi
 
         <!-- 2026-11-03 A-148: 가입 유형을 먼저 고르게 한다. 기존에는 브랜드 입점 경로가
              카드 맨 아래 작은 링크(그것도 '브랜드 포털' = 로그인)에만 있어 찾기 어려웠다. -->
+        <!-- 2026-11-03 A-149: 로그인 상태에서 아무 설명 없이 튕겨내던 것을 안내 + 선택지로 교체 -->
+        <div id="alreadyLoggedIn" style="display:none;">
+            <div class="benefits" style="margin-top:24px;">
+                <h3 style="margin-bottom:8px;" data-en="You're already signed in" data-ko="이미 로그인되어 있습니다">You're already signed in</h3>
+                <p style="font-size:0.84rem;color:#666;line-height:1.6;margin:0;">
+                    <strong id="aliEmail" style="color:#111;"></strong>
+                    <span data-en="is signed in on this browser. To create a different account, log out first." data-ko=" 계정으로 로그인된 상태입니다. 다른 계정을 만들려면 먼저 로그아웃해 주세요.">is signed in on this browser. To create a different account, log out first.</span>
+                </p>
+            </div>
+            <button type="button" class="auth-btn" onclick="aliLogout()" data-en="Log out and create another account" data-ko="로그아웃하고 다른 계정 만들기">Log out and create another account</button>
+            <div class="auth-links">
+                <a id="aliGo" href="profile.html" data-en="Go to my page →" data-ko="내 페이지로 가기 →">Go to my page →</a>
+            </div>
+        </div>
+
         <div id="roleChooser">
             <div class="role-grid">
                 <button type="button" class="role-card" onclick="chooseRole('member')">
@@ -249,6 +264,10 @@ const SIGNUP_SUBTITLE = {
     member: {
         en: "Create your free account to explore global brands, save them to your list, and contact them directly.",
         ko: "무료 계정을 만들어 글로벌 브랜드를 탐색하고, 내 리스트에 저장하고, 직접 문의하세요."
+    },
+    loggedIn: {
+        en: "You are already signed in on this browser.",
+        ko: "이 브라우저에 이미 로그인되어 있습니다."
     }
 };
 function setSignupSubtitle(which) {
@@ -286,23 +305,44 @@ function backToRoles(e) {
 // ── 세션 유지 ──
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
 
-// ── 이미 로그인 상태면 리디렉션 ──
-auth.onAuthStateChanged(user => {
-    if (user) {
-        // 어드민이면 어드민으로
-        if (isAdmin(user.email)) {
-            window.location.href = '../admin/dashboard.html';
-            return;
-        }
-        // brands 컬렉션에 있으면 브랜드 대시보드로
-        db.collection('brands').doc(user.uid).get().then(doc => {
-            if (doc.exists) {
-                window.location.href = '../brand-portal/dashboard.html';
-            } else {
-                window.location.href = 'profile.html';
-            }
-        });
+// ── 이미 로그인 상태면 안내 (2026-11-03 A-149) ──
+// 기존에는 아무 설명 없이 즉시 리다이렉트해서, 가입을 누른 사람이
+// 영문도 모르고 대시보드로 밀려났다. 상황을 알려주고 선택하게 한다.
+function aliLogout() {
+    auth.signOut().then(function () { window.location.href = 'signup.html'; })
+                  .catch(function (err) { console.error('signOut failed', err); });
+}
+function showAlreadyLoggedIn(user, dest, destEn, destKo) {
+    const chooser = document.getElementById('roleChooser');
+    const member = document.getElementById('memberSignup');
+    const panel = document.getElementById('alreadyLoggedIn');
+    if (chooser) chooser.style.display = 'none';
+    if (member) member.style.display = 'none';
+    if (!panel) return;
+    panel.style.display = '';
+    const em = document.getElementById('aliEmail');
+    if (em) em.textContent = user.email || '';
+    const go = document.getElementById('aliGo');
+    if (go) {
+        go.href = dest;
+        go.setAttribute('data-en', destEn);
+        go.setAttribute('data-ko', destKo);
+        go.textContent = document.documentElement.lang === 'en' ? destEn : destKo;
     }
+    setSignupSubtitle('loggedIn');
+}
+auth.onAuthStateChanged(user => {
+    if (!user) return;
+    if (isAdmin(user.email)) {
+        showAlreadyLoggedIn(user, '../admin/dashboard.html', 'Go to admin →', '어드민으로 가기 →');
+        return;
+    }
+    db.collection('brands').doc(user.uid).get().then(doc => {
+        if (doc.exists) showAlreadyLoggedIn(user, '../brand-portal/dashboard.html', 'Go to brand dashboard →', '브랜드 대시보드로 가기 →');
+        else            showAlreadyLoggedIn(user, 'profile.html', 'Go to my page →', '내 페이지로 가기 →');
+    }).catch(function () {
+        showAlreadyLoggedIn(user, 'profile.html', 'Go to my page →', '내 페이지로 가기 →');
+    });
 });
 
 // ── 회원가입 ──
