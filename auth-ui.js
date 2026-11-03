@@ -6,9 +6,12 @@
 //
 // 헤더의 .header-actions 영역에 로그인/프로필 링크를 동적으로 추가
 // - 비로그인: "Log In" 버튼 표시
-// - 전문가 로그인: "My Page" 버튼 + 프로필 아이콘 표시
-// - 브랜드 로그인: "Dashboard" 버튼 표시
-// - 어드민 로그인: "Admin" 버튼 표시
+// - 로그인: 계정 종류 아이콘 + 로그인한 이메일 + 로그아웃 버튼 표시
+//
+// 2026-11-03 A-147: 기존에는 "Admin"/"Dashboard"/"My Page" 라고 계정 종류만
+// 보여줘서 어느 계정으로 로그인했는지 알 수 없었다(브랜드 계정과 어드민을
+// 오가며 테스트할 때 특히). 이메일을 함께 노출하고, 로그인 상태에서는
+// 의미가 없어진 정적 "브랜드 로그인" 링크를 숨긴다. 로그아웃 버튼도 추가.
 // ═══════════════════════════════════════════════════════════
 
 (function() {
@@ -31,62 +34,108 @@
         basePath = '../';
     }
 
+    function esc(t) {
+        return String(t == null ? '' : t)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function isKo() { return document.documentElement.lang !== 'en'; }
+
+    // 계정 종류 아이콘 + 로그인한 이메일
+    function accountHtml(iconClass, user) {
+        return '<i class="fas ' + iconClass + '" style="margin-right:5px;"></i>'
+             + '<span class="auth-email" style="display:inline-block;max-width:160px;overflow:hidden;'
+             + 'text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;">'
+             + esc(user.email || (isKo() ? '로그인됨' : 'Signed in')) + '</span>';
+    }
+
     auth.onAuthStateChanged(async (user) => {
         const actions = document.querySelector('.header-actions');
         if (!actions) return;
 
-        // 기존 auth-link 요소 제거 (중복 방지)
-        const existing = actions.querySelector('.auth-link');
-        if (existing) existing.remove();
+        // 기존에 넣은 요소 제거 (중복 방지)
+        actions.querySelectorAll('.auth-link, .auth-logout').forEach(function (el) { el.remove(); });
+
+        // 정적 "브랜드 로그인" 링크는 로그인 상태에서 숨긴다 (A-147)
+        const staticLogin = actions.querySelector('a[href*="brand-portal/login"], a[href*="auth/login"]');
+        if (staticLogin) staticLogin.style.display = user ? 'none' : '';
 
         const link = document.createElement('a');
         link.className = 'auth-link';
-        link.style.cssText = 'font-size:0.78rem;font-weight:600;text-decoration:none;padding:6px 14px;border-radius:4px;transition:all 0.2s;white-space:nowrap;';
+        link.style.cssText = 'font-size:0.78rem;font-weight:600;text-decoration:none;padding:6px 14px;border-radius:4px;transition:all 0.2s;white-space:nowrap;display:inline-flex;align-items:center;';
 
         if (!user) {
-            // 비로그인
             link.href = basePath + 'auth/login.html';
             link.style.cssText += 'background:#111;color:#fff;';
             link.innerHTML = '<i class="fas fa-user" style="margin-right:4px;"></i><span data-en="Log In" data-ko="로그인">Log In</span>';
             link.addEventListener('mouseenter', () => { link.style.background = '#C8A96E'; });
             link.addEventListener('mouseleave', () => { link.style.background = '#111'; });
-        } else if (isAdmin(user.email)) {
-            // 어드민
-            link.href = basePath + 'admin/dashboard.html';
-            link.style.cssText += 'background:#C8A96E;color:#fff;';
-            link.innerHTML = '<i class="fas fa-shield-alt" style="margin-right:4px;"></i>Admin';
-        } else {
-            // 브랜드 vs 전문가 판별
-            try {
-                const brandDoc = await db.collection('brands').doc(user.uid).get();
-                if (brandDoc.exists) {
-                    // 브랜드 계정
-                    link.href = basePath + 'brand-portal/dashboard.html';
-                    link.style.cssText += 'background:#111;color:#fff;';
-                    link.innerHTML = '<i class="fas fa-building" style="margin-right:4px;"></i><span data-en="Dashboard" data-ko="대시보드">Dashboard</span>';
-                } else {
-                    // 전문가 계정
-                    link.href = basePath + 'auth/profile.html';
-                    link.style.cssText += 'background:#111;color:#fff;';
-                    const displayName = user.displayName || user.email.split('@')[0];
-                    link.innerHTML = `<i class="fas fa-user" style="margin-right:4px;"></i><span data-en="My Page" data-ko="마이페이지">My Page</span>`;
-                }
-                link.addEventListener('mouseenter', () => { link.style.background = '#C8A96E'; });
-                link.addEventListener('mouseleave', () => { link.style.background = '#111'; });
-            } catch (err) {
-                // Firestore 쿼리 실패 시 기본 프로필로
-                link.href = basePath + 'auth/profile.html';
-                link.style.cssText += 'background:#111;color:#fff;';
-                link.innerHTML = '<i class="fas fa-user" style="margin-right:4px;"></i>My Page';
-            }
+            insert(link);
+            return;
         }
 
-        // Brand Login 링크 앞에 삽입 (또는 actions의 첫번째 자식으로)
-        const brandLoginLink = actions.querySelector('a[href*="brand-portal"], a[href*="login"]');
-        if (brandLoginLink) {
-            actions.insertBefore(link, brandLoginLink);
+        let kindEn = 'Member', kindKo = '회원';
+        if (isAdmin(user.email)) {
+            link.href = basePath + 'admin/dashboard.html';
+            link.style.cssText += 'background:#C8A96E;color:#fff;';
+            link.innerHTML = accountHtml('fa-shield-halved', user);
+            kindEn = 'Admin'; kindKo = '어드민';
         } else {
-            actions.prepend(link);
+            let isBrand = false;
+            try {
+                const brandDoc = await db.collection('brands').doc(user.uid).get();
+                isBrand = brandDoc.exists;
+            } catch (err) {
+                console.warn('auth-ui: brand lookup failed', err);
+            }
+            if (isBrand) {
+                link.href = basePath + 'brand-portal/dashboard.html';
+                link.innerHTML = accountHtml('fa-building', user);
+                kindEn = 'Brand account'; kindKo = '브랜드 계정';
+            } else {
+                link.href = basePath + 'auth/profile.html';
+                link.innerHTML = accountHtml('fa-user', user);
+                kindEn = 'Member account'; kindKo = '회원 계정';
+            }
+            link.style.cssText += 'background:#111;color:#fff;';
+            link.addEventListener('mouseenter', () => { link.style.background = '#C8A96E'; });
+            link.addEventListener('mouseleave', () => { link.style.background = '#111'; });
         }
+
+        // 마우스를 올리면 계정 종류까지 확인 가능
+        link.title = (isKo() ? kindKo : kindEn) + ' — ' + (user.email || '');
+        link.setAttribute('data-en-title', kindEn + ' — ' + (user.email || ''));
+        link.setAttribute('data-ko-title', kindKo + ' — ' + (user.email || ''));
+
+        // 로그아웃 버튼
+        const out = document.createElement('a');
+        out.className = 'auth-logout';
+        out.href = '#';
+        out.title = isKo() ? '로그아웃' : 'Log out';
+        out.setAttribute('data-en-title', 'Log out');
+        out.setAttribute('data-ko-title', '로그아웃');
+        out.setAttribute('aria-label', out.title);
+        out.style.cssText = 'font-size:0.8rem;color:#777;text-decoration:none;padding:6px 8px;margin-left:2px;';
+        out.innerHTML = '<i class="fas fa-right-from-bracket"></i>';
+        out.addEventListener('mouseenter', () => { out.style.color = '#111'; });
+        out.addEventListener('mouseleave', () => { out.style.color = '#777'; });
+        out.addEventListener('click', function (e) {
+            e.preventDefault();
+            auth.signOut().then(function () { window.location.reload(); })
+                          .catch(function (err) { console.error('signOut failed', err); });
+        });
+
+        insert(link);
+        if (link.parentNode) link.parentNode.insertBefore(out, link.nextSibling);
     });
+
+    // Brand Login 링크 앞에 삽입 (또는 actions의 첫번째 자식으로)
+    function insert(link) {
+        const actions = document.querySelector('.header-actions');
+        if (!actions) return;
+        const anchor = actions.querySelector('a[href*="brand-portal"], a[href*="login"]');
+        if (anchor) actions.insertBefore(link, anchor);
+        else actions.prepend(link);
+    }
+
 })();
