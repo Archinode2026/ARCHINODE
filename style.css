@@ -5,7 +5,7 @@
 html { scroll-behavior: smooth; font-size: 16px; }
 body {
   font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #1a1a1a;
+  color: #332e27;
   background: #fdfbf7;
   line-height: 1.6;
   overflow-x: hidden;
@@ -506,7 +506,7 @@ input, select, textarea { font-family: inherit; }
 .footer-col ul li { margin-bottom: 12px; }
 .footer-col ul li a {
   font-size: 0.8rem;
-  color: #a3a3a3; /* A-112: 어두운 배경(#0a0a0a) 대비 WCAG AA 통과하도록 #737373→#a3a3a3 */
+  color: #a3a3a3; /* A-112: 어두운 배경(#332e27) 대비 WCAG AA 통과하도록 #737373→#a3a3a3 */
   transition: color 0.2s;
 }
 .footer-col ul li a:hover { color: var(--white); }
@@ -2126,7 +2126,7 @@ input, select, textarea { font-family: inherit; }
 }
 .form-success .credentials p:last-child { margin-bottom: 0; }
 .form-success .credentials strong {
-  color: #111 !important; font-weight: 600;
+  color: #332e27 !important; font-weight: 600;
   font-family: 'Courier New', monospace;
   background: #fdfbf7; padding: 4px 10px; border-radius: 4px;
   border: 1px solid #e5e5e5; flex: 1; word-break: break-all;
@@ -2221,6 +2221,8 @@ input, select, textarea { font-family: inherit; }
 
 /* ── 2) 전역 ────────────────────────────────────────────────────────── */
 body { background: var(--white); color: var(--black); -webkit-font-smoothing: antialiased; }
+/* 폼 컨트롤은 color 를 상속하지 않아 브라우저 기본 검정이 남는다 (A-170) */
+input, select, textarea, option { color: var(--black); }
 
 /* 제목은 세리프, 본문·UI 는 산세리프 — 건축 매거진의 기본 문법 */
 .display, .section-title, .hero h1, .cta-listing h2, .photo-band h2,
@@ -2461,7 +2463,7 @@ body.home .cat-grid {
   --step: clamp(16px, 2vw, 32px);
   /* --gap: 기준 간격. 가로세로가 같으면 사진이 떨어져 보여 세로를 더 조인다 */
   --gap: clamp(14px, 1.6vw, 24px);
-  display: grid; grid-template-columns: repeat(5, 1fr); align-items: start;
+  display: grid; grid-template-columns: repeat(4, 1fr); align-items: start;
   row-gap: calc(var(--gap) * .6);      /* 세로 -40% */
   column-gap: calc(var(--gap) * .8);   /* 가로 -20% */
   padding: 0 40px calc(var(--step) * 3); max-width: var(--max-width); margin: 0 auto;
@@ -2474,11 +2476,10 @@ body.home .cat-card {
 }
 /* transform 은 레이아웃을 건드리지 않으므로 그리드는 그대로 두고 보이는 위치만 내려간다.
    아래로 밀린 만큼은 .cat-grid 의 padding-bottom 이 받아준다 */
-body.home .cat-card:nth-child(5n+1) { --off: 0px; }
-body.home .cat-card:nth-child(5n+2) { --off: calc(var(--step) * 2); }
-body.home .cat-card:nth-child(5n+3) { --off: calc(var(--step) * .7); }
-body.home .cat-card:nth-child(5n+4) { --off: calc(var(--step) * 3); }
-body.home .cat-card:nth-child(5n+5) { --off: calc(var(--step) * 1.3); }
+body.home .cat-card:nth-child(4n+1) { --off: 0px; }
+body.home .cat-card:nth-child(4n+2) { --off: calc(var(--step) * 2); }
+body.home .cat-card:nth-child(4n+3) { --off: calc(var(--step) * .8); }
+body.home .cat-card:nth-child(4n+4) { --off: calc(var(--step) * 2.6); }
 body.home .cat-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .9s cubic-bezier(.2,.6,.2,1); }
 /* 호버 리프트는 열 오프셋 위에 8px 를 더 얹는다 */
 body.home .cat-card:hover { transform: translateY(calc(var(--off, 0px) - 8px)); box-shadow: 0 18px 38px -16px rgba(51,46,39,.38); }
@@ -2509,6 +2510,25 @@ body.home .cat-card-overlay span { font-size: 0.76rem; color: rgba(253,251,247,.
   body.home .cat-card, body.home .cat-card img { transition: none; }
   body.home .cat-card:hover { transform: translateY(var(--off, 0px)); box-shadow: none; }
 }
+
+/* ── 알약 버튼 (A-170) ── 채도 낮은 브라운-그레이. 본문 위 2차 동선용 */
+body.home .cat-more { margin-top: clamp(30px, 3.4vw, 52px); display: flex; }
+body.home .pill-btn,
+.pill-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #6f685c; color: #fdfbf7;
+  padding: 15px 34px; border-radius: 999px;
+  font-size: 0.84rem; font-weight: 500; letter-spacing: 0.02em;
+  transition: background .3s, transform .3s;
+}
+.pill-btn:hover { background: var(--deep); transform: translateY(-2px); color: #fdfbf7; }
+.pill-btn i { font-size: 0.78em; }
+
+/* 버튼·입력칸은 전부 타원형으로 (A-170) */
+body .hero-btn, body .cta-btn, body .main-nav a.nav-cta, body .btn, body .auth-btn,
+body .pill-btn, body .newsletter-form button, body .mag-newsletter-form button,
+body .search-box button, body .newsletter-form input, body .mag-newsletter-form input,
+body button[type="submit"] { border-radius: 999px; }
 
 /* ── 에디토리얼 — 7:4 비대칭. 같은 크기로 깔면 카탈로그처럼 보인다 ── */
 body.home .editorial { background: var(--gray-100); }
@@ -2598,14 +2618,26 @@ body.home .service-item p { margin: 0; font-size: 0.86rem; line-height: 1.8; col
 
 /* ── CTA 밴드 ── */
 body.home .cta-listing { background: var(--band-white); color: var(--black); text-align: left; }
+/* 좌 텍스트 / 우 사진. 오른쪽이 비어 보인다는 지적(A-170) */
+body.home .cta-inner {
+  display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  gap: clamp(32px, 4vw, 72px); align-items: center;
+}
+body.home .cta-photo { overflow: hidden; border-radius: var(--radius); aspect-ratio: 4 / 3; }
+body.home .cta-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 1000px) {
+  body.home .cta-inner { grid-template-columns: 1fr; gap: clamp(28px, 4vw, 44px); }
+  body.home .cta-photo { aspect-ratio: 21 / 9; }
+}
 body.home .cta-listing h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
-  font-size: var(--t-h2); line-height: 1.14; margin: 0; max-width: 20ch;
+  font-size: var(--t-h2); line-height: 1.14; margin: 0; max-width: none;
   color: var(--black); letter-spacing: -0.012em;
 }
 html[lang="ko"] body.home .cta-listing h2 { letter-spacing: -0.005em; }
 /* 인라인 규칙이 `margin: 0 auto` 로 가운데를 잡고 있어 좌측 기준선이 무너진다 */
-body.home .cta-listing p { color: var(--gray-700); max-width: 52ch; margin: 18px 0 38px; }
+/* max-width 로 일찍 접히면 오른쪽이 비어 보인다 — 칼럼 폭을 그대로 쓴다 */
+body.home .cta-listing p { color: var(--gray-700); max-width: none; margin: 18px 0 38px; }
 body.home .cta-btn { background: var(--deep); color: #fdfbf7; }
 body.home .cta-btn:hover { background: var(--accent); color: #fdfbf7; }
 body.home .cta-free-tag { color: var(--gray-600); }
@@ -2621,14 +2653,17 @@ body.home .newsletter {
 body.home .newsletter h2 { color: var(--black); }
 body.home .newsletter p { color: var(--gray-700); }
 /* 폼 — index.html 인라인 규칙(0,1,1)을 이기려고 선택자를 한 단 더 길게 쓴다 */
+body.home .newsletter .newsletter-form { gap: 10px; }
 body.home .newsletter .newsletter-form input {
   background: var(--band-white); color: var(--black);
-  border: 1px solid var(--gray-300); border-right: none;
+  border: 1px solid var(--gray-300);   /* 알약이라 오른쪽 테두리를 살린다 */
+  padding-left: 24px;
 }
 body.home .newsletter .newsletter-form input::placeholder { color: var(--gray-600); }
 body.home .newsletter .newsletter-form input:focus { border-color: var(--accent); }
 body.home .newsletter .newsletter-form button {
   background: var(--deep); color: #fdfbf7; border: 1px solid var(--deep);
+  padding: 14px 32px;
 }
 body.home .newsletter .newsletter-form button:hover { background: var(--accent); border-color: var(--accent); color: #fdfbf7; }
 body.home .newsletter-msg { color: var(--gray-700); }
@@ -2726,11 +2761,16 @@ body.home .korea-network {
 body.home .korea-network > .container > div:first-child { text-align: left !important; margin-bottom: clamp(38px,4.2vw,62px) !important; }
 body.home .korea-network h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif !important; font-weight: 500 !important;
-  font-size: var(--t-h2) !important; line-height: 1.14 !important;
-  color: var(--black) !important; letter-spacing: -0.012em !important; max-width: 22ch;
+  /* A-170: 이 단은 로고가 들어갈 자리라 글이 먼저 무게를 잡아야 한다 */
+  font-size: clamp(2.1rem, 3.5vw, 3.3rem) !important; line-height: 1.16 !important;
+  color: var(--black) !important; letter-spacing: -0.012em !important; max-width: 19ch;
 }
 html[lang="ko"] body.home .korea-network h2 { letter-spacing: -0.005em !important; }
-body.home .korea-network p { color: var(--gray-700) !important; margin: 20px 0 0 !important; max-width: 54ch !important; line-height: 1.85 !important; }
+body.home .korea-network p {
+  color: var(--gray-700) !important; margin: 24px 0 0 !important;
+  max-width: 62ch !important; line-height: 1.8 !important;
+  font-size: clamp(1rem, 1.15vw, 1.16rem) !important;
+}
 /* 라벨 — 다른 섹션의 eyebrow 와 같은 어휘로 */
 body.home .korea-network > .container > div:first-child > div:first-child {
   display: inline-flex !important; align-items: center; gap: 11px;
@@ -2742,4 +2782,8 @@ body.home .korea-network > .container > div:first-child > div:first-child::befor
 }
 /* 파트너 로고 자리 — 가운데 몰린 것을 좌측 기준선에 맞춘다 */
 body.home .korea-network > .container > div:last-child { margin: 0 !important; max-width: none !important; }
-body.home .korea-network > .container > div:last-child > div { text-align: left !important; padding: 18px 0 !important; color: var(--gray-500) !important; }
+/* 로고 자리 — 승리가 실제 로고 파일을 넣기 전까지 글자로 둔다 */
+body.home .korea-network > .container > div:last-child > div {
+  text-align: left !important; padding: 22px 0 !important;
+  color: var(--gray-600) !important; font-size: 1rem !important; letter-spacing: 0.06em;
+}

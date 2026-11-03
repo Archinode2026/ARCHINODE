@@ -22,7 +22,7 @@
 body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; color: #333; }
 
 /* TOPBAR */
-.topbar { background: #0a0a0a; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.topbar { background: #332e27; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
 .topbar .logo { color: #fff; font-size: 1.1rem; font-weight: 800; text-decoration: none; }
 .topbar .logo span { color: #C8A96E; font-size: 0.7rem; font-weight: 400; margin-left: 8px; }
 .topbar .user-info { display: flex; align-items: center; gap: 16px; }
@@ -48,7 +48,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 /* LAYOUT */
 .dashboard { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
 .welcome { margin-bottom: 32px; }
-.welcome h1 { font-family: 'Georgia', serif; font-size: 1.8rem; color: #111; margin-bottom: 4px; }
+.welcome h1 { font-family: 'Georgia', serif; font-size: 1.8rem; color: #332e27; margin-bottom: 4px; }
 .welcome p { font-size: 0.9rem; color: #888; }
 
 /* CARDS */
@@ -57,7 +57,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
     padding: 32px; margin-bottom: 24px;
 }
 .section-card h2 {
-    font-size: 1.1rem; font-weight: 700; color: #111; margin-bottom: 20px;
+    font-size: 1.1rem; font-weight: 700; color: #332e27; margin-bottom: 20px;
     padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
 }
 .section-card h2 i { color: #C8A96E; margin-right: 8px; }
@@ -75,8 +75,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .readonly { background: #f0f0f0 !important; color: #999; }
 
 /* BUTTONS */
-.btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.3s; }
-.btn-primary { background: #111; color: #fff; }
+.btn { padding: 10px 24px; border: none; border-radius: 999px; font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.3s; }
+.btn-primary { background: #332e27; color: #fff; }
 .btn-primary:hover { background: #C8A96E; }
 .btn-secondary { background: #f0f0f0; color: #555; }
 .btn-secondary:hover { background: #e0e0e0; }
@@ -96,7 +96,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 }
 .product-card .img-area img { width: 100%; height: 100%; object-fit: cover; }
 .product-card .info { padding: 12px; }
-.product-card .info h4 { font-size: 0.88rem; color: #111; margin-bottom: 4px; }
+.product-card .info h4 { font-size: 0.88rem; color: #332e27; margin-bottom: 4px; }
 .product-card .info p { font-size: 0.78rem; color: #888; }
 
 /* UPLOAD AREA */
@@ -112,7 +112,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid #eee; }
 .tab { padding: 10px 20px; font-size: 0.88rem; font-weight: 600; color: #999; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s; }
 .tab:hover { color: #666; }
-.tab.active { color: #111; border-bottom-color: #C8A96E; }
+.tab.active { color: #332e27; border-bottom-color: #C8A96E; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
@@ -123,17 +123,17 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .notice-banner .notice-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .notice-banner .notice-row > i { color: #C8A96E; margin-top: 3px; }
 .notice-banner .notice-main { flex: 1; min-width: 200px; }
-.notice-banner h3 { font-size: 0.92rem; font-weight: 700; color: #111; margin: 0 0 4px; }
+.notice-banner h3 { font-size: 0.92rem; font-weight: 700; color: #332e27; margin: 0 0 4px; }
 .notice-banner p { font-size: 0.84rem; color: #555; margin: 0; line-height: 1.5; word-break: break-word; }
 .notice-banner .notice-all { background: none; border: 1px solid #C8A96E; color: #8a6a2a; padding: 6px 12px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
 .notice-banner .notice-all:hover { background: #C8A96E; color: #fff; }
 .notice-item { padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
-.notice-item h3 { font-size: 0.92rem; font-weight: 700; color: #111; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.notice-item h3 { font-size: 0.92rem; font-weight: 700; color: #332e27; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .notice-item h3 small { font-size: 0.72rem; color: #999; font-weight: 400; }
 .notice-item p { font-size: 0.85rem; color: #444; line-height: 1.6; margin: 0; word-break: break-word; }
 .sup-item { padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
 .sup-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
-.sup-head strong { font-size: 0.92rem; color: #111; }
+.sup-head strong { font-size: 0.92rem; color: #332e27; }
 .sup-head small { font-size: 0.74rem; color: #999; }
 .sup-body { font-size: 0.85rem; color: #444; line-height: 1.6; word-break: break-word; }
 .sup-answer { margin-top: 10px; padding: 12px 14px; background: #f8f6f1; border-left: 3px solid #C8A96E; border-radius: 6px; font-size: 0.85rem; color: #333; line-height: 1.6; word-break: break-word; }
@@ -156,7 +156,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .inbox-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
 .inbox-overlay.show { display: flex; }
 .inbox-modal { background: #fff; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 32px; }
-.inbox-modal h2 { font-size: 1.1rem; font-weight: 700; color: #111; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.inbox-modal h2 { font-size: 1.1rem; font-weight: 700; color: #332e27; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .inbox-modal .close-btn { float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
 .inbox-dl dt { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 12px; }
 .inbox-dl dd { font-size: 0.88rem; color: #333; margin: 4px 0 0; white-space: pre-wrap; word-break: break-word; }
@@ -262,11 +262,11 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
         </div>
         <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Products" data-ko="등록 제품">Products</div>
-            <div id="statProductCount" style="font-size:1.8rem;font-weight:800;color:#111;">0</div>
+            <div id="statProductCount" style="font-size:1.8rem;font-weight:800;color:#332e27;">0</div>
         </div>
         <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Articles" data-ko="매거진 기사">Articles</div>
-            <div id="statArticleCount" style="font-size:1.8rem;font-weight:800;color:#111;">0</div>
+            <div id="statArticleCount" style="font-size:1.8rem;font-weight:800;color:#332e27;">0</div>
         </div>
     </div>
 
