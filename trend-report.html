@@ -639,12 +639,13 @@ fadeEls.forEach(el => fadeObserver.observe(el));
 </script>
 <script src="search.js"></script>
 <script src="lang.js?v=20260630"></script>
-<script src="auth-ui.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <!-- A-004(2026-11-03): reCAPTCHA v3 — 사이트 키는 공개돼도 안전함. 비밀 키는 netlify/functions/recaptcha-verify.js 서버 쪽에만 있음 -->
 <script src="https://www.google.com/recaptcha/api.js?render=6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po"></script>
 <script src="firebase-config.js"></script>
+<script src="auth-ui.js"></script>
 <script>
 (function(){
   var grid = document.getElementById('articlesGrid');
