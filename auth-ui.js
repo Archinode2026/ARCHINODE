@@ -85,12 +85,17 @@
             link.innerHTML = accountHtml('fa-shield-halved', user);
             kindEn = 'Admin'; kindKo = '어드민';
         } else {
+            // 2026-11-03 A-047 확장: 매거진 글 페이지는 firestore-compat 을 싣지 않아 db 가 null 이다
+            // (A-056 가드). 그 경우 브랜드/회원 구분만 건너뛰고 이메일 표시·로그아웃은 그대로 동작한다.
+            // 링크는 profile.html 로 가는데, profile.html 이 brands 문서를 보고 알아서 라우팅한다.
             let isBrand = false;
-            try {
-                const brandDoc = await db.collection('brands').doc(user.uid).get();
-                isBrand = brandDoc.exists;
-            } catch (err) {
-                console.warn('auth-ui: brand lookup failed', err);
+            if (db) {
+                try {
+                    const brandDoc = await db.collection('brands').doc(user.uid).get();
+                    isBrand = brandDoc.exists;
+                } catch (err) {
+                    console.warn('auth-ui: brand lookup failed', err);
+                }
             }
             if (isBrand) {
                 link.href = basePath + 'brand-portal/dashboard.html';
