@@ -926,13 +926,25 @@ async function toggleBrandLike() {
     try {
         if (isBrandLiked) {
             await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayRemove(currentBrandDocId) });
-            await db.collection('brands').doc(currentBrandDocId).update({ likeCount: firebase.firestore.FieldValue.increment(-1) });
+            // 2026-11-03 A-144: likeCount 쓰기가 실패하면 users 문서를 되돌려 두 기록이 어긋나지 않게 한다
+            try {
+                await db.collection('brands').doc(currentBrandDocId).update({ likeCount: firebase.firestore.FieldValue.increment(-1) });
+            } catch (countErr) {
+                await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayUnion(currentBrandDocId) });
+                throw countErr;
+            }
             isBrandLiked = false;
             const c = document.getElementById('brandLikeCount');
             if (c) c.textContent = Math.max(0, parseInt(c.textContent) - 1);
         } else {
             await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayUnion(currentBrandDocId) });
-            await db.collection('brands').doc(currentBrandDocId).update({ likeCount: firebase.firestore.FieldValue.increment(1) });
+            // 2026-11-03 A-144: likeCount 쓰기가 실패하면 users 문서를 되돌려 두 기록이 어긋나지 않게 한다
+            try {
+                await db.collection('brands').doc(currentBrandDocId).update({ likeCount: firebase.firestore.FieldValue.increment(1) });
+            } catch (countErr) {
+                await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayRemove(currentBrandDocId) });
+                throw countErr;
+            }
             isBrandLiked = true;
             const c = document.getElementById('brandLikeCount');
             if (c) c.textContent = parseInt(c.textContent) + 1;

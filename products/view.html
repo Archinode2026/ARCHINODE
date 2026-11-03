@@ -910,9 +910,17 @@ async function toggleLike() {
             await db.collection('users').doc(user.uid).update({
                 likedProducts: firebase.firestore.FieldValue.arrayRemove(currentProductDocId)
             });
-            await db.collection('products').doc(currentProductDocId).update({
-                likeCount: firebase.firestore.FieldValue.increment(-1)
-            });
+            // 2026-11-03 A-144: likeCount 쓰기가 실패하면 users 문서를 되돌려 두 기록이 어긋나지 않게 한다
+            try {
+                await db.collection('products').doc(currentProductDocId).update({
+                    likeCount: firebase.firestore.FieldValue.increment(-1)
+                });
+            } catch (countErr) {
+                await db.collection('users').doc(user.uid).update({
+                    likedProducts: firebase.firestore.FieldValue.arrayUnion(currentProductDocId)
+                });
+                throw countErr;
+            }
             isLiked = false;
             const countEl = document.getElementById('likeCount');
             if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
@@ -921,9 +929,17 @@ async function toggleLike() {
             await db.collection('users').doc(user.uid).update({
                 likedProducts: firebase.firestore.FieldValue.arrayUnion(currentProductDocId)
             });
-            await db.collection('products').doc(currentProductDocId).update({
-                likeCount: firebase.firestore.FieldValue.increment(1)
-            });
+            // 2026-11-03 A-144: likeCount 쓰기가 실패하면 users 문서를 되돌려 두 기록이 어긋나지 않게 한다
+            try {
+                await db.collection('products').doc(currentProductDocId).update({
+                    likeCount: firebase.firestore.FieldValue.increment(1)
+                });
+            } catch (countErr) {
+                await db.collection('users').doc(user.uid).update({
+                    likedProducts: firebase.firestore.FieldValue.arrayRemove(currentProductDocId)
+                });
+                throw countErr;
+            }
             isLiked = true;
             const countEl = document.getElementById('likeCount');
             if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
