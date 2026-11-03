@@ -2350,8 +2350,11 @@ body.home .hero-btn:hover { background: var(--accent); color: #fff; }
 body.home .cat-grid {
   /* --step: 어긋남 한 칸. 열마다 이 값의 배수만큼 아래로 내린다 */
   --step: clamp(16px, 2vw, 32px);
+  /* --gap: 기준 간격. 가로세로가 같으면 사진이 떨어져 보여 세로를 더 조인다 */
+  --gap: clamp(14px, 1.6vw, 24px);
   display: grid; grid-template-columns: repeat(5, 1fr); align-items: start;
-  gap: clamp(14px, 1.6vw, 24px);
+  row-gap: calc(var(--gap) * .6);      /* 세로 -40% */
+  column-gap: calc(var(--gap) * .8);   /* 가로 -20% */
   padding: 0 40px calc(var(--step) * 3); max-width: var(--max-width); margin: 0 auto;
 }
 body.home .cat-card {
