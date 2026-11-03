@@ -166,7 +166,7 @@ tr:hover { background: #fafafa; }
         <a href="newsletter-subscribers.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-envelope-open-text"></i> Newsletter</a>
         <a href="articles.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-newspaper"></i> Articles</a>
         <span class="admin-email" id="adminEmail"></span>
-        <a href="../brand-portal/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Brand Login" data-ko="브랜드 로그인">Brand Login</a>
+        <a href="../auth/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
         <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
     </div>
 </div>
@@ -526,7 +526,7 @@ async function updateBrand(docId, newStatus) {
                     lines.push('Your brand ' + (b.brandName || '') + ' has been approved on ARCHINODE.');
                     lines.push('');
                     lines.push('You can now log in to the Brand Portal:');
-                    lines.push('https://archinodekr.com/brand-portal/login.html');
+                    lines.push('https://archinodekr.com/auth/login.html');
                     lines.push('');
                     lines.push('Use the email and temporary password you received when you first applied.');
                     lines.push('');

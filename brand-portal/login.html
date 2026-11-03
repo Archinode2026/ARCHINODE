@@ -1,199 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-<meta name="description" content="ARCHINODE Brand Portal">
 <meta charset="UTF-8">
-<meta property="og:image" content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brand Portal Login | ARCHINODE</title>
-<link rel="icon" type="image/x-icon" href="../favicon.ico">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
+<meta name="robots" content="noindex, nofollow">
+<title>Log In | ARCHINODE</title>
+<!--
+  2026-11-03 A-152: 로그인 창 통합.
+  브랜드용 로그인(brand-portal/login.html)과 회원용 로그인(auth/login.html)이
+  화면은 같은데 로그인 후 분기만 달랐다. 이쪽은 brands 문서 여부를 보지 않고
+  어드민이 아니면 무조건 브랜드 대시보드로 보내서, 일반 회원이 이 창으로
+  로그인하면 자기 브랜드가 없는 대시보드로 떨어졌다.
+  통합 로그인(auth/login.html)은 어드민·브랜드·회원 세 갈래를 모두 처리한다.
+  기존 북마크와 외부 링크가 깨지지 않도록 이 파일은 남기고 그쪽으로 보낸다.
+-->
+<link rel="canonical" href="/auth/login.html">
+<meta http-equiv="refresh" content="0; url=../auth/login.html">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; }
-
-.login-header {
-    background: #0a0a0a; padding: 16px 24px; text-align: center;
-}
-.login-header a { color: #fff; font-size: 1.3rem; font-weight: 800; text-decoration: none; letter-spacing: -0.5px; }
-.login-header span { font-size: 0.6rem; font-weight: 400; color: #666; margin-left: 4px; }
-
-.login-container {
-    flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px;
-}
-.login-box {
-    background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    padding: 48px 40px; max-width: 420px; width: 100%;
-}
-.login-box h1 {
-    font-family: 'Georgia', serif; font-size: 1.6rem; color: #111; margin-bottom: 8px;
-}
-.login-box .subtitle { font-size: 0.88rem; color: #999; margin-bottom: 32px; }
-
-.field { margin-bottom: 20px; }
-.field label { display: block; font-size: 0.82rem; font-weight: 600; color: #333; margin-bottom: 6px; }
-.field input {
-    width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 6px;
-    font-size: 0.95rem; font-family: inherit; transition: border-color 0.3s;
-}
-.field input:focus { outline: none; border-color: #C8A96E; }
-
-.login-btn {
-    width: 100%; background: #111; color: #fff; border: none; padding: 14px;
-    border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
-    transition: background 0.3s; font-family: inherit; margin-top: 8px;
-}
-.login-btn:hover { background: #C8A96E; }
-.login-btn:disabled { background: #999; cursor: not-allowed; }
-
-.login-links {
-    text-align: center; margin-top: 20px; font-size: 0.82rem; color: #999;
-}
-.login-links a { color: #C8A96E; text-decoration: none; }
-.login-links a:hover { text-decoration: underline; }
-
-.error-msg {
-    display: none; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626;
-    padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem;
-}
-
-.reset-section { display: none; }
-.back-to-login { display: inline-block; margin-top: 12px; color: #C8A96E; font-size: 0.85rem; cursor: pointer; }
-.success-msg {
-    display: none; background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a;
-    padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem;
-}
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;
+         background:#fafaf7; color:#666; font-size:0.9rem; }
+  a { color:#C8A96E; }
 </style>
 </head>
 <body>
-
-<div class="login-header">
-    <a href="../index.html">ARCHINODE <span>건축을 잇다</span></a>
-</div>
-
-<div class="login-container">
-    <div class="login-box">
-        <!-- LOGIN FORM -->
-        <div id="loginSection">
-            <h1 data-en="Brand Portal" data-ko="브랜드 포털">Brand Portal</h1>
-            <p class="subtitle" data-en="Log in to manage your brand on ARCHINODE." data-ko="ARCHINODE에서 브랜드를 관리하기 위해 로그인하세요.">Log in to manage your brand on ARCHINODE.</p>
-            <div class="error-msg" id="loginError"></div>
-            <form id="loginForm">
-                <div class="field">
-                    <label data-en="Email" data-ko="이메일">Email</label>
-                    <input type="email" id="loginEmail" required placeholder="name@brand.com" data-en-placeholder="name@brand.com" data-ko-placeholder="name@brand.com">
-                </div>
-                <div class="field">
-                    <label data-en="Password" data-ko="비밀번호">Password</label>
-                    <input type="password" id="loginPassword" required placeholder="Enter your password" data-en-placeholder="Enter your password" data-ko-placeholder="비밀번호를 입력하세요">
-                </div>
-                <button type="submit" class="login-btn" id="loginBtn" data-en="Log In" data-ko="로그인">Log In</button>
-            </form>
-            <div class="login-links">
-                <a href="#" id="showReset" data-en="Forgot password?" data-ko="비밀번호를 잊으셨나요?">Forgot password?</a>
-                &nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="../list-your-brand.html" data-en="Register your brand" data-ko="브랜드 등록">Register your brand</a>
-            </div>
-        </div>
-
-        <!-- RESET PASSWORD -->
-        <div id="resetSection" class="reset-section">
-            <h1 data-en="Reset Password" data-ko="비밀번호 재설정">Reset Password</h1>
-            <p class="subtitle" data-en="Enter your email to receive a password reset link." data-ko="비밀번호 재설정 링크를 받으려면 이메일을 입력하세요.">Enter your email to receive a password reset link.</p>
-            <div class="error-msg" id="resetError"></div>
-            <div class="success-msg" id="resetSuccess"></div>
-            <form id="resetForm">
-                <div class="field">
-                    <label data-en="Email" data-ko="이메일">Email</label>
-                    <input type="email" id="resetEmail" required placeholder="name@brand.com" data-en-placeholder="name@brand.com" data-ko-placeholder="name@brand.com">
-                </div>
-                <button type="submit" class="login-btn" data-en="Send Reset Link" data-ko="재설정 링크 전송">Send Reset Link</button>
-            </form>
-            <span class="back-to-login" id="backToLogin"><i class="fas fa-arrow-left"></i> <span data-en="Back to login" data-ko="로그인으로 돌아가기">Back to login</span></span>
-        </div>
-    </div>
-</div>
-
-<script src="../firebase-config.js"></script>
-<script src="../search.js"></script>
-<script src="../lang.js?v=20260630"></script>
+<p>
+  로그인 창으로 이동합니다…
+  <a href="../auth/login.html">바로 가기</a>
+</p>
 <script>
-// ── 세션 유지: LOCAL 퍼시스턴스 설정 ──
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
-
-// ── 이미 로그인 상태면 대시보드로 ──
-auth.onAuthStateChanged(user => {
-    if (user) {
-        // 관리자면 어드민으로
-        if (isAdmin(user.email)) {
-            window.location.href = '../admin/dashboard.html';
-        } else {
-            window.location.href = 'dashboard.html';
-        }
-    }
-});
-
-// ── 로그인 ──
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('loginBtn');
-    const errorDiv = document.getElementById('loginError');
-    errorDiv.style.display = 'none';
-    btn.disabled = true;
-    btn.textContent = 'Logging in...';
-
-    try {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        await auth.signInWithEmailAndPassword(email, password);
-        // onAuthStateChanged가 리디렉션 처리
-    } catch (error) {
-        btn.disabled = false;
-        btn.textContent = 'Log In';
-        errorDiv.style.display = 'block';
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-            errorDiv.textContent = 'Invalid email or password. Please try again.';
-        } else {
-            errorDiv.textContent = error.message;
-        }
-    }
-});
-
-// ── 비밀번호 찾기 ──
-document.getElementById('showReset').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('resetSection').style.display = 'block';
-});
-document.getElementById('backToLogin').addEventListener('click', () => {
-    document.getElementById('resetSection').style.display = 'none';
-    document.getElementById('loginSection').style.display = 'block';
-});
-document.getElementById('resetForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('resetEmail').value.trim();
-    const errorDiv = document.getElementById('resetError');
-    const successDiv = document.getElementById('resetSuccess');
-    errorDiv.style.display = 'none';
-    successDiv.style.display = 'none';
-    try {
-        await auth.sendPasswordResetEmail(email);
-        successDiv.style.display = 'block';
-        successDiv.textContent = 'Password reset email sent! Check your inbox.';
-    } catch (error) {
-        errorDiv.style.display = 'block';
-        errorDiv.textContent = 'Could not send reset email. Check if the email is correct.';
-    }
-});
+  // meta refresh 보다 빠르게. replace 로 뒤로가기 루프를 막는다.
+  window.location.replace('../auth/login.html' + window.location.search + window.location.hash);
 </script>
-<script src="../form-throttle.js?v=20260630" defer></script>
 </body>
 </html>

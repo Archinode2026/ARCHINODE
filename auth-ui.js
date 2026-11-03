@@ -56,9 +56,13 @@
         // 기존에 넣은 요소 제거 (중복 방지)
         actions.querySelectorAll('.auth-link, .auth-logout').forEach(function (el) { el.remove(); });
 
-        // 정적 "브랜드 로그인" 링크는 로그인 상태에서 숨긴다 (A-147)
-        const staticLogin = actions.querySelector('a[href*="brand-portal/login"], a[href*="auth/login"]');
-        if (staticLogin) staticLogin.style.display = user ? 'none' : '';
+        // 정적 로그인 링크는 auth-ui 가 자체 버튼을 그리므로 항상 숨긴다 (A-152).
+        // A-147 때는 로그인 상태에서만 숨겼는데, 로그인 창이 통합되면서
+        // 로그아웃 상태에 "로그인" 버튼이 두 개 보이게 됐다.
+        // auth-ui.js 가 없는 페이지(submit-trend.html)에서는 이 정적 링크가 그대로
+        // 폴백으로 남으므로, 숨기는 책임을 auth-ui 쪽에 두는 편이 안전하다.
+        const staticLogin = actions.querySelector('a[href*="auth/login"], a[href*="brand-portal/login"]');
+        if (staticLogin) staticLogin.style.display = 'none';
 
         const link = document.createElement('a');
         link.className = 'auth-link';
@@ -133,7 +137,7 @@
     function insert(link) {
         const actions = document.querySelector('.header-actions');
         if (!actions) return;
-        const anchor = actions.querySelector('a[href*="brand-portal"], a[href*="login"]');
+        const anchor = actions.querySelector('a[href*="login"], a[href*="brand-portal"]');
         if (anchor) actions.insertBefore(link, anchor);
         else actions.prepend(link);
     }
