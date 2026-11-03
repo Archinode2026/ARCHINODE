@@ -2202,6 +2202,10 @@ input, select, textarea { font-family: inherit; }
   --navy-deep: #1c2533;   /* 최하단 바 */
   --navy-soft: #334155;   /* 구분선·호버 */
   --navy-mid:  #2a3646;   /* 하단 네이비 구간 안의 한 단 밝은 톤 */
+  /* 섹션 교차 배경 — 화이트 / 베이지 / 연그레이 (A-168) */
+  --band-white: #fdfbf7;
+  --band-beige: #f4efe6;
+  --band-grey:  #ecebe6;
   --navy-gold: #c9a36a;   /* 네이비 위에서 --accent 는 대비가 모자라 밝은 금색을 쓴다 */
   --radius:    4px;          /* 승리 선택: B안 */
 
@@ -2387,10 +2391,20 @@ body.home .hero-btn {
 body.home .hero-btn:hover { background: var(--accent); color: #fff; }
 @media (max-width: 860px) { body.home .hero-inner { max-width: 100%; } }
 
+/* ── 섹션 교차 배경 (A-168) — 화이트 / 베이지 / 화이트 / 연그레이 ──────
+   사진 밴드는 전면 사진이라, 푸터는 네이비라 교차에서 빠진다 */
+body.home .promo-mosaic  { background: var(--band-white); }
+body.home .categories    { background: var(--band-beige); }
+body.home .korea-network { background: var(--band-white); }
+body.home .services      { background: var(--band-grey); }
+body.home .cta-listing   { background: var(--band-white); }
+body.home .newsletter    { background: var(--band-beige); }
+/* 모자이크는 바로 아래 카테고리와 배경이 달라졌으니 자기 아래 여백을 가져야 한다 */
+body.home .promo-mosaic  { padding: var(--sec-y) 0; }
+
 /* ── 매거진 모자이크 (A-166) — 가로열 기준 2장 / 3장 / 1장 ──────────────
    6열 그리드 위에서 슬롯 폭만 바꾼다: half=3칸(2장), third=2칸(3장), full=6칸(1장).
    나중에 광고로 교체할 때도 클래스만 갈아끼우면 된다. */
-body.home .promo-mosaic { padding: var(--sec-y) 0 0; }
 body.home .promo-grid {
   --gap: clamp(14px, 1.6vw, 24px);
   display: grid; grid-template-columns: repeat(6, 1fr);
@@ -2580,38 +2594,41 @@ body.home .service-item p { margin: 0; font-size: 0.86rem; line-height: 1.8; col
 }
 
 /* ── CTA 밴드 ── */
-body.home .cta-listing { background: var(--navy); color: var(--white); text-align: left; }
+body.home .cta-listing { background: var(--band-white); color: var(--black); text-align: left; }
 body.home .cta-listing h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
   font-size: var(--t-h2); line-height: 1.14; margin: 0; max-width: 20ch;
-  color: var(--white); letter-spacing: -0.012em;
+  color: var(--black); letter-spacing: -0.012em;
 }
 html[lang="ko"] body.home .cta-listing h2 { letter-spacing: -0.005em; }
-body.home .cta-listing p { color: rgba(253,251,247,.7); max-width: 52ch; }
+/* 인라인 규칙이 `margin: 0 auto` 로 가운데를 잡고 있어 좌측 기준선이 무너진다 */
+body.home .cta-listing p { color: var(--gray-700); max-width: 52ch; margin: 18px 0 38px; }
+body.home .cta-btn { background: var(--deep); color: #fdfbf7; }
+body.home .cta-btn:hover { background: var(--accent); color: #fdfbf7; }
+body.home .cta-free-tag { color: var(--gray-600); }
 
 /* ── 뉴스레터 ── */
-/* 뉴스레터 — 브랜드 입점(CTA)부터 푸터까지가 네이비 구간이다.
-   세 블록이 같은 색이면 한 덩어리로 보여서 가운데만 한 단 밝게 둔다.
+/* 뉴스레터 — 교차 배경의 마지막 단(베이지). 바로 아래 네이비 푸터와 대비를 만든다.
    본문 섹션용 --sec-y(최대 158px)는 이 띠에 과해서 따로 조인다 */
 body.home .newsletter {
-  background: var(--navy-mid); color: rgba(237,242,247,.72);
-  border-top: 1px solid rgba(237,242,247,.10);
+  background: var(--band-beige); color: var(--gray-700);
+  border-top: 1px solid var(--rule);
   padding: clamp(52px, 5vw, 78px) 0; text-align: left;
 }
-body.home .newsletter h2 { color: #fdfbf7; }
-body.home .newsletter p { color: rgba(237,242,247,.70); }
+body.home .newsletter h2 { color: var(--black); }
+body.home .newsletter p { color: var(--gray-700); }
 /* 폼 — index.html 인라인 규칙(0,1,1)을 이기려고 선택자를 한 단 더 길게 쓴다 */
 body.home .newsletter .newsletter-form input {
-  background: transparent; color: #fdfbf7;
-  border: 1px solid rgba(237,242,247,.26); border-right: none;
+  background: var(--band-white); color: var(--black);
+  border: 1px solid var(--gray-300); border-right: none;
 }
-body.home .newsletter .newsletter-form input::placeholder { color: rgba(237,242,247,.48); }
-body.home .newsletter .newsletter-form input:focus { border-color: var(--navy-gold); }
+body.home .newsletter .newsletter-form input::placeholder { color: var(--gray-600); }
+body.home .newsletter .newsletter-form input:focus { border-color: var(--accent); }
 body.home .newsletter .newsletter-form button {
-  background: #fdfbf7; color: var(--navy); border: 1px solid #fdfbf7;
+  background: var(--deep); color: #fdfbf7; border: 1px solid var(--deep);
 }
-body.home .newsletter .newsletter-form button:hover { background: var(--navy-gold); border-color: var(--navy-gold); color: var(--navy); }
-body.home .newsletter-msg { color: rgba(237,242,247,.82); }
+body.home .newsletter .newsletter-form button:hover { background: var(--accent); border-color: var(--accent); color: #fdfbf7; }
+body.home .newsletter-msg { color: var(--gray-700); }
 body.home .newsletter h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
   font-size: var(--t-h2); line-height: 1.14; letter-spacing: -0.012em;
@@ -2698,7 +2715,7 @@ body.home .editorial-card-side i { color: var(--accent) !important; font-size: 1
 
 /* 한국 네트워크 — 인라인 스타일을 걷어내고 클래스로 잡는다(A-163) */
 body.home .korea-network {
-  background: var(--gray-100) !important;
+  background: var(--band-white) !important;   /* 교차 배경: 화이트 단 (A-168) */
   padding: var(--sec-y) 0 !important;
   border-top: 1px solid var(--rule) !important;
   border-bottom: none !important;
