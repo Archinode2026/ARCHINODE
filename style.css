@@ -2201,6 +2201,7 @@ input, select, textarea { font-family: inherit; }
   --navy:      #253040;
   --navy-deep: #1c2533;   /* 최하단 바 */
   --navy-soft: #334155;   /* 구분선·호버 */
+  --navy-mid:  #2a3646;   /* 하단 네이비 구간 안의 한 단 밝은 톤 */
   --navy-gold: #c9a36a;   /* 네이비 위에서 --accent 는 대비가 모자라 밝은 금색을 쓴다 */
   --radius:    4px;          /* 승리 선택: B안 */
 
@@ -2386,6 +2387,57 @@ body.home .hero-btn {
 body.home .hero-btn:hover { background: var(--accent); color: #fff; }
 @media (max-width: 860px) { body.home .hero-inner { max-width: 100%; } }
 
+/* ── 매거진 모자이크 (A-166) — 가로열 기준 2장 / 3장 / 1장 ──────────────
+   6열 그리드 위에서 슬롯 폭만 바꾼다: half=3칸(2장), third=2칸(3장), full=6칸(1장).
+   나중에 광고로 교체할 때도 클래스만 갈아끼우면 된다. */
+body.home .promo-mosaic { padding: var(--sec-y) 0 0; }
+body.home .promo-grid {
+  --gap: clamp(14px, 1.6vw, 24px);
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  row-gap: calc(var(--gap) * .6); column-gap: calc(var(--gap) * .8);
+}
+body.home .promo-item {
+  position: relative; display: block; overflow: hidden; border-radius: var(--radius);
+  grid-column: span 3; aspect-ratio: 16 / 10;
+  transition: transform .5s cubic-bezier(.2,.6,.2,1), box-shadow .5s cubic-bezier(.2,.6,.2,1);
+}
+body.home .promo-third { grid-column: span 2; aspect-ratio: 4 / 3; }
+body.home .promo-full  { grid-column: span 6; aspect-ratio: 32 / 9; }
+body.home .promo-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .9s cubic-bezier(.2,.6,.2,1); }
+body.home .promo-item:hover { transform: translateY(-8px); box-shadow: 0 18px 38px -16px rgba(51,46,39,.38); }
+body.home .promo-item:hover img { transform: scale(1.04); }
+body.home .promo-overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: clamp(18px, 2vw, 30px); color: var(--white);
+  background: linear-gradient(180deg, rgba(51,46,39,0) 38%, rgba(51,46,39,.68) 100%);
+}
+body.home .promo-tag {
+  font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--navy-gold); margin-bottom: 9px;
+}
+body.home .promo-overlay h3 {
+  font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
+  font-size: clamp(1rem, 1.35vw, 1.42rem); line-height: 1.3; margin: 0; letter-spacing: -0.01em;
+}
+body.home .promo-full .promo-overlay h3 { font-size: clamp(1.15rem, 1.9vw, 1.9rem); }
+body.home .promo-foot {
+  margin: 22px 0 0; font-size: 0.82rem; color: var(--gray-600);
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+body.home .promo-foot a { color: var(--accent); border-bottom: 1px solid currentColor; }
+/* 열 수가 줄면 슬롯 폭도 다시 나눈다 */
+@media (max-width: 900px) {
+  body.home .promo-third { grid-column: span 3; aspect-ratio: 16 / 11; }
+  body.home .promo-full  { aspect-ratio: 21 / 9; }
+}
+@media (max-width: 640px) {
+  body.home .promo-item, body.home .promo-third, body.home .promo-full { grid-column: span 6; aspect-ratio: 16 / 10; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.home .promo-item, body.home .promo-item img { transition: none; }
+  body.home .promo-item:hover { transform: none; box-shadow: none; }
+}
+
 /* ── 카테고리 — 사진 크기는 전부 동일(4:5), 열을 세로로 어긋나게 배치 ── */
 body.home .cat-grid {
   /* --step: 어긋남 한 칸. 열마다 이 값의 배수만큼 아래로 내린다 */
@@ -2538,18 +2590,34 @@ html[lang="ko"] body.home .cta-listing h2 { letter-spacing: -0.005em; }
 body.home .cta-listing p { color: rgba(253,251,247,.7); max-width: 52ch; }
 
 /* ── 뉴스레터 ── */
-/* 뉴스레터 — 네이비 CTA 와 네이비 푸터 사이에 끼는 크림 밴드.
+/* 뉴스레터 — 브랜드 입점(CTA)부터 푸터까지가 네이비 구간이다.
+   세 블록이 같은 색이면 한 덩어리로 보여서 가운데만 한 단 밝게 둔다.
    본문 섹션용 --sec-y(최대 158px)는 이 띠에 과해서 따로 조인다 */
 body.home .newsletter {
-  border-top: 1px solid var(--rule); background: var(--gray-100);
+  background: var(--navy-mid); color: rgba(237,242,247,.72);
+  border-top: 1px solid rgba(237,242,247,.10);
   padding: clamp(52px, 5vw, 78px) 0; text-align: left;
 }
+body.home .newsletter h2 { color: #fdfbf7; }
+body.home .newsletter p { color: rgba(237,242,247,.70); }
+/* 폼 — index.html 인라인 규칙(0,1,1)을 이기려고 선택자를 한 단 더 길게 쓴다 */
+body.home .newsletter .newsletter-form input {
+  background: transparent; color: #fdfbf7;
+  border: 1px solid rgba(237,242,247,.26); border-right: none;
+}
+body.home .newsletter .newsletter-form input::placeholder { color: rgba(237,242,247,.48); }
+body.home .newsletter .newsletter-form input:focus { border-color: var(--navy-gold); }
+body.home .newsletter .newsletter-form button {
+  background: #fdfbf7; color: var(--navy); border: 1px solid #fdfbf7;
+}
+body.home .newsletter .newsletter-form button:hover { background: var(--navy-gold); border-color: var(--navy-gold); color: var(--navy); }
+body.home .newsletter-msg { color: rgba(237,242,247,.82); }
 body.home .newsletter h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
   font-size: var(--t-h2); line-height: 1.14; letter-spacing: -0.012em;
   margin: 0 0 10px;
 }
-body.home .newsletter p { margin: 0 0 26px; max-width: 46ch; color: var(--gray-700); }
+body.home .newsletter p { margin: 0 0 26px; max-width: 46ch; }
 body.home .newsletter-form { margin: 0; max-width: 520px; }
 body.home .newsletter-msg { text-align: left; }
 @media (max-width: 440px) { body.home .newsletter-form { max-width: none; } }
