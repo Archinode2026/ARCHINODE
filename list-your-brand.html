@@ -24,6 +24,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<!-- A-004(2026-11-03): reCAPTCHA v3 — 사이트 키는 공개돼도 안전함(설계상 그렇게 쓰도록 되어 있음). 비밀 키는 netlify/functions/recaptcha-verify.js 서버 쪽에만 있음 -->
+<script src="https://www.google.com/recaptcha/api.js?render=6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po"></script>
 
 <style>
 /* ── Brand Registration Page ── */
@@ -662,6 +664,24 @@ form.addEventListener('submit', async function(e) {
     const baseSlug = slugify(brandName);
 
     try {
+        // A-004(2026-11-03): reCAPTCHA v3 — 토큰 발급 + 서버(Netlify Function)에서 검증, 낮은 점수면 중단
+        const captchaToken = await archinodeWithTimeout(
+            grecaptcha.execute('6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po', { action: 'list_your_brand' }),
+            15000
+        );
+        const captchaResp = await archinodeWithTimeout(
+            fetch('/.netlify/functions/recaptcha-verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: captchaToken, action: 'list_your_brand' })
+            }),
+            15000
+        );
+        const captchaData = await captchaResp.json();
+        if (!captchaData.ok) {
+            throw new Error('ARCHINODE_CAPTCHA_FAILED');
+        }
+
         // 0. slug 중복 체크
         const slug = await archinodeWithTimeout(getUniqueSlug(baseSlug), 15000);
 
@@ -768,7 +788,10 @@ form.addEventListener('submit', async function(e) {
         submitBtn.textContent = 'Submit Application';
         errorDiv.style.display = 'block';
 
-        if (error.message === 'ARCHINODE_TIMEOUT') {
+        if (error.message === 'ARCHINODE_CAPTCHA_FAILED') {
+            // A-004: reCAPTCHA v3 검증 실패(낮은 점수/오류) — 재시도 유도, 구체적 사유는 밝히지 않음(봇 회피 방지)
+            errorDiv.textContent = 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.';
+        } else if (error.message === 'ARCHINODE_TIMEOUT') {
             // A-010: 오프라인/연결 불안정 전용 안내 — 일반 오류와 구분해 재시도를 유도
             errorDiv.textContent = 'Your connection seems slow or offline. Please check your network and try again. If you already received a confirmation, you don\'t need to resubmit.';
         } else if (error.code === 'auth/email-already-in-use') {

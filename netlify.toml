@@ -1,6 +1,11 @@
 [build]
   publish = "."
 
+# A-004(2026-11-03): reCAPTCHA v3 서버 검증용 Netlify Function.
+# 비밀 키(RECAPTCHA_SECRET_KEY)는 Netlify 대시보드 환경변수로만 설정 — 이 파일/레포에는 절대 없음.
+[functions]
+  directory = "netlify/functions"
+
 [[redirects]]
   from = "/*"
   to = "/404.html"

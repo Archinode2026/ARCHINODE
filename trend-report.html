@@ -634,6 +634,8 @@ fadeEls.forEach(el => fadeObserver.observe(el));
 <script src="auth-ui.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<!-- A-004(2026-11-03): reCAPTCHA v3 — 사이트 키는 공개돼도 안전함. 비밀 키는 netlify/functions/recaptcha-verify.js 서버 쪽에만 있음 -->
+<script src="https://www.google.com/recaptcha/api.js?render=6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po"></script>
 <script src="firebase-config.js"></script>
 <script>
 (function(){
@@ -703,6 +705,23 @@ window.subscribeNewsletter = async function(e, source) {
   btn.textContent = '...';
   try {
     if (typeof firebase === 'undefined') throw new Error('Firebase SDK not loaded');
+
+    // A-004(2026-11-03): reCAPTCHA v3 — 토큰 발급 + 서버(Netlify Function)에서 검증, 낮은 점수면 중단
+    var captchaToken = await archinodeWithTimeout(
+      grecaptcha.execute('6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po', { action: 'newsletter_subscribe' }),
+      15000
+    );
+    var captchaResp = await archinodeWithTimeout(
+      fetch('/.netlify/functions/recaptcha-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: captchaToken, action: 'newsletter_subscribe' })
+      }),
+      15000
+    );
+    var captchaData = await captchaResp.json();
+    if (!captchaData.ok) { throw new Error('ARCHINODE_CAPTCHA_FAILED'); }
+
     await archinodeWithTimeout(firebase.firestore().collection('newsletter-subscribers').add({
       email: email,
       source: source || 'unknown',
@@ -731,7 +750,9 @@ window.subscribeNewsletter = async function(e, source) {
     form.reset();
   } catch (err) {
     console.error('Subscribe failed:', err);
-    if (err.message === 'ARCHINODE_TIMEOUT') {
+    if (err.message === 'ARCHINODE_CAPTCHA_FAILED') {
+      showMsg(curLang === 'ko' ? '제출을 확인할 수 없습니다. 다시 시도해 주세요.' : 'We could not verify this submission. Please try again.', true);
+    } else if (err.message === 'ARCHINODE_TIMEOUT') {
       showMsg(curLang === 'ko' ? '연결이 느리거나 끊긴 것 같습니다. 네트워크를 확인하고 다시 시도해 주세요.' : 'Your connection seems slow or offline. Please check your network and try again.', true);
     } else {
       showMsg((curLang === 'ko' ? '구독에 실패했습니다: ' : 'Subscription failed: ') + err.message, true);
