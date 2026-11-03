@@ -271,7 +271,7 @@
         }), 15000);
 
         try {
-          await db.collection('mail').add({
+          await archinodeWithTimeout(db.collection('mail').add({
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
             to: 'office@archinode.org',
             message: {
@@ -288,7 +288,7 @@
                 'Admin review: https://archinodekr.com/admin/articles.html'
               ].join('\n')
             }
-          });
+          }), 10000);
         } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
 
         msg.textContent = '✓ Submitted for review';

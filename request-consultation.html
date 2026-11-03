@@ -563,7 +563,7 @@ async function submitConsult(e) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }), 15000);
     try {
-        await dbRef.collection('mail').add({
+        await archinodeWithTimeout(dbRef.collection('mail').add({
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
             to: 'office@archinode.org',
             message: {
@@ -586,7 +586,7 @@ async function submitConsult(e) {
                     'Admin inbox: https://archinodekr.com/admin/consultations.html'
                 ].join('\n')
             }
-        });
+        }), 10000);  // 2026-11-03 QA(R-033): 오프라인 큐잉으로 catch가 영구 미발동하던 문제 차단
     } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
 
 

@@ -729,7 +729,7 @@ window.subscribeNewsletter = async function(e, source) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }), 15000);
     try {
-        await firebase.firestore().collection('mail').add({
+        await archinodeWithTimeout(firebase.firestore().collection('mail').add({
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
             to: 'office@archinode.org',
             message: {
@@ -743,7 +743,7 @@ window.subscribeNewsletter = async function(e, source) {
                     'Admin inbox: https://archinodekr.com/admin/newsletter-subscribers.html'
                 ].join('\n')
             }
-        });
+        }), 10000);
     } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
 
     showMsg(curLang === 'ko' ? '구독해 주셔서 감사합니다!' : 'Thank you for subscribing!', false);

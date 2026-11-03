@@ -720,7 +720,7 @@ form.addEventListener('submit', async function(e) {
         // 4. 어드민 알림 (Firebase Extensions "Trigger Email")
         try {
             // 브랜드에게 접수 확인 이메일
-            await db.collection('mail').add({
+            await archinodeWithTimeout(db.collection('mail').add({
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                 to: email,
                 message: {
@@ -746,11 +746,11 @@ form.addEventListener('submit', async function(e) {
                         'https://archinodekr.com'
                     ].join('\n')
                 }
-            });
+            }), 10000);
         } catch(mailErr) { console.warn('Brand confirmation skipped:', mailErr); }
 
         try {
-            await db.collection('mail').add({
+            await archinodeWithTimeout(db.collection('mail').add({
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                 to: 'office@archinode.org',
                 message: {
@@ -770,7 +770,7 @@ form.addEventListener('submit', async function(e) {
                         'Admin dashboard: https://archinodekr.com/admin/dashboard.html'
                     ].join('\n')
                 }
-            });
+            }), 10000);
         } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
 
         // 5. 성공 화면 표시

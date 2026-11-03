@@ -386,6 +386,13 @@
 <script src="../lang.js?v=20260630"></script>
 <script src="../auth-ui.js"></script>
 <script>
+function archinodeWithTimeout(promise, ms) {
+    return Promise.race([
+        promise,
+        new Promise(function(_, reject) { setTimeout(function () { reject(new Error('ARCHINODE_TIMEOUT')); }, ms); })
+    ]);
+}
+
 // XSS 방어: 사용자(브랜드)가 입력한 텍스트를 화면에 넣기 전 이스케이프 (A-003)
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
@@ -748,7 +755,7 @@ async function submitBimRequest(e) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         try {
-            await db.collection('mail').add({
+            await archinodeWithTimeout(db.collection('mail').add({
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                 to: 'office@archinode.org',
                 message: {
@@ -768,7 +775,7 @@ async function submitBimRequest(e) {
                         'Admin: https://archinodekr.com/admin/bim-requests.html'
                     ].join('\n')
                 }
-            });
+            }), 10000);
         } catch (mailErr) { console.warn('Admin notification skipped:', mailErr); }
 
         document.getElementById('bimFormWrap').style.display = 'none';
