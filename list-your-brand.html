@@ -594,23 +594,33 @@ function escapeHtml(text) {
 }
 
 // ── slug 중복 체크 ──
+// 2026-11-03 A-155: slug 중복 확인은 brands 를 where('slug') 로 조회하는데, brands 의 read
+// 규칙은 status=='approved' 등을 요구한다. 신청자는 아직 로그인도 승인도 안 된 상태라 이 조회가
+// permission-denied 로 거부될 수 있고, 그러면 **입점 신청 전체가 실패**한다(R-024 와 같은 구조).
+// 중복 확인은 편의 기능일 뿐이므로, 실패하면 타임스탬프 suffix 로 고유성을 보장하고 신청은
+// 계속 진행시킨다 — brand-portal/article-editor.js 의 같은 함수와 동일한 방어.
 async function getUniqueSlug(baseSlug) {
-    const snapshot = await db.collection('brands')
-        .where('slug', '==', baseSlug)
-        .limit(1)
-        .get();
-    if (snapshot.empty) return baseSlug;
-    // 중복 시 suffix 추가
-    let suffix = 2;
-    while (true) {
-        const candidate = baseSlug + '-' + suffix;
-        const check = await db.collection('brands')
-            .where('slug', '==', candidate)
+    try {
+        const snapshot = await db.collection('brands')
+            .where('slug', '==', baseSlug)
             .limit(1)
             .get();
-        if (check.empty) return candidate;
-        suffix++;
-        if (suffix > 99) return baseSlug + '-' + Date.now(); // 안전장치
+        if (snapshot.empty) return baseSlug;
+        // 중복 시 suffix 추가
+        let suffix = 2;
+        while (suffix <= 99) {
+            const candidate = baseSlug + '-' + suffix;
+            const check = await db.collection('brands')
+                .where('slug', '==', candidate)
+                .limit(1)
+                .get();
+            if (check.empty) return candidate;
+            suffix++;
+        }
+        return baseSlug + '-' + Date.now(); // 안전장치
+    } catch (err) {
+        console.warn('slug uniqueness check skipped:', (err && err.code) || err);
+        return baseSlug + '-' + Date.now();
     }
 }
 

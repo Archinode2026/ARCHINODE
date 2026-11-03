@@ -311,6 +311,27 @@ function populateProfile() {
     document.getElementById('editPhone').value = userData.phone || '';
 }
 
+// 2026-11-03 A-155(R-024 전수 점검 중 발견): 저장 목록을 documentId() in [...] list 쿼리로
+// 가져오고 있었다. products/brands 의 read 규칙은 status=='approved' 등을 요구하는데 이 쿼리에는
+// 그 조건이 없다 — R-024(브랜드 상세 전체 마비)와 정확히 같은 구조다. 게다가 try/catch 가 없어
+// 실패하면 저장 목록이 조용히 빈 화면이 된다(A-153 과 같은 침묵 실패).
+//
+// 문서 1건씩 get() 으로 바꾸면 규칙이 실제 문서를 보고 판정하므로 이 문제가 사라지고,
+// 중간에 비승인으로 바뀐 항목이 섞여 있어도 그 항목만 건너뛰고 나머지는 정상 표시된다.
+// 저장 목록은 개인 북마크라 건수가 적어 개별 읽기 비용도 문제되지 않는다.
+async function fetchSavedDocs(collection, ids) {
+    const out = [];
+    for (const id of ids) {
+        try {
+            const d = await db.collection(collection).doc(id).get();
+            if (d.exists) out.push({ id: d.id, data: d.data() });
+        } catch (err) {
+            console.warn('saved item skipped:', collection, id, (err && err.code) || err);
+        }
+    }
+    return out;
+}
+
 // ── 저장한 제품 로드 ──
 async function loadLikedProducts() {
     const grid = document.getElementById('likedProductsGrid');
@@ -321,15 +342,11 @@ async function loadLikedProducts() {
     empty.style.display = 'none';
 
     let html = '';
-    // Firestore 'in' 쿼리는 최대 30개씩
-    const chunks = [];
-    for (let i = 0; i < ids.length; i += 30) chunks.push(ids.slice(i, i + 30));
-
-    for (const chunk of chunks) {
-        const snap = await db.collection('products').where(firebase.firestore.FieldPath.documentId(), 'in', chunk).get();
-        snap.forEach(doc => {
-            const p = doc.data();
-            html += `
+    const entries = await fetchSavedDocs('products', ids);
+    entries.forEach(entry => {
+        const doc = { id: entry.id };
+        const p = entry.data;
+        html += `
             <div class="liked-card">
                 <button class="unlike-btn" onclick="unlikeProduct('${doc.id}')" title="Remove from saved"><i class="fas fa-bookmark"></i></button>
                 <a href="../products/view.html?id=${p.slug || ''}" style="text-decoration:none;color:inherit;">
@@ -342,8 +359,7 @@ async function loadLikedProducts() {
                     </div>
                 </a>
             </div>`;
-        });
-    }
+    });
     grid.innerHTML = html || '';
     if (!html) empty.style.display = 'block';
 }
@@ -358,14 +374,11 @@ async function loadLikedBrands() {
     empty.style.display = 'none';
 
     let html = '';
-    const chunks = [];
-    for (let i = 0; i < ids.length; i += 30) chunks.push(ids.slice(i, i + 30));
-
-    for (const chunk of chunks) {
-        const snap = await db.collection('brands').where(firebase.firestore.FieldPath.documentId(), 'in', chunk).get();
-        snap.forEach(doc => {
-            const b = doc.data();
-            html += `
+    const entries = await fetchSavedDocs('brands', ids);
+    entries.forEach(entry => {
+        const doc = { id: entry.id };
+        const b = entry.data;
+        html += `
             <div class="liked-card">
                 <button class="unlike-btn" onclick="unlikeBrand('${doc.id}')" title="Remove from saved"><i class="fas fa-bookmark"></i></button>
                 <a href="../brands/view.html?id=${b.slug || ''}" style="text-decoration:none;color:inherit;">
@@ -378,8 +391,7 @@ async function loadLikedBrands() {
                     </div>
                 </a>
             </div>`;
-        });
-    }
+    });
     grid.innerHTML = html || '';
     if (!html) empty.style.display = 'block';
 }
