@@ -26,7 +26,7 @@
     var isKo = lang === 'ko';
     var wrap = document.createElement('div');
     wrap.id = 'archi-cookie-banner';
-    wrap.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#111;color:#fff;padding:20px 24px;border-radius:10px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:720px;margin:0 auto;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;';
+    wrap.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#332e27;color:#fff;padding:20px 24px;border-radius:10px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:720px;margin:0 auto;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;';
     wrap.innerHTML =
       '<div style="display:flex;flex-direction:column;gap:12px;">' +
         '<h3 style="font-size:0.95rem;font-weight:700;margin:0;color:#C8A96E;">' +
@@ -41,7 +41,7 @@
           ) +
         '</p>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">' +
-          '<button id="cc-accept" style="background:#C8A96E;color:#0a0a0a;border:none;padding:10px 18px;font-size:0.82rem;font-weight:700;border-radius:6px;cursor:pointer;font-family:inherit;">' +
+          '<button id="cc-accept" style="background:#C8A96E;color:#332e27;border:none;padding:10px 18px;font-size:0.82rem;font-weight:700;border-radius:6px;cursor:pointer;font-family:inherit;">' +
             (isKo ? '모두 수락' : 'Accept All') + '</button>' +
           '<button id="cc-necessary" style="background:transparent;color:#fff;border:1px solid #444;padding:10px 18px;font-size:0.82rem;font-weight:600;border-radius:6px;cursor:pointer;font-family:inherit;">' +
             (isKo ? '필수만' : 'Necessary Only') + '</button>' +

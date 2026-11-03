@@ -70,10 +70,10 @@
 
         if (!user) {
             link.href = basePath + 'auth/login.html';
-            link.style.cssText += 'background:#111;color:#fff;';
+            link.style.cssText += 'background:#332e27;color:#fff;';
             link.innerHTML = '<i class="fas fa-user" style="margin-right:4px;"></i><span data-en="Log In" data-ko="로그인">Log In</span>';
             link.addEventListener('mouseenter', () => { link.style.background = '#C8A96E'; });
-            link.addEventListener('mouseleave', () => { link.style.background = '#111'; });
+            link.addEventListener('mouseleave', () => { link.style.background = '#332e27'; });
             insert(link);
             return;
         }
@@ -106,9 +106,9 @@
                 link.innerHTML = accountHtml('fa-user', user);
                 kindEn = 'Member account'; kindKo = '회원 계정';
             }
-            link.style.cssText += 'background:#111;color:#fff;';
+            link.style.cssText += 'background:#332e27;color:#fff;';
             link.addEventListener('mouseenter', () => { link.style.background = '#C8A96E'; });
-            link.addEventListener('mouseleave', () => { link.style.background = '#111'; });
+            link.addEventListener('mouseleave', () => { link.style.background = '#332e27'; });
         }
 
         // 마우스를 올리면 계정 종류까지 확인 가능
@@ -124,10 +124,10 @@
         out.setAttribute('data-en-title', 'Log out');
         out.setAttribute('data-ko-title', '로그아웃');
         out.setAttribute('aria-label', out.title);
-        out.style.cssText = 'font-size:0.8rem;color:#777;text-decoration:none;padding:6px 8px;margin-left:2px;';
+        out.style.cssText = 'font-size:0.8rem;color:#7a7164;text-decoration:none;padding:6px 8px;margin-left:2px;';
         out.innerHTML = '<i class="fas fa-right-from-bracket"></i>';
-        out.addEventListener('mouseenter', () => { out.style.color = '#111'; });
-        out.addEventListener('mouseleave', () => { out.style.color = '#777'; });
+        out.addEventListener('mouseenter', () => { out.style.color = '#332e27'; });
+        out.addEventListener('mouseleave', () => { out.style.color = '#7a7164'; });
         out.addEventListener('click', function (e) {
             e.preventDefault();
             auth.signOut().then(function () { window.location.reload(); })

@@ -27,7 +27,7 @@
     el.textContent = msg;
     el.setAttribute('role', 'status');
     el.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);' +
-      'background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:8px;font-size:0.85rem;' +
+      'background:#332e27;color:#fff;padding:10px 18px;border-radius:8px;font-size:0.85rem;' +
       'z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,0.25);max-width:90vw;text-align:center;';
     document.body.appendChild(el);
     setTimeout(function(){ if (el.parentNode) el.remove(); }, remainMs + 500);

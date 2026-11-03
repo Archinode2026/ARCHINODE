@@ -2398,12 +2398,15 @@ body.home .hero-btn:hover { background: var(--accent); color: #fff; }
 
 /* ── 섹션 교차 배경 (A-168) — 화이트 / 베이지 / 화이트 / 연그레이 ──────
    사진 밴드는 전면 사진이라, 푸터는 네이비라 교차에서 빠진다 */
-body.home .promo-mosaic  { background: var(--band-white); }
-body.home .categories    { background: var(--band-beige); }
-body.home .korea-network { background: var(--band-white); }
-body.home .services      { background: var(--band-grey); }
-body.home .cta-listing   { background: var(--band-white); }
-body.home .newsletter    { background: var(--band-beige); }
+body.home .cat-strip     { background: var(--band-white); }
+body.home .promo-mosaic  { background: var(--band-beige); }
+body.home .categories    { background: var(--band-white); }
+body.home .korea-network { background: var(--band-grey); }
+body.home .services      { background: var(--band-white); }
+body.home .cta-listing   { background: var(--band-beige); }
+body.home .newsletter    { background: var(--band-white); }
+/* 원형 줄은 띠 하나라 본문 섹션 여백(--sec-y)이 과하다 */
+body.home .cat-strip { padding: clamp(32px, 3.4vw, 54px) 0; }
 /* 모자이크는 바로 아래 카테고리와 배경이 달라졌으니 자기 아래 여백을 가져야 한다 */
 body.home .promo-mosaic  { padding: var(--sec-y) 0; }
 
@@ -2455,6 +2458,34 @@ body.home .promo-foot a { color: var(--accent); border-bottom: 1px solid current
 @media (prefers-reduced-motion: reduce) {
   body.home .promo-item, body.home .promo-item img { transition: none; }
   body.home .promo-item:hover { transform: none; box-shadow: none; }
+}
+
+/* ── 헤더 오버레이 (A-174) ────────────────────────────────────────
+   메인 사진 위에서는 헤더가 투명하게 얹히고, 사진을 지나면 흰 배경으로 바뀐다.
+   사진이 헤더 뒤까지 올라와야 하므로 히어로를 헤더 높이만큼 끌어올린다 */
+body.home .hero { margin-top: calc(-1 * var(--header-height) - 1px); }
+body.home .hero-content { padding-top: var(--header-height); }
+body.home .header.over-hero {
+  background: transparent; backdrop-filter: none; border-bottom-color: transparent;
+  /* 어떤 사진 위에서도 글자가 읽히도록 옅은 그늘 */
+  box-shadow: inset 0 60px 60px -60px rgba(26,22,18,.55);
+}
+body.home .header.over-hero .logo,
+body.home .header.over-hero .main-nav > a,
+body.home .header.over-hero .header-actions a,
+body.home .header.over-hero .header-actions button { color: #fdfbf7 !important; }
+body.home .header.over-hero .logo-sub { color: rgba(253,251,247,.74); }
+body.home .header.over-hero .main-nav > a:hover { color: #fdfbf7; }
+body.home .header.over-hero .main-nav > a::after { background: #fdfbf7; }
+/* .nav-cta 가 !important 로 박혀 있어 같은 무기가 아니면 진다 */
+body.home .header.over-hero .main-nav a.nav-cta { background: #fdfbf7 !important; color: var(--black) !important; }
+body.home .header.over-hero .main-nav a.nav-cta:hover { background: var(--accent) !important; color: #fdfbf7 !important; }
+body.home .header.over-hero .lang-switcher,
+body.home .header.over-hero .lang-switcher button { border-color: rgba(253,251,247,.5); color: #fdfbf7; }
+@media (prefers-reduced-motion: no-preference) {
+  body.home .header { transition: background .35s, box-shadow .35s, border-color .35s; }
+  body.home .header .logo, body.home .header .main-nav > a,
+  body.home .header .header-actions a, body.home .header .header-actions button { transition: color .35s; }
 }
 
 /* ── 원형 카테고리 (A-172) — 제품 그리드 위의 진입 동선 ──────────────
@@ -2666,7 +2697,7 @@ body.home .service-item p { margin: 0; font-size: 0.86rem; line-height: 1.8; col
 }
 
 /* ── CTA 밴드 ── */
-body.home .cta-listing { background: var(--band-white); color: var(--black); text-align: left; }
+body.home .cta-listing { background: var(--band-beige); color: var(--black); text-align: left; }
 /* 좌 텍스트 / 우 사진. 오른쪽이 비어 보인다는 지적(A-170) */
 body.home .cta-inner {
   display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
@@ -2698,7 +2729,7 @@ body.home .cta-free-tag { color: var(--gray-600); }
 /* 뉴스레터 — 교차 배경의 마지막 단(베이지). 바로 아래 네이비 푸터와 대비를 만든다.
    본문 섹션용 --sec-y(최대 158px)는 이 띠에 과해서 따로 조인다 */
 body.home .newsletter {
-  background: var(--band-beige); color: var(--gray-700);
+  background: var(--band-white); color: var(--gray-700);
   border-top: 1px solid var(--rule);
   padding: clamp(52px, 5vw, 78px) 0; text-align: left;
 }
@@ -2805,7 +2836,7 @@ body.home .editorial-card-side i { color: var(--accent) !important; font-size: 1
 
 /* 한국 네트워크 — 인라인 스타일을 걷어내고 클래스로 잡는다(A-163) */
 body.home .korea-network {
-  background: var(--band-white) !important;   /* 교차 배경: 화이트 단 (A-168) */
+  background: var(--band-grey) !important;   /* 교차 배경 (A-174) */
   padding: var(--sec-y) 0 !important;
   border-top: 1px solid var(--rule) !important;
   border-bottom: none !important;

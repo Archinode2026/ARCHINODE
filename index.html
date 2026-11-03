@@ -877,70 +877,9 @@ input, select, textarea { font-family: inherit; }
   </div>
 </section>
 
-<!-- MAGAZINE MOSAIC (A-166) — 가로열 기준 2장·3장·1장.
-     지금은 매거진 글로 채우고, 추후 광고 슬롯으로 교체 예정.
-     슬롯 크기는 promo-half(2장) / promo-third(3장) / promo-full(1장) 클래스로만 정해진다. -->
-<section class="promo-mosaic" id="trend-report">
+<!-- CATEGORY STRIP (A-174) — 메인 사진 바로 아래, 흰 배경 -->
+<section class="cat-strip">
   <div class="container">
-    <div class="section-header fade-in">
-      <h2 class="section-title" data-en="Magazine" data-ko="매거진">Magazine</h2>
-      <a href="magazine.html" class="section-link" data-en="View All" data-ko="전체 보기">View All <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <div class="promo-grid">
-      <a href="trend-report/salone-del-mobile-2026-trends.html" class="promo-item promo-half fade-in">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=900&q=80" alt="">
-        <div class="promo-overlay">
-          <span class="promo-tag" data-en="EDITORIAL · MILANO" data-ko="에디토리얼 · 밀라노">EDITORIAL · MILANO</span>
-          <h3 data-en="Salone del Mobile 2026 — The Urban Greenhouse Returns" data-ko="살로네 델 모빌 2026 — 도심 속 온실의 귀환">Salone del Mobile 2026 — The Urban Greenhouse Returns</h3>
-        </div>
-      </a>
-      <a href="magazine/riba-stirling-prize-2026-lion-green-road-council-housing.html" class="promo-item promo-half fade-in">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80" alt="">
-        <div class="promo-overlay">
-          <span class="promo-tag" data-en="Global" data-ko="글로벌">Global</span>
-          <h3 data-en="From Car Park to Neighbourhood" data-ko="주차장이 동네가 되기까지">From Car Park to Neighbourhood</h3>
-        </div>
-      </a>
-      <a href="magazine/illegal-building-legalization-special-act-december-2026.html" class="promo-item promo-third fade-in">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?w=700&q=80" alt="">
-        <div class="promo-overlay">
-          <span class="promo-tag" data-en="Policy" data-ko="정책">Policy</span>
-          <h3 data-en="The Sixth Amnesty — Will It Be the Last?" data-ko="여섯 번째 사면, 이번엔 마지막일까">The Sixth Amnesty — Will It Be the Last?</h3>
-        </div>
-      </a>
-      <a href="magazine/k-ai-city-implementation-strategy-2026.html" class="promo-item promo-third fade-in">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=700&q=80" alt="">
-        <div class="promo-overlay">
-          <span class="promo-tag" data-en="Urban" data-ko="도시">Urban</span>
-          <h3 data-en="A Warm City, Written in Five Verbs" data-ko="따뜻한 도시라는 다섯 개의 동사">A Warm City, Written in Five Verbs</h3>
-        </div>
-      </a>
-      <a href="magazine/public-design-competition-entry-simplification-2026.html" class="promo-item promo-third fade-in">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=700&q=80" alt="">
-        <div class="promo-overlay">
-          <span class="promo-tag" data-en="Policy" data-ko="정책">Policy</span>
-          <h3 data-en="A Single Form Used to Beat the Design" data-ko="협정서 한 장이 설계안을 이겼다">A Single Form Used to Beat the Design</h3>
-        </div>
-      </a>
-      <a href="magazine/korea-facade-awards-2026-technology-materials.html" class="promo-item promo-full fade-in">
-        <img loading="lazy" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1800&q=80" alt="">
-        <div class="promo-overlay">
-          <span class="promo-tag" data-en="Materials" data-ko="자재">Materials</span>
-          <h3 data-en="When the Envelope Becomes the Performance" data-ko="외피가 성능이 되는 시대의 심사 기준">When the Envelope Becomes the Performance</h3>
-        </div>
-      </a>
-    </div>
-    <p class="promo-foot fade-in">
-      <span data-en="Are you a European brand?" data-ko="유럽 브랜드이신가요?">Are you a European brand?</span>
-      <a href="submit-trend.html" data-en="Submit your brand magazine story" data-ko="브랜드 매거진 글 제출하기">Submit your brand magazine story</a>
-    </p>
-  </div>
-</section>
-
-<!-- CATEGORY CIRCLES + PRODUCTS (A-172) -->
-<section class="categories products" id="products">
-  <div class="container">
-    <!-- 원형 카테고리 — 가로로 넘치면 스크롤 -->
     <div class="cat-rail">
       <button type="button" class="cat-rail-btn" data-dir="-1" aria-label="이전 카테고리" data-en-aria-label="Previous categories" data-ko-aria-label="이전 카테고리"><i class="fas fa-chevron-left"></i></button>
       <nav class="cat-circles" aria-label="Categories">
@@ -987,6 +926,108 @@ input, select, textarea { font-family: inherit; }
       </nav>
       <button type="button" class="cat-rail-btn" data-dir="1" aria-label="다음 카테고리" data-en-aria-label="Next categories" data-ko-aria-label="다음 카테고리"><i class="fas fa-chevron-right"></i></button>
     </div>
+  </div>
+</section>
+
+<!-- MAGAZINE MOSAIC (A-166) — 가로열 기준 2장·3장·1장.
+     지금은 매거진 글로 채우고, 추후 광고 슬롯으로 교체 예정.
+     슬롯 크기는 promo-half(2장) / promo-third(3장) / promo-full(1장) 클래스로만 정해진다. -->
+<section class="promo-mosaic" id="trend-report">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title" data-en="Magazine" data-ko="매거진">Magazine</h2>
+      <a href="magazine.html" class="section-link" data-en="View All" data-ko="전체 보기">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="promo-grid">
+      <a href="trend-report/salone-del-mobile-2026-trends.html" class="promo-item promo-half fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=900&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="EDITORIAL · MILANO" data-ko="에디토리얼 · 밀라노">EDITORIAL · MILANO</span>
+          <h3 data-en="Salone del Mobile 2026 — The Urban Greenhouse Returns" data-ko="살로네 델 모빌 2026 — 도심 속 온실의 귀환">Salone del Mobile 2026 — The Urban Greenhouse Returns</h3>
+        </div>
+      </a>
+      <a href="magazine/riba-stirling-prize-2026-lion-green-road-council-housing.html" class="promo-item promo-half fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Global" data-ko="글로벌">Global</span>
+          <h3 data-en="From Car Park to Neighbourhood" data-ko="주차장이 동네가 되기까지">From Car Park to Neighbourhood</h3>
+        </div>
+      </a>
+      <a href="magazine/illegal-building-legalization-special-act-december-2026.html" class="promo-item promo-third fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?w=700&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Policy" data-ko="정책">Policy</span>
+          <h3 data-en="The Sixth Amnesty — Will It Be the Last?" data-ko="여섯 번째 사면, 이번엔 마지막일까">The Sixth Amnesty — Will It Be the Last?</h3>
+        </div>
+      </a>
+      <a href="magazine/k-ai-city-implementation-strategy-2026.html" class="promo-item promo-third fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=700&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Urban" data-ko="도시">Urban</span>
+          <h3 data-en="A Warm City, Written in Five Verbs" data-ko="따뜻한 도시라는 다섯 개의 동사">A Warm City, Written in Five Verbs</h3>
+        </div>
+      </a>
+      <a href="magazine/public-design-competition-entry-simplification-2026.html" class="promo-item promo-third fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=700&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Policy" data-ko="정책">Policy</span>
+          <h3 data-en="A Single Form Used to Beat the Design" data-ko="협정서 한 장이 설계안을 이겼다">A Single Form Used to Beat the Design</h3>
+        </div>
+      </a>
+      <a href="magazine/korea-facade-awards-2026-technology-materials.html" class="promo-item promo-full fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1800&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Materials" data-ko="자재">Materials</span>
+          <h3 data-en="When the Envelope Becomes the Performance" data-ko="외피가 성능이 되는 시대의 심사 기준">When the Envelope Becomes the Performance</h3>
+        </div>
+      </a>
+      <a href="magazine/seoul-architecture-festival-2026-assembling-seoul.html" class="promo-item promo-half fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1503602642458-232111445657?w=900&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Culture" data-ko="문화">Culture</span>
+          <h3 data-en="Seoul Was Not Built. It Was Assembled." data-ko="서울은 지어진 게 아니라 조립됐다">Seoul Was Not Built. It Was Assembled.</h3>
+        </div>
+      </a>
+      <a href="magazine/gansam-pmdc-modular-ai-datacenter-2026.html" class="promo-item promo-half fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Project" data-ko="프로젝트">Project</span>
+          <h3 data-en="AI Data Centres Are Pushing Architecture Into the Factory" data-ko="AI 데이터센터가 건축을 공장으로 옮긴다">AI Data Centres Are Pushing Architecture Into the Factory</h3>
+        </div>
+      </a>
+      <a href="magazine/ai-architectural-drawing-copyright-2026.html" class="promo-item promo-third fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=700&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Technology" data-ko="기술">Technology</span>
+          <h3 data-en="Architects Already Use AI — the Rights Are Missing" data-ko="건축사는 이미 AI를 쓴다, 권리만 아직 없다">Architects Already Use AI — the Rights Are Missing</h3>
+        </div>
+      </a>
+      <a href="magazine/building-materials-brand-reputation-september-2026.html" class="promo-item promo-third fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=700&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Industry" data-ko="업계 동향">Industry</span>
+          <h3 data-en="Ranking the Brands Nobody Gets to Choose" data-ko="아무도 고르지 않는 브랜드에 순위가 붙는다">Ranking the Brands Nobody Gets to Choose</h3>
+        </div>
+      </a>
+      <a href="magazine/basic-construction-cost-4-07-percent-september-2026.html" class="promo-item promo-third fade-in">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=700&q=80" alt="">
+        <div class="promo-overlay">
+          <span class="promo-tag" data-en="Policy" data-ko="정책">Policy</span>
+          <h3 data-en="A 4% Lift in the Ceiling" data-ko="건축비 4% 인상, 안전은 어디에">A 4% Lift in the Ceiling</h3>
+        </div>
+      </a>
+    </div>
+    <p class="promo-foot fade-in">
+      <span data-en="Are you a European brand?" data-ko="유럽 브랜드이신가요?">Are you a European brand?</span>
+      <a href="submit-trend.html" data-en="Submit your brand magazine story" data-ko="브랜드 매거진 글 제출하기">Submit your brand magazine story</a>
+    </p>
+  </div>
+</section>
+
+<!-- CATEGORY CIRCLES + PRODUCTS (A-172) -->
+<section class="categories products" id="products">
+  <div class="container">
+    <!-- 원형 카테고리 — 가로로 넘치면 스크롤 -->
     <div class="section-header fade-in">
       <h2 class="section-title" data-en="Products" data-ko="제품">Products</h2>
       <a href="categories.html" class="section-link" data-en="View All" data-ko="전체 보기">View All <i class="fas fa-arrow-right"></i></a>
@@ -1262,6 +1303,31 @@ input, select, textarea { font-family: inherit; }
     if (!im.complete) im.addEventListener('load', sync, { once: true });
   });
   sync();
+})();
+</script>
+
+<script>
+/* 헤더 오버레이 — 메인 사진 위에 있을 때만 투명 (A-174).
+   사진을 지나면 흰 배경으로 바뀐다. rAF 로 묶어 스크롤마다 레이아웃을 재지 않는다 */
+(function () {
+  var header = document.querySelector('.header');
+  var hero = document.querySelector('.hero');
+  if (!header || !hero) return;
+  var ticking = false, limit = 0;
+  function measure() { limit = hero.offsetHeight - header.offsetHeight; }
+  function apply() {
+    header.classList.toggle('over-hero', window.scrollY < limit);
+    ticking = false;
+  }
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(apply);
+  }
+  measure(); apply();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () { measure(); apply(); });
+  window.addEventListener('load', function () { measure(); apply(); });
 })();
 </script>
 
