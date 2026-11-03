@@ -165,6 +165,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .form-group .req { color: #dc2626; }
 .form-group .hint { font-size: 0.72rem; font-weight: 400; color: var(--gray-400); margin-left: 6px; }
+/* 2026-11-03 QA: 자문 요청 설명란 글자 카운터 — 검증(100자)과 동일 기준 */
+.form-group .char-count { margin-top: 5px; font-size: 0.72rem; font-weight: 500; text-align: right;
+  color: var(--gray-400); font-variant-numeric: tabular-nums; transition: color .15s ease; }
+.form-group .char-count.is-short { color: #b45309; }
+.form-group .char-count.is-ok { color: #16a34a; }
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -351,8 +356,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         </div>
 
         <div class="form-group">
-          <label for="description" data-en="What do you need help with?" data-ko="어떤 부분에 자문이 필요하신가요?">What do you need help with? <span class="req">*</span> <span class="hint" data-en="100 words minimum — context helps us prepare" data-ko="100단어 이상 — 사전 준비를 위해 필요">100 words minimum — context helps us prepare</span></label>
+          <label for="description" data-en="What do you need help with?" data-ko="어떤 부분에 자문이 필요하신가요?">What do you need help with? <span class="req">*</span> <span class="hint" data-en="100 characters minimum — context helps us prepare" data-ko="100자 이상 — 사전 준비를 위해 필요">100 characters minimum — context helps us prepare</span></label>
           <textarea id="description" required placeholder="Brief on your situation, goal, and what you've tried so far. The more specific, the better we can prepare for the session." data-en-placeholder="Brief on your situation, goal, and what you've tried so far. The more specific, the better we can prepare for the session." data-ko-placeholder="현재 상황, 목표, 지금까지 시도한 것. 구체적일수록 사전 준비가 더 정확해집니다."></textarea>
+          <div class="char-count" id="descCount">0/100</div>
         </div>
 
         <div class="form-row">
@@ -610,6 +616,23 @@ async function submitConsult(e) {
   }
   return false;
 }
+
+// 2026-11-03 QA: 설명란 글자 카운터. 검증과 똑같이 trim() 기준으로 센다.
+(function () {
+  var MIN = 100;
+  var ta = document.getElementById('description');
+  var out = document.getElementById('descCount');
+  if (!ta || !out) return;
+  function render() {
+    var n = ta.value.trim().length;
+    out.textContent = n + '/' + MIN;
+    out.classList.toggle('is-ok', n >= MIN);
+    out.classList.toggle('is-short', n > 0 && n < MIN);
+  }
+  ta.addEventListener('input', render);
+  ta.addEventListener('blur', render);
+  render();
+})();
 </script>
 <script src="cookie-consent.js?v=20260630" defer></script>
 <script src="analytics-loader.js?v=20260630" defer></script>
