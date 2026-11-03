@@ -76,6 +76,14 @@
   });
 
   function initSwitcher() {
+    // A-008(2026-11-03): data-langs 가 언어 1개뿐인 페이지(예: list-your-brand.html의 "en")는
+    // 전환할 다른 언어가 없으니 스위처 UI 자체가 필요 없다. 기존에는 이 체크가 없어서 페이지에
+    // 명시적 스위처 마크업이 없으면 무조건 플로팅 스위처를 새로 만들어 "EN ▾" 1개짜리 무의미한
+    // 드롭다운이 떠 있었다. 기존 placeholder가 있으면 숨기고, 새로 만들지 않는다.
+    if (availableLangs.length < 2) {
+      document.querySelectorAll('.lang-switch, .lang-switcher').forEach(function(el) { el.style.display = 'none'; });
+      return;
+    }
     document.querySelectorAll('.lang-switcher').forEach(function(sw) {
       sw.innerHTML = buildSwitcherInner();
     });
