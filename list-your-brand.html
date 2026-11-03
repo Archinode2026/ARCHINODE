@@ -754,7 +754,7 @@ form.addEventListener('submit', async function(e) {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                 to: 'office@archinode.org',
                 message: {
-                    subject: '[ARCHINODE] 신규 브랜드 입점 신청 - ' + brandName,
+                    subject: ('[ARCHINODE] 신규 브랜드 입점 신청 - ' + brandName).substring(0, 180),  // 2026-11-03 QA: rules의 subject<200 제한 초과로 조용히 거부되는 것 방지
                     text: [
                         '새 브랜드가 입점 신청했습니다.',
                         '',

@@ -308,7 +308,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <div class="form-row">
           <div class="form-group">
             <label for="companyName" data-en="Company / Studio Name" data-ko="회사 · 스튜디오 명">Company / Studio Name <span class="req">*</span></label>
-            <input type="text" id="companyName" required>
+            <input type="text" id="companyName" maxlength="120" required>
           </div>
           <div class="form-group">
             <label for="contactName" data-en="Your Name" data-ko="담당자">Your Name <span class="req">*</span></label>
@@ -567,7 +567,7 @@ async function submitConsult(e) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
             to: 'office@archinode.org',
             message: {
-                subject: '[ARCHINODE] 컨설팅 요청 - ' + (companyName || 'Unknown'),
+                subject: ('[ARCHINODE] 컨설팅 요청 - ' + (companyName || 'Unknown')).substring(0, 180),  // 2026-11-03 QA: rules의 subject<200 제한 초과로 조용히 거부되는 것 방지
                 text: [
                     '컨설팅 요청이 접수되었습니다.',
                     '',

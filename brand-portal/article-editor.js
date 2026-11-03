@@ -275,7 +275,7 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
             to: 'office@archinode.org',
             message: {
-              subject: '[ARCHINODE] 매거진 원고 - ' + (brandData.brandName || 'Unknown') + ': ' + title,
+              subject: ('[ARCHINODE] 매거진 원고 - ' + (brandData.brandName || 'Unknown') + ': ' + title).substring(0, 180),  // 2026-11-03 QA: rules의 subject<200 제한 초과로 조용히 거부되는 것 방지
               text: [
                 '브랜드가 매거진 원고를 제출했습니다.',
                 '',

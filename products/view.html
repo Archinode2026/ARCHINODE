@@ -759,7 +759,7 @@ async function submitBimRequest(e) {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                 to: 'office@archinode.org',
                 message: {
-                    subject: '[ARCHINODE] BIM 데이터 요청 — ' + (currentProductBrandName || '') + ' / ' + (currentProductName || ''),
+                    subject: ('[ARCHINODE] BIM 데이터 요청 — ' + (currentProductBrandName || '') + ' / ' + (currentProductName || '')).substring(0, 180),  // 2026-11-03 QA: rules의 subject<200 제한 초과로 조용히 거부되는 것 방지
                     text: [
                         'BIM/CAD/카탈로그 데이터 신규 요청',
                         '',
