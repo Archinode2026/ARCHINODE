@@ -1294,8 +1294,11 @@ document.querySelectorAll('.product-wish').forEach(btn => {
 </script>
 <script src="search.js"></script>
 
-<!-- Firebase SDK (Newsletter Subscribe) -->
+<!-- Firebase SDK (Newsletter Subscribe + 헤더 로그인 상태 표시) -->
+<!-- A-001 재발: firebase-auth-compat.js가 빠져있어 firebase.auth가 undefined -> firebase-config.js가 auth=null로
+     초기화 -> auth-ui.js가 조용히 종료되어 로그인해도 헤더에 Dashboard/Admin 버튼이 안 뜨던 원인 -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="lang.js?v=20260630"></script>
