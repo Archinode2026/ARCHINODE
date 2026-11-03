@@ -32,7 +32,10 @@ input, select, textarea { font-family: inherit; }
   --gray-900: #171717;
   --accent: #332e27;
   --accent-hover: #333333;
-  --max-width: 1440px;
+  --max-width: min(max(1440px, 85vw), 2400px);
+  /* A-169: 1440px 고정이면 1920 화면에서 양쪽 여백이 25%, 2560 에서 44% 가 된다.
+     85vw 를 바닥으로 깔아 넓은 화면에서는 양쪽 15% 로 고정하고,
+     1440px 보다 좁아지지 않게 max() 로 받치고, 초광폭은 2400px 에서 끊는다 */
   --header-height: 64px;
 }
 
