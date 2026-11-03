@@ -28,9 +28,9 @@
 <style>
 /* ===== BRAND PAGE STYLES ===== */
 .btn-like { background:#fff; border:1px solid #ddd; color:#333; display:inline-flex; align-items:center; gap:6px; padding:11px 20px; border-radius:6px; font-size:0.92rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:inherit; }
-.btn-like:hover { border-color:#e11d48; color:#e11d48; }
-.btn-like.liked { border-color:#e11d48; color:#e11d48; background:#fef2f2; }
-.btn-like.liked .fa-heart { font-weight:900; }
+.btn-like:hover { border-color:#C8A96E; color:#8a7030; }
+.btn-like.liked { border-color:#C8A96E; color:#8a7030; background:#faf6ee; }
+.btn-like.liked .fa-bookmark { font-weight:900; }
 
 /* Loading State */
 .bp-loading {
@@ -710,10 +710,9 @@ function renderBrand(brand, products, articles) {
                     `).join('')}
                 </div>` : ''}
                 <div class="bp-cta-group">
-                    <button class="btn-like" id="brandLikeBtn" onclick="toggleBrandLike()" title="Like">
-                        <i class="far fa-heart" id="brandLikeIcon"></i>
-                        <span id="brandLikeLabel" data-en="Like" data-ko="좋아요">Like</span>
-                        <span id="brandLikeCount" style="margin-left:4px;font-size:0.82rem;color:#999;">${brand.likeCount || 0}</span>
+                    <button class="btn-like" id="brandLikeBtn" onclick="toggleBrandLike()" data-en-title="Save to my list" data-ko-title="내 리스트에 저장" title="Save to my list">
+                        <i class="far fa-bookmark" id="brandLikeIcon"></i>
+                        <span id="brandLikeLabel" data-en="Save" data-ko="저장">Save</span>
                     </button>
                     <button type="button" class="btn btn-primary" onclick="openRfqModal()"><i class="fas fa-file-invoice"></i> Inquire</button>
                     ${website ? `<a href="${wsUrl}" target="_blank" class="btn btn-secondary" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> Visit Website</a>` : ''}
@@ -893,12 +892,16 @@ function updateBrandLikeUI() {
     const btn = document.getElementById('brandLikeBtn');
     const icon = document.getElementById('brandLikeIcon');
     if (!btn) return;
+    const label = document.getElementById('brandLikeLabel');
+    const ko = document.documentElement.lang !== 'en';
     if (isBrandLiked) {
         btn.classList.add('liked');
-        icon.className = 'fas fa-heart';
+        icon.className = 'fas fa-bookmark';
+        if (label) label.textContent = ko ? '저장됨' : 'Saved';
     } else {
         btn.classList.remove('liked');
-        icon.className = 'far fa-heart';
+        icon.className = 'far fa-bookmark';
+        if (label) label.textContent = ko ? '저장' : 'Save';
     }
 }
 
@@ -907,19 +910,41 @@ async function toggleBrandLike() {
     if (!user) {
         var lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
         var msg = lang === 'en'
-            ? 'Log in to like this brand. Go to the sign-in page?'
-            : '좋아요를 누르려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?';
+            ? 'Log in to save this brand. Go to the sign-in page?'
+            : '저장하려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?';
         if (confirm(msg)) {
             window.location.href = '../auth/login.html';
         }
         return;
     }
     if (!currentBrandDocId) return;
-    const userDoc = await db.collection('users').doc(user.uid).get();
+    // 2026-11-03 A-145: users 문서가 아직 없는 회원은 여기서 바로 만들어 준다.
+    // 기존에는 안내만 하고 끝나서, 가입했는데도 저장이 안 되는 막다른 길이 됐다.
+    let userDoc = await db.collection('users').doc(user.uid).get();
     if (!userDoc.exists) {
         var lang2 = document.documentElement.lang === 'en' ? 'en' : 'ko';
-        alert(lang2 === 'en' ? 'Please log in with a professional account.' : '전문가 계정으로 로그인해 주세요.');
-        return;
+        const brandDoc = await db.collection('brands').doc(user.uid).get();
+        if (brandDoc.exists) {
+            alert(lang2 === 'en'
+                ? 'Brand accounts cannot save brands. Please use a member account.'
+                : '브랜드 계정으로는 저장할 수 없습니다. 회원 계정으로 로그인해 주세요.');
+            return;
+        }
+        try {
+            await db.collection('users').doc(user.uid).set({
+                displayName: user.displayName || '',
+                email: user.email,
+                company: '', jobTitle: '', industry: '', phone: '',
+                role: 'professional',
+                likedProducts: [], likedBrands: [],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (mkErr) {
+            console.error('User doc create failed:', mkErr);
+            alert(lang2 === 'en' ? 'Could not set up your account. Please try again.' : '계정 설정에 실패했습니다. 다시 시도해 주세요.');
+            return;
+        }
     }
     const btn = document.getElementById('brandLikeBtn');
     btn.disabled = true;
@@ -934,8 +959,6 @@ async function toggleBrandLike() {
                 throw countErr;
             }
             isBrandLiked = false;
-            const c = document.getElementById('brandLikeCount');
-            if (c) c.textContent = Math.max(0, parseInt(c.textContent) - 1);
         } else {
             await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayUnion(currentBrandDocId) });
             // 2026-11-03 A-144: likeCount 쓰기가 실패하면 users 문서를 되돌려 두 기록이 어긋나지 않게 한다
@@ -946,8 +969,6 @@ async function toggleBrandLike() {
                 throw countErr;
             }
             isBrandLiked = true;
-            const c = document.getElementById('brandLikeCount');
-            if (c) c.textContent = parseInt(c.textContent) + 1;
         }
         updateBrandLikeUI();
     } catch (err) { console.error('Brand like error:', err); }

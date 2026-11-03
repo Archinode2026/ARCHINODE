@@ -121,9 +121,9 @@
 .pp-rel-card-name { font-size:0.88rem; font-weight:600; color:var(--black); }
 
 .btn-like { background:#fff; border:1px solid #ddd; color:#333; display:inline-flex; align-items:center; gap:6px; padding:11px 20px; border-radius:6px; font-size:0.92rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:inherit; }
-.btn-like:hover { border-color:#e11d48; color:#e11d48; }
-.btn-like.liked { border-color:#e11d48; color:#e11d48; background:#fef2f2; }
-.btn-like.liked .fa-heart { font-weight:900; }
+.btn-like:hover { border-color:#C8A96E; color:#8a7030; }
+.btn-like.liked { border-color:#C8A96E; color:#8a7030; background:#faf6ee; }
+.btn-like.liked .fa-bookmark { font-weight:900; }
 
 .fade-in { opacity:1; animation:fadeIn 0.6s ease-in; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
@@ -587,10 +587,9 @@ function renderProduct(p, related) {
                 ${specsHtml}
 
                 <div class="pp-cta">
-                    <button class="btn btn-like" id="likeBtn" onclick="toggleLike()" title="Like">
-                        <i class="far fa-heart" id="likeIcon"></i>
-                        <span id="likeLabel" data-en="Like" data-ko="좋아요">Like</span>
-                        <span id="likeCount" style="margin-left:4px;font-size:0.82rem;color:#999;">${p.likeCount || 0}</span>
+                    <button class="btn btn-like" id="likeBtn" onclick="toggleLike()" data-en-title="Save to my list" data-ko-title="내 리스트에 저장" title="Save to my list">
+                        <i class="far fa-bookmark" id="likeIcon"></i>
+                        <span id="likeLabel" data-en="Save" data-ko="저장">Save</span>
                     </button>
                     <button type="button" class="btn btn-primary" onclick="openRfqModal('quote')"><i class="fas fa-file-invoice"></i> <span data-en="Request a Quote" data-ko="견적 요청">Request a Quote</span></button>
                     <button type="button" class="btn btn-secondary" onclick="openRfqModal('sample-request')"><i class="fas fa-box-open"></i> <span data-en="Request a Sample" data-ko="샘플 요청">Request a Sample</span></button>
@@ -866,14 +865,15 @@ function updateLikeUI() {
     const icon = document.getElementById('likeIcon');
     const label = document.getElementById('likeLabel');
     if (!btn) return;
+    const ko = document.documentElement.lang !== 'en';
     if (isLiked) {
         btn.classList.add('liked');
-        icon.className = 'fas fa-heart';
-        label.textContent = label.getAttribute('data-ko') && document.documentElement.lang === 'ko' ? '좋아요 취소' : 'Liked';
+        icon.className = 'fas fa-bookmark';
+        label.textContent = ko ? '저장됨' : 'Saved';
     } else {
         btn.classList.remove('liked');
-        icon.className = 'far fa-heart';
-        label.textContent = label.getAttribute('data-ko') && document.documentElement.lang === 'ko' ? '좋아요' : 'Like';
+        icon.className = 'far fa-bookmark';
+        label.textContent = ko ? '저장' : 'Save';
     }
 }
 
@@ -884,8 +884,8 @@ async function toggleLike() {
         // A-116: 사이트 디자인·현재 언어에 맞는 확인창(기본 confirm/alert 대신)
         var lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
         var msg = lang === 'en'
-            ? 'Log in to like this product. Go to the sign-in page?'
-            : '좋아요를 누르려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?';
+            ? 'Log in to save this product. Go to the sign-in page?'
+            : '저장하려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?';
         if (confirm(msg)) {
             window.location.href = '../auth/login.html';
         }
@@ -893,12 +893,33 @@ async function toggleLike() {
     }
     if (!currentProductDocId) return;
 
-    // users 컬렉션에 문서가 없으면 brands 계정일 수 있음
-    const userDoc = await db.collection('users').doc(user.uid).get();
+    // 2026-11-03 A-145: users 문서가 아직 없는 회원은 여기서 바로 만들어 준다.
+    // 기존에는 안내만 하고 끝나서, 가입했는데도 저장이 안 되는 막다른 길이 됐다.
+    let userDoc = await db.collection('users').doc(user.uid).get();
     if (!userDoc.exists) {
         var lang2 = document.documentElement.lang === 'en' ? 'en' : 'ko';
-        alert(lang2 === 'en' ? 'Please log in with a professional account.' : '전문가 계정으로 로그인해 주세요.');
-        return;
+        const brandDoc = await db.collection('brands').doc(user.uid).get();
+        if (brandDoc.exists) {
+            alert(lang2 === 'en'
+                ? 'Brand accounts cannot save products. Please use a member account.'
+                : '브랜드 계정으로는 저장할 수 없습니다. 회원 계정으로 로그인해 주세요.');
+            return;
+        }
+        try {
+            await db.collection('users').doc(user.uid).set({
+                displayName: user.displayName || '',
+                email: user.email,
+                company: '', jobTitle: '', industry: '', phone: '',
+                role: 'professional',
+                likedProducts: [], likedBrands: [],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (mkErr) {
+            console.error('User doc create failed:', mkErr);
+            alert(lang2 === 'en' ? 'Could not set up your account. Please try again.' : '계정 설정에 실패했습니다. 다시 시도해 주세요.');
+            return;
+        }
     }
 
     const likeBtn = document.getElementById('likeBtn');
@@ -922,8 +943,6 @@ async function toggleLike() {
                 throw countErr;
             }
             isLiked = false;
-            const countEl = document.getElementById('likeCount');
-            if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
         } else {
             // 좋아요
             await db.collection('users').doc(user.uid).update({
@@ -941,12 +960,10 @@ async function toggleLike() {
                 throw countErr;
             }
             isLiked = true;
-            const countEl = document.getElementById('likeCount');
-            if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
         }
         updateLikeUI();
     } catch (err) {
-        console.error('Like error:', err);
+        console.error('Save error:', err);
     }
     likeBtn.disabled = false;
 }

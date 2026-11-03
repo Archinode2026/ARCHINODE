@@ -145,7 +145,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
 
     <!-- TABS -->
     <div class="tabs">
-        <div class="tab active" data-tab="likes" data-en="My Likes" data-ko="좋아요 목록">My Likes</div>
+        <div class="tab active" data-tab="likes" data-en="Saved" data-ko="저장 목록">Saved</div>
         <div class="tab" data-tab="profile" data-en="Edit Profile" data-ko="프로필 수정">Edit Profile</div>
         <div class="tab" data-tab="settings" data-en="Settings" data-ko="설정">Settings</div>
     </div>
@@ -153,22 +153,22 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f5f5f5; co
     <!-- TAB: MY LIKES -->
     <div class="tab-content active" id="tab-likes">
         <div class="section-card">
-            <h2><i class="fas fa-heart"></i> <span data-en="Liked Products" data-ko="좋아요한 제품">Liked Products</span></h2>
+            <h2><i class="fas fa-bookmark"></i> <span data-en="Saved Products" data-ko="저장한 제품">Saved Products</span></h2>
             <div class="liked-grid" id="likedProductsGrid"></div>
             <div class="empty-state" id="emptyProducts" style="display:none;">
-                <i class="fas fa-heart"></i>
-                <h3 data-en="No liked products yet" data-ko="아직 좋아요한 제품이 없습니다">No liked products yet</h3>
-                <p data-en="Explore products and tap the heart icon to save your favorites." data-ko="제품을 탐색하고 하트 아이콘을 눌러 즐겨찾기를 저장하세요.">Explore products and tap the heart icon to save your favorites.</p>
+                <i class="fas fa-bookmark"></i>
+                <h3 data-en="No saved products yet" data-ko="아직 저장한 제품이 없습니다">No saved products yet</h3>
+                <p data-en="Browse products and tap Save to add them to your list." data-ko="제품을 둘러보고 저장 버튼을 눌러 내 리스트에 담아보세요.">Browse products and tap Save to add them to your list.</p>
                 <p style="margin-top:12px;"><a href="../categories.html" data-en="Browse Products →" data-ko="제품 둘러보기 →">Browse Products →</a></p>
             </div>
         </div>
 
         <div class="section-card">
-            <h2><i class="fas fa-building"></i> <span data-en="Liked Brands" data-ko="좋아요한 브랜드">Liked Brands</span></h2>
+            <h2><i class="fas fa-building"></i> <span data-en="Saved Brands" data-ko="저장한 브랜드">Saved Brands</span></h2>
             <div class="liked-grid" id="likedBrandsGrid"></div>
             <div class="empty-state" id="emptyBrands" style="display:none;">
                 <i class="fas fa-building"></i>
-                <h3 data-en="No liked brands yet" data-ko="아직 좋아요한 브랜드가 없습니다">No liked brands yet</h3>
+                <h3 data-en="No saved brands yet" data-ko="아직 저장한 브랜드가 없습니다">No saved brands yet</h3>
                 <p data-en="Discover brands and save the ones you love." data-ko="브랜드를 발견하고 마음에 드는 브랜드를 저장하세요.">Discover brands and save the ones you love.</p>
                 <p style="margin-top:12px;"><a href="../brands.html" data-en="Browse Brands →" data-ko="브랜드 둘러보기 →">Browse Brands →</a></p>
             </div>
@@ -311,7 +311,7 @@ function populateProfile() {
     document.getElementById('editPhone').value = userData.phone || '';
 }
 
-// ── 좋아요 제품 로드 ──
+// ── 저장한 제품 로드 ──
 async function loadLikedProducts() {
     const grid = document.getElementById('likedProductsGrid');
     const empty = document.getElementById('emptyProducts');
@@ -331,7 +331,7 @@ async function loadLikedProducts() {
             const p = doc.data();
             html += `
             <div class="liked-card">
-                <button class="unlike-btn" onclick="unlikeProduct('${doc.id}')" title="Remove"><i class="fas fa-heart"></i></button>
+                <button class="unlike-btn" onclick="unlikeProduct('${doc.id}')" title="Remove from saved"><i class="fas fa-bookmark"></i></button>
                 <a href="../products/view.html?id=${p.slug || ''}" style="text-decoration:none;color:inherit;">
                     <div class="liked-card-img">
                         ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<i class="fas fa-cube" style="font-size:2rem;color:#ddd;"></i>'}
@@ -348,7 +348,7 @@ async function loadLikedProducts() {
     if (!html) empty.style.display = 'block';
 }
 
-// ── 좋아요 브랜드 로드 ──
+// ── 저장한 브랜드 로드 ──
 async function loadLikedBrands() {
     const grid = document.getElementById('likedBrandsGrid');
     const empty = document.getElementById('emptyBrands');
@@ -367,7 +367,7 @@ async function loadLikedBrands() {
             const b = doc.data();
             html += `
             <div class="liked-card">
-                <button class="unlike-btn" onclick="unlikeBrand('${doc.id}')" title="Remove"><i class="fas fa-heart"></i></button>
+                <button class="unlike-btn" onclick="unlikeBrand('${doc.id}')" title="Remove from saved"><i class="fas fa-bookmark"></i></button>
                 <a href="../brands/view.html?id=${b.slug || ''}" style="text-decoration:none;color:inherit;">
                     <div class="liked-card-img">
                         ${b.logoUrl ? `<img loading="lazy" src="${b.logoUrl}" alt="${b.brandName}" style="object-fit:contain;padding:20px;">` : '<i class="fas fa-building" style="font-size:2rem;color:#ddd;"></i>'}
@@ -384,7 +384,7 @@ async function loadLikedBrands() {
     if (!html) empty.style.display = 'block';
 }
 
-// ── 좋아요 취소 ──
+// ── 저장 해제 ──
 async function unlikeProduct(productId) {
     await db.collection('users').doc(currentUser.uid).update({
         likedProducts: firebase.firestore.FieldValue.arrayRemove(productId)

@@ -36,7 +36,7 @@ var USR_COLUMNS = [
     { en: 'Company',           ko: '회사' },
     { en: 'Industry',          ko: '업종' },
     { en: 'Joined',            ko: '가입일' },
-    { en: 'Likes (P / B)',     ko: '좋아요 (제품 / 브랜드)' },
+    { en: 'Saves (P / B)',     ko: '저장 (제품 / 브랜드)' },
     { en: '',                  ko: '' }
 ];
 
@@ -263,9 +263,9 @@ function usr_view(id) {
         + dd('Updated', '수정일', fmtDate(it.updatedAt))
         + dd('UID', 'UID', it.id)
         + '</dl>'
-        + '<div class="adm-hist-head" ' + tAttr('Liked brands (' + likedB.length + ')', '좋아요한 브랜드 (' + likedB.length + ')') + '>' + escapeHtml(t('Liked brands (' + likedB.length + ')', '좋아요한 브랜드 (' + likedB.length + ')')) + '</div>'
+        + '<div class="adm-hist-head" ' + tAttr('Saved brands (' + likedB.length + ')', '저장한 브랜드 (' + likedB.length + ')') + '>' + escapeHtml(t('Liked brands (' + likedB.length + ')', '좋아요한 브랜드 (' + likedB.length + ')')) + '</div>'
         + '<ul class="adm-hist">' + usr_likesListHtml(likedB, 'brands', function (b) { return String(b.brandName || b.id); }, 'None', '없음') + '</ul>'
-        + '<div class="adm-hist-head" ' + tAttr('Liked products (' + likedP.length + ')', '좋아요한 제품 (' + likedP.length + ')') + '>' + escapeHtml(t('Liked products (' + likedP.length + ')', '좋아요한 제품 (' + likedP.length + ')')) + '</div>'
+        + '<div class="adm-hist-head" ' + tAttr('Saved products (' + likedP.length + ')', '저장한 제품 (' + likedP.length + ')') + '>' + escapeHtml(t('Liked products (' + likedP.length + ')', '좋아요한 제품 (' + likedP.length + ')')) + '</div>'
         + '<ul class="adm-hist">' + usr_likesListHtml(likedP, 'products', function (p) { return String(p.name || p.id) + (p.brandName ? ' — ' + String(p.brandName) : ''); }, 'None', '없음') + '</ul>'
         + '</div>';
     openModal(html);
@@ -275,7 +275,7 @@ function usr_view(id) {
 function users_exportCsv() {
     var list = users_filtered();
     if (!list.length) { showToast(t('No members to export', '내보낼 회원이 없습니다'), 'error'); return; }
-    var rows = [['Name', 'Company', 'Job title', 'Industry', 'Email', 'Phone', 'Joined', 'Liked products', 'Liked brands', 'UID']];
+    var rows = [['Name', 'Company', 'Job title', 'Industry', 'Email', 'Phone', 'Joined', 'Saved products', 'Saved brands', 'UID']];
     for (var i = 0; i < list.length; i++) {
         var it = list[i] || {};
         rows.push([it.displayName || '', it.company || '', it.jobTitle || '', it.industry || '', it.email || '', it.phone || '',
