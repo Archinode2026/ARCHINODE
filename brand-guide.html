@@ -73,7 +73,13 @@
 .bg-founding strong { color:#332e27; }
 </style>
 </head>
-<body>
+<!-- A-207 / R-059: 이 페이지는 번역 커버가 **1%**(58/7,194자) 다 — 네비게이션 몇 개만
+     data-en/data-ko 짝이 있고 본문은 전부 영어다. 그래서 스위처에 한국어가 떠도 눌러도
+     아무 일이 없는 **죽은 선택지**였고, 방문자는 "KR" 표시를 보고 한국어로 보고 있다고
+     착각했다. 없는 선택지를 보여주는 것보다 안 보여주는 게 정직하다.
+     data-langs="en" 이면 lang.js 의 availableLangs < 2 가드가 스위처를 숨긴다(A-008 때 만든 것).
+     **한국어 원고가 생기면 이 한 줄을 "en,ko" 로 바꾸고 본문에 data-ko 를 채우면 된다** (A-208). -->
+<body data-langs="en">
 
 <!-- ANNOUNCEMENT BAR -->
 <div class="announcement-bar">
