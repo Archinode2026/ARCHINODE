@@ -1361,13 +1361,47 @@ document.getElementById('reviewFilter').addEventListener('change', renderReview)
 document.getElementById('reviewAddBtn').addEventListener('click', openReviewForm);
 document.getElementById('reviewImportBtn').addEventListener('click', importReviewSeed);
 
-// ── 탭 전환 ──
+/* ── 탭 전환 ─────────────────────────────────────────────────────────────
+   R-071(=A-200): 네 탭의 데이터는 init 의 loadAll() 에서 **딱 한 번만** 읽혔다.
+   그 뒤로는 자기 컬렉션에 쓰기를 했을 때만 다시 읽었으므로, 다른 사람이
+   등록한 건은 페이지를 새로 열기 전까지 영원히 안 보였다. 반면 대시보드
+   카드(view-dashboard.js)는 진입마다 새로 질의한다 — 그래서 같은 화면에서
+   카드 59건 / 탭 56건처럼 두 숫자가 엇갈렸다.
+
+   탭에 들어올 때마다 그 탭의 컬렉션을 다시 읽는다. 사이드바 '검수관리' 는
+   kind:'tab' 이라 admin-nav.js 가 이 .tab 요소를 click() 하므로, 옛 탭 바와
+   사이드바 두 경로가 여기 한 곳으로 모인다.
+   ───────────────────────────────────────────────────────────────────── */
+var TAB_RELOADERS = {
+    brands:   function () { return loadBrands(); },
+    products: function () { return loadProducts(); },
+    articles: function () { return loadArticles(); },
+    review:   function () { return loadReview(); }
+};
+var tabReloading = {};   // 같은 탭을 연달아 눌러도 질의가 겹치지 않게
+
+function reloadTabData(key) {
+    var fn = TAB_RELOADERS[key];
+    if (!fn) return;                                   // 대시보드·로그·규정집 등은 자기 모듈이 알아서 읽는다
+    if (tabReloading[key]) return;                     // 이미 읽는 중
+    if (typeof db === 'undefined' || !db) return;      // 인증 전 진입
+    tabReloading[key] = true;
+    Promise.resolve().then(fn).then(function () {
+        if (typeof dash_render === 'function') dash_render(document.getElementById('tab-dashboard'));   // 카드와 탭 숫자를 같은 시점으로
+    }).catch(function (err) {
+        console.error('reloadTabData(' + key + ') 실패:', err);   // 실패해도 탭 전환 자체는 막지 않는다 — 옛 목록이 남을 뿐
+    }).then(function () {
+        tabReloading[key] = false;
+    });
+}
+
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        reloadTabData(tab.dataset.tab);   // A-200 — 들어올 때마다 다시 읽는다
     });
 });
 
