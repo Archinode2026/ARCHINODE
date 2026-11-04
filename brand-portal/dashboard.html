@@ -599,6 +599,9 @@ h1, h2, .section-card h2 {
                     <button type="button" class="btn btn-primary" id="submitProduct">Submit for Review</button>
                     <button type="button" class="btn btn-secondary" id="cancelProduct">Cancel</button>
                 </div>
+                <!-- R-026 = A-216: 이 폼에는 메시지 자리가 없어 전부 alert() 로 띄웠다.
+                     매거진 폼(#artFormMsg)과 같은 꼴로 폼 안에서 말하게 한다. -->
+                <div id="prodFormMsg" style="margin-top:14px;font-size:0.85rem;line-height:1.6;"></div>
             </div>
 
             <!-- Product Grid -->
@@ -1260,10 +1263,19 @@ document.getElementById('prodImage').addEventListener('change', (e) => {
     }
 });
 
+// 제품 폼 안내 (A-216 — alert 대신). isErr 면 붉게.
+function prodMsg(text, isErr) {
+    const el = document.getElementById('prodFormMsg');
+    if (!el) { if (text) alert(text); return; }       // 자리가 없으면 옛 방식으로
+    el.textContent = text || '';
+    el.style.color = isErr ? '#991b1b' : '#15803d';
+}
+
 // 제품 제출
 document.getElementById('submitProduct').addEventListener('click', async () => {
+    prodMsg('', false);   // A-216 — 이전 안내를 지우고 시작
     const name = document.getElementById('prodName').value.trim();
-    if (!name) { alert('Product name is required'); return; }
+    if (!name) { prodMsg(document.documentElement.lang !== 'en' ? '제품명을 입력해 주세요.' : 'Product name is required', true); return; }
 
     const btn = document.getElementById('submitProduct');
     btn.disabled = true;
@@ -1287,11 +1299,11 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
 
     const category = document.getElementById('prodCategory').value;
     const subcategory = document.getElementById('prodSubcategory').value;
-    if (!category || !subcategory) { alert('Category and subcategory are required'); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+    if (!category || !subcategory) { prodMsg(document.documentElement.lang !== 'en' ? '카테고리와 서브카테고리를 모두 골라 주세요.' : 'Category and subcategory are required', true); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
 
     // A-213: 업로드 전에 한 번 — 파일을 올리고 나서 멈추면 쓰레기 파일이 남는다
     let bpId = bpIdentity(bpFormUid);
-    if (!bpId.ok) { alert(bpIdentityMessage(bpId.reason)); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
 
     const catalogPdf = await uploadIfPresent('prodCatalogFile', 'products-specs');
     const bimFile = await uploadIfPresent('prodBimFile', 'products-specs');
@@ -1299,7 +1311,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
 
     // A-213: 업로드는 await 를 여러 번 거친다. 그 사이에 계정이 바뀌었을 수 있으므로 다시 확인한다.
     bpId = bpIdentity(bpFormUid);
-    if (!bpId.ok) { alert(bpIdentityMessage(bpId.reason)); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
 
     await db.collection('products').add({
         brandId: bpId.uid,            // A-213 — brandId·brandName·brandSlug 를 한 객체에서 함께
