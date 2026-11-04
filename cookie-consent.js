@@ -29,19 +29,19 @@
     wrap.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#332e27;color:#fff;padding:20px 24px;border-radius:10px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:720px;margin:0 auto;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;';
     wrap.innerHTML =
       '<div style="display:flex;flex-direction:column;gap:12px;">' +
-        '<h3 style="font-size:0.95rem;font-weight:700;margin:0;color:#C8A96E;">' +
+        '<h3 style="font-size:0.95rem;font-weight:700;margin:0;color:#7a5c32;">' +
           (isKo ? '쿠키 사용에 대한 안내' : 'We use cookies') +
         '</h3>' +
         '<p style="font-size:0.82rem;line-height:1.5;margin:0;color:#ccc;">' +
           (isKo
             ? 'ARCHINODE는 사이트 작동에 필요한 쿠키와 사용 분석용 쿠키를 사용합니다. '
-              + '<a href="/privacy.html" style="color:#C8A96E;text-decoration:underline;">개인정보 처리방침</a>을 확인하시고 선택해주세요.'
+              + '<a href="/privacy.html" style="color:#7a5c32;text-decoration:underline;">개인정보 처리방침</a>을 확인하시고 선택해주세요.'
             : 'ARCHINODE uses necessary cookies for the site to work and analytics cookies to improve it. '
-              + 'See our <a href="/privacy.html" style="color:#C8A96E;text-decoration:underline;">Privacy Policy</a>. Choose your preference below.'
+              + 'See our <a href="/privacy.html" style="color:#7a5c32;text-decoration:underline;">Privacy Policy</a>. Choose your preference below.'
           ) +
         '</p>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">' +
-          '<button id="cc-accept" style="background:#C8A96E;color:#332e27;border:none;padding:10px 18px;font-size:0.82rem;font-weight:700;border-radius:6px;cursor:pointer;font-family:inherit;">' +
+          '<button id="cc-accept" style="background:#a07c4a;color:#332e27;border:none;padding:10px 18px;font-size:0.82rem;font-weight:700;border-radius:6px;cursor:pointer;font-family:inherit;">' +
             (isKo ? '모두 수락' : 'Accept All') + '</button>' +
           '<button id="cc-necessary" style="background:transparent;color:#fff;border:1px solid #444;padding:10px 18px;font-size:0.82rem;font-weight:600;border-radius:6px;cursor:pointer;font-family:inherit;">' +
             (isKo ? '필수만' : 'Necessary Only') + '</button>' +

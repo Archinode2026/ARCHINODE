@@ -24,11 +24,11 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 /* TOPBAR */
 .topbar { background: #332e27; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
 .topbar .logo { color: #fff; font-size: 1.1rem; font-weight: 800; text-decoration: none; }
-.topbar .logo span { color: #C8A96E; font-size: 0.7rem; font-weight: 400; margin-left: 8px; }
+.topbar .logo span { color: #c9a36a; font-size: 0.7rem; font-weight: 400; margin-left: 8px; }
 .topbar .user-info { display: flex; align-items: center; gap: 16px; }
 .topbar .user-email { color: #888; font-size: 0.8rem; }
 .topbar .logout-btn { background: none; border: 1px solid #444; color: #aaa; padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
-.topbar .logout-btn:hover { border-color: #C8A96E; color: #C8A96E; }
+.topbar .logout-btn:hover { border-color: #a07c4a; color: #c9a36a; }
 
 /* STATUS BADGE */
 .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -60,7 +60,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
     font-size: 1.1rem; font-weight: 700; color: #332e27; margin-bottom: 20px;
     padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
 }
-.section-card h2 i { color: #C8A96E; margin-right: 8px; }
+.section-card h2 i { color: #7a5c32; margin-right: 8px; }
 
 /* FORM FIELDS */
 .field { margin-bottom: 18px; }
@@ -69,7 +69,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
     width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px;
     font-size: 0.9rem; font-family: inherit; background: #fafafa;
 }
-.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: #C8A96E; background: #fff; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: #a07c4a; background: #fff; }
 .field textarea { resize: vertical; min-height: 80px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .readonly { background: #f0f0f0 !important; color: #999; }
@@ -77,7 +77,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 /* BUTTONS */
 .btn { padding: 10px 24px; border: none; border-radius: 999px; font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.3s; }
 .btn-primary { background: #332e27; color: #fff; }
-.btn-primary:hover { background: #C8A96E; }
+.btn-primary:hover { background: #7a5c32; }
 .btn-secondary { background: #f0f0f0; color: #555; }
 .btn-secondary:hover { background: #e0e0e0; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -104,7 +104,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
     border: 2px dashed #ddd; border-radius: 8px; padding: 32px; text-align: center;
     cursor: pointer; transition: border-color 0.3s; margin-bottom: 16px;
 }
-.upload-area:hover { border-color: #C8A96E; }
+.upload-area:hover { border-color: #a07c4a; }
 .upload-area i { font-size: 2rem; color: #ccc; margin-bottom: 8px; }
 .upload-area p { font-size: 0.85rem; color: #999; }
 
@@ -112,21 +112,21 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid #eee; }
 .tab { padding: 10px 20px; font-size: 0.88rem; font-weight: 600; color: #999; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s; }
 .tab:hover { color: #666; }
-.tab.active { color: #332e27; border-bottom-color: #C8A96E; }
+.tab.active { color: #332e27; border-bottom-color: #a07c4a; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
 /* INBOX (2026-09-12 어드민 개편 4a — 배정된 리드. 모달은 admin/dashboard.html .modal-overlay 와 같은 모양, 확인창 없음) */
 .tab .tab-badge { background: #fee2e2; color: #b91c1c; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
 /* NOTICE BANNER + SUPPORT (2026-09-12 어드민 개편 5단계 — notices 배너 · inquiries Support 탭. 확인창 없음, 값은 inbox_esc) */
-.notice-banner { display: none; background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #C8A96E; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; }
+.notice-banner { display: none; background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #a07c4a; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; }
 .notice-banner .notice-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.notice-banner .notice-row > i { color: #C8A96E; margin-top: 3px; }
+.notice-banner .notice-row > i { color: #7a5c32; margin-top: 3px; }
 .notice-banner .notice-main { flex: 1; min-width: 200px; }
 .notice-banner h3 { font-size: 0.92rem; font-weight: 700; color: #332e27; margin: 0 0 4px; }
 .notice-banner p { font-size: 0.84rem; color: #555; margin: 0; line-height: 1.5; word-break: break-word; }
-.notice-banner .notice-all { background: none; border: 1px solid #C8A96E; color: #8a6a2a; padding: 6px 12px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
-.notice-banner .notice-all:hover { background: #C8A96E; color: #fff; }
+.notice-banner .notice-all { background: none; border: 1px solid #a07c4a; color: #8a6a2a; padding: 6px 12px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.notice-banner .notice-all:hover { background: #7a5c32; color: #fff; }
 .notice-item { padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
 .notice-item h3 { font-size: 0.92rem; font-weight: 700; color: #332e27; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .notice-item h3 small { font-size: 0.72rem; color: #999; font-weight: 400; }
@@ -136,7 +136,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .sup-head strong { font-size: 0.92rem; color: #332e27; }
 .sup-head small { font-size: 0.74rem; color: #999; }
 .sup-body { font-size: 0.85rem; color: #444; line-height: 1.6; word-break: break-word; }
-.sup-answer { margin-top: 10px; padding: 12px 14px; background: #f8f6f1; border-left: 3px solid #C8A96E; border-radius: 6px; font-size: 0.85rem; color: #333; line-height: 1.6; word-break: break-word; }
+.sup-answer { margin-top: 10px; padding: 12px 14px; background: #f8f6f1; border-left: 3px solid #a07c4a; border-radius: 6px; font-size: 0.85rem; color: #333; line-height: 1.6; word-break: break-word; }
 .sup-answer .sup-answer-head { font-size: 0.72rem; font-weight: 700; color: #8a6a2a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
 .sup-wait { margin-top: 8px; font-size: 0.78rem; color: #999; }
 
@@ -174,7 +174,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 
 /* LOADING */
 .loading { text-align: center; padding: 60px; color: #999; }
-.loading i { font-size: 2rem; margin-bottom: 12px; color: #C8A96E; }
+.loading i { font-size: 2rem; margin-bottom: 12px; color: #7a5c32; }
 
 /* EMPTY STATE */
 .empty-state { text-align: center; padding: 40px; color: #bbb; }
@@ -202,7 +202,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 <div class="topbar">
     <a href="../index.html" class="logo">ARCHINODE <span data-en="Brand Portal" data-ko="브랜드 포털">Brand Portal</span></a>
     <div class="user-info">
-        <a href="../brand-guide.html" target="_blank" style="font-size:0.82rem;color:#C8A96E;font-weight:600;text-decoration:none;padding:6px 12px;border:1px solid rgba(160,124,74,0.4);border-radius:4px;" data-en="Brand Guide" data-ko="브랜드 가이드" rel="noopener noreferrer"><i class="fas fa-book-open"></i> Brand Guide</a>
+        <a href="../brand-guide.html" target="_blank" style="font-size:0.82rem;color:#7a5c32;font-weight:600;text-decoration:none;padding:6px 12px;border:1px solid rgba(160,124,74,0.4);border-radius:4px;" data-en="Brand Guide" data-ko="브랜드 가이드" rel="noopener noreferrer"><i class="fas fa-book-open"></i> Brand Guide</a>
         <span class="user-email" id="userEmail"></span>
         <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-en="Log Out" data-ko="로그아웃">Log Out</span></button>
     </div>
@@ -258,7 +258,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
         </div>
         <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Product Saves" data-ko="제품 저장 수">Product Saves</div>
-            <div id="statProductLikes" style="font-size:1.8rem;font-weight:800;color:#C8A96E;">0</div>
+            <div id="statProductLikes" style="font-size:1.8rem;font-weight:800;color:#7a5c32;">0</div>
         </div>
         <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Products" data-ko="등록 제품">Products</div>
@@ -336,7 +336,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
                 </div>
 
                 <hr style="border:none;border-top:1px solid #eee;margin:28px 0;">
-                <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#333;" data-en="Brand Visuals" data-ko="브랜드 비주얼"><i class="fas fa-image" style="margin-right:8px;color:#C8A96E;"></i>Brand Visuals</h3>
+                <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#333;" data-en="Brand Visuals" data-ko="브랜드 비주얼"><i class="fas fa-image" style="margin-right:8px;color:#7a5c32;"></i>Brand Visuals</h3>
                 <p style="font-size:0.8rem;color:#999;margin-bottom:16px;" data-en="Add image URLs to make your brand page stand out. You can use links from your website or image hosting services." data-ko="이미지 URL을 추가하여 브랜드 페이지를 돋보이게 하세요. 웹사이트 링크 또는 이미지 호스팅 서비스를 사용할 수 있습니다.">Add image URLs to make your brand page stand out. You can use links from your website or image hosting services.</p>
 
                 <div class="field">
@@ -361,7 +361,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
                 </div>
 
                 <hr style="border:none;border-top:1px solid #eee;margin:28px 0;">
-                <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#333;"><i class="fas fa-pen-fancy" style="margin-right:8px;color:#C8A96E;"></i>Brand Story</h3>
+                <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#333;"><i class="fas fa-pen-fancy" style="margin-right:8px;color:#7a5c32;"></i>Brand Story</h3>
 
                 <div class="field">
                     <label>Brand Story (detailed)</label>
@@ -369,7 +369,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
                 </div>
 
                 <hr style="border:none;border-top:1px solid #eee;margin:28px 0;">
-                <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#333;"><i class="fab fa-instagram" style="margin-right:8px;color:#C8A96E;"></i>Social Media</h3>
+                <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#333;"><i class="fab fa-instagram" style="margin-right:8px;color:#7a5c32;"></i>Social Media</h3>
 
                 <div class="field-row">
                     <div class="field">
@@ -393,7 +393,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
                 </div>
 
                 <hr style="border:none;border-top:1px solid #eee;margin:28px 0;">
-                <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;color:#333;" data-en="Korean Dealer / Distributor" data-ko="한국 딜러 / 유통사"><i class="fas fa-handshake" style="margin-right:8px;color:#C8A96E;"></i>Korean Dealer / Distributor</h3>
+                <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;color:#333;" data-en="Korean Dealer / Distributor" data-ko="한국 딜러 / 유통사"><i class="fas fa-handshake" style="margin-right:8px;color:#7a5c32;"></i>Korean Dealer / Distributor</h3>
                 <p style="font-size:0.8rem;color:#999;margin-bottom:16px;" data-en="If your brand has an official Korean dealer or distributor, add their info here. Korean architects and designers will see this on your brand page." data-ko="브랜드의 공식 한국 딜러 또는 유통사가 있다면 여기에 정보를 입력하세요. 한국 건축가와 디자이너가 브랜드 페이지에서 확인할 수 있습니다.">If your brand has an official Korean dealer or distributor, add their info here. Korean architects and designers will see this on your brand page.</p>
 
                 <div class="field-row">
@@ -545,7 +545,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
                 </div>
 
                 <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
-                <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;color:#333;" data-en="Spec Package (CAD/BIM/Catalog)" data-ko="스펙 패키지 (CAD/BIM/카탈로그)"><i class="fas fa-drafting-compass" style="margin-right:6px;color:#C8A96E;"></i>Spec Package (CAD/BIM/Catalog)</h4>
+                <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;color:#333;" data-en="Spec Package (CAD/BIM/Catalog)" data-ko="스펙 패키지 (CAD/BIM/카탈로그)"><i class="fas fa-drafting-compass" style="margin-right:6px;color:#7a5c32;"></i>Spec Package (CAD/BIM/Catalog)</h4>
                 <p style="font-size:0.78rem;color:#999;margin-bottom:12px;" data-en="Architects can drop these straight into their drawings." data-ko="건축가가 도면에 바로 반영할 수 있는 파일이에요.">Architects can drop these straight into their drawings.</p>
                 <div class="field-row">
                     <div class="field">
@@ -563,7 +563,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
                 </div>
 
                 <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
-                <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;color:#333;" data-en="Trade Conditions" data-ko="거래조건"><i class="fas fa-handshake" style="margin-right:6px;color:#C8A96E;"></i>Trade Conditions</h4>
+                <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;color:#333;" data-en="Trade Conditions" data-ko="거래조건"><i class="fas fa-handshake" style="margin-right:6px;color:#7a5c32;"></i>Trade Conditions</h4>
                 <div class="field-row">
                     <div class="field">
                         <label data-en="MOQ (Minimum Order Quantity)" data-ko="최소 발주 수량(MOQ)">MOQ (Minimum Order Quantity)</label>
@@ -1051,7 +1051,7 @@ function renderCertList(certs) {
     wrap.innerHTML = certs.map((cert, i) => `
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f9f9f9;border-radius:6px;">
             <div>
-                <a href="${cert.fileUrl}" target="_blank" style="font-weight:600;color:#332e27;text-decoration:none;" rel="noopener noreferrer"><i class="fas fa-file-certificate" style="margin-right:6px;color:#C8A96E;"></i>${cert.name}</a>
+                <a href="${cert.fileUrl}" target="_blank" style="font-weight:600;color:#332e27;text-decoration:none;" rel="noopener noreferrer"><i class="fas fa-file-certificate" style="margin-right:6px;color:#7a5c32;"></i>${cert.name}</a>
                 ${cert.issuer ? `<span style="color:#999;font-size:0.8rem;margin-left:8px;">${cert.issuer}</span>` : ''}
             </div>
             <button type="button" onclick="deleteCertification(${i})" style="background:none;border:none;color:#c62828;cursor:pointer;font-size:0.9rem;"><i class="fas fa-trash"></i></button>
@@ -1390,7 +1390,7 @@ async function loadArticles() {
             <div style="padding:16px;border:1px solid #eee;border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
                 <div style="min-width:0;">
                     <strong style="font-size:0.92rem;">${aTitle}</strong>
-                    <span style="font-size:0.75rem;color:#C8A96E;margin-left:8px;">${aTag}</span>
+                    <span style="font-size:0.75rem;color:#7a5c32;margin-left:8px;">${aTag}</span>
                     <p style="font-size:0.8rem;color:#999;margin-top:4px;">${aContent}${aContent ? '...' : ''}</p>
                     ${when ? `<p style="font-size:0.72rem;color:#bbb;margin-top:4px;">${ko ? '제출일' : 'Submitted'} ${when}</p>` : ''}
                     ${rejectReasonHtml(st, a.reviewerNote)}
@@ -1606,7 +1606,7 @@ function pn_draw() {
     if (!items.length) { banner.style.display = 'none'; return; }
     var top = items[0];
     var body = pn_text(top, 'body').replace(/\s+/g, ' ').trim();
-    main.innerHTML = '<h3>' + (top.pinned ? '<i class="fas fa-thumbtack" style="color:#C8A96E;margin-right:6px;"></i>' : '') + inbox_esc(pn_text(top, 'title') || '-') + '</h3>'
+    main.innerHTML = '<h3>' + (top.pinned ? '<i class="fas fa-thumbtack" style="color:#7a5c32;margin-right:6px;"></i>' : '') + inbox_esc(pn_text(top, 'title') || '-') + '</h3>'
         + '<p>' + inbox_esc(body.length > 140 ? body.slice(0, 140) + '…' : body) + '</p>';
     all.innerHTML = inbox_esc(inbox_t('View all (' + items.length + ')', '전체 보기 (' + items.length + ')'));
     all.style.display = '';
@@ -1618,7 +1618,7 @@ function pn_openAll() {
     var items = pn_state.items, html = '<h2>' + inbox_span('Notices', '공지사항') + '</h2>';
     for (var i = 0; i < items.length; i++) {
         var it = items[i];
-        html += '<div class="notice-item"><h3>' + (it.pinned ? '<i class="fas fa-thumbtack" style="color:#C8A96E;"></i>' : '') + inbox_esc(pn_text(it, 'title') || '-')
+        html += '<div class="notice-item"><h3>' + (it.pinned ? '<i class="fas fa-thumbtack" style="color:#7a5c32;"></i>' : '') + inbox_esc(pn_text(it, 'title') || '-')
             + '<small>' + inbox_esc(inbox_fmtDate(it.updatedAt || it.createdAt)) + '</small></h3>'
             + '<p>' + pn_bodyHtml(pn_text(it, 'body')) + '</p></div>';
     }

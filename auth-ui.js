@@ -72,7 +72,7 @@
             link.href = basePath + 'auth/login.html';
             link.style.cssText += 'background:#332e27;color:#fff;';
             link.innerHTML = '<i class="fas fa-user" style="margin-right:4px;"></i><span data-en="Log In" data-ko="로그인">Log In</span>';
-            link.addEventListener('mouseenter', () => { link.style.background = '#C8A96E'; });
+            link.addEventListener('mouseenter', () => { link.style.background = '#7a5c32'; });
             link.addEventListener('mouseleave', () => { link.style.background = '#332e27'; });
             insert(link);
             return;
@@ -81,7 +81,7 @@
         let kindEn = 'Member', kindKo = '회원';
         if (isAdmin(user.email)) {
             link.href = basePath + 'admin/dashboard.html';
-            link.style.cssText += 'background:#C8A96E;color:#fff;';
+            link.style.cssText += 'background:#7a5c32;color:#fff;';
             link.innerHTML = accountHtml('fa-shield-halved', user);
             kindEn = 'Admin'; kindKo = '어드민';
         } else {
@@ -107,7 +107,7 @@
                 kindEn = 'Member account'; kindKo = '회원 계정';
             }
             link.style.cssText += 'background:#332e27;color:#fff;';
-            link.addEventListener('mouseenter', () => { link.style.background = '#C8A96E'; });
+            link.addEventListener('mouseenter', () => { link.style.background = '#7a5c32'; });
             link.addEventListener('mouseleave', () => { link.style.background = '#332e27'; });
         }
 

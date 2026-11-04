@@ -2,8 +2,8 @@
 
 /* Category Checkbox (Custom UI) */
 .cat-checkbox { border: 1px solid #ddd !important; border-radius: 6px !important; transition: all 0.2s !important; }
-.cat-checkbox:hover { border-color: #C8A96E !important; }
-.cat-checkbox:has(input:checked) { background: #FAF6EC; border-color: #C8A96E !important; }
+.cat-checkbox:hover { border-color: var(--accent) !important; }
+.cat-checkbox:has(input:checked) { background: #FAF6EC; border-color: var(--accent) !important; }
 .cat-checkbox input[type="checkbox"] { display: none !important; }
 
 /* Success Card */
@@ -11,7 +11,7 @@
 .form-success .credentials {
   background: #FAF6EC !important;
   color: #333 !important;
-  border: 1px solid #C8A96E !important;
+  border: 1px solid var(--accent) !important;
   border-radius: 8px;
   padding: 24px;
   margin: 24px 0;
@@ -49,7 +49,7 @@
   }
 }
 .form-success .copy-btn {
-  background: #C8A96E;
+  background: var(--accent-ink);
   color: #fff;
   border: none;
   padding: 6px 14px;

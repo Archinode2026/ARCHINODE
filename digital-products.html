@@ -42,7 +42,7 @@
 .dp-hero .badge-prelaunch {
   display: inline-block;
   background: rgba(160,124,74,0.15);
-  color: #C8A96E;
+  color: var(--navy-gold);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -105,7 +105,7 @@
   border: 1px solid #e8e8e8;
   border-radius: 8px;
 }
-.dp-why-card i { font-size: 1.4rem; color: #C8A96E; margin-bottom: 12px; }
+.dp-why-card i { font-size: 1.4rem; color: var(--accent-ink); margin-bottom: 12px; }
 .dp-why-card h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 8px; }
 .dp-why-card p { font-size: 0.85rem; color: #666; line-height: 1.55; }
 
@@ -132,7 +132,7 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-.dp-filter-btn:hover { border-color: #C8A96E; color: #C8A96E; }
+.dp-filter-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
 .dp-filter-btn.active { background: #332e27; color: #fff; border-color: #332e27; }
 
 .dp-products {
@@ -156,7 +156,7 @@
 .dp-card:hover {
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   transform: translateY(-2px);
-  border-color: #C8A96E;
+  border-color: var(--accent);
 }
 .dp-card-thumb {
   width: 100%;
@@ -223,7 +223,7 @@
   color: #888;
   margin-bottom: 16px;
 }
-.dp-card-meta span i { color: #C8A96E; margin-right: 4px; }
+.dp-card-meta span i { color: var(--accent-ink); margin-right: 4px; }
 .dp-card-btn {
   display: block;
   width: 100%;
@@ -240,7 +240,7 @@
   font-family: inherit;
   cursor: pointer;
 }
-.dp-card-btn:hover { background: #C8A96E; }
+.dp-card-btn:hover { background: var(--accent-ink); }
 .dp-card-btn.disabled { background: #ccc; cursor: not-allowed; }
 
 .dp-notify {
@@ -279,7 +279,7 @@
   font-family: inherit;
   background: #fff;
 }
-.dp-notify-form input:focus { outline: none; border-color: #C8A96E; }
+.dp-notify-form input:focus { outline: none; border-color: var(--accent); }
 .dp-notify-form button {
   background: #332e27;
   color: #fff;
@@ -291,7 +291,7 @@
   cursor: pointer;
   font-family: inherit;
 }
-.dp-notify-form button:hover { background: #C8A96E; }
+.dp-notify-form button:hover { background: var(--accent-ink); }
 .dp-notify-msg { font-size: 0.85rem; color: #6b5837; margin-top: 14px; display: none; }
 </style>
 </head>
@@ -405,7 +405,7 @@
 
       <!-- 시드 상품 6개 삭제 (2026-05-13). 콘텐츠 큐레이션 진행 중 — 진짜 출시 자료 정의 후 신설. -->
       <div style="background:#fafafa;border:1px dashed #ddd;border-radius:10px;padding:60px 24px;text-align:center;color:#888;">
-        <i class="fas fa-pencil-ruler" style="font-size:2.5rem;color:#C8A96E;margin-bottom:18px;"></i>
+        <i class="fas fa-pencil-ruler" style="font-size:2.5rem;color:#7a5c32;margin-bottom:18px;"></i>
         <h3 style="font-size:1.2rem;font-weight:800;color:#332e27;margin-bottom:10px;" data-en="Content curation in progress" data-ko="콘텐츠 큐레이션 진행 중">Content curation in progress</h3>
         <p style="font-size:0.95rem;color:#666;max-width:520px;margin:0 auto;line-height:1.65;" data-en="ARCHINODE editorial is defining the first batch of digital products — trend reports, CAD libraries, BIM families, spec sheets, and Korean market intelligence. Real product line-up coming H2 2026." data-ko="ARCHINODE 편집부가 첫 번째 디지털 상품 라인업을 정리하고 있습니다 — 브랜드 매거진, CAD 라이브러리, BIM 패밀리, 자재 스펙시트, 한국 시장 인텔리전스. 진짜 출시는 2026년 하반기.">ARCHINODE editorial is defining the first batch of digital products — trend reports, CAD libraries, BIM families, spec sheets, and Korean market intelligence. Real product line-up coming H2 2026.</p>
       </div>
@@ -570,7 +570,7 @@ async function submitNotify(e) {
 <script src="form-throttle.js?v=20260630" defer></script>
 
 <!-- P3-1 Order CTA -->
-<div style="background:linear-gradient(135deg,#C8A96E 0%,#a88752 100%);color:#fff;padding:40px 24px;text-align:center;margin:40px 0;">
+<div style="background:linear-gradient(135deg,#a07c4a 0%,#a88752 100%);color:#fff;padding:40px 24px;text-align:center;margin:40px 0;">
   <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:8px;" data-en="Ready to order?" data-ko="주문 준비 되셨나요?">Ready to order?</h2>
   <p style="font-size:0.95rem;margin-bottom:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;" data-en="Contact us with the product name and we will send a PayPal invoice within 24 hours." data-ko="원하시는 상품명을 알려주시면 24시간 내 PayPal 인보이스를 보내드립니다.">Contact us with the product name and we will send a PayPal invoice within 24 hours.</p>
   <a href="mailto:office@archinode.org?subject=ARCHINODE%20Digital%20Product%20Order" style="display:inline-block;background:#332e27;color:#fff;padding:14px 36px;font-size:0.95rem;font-weight:700;text-decoration:none;border-radius:6px;" data-en="Order via Email" data-ko="이메일로 주문">Order via Email &rarr;</a>
