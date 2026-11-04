@@ -2302,6 +2302,26 @@ html[lang="ko"] p,  html[lang="ko"] li, html[lang="ko"] .eyebrow { word-break: k
    ──────────────────────────────────────────────────────────────────────── */
 body { overflow-wrap: break-word; }
 
+/* ── 검은 상단바가 좁은 화면에서 글자 단위로 쪼개지는 문제 (R-016 = A-217) ──
+   `.topbar { display:flex; height:56px }` 에 `flex-wrap` 이 없으면, 좁은 화면에서
+   flex 항목이 `min-width:auto` 로 눌려 "로그아웃" 이 한 글자씩 세로로 쌓인다.
+   고정 높이 56px 를 넘어가므로 **화면 위로 잘려** 로고와 겹치기까지 한다.
+   실측(auth/profile.html, 322px): 로그아웃 버튼 41×86px · top -15px · 문서 폭 408/322.
+
+   이 패턴은 이미 **두 번 따로** 고쳐졌다 — 어드민(A-038, admin.css)과
+   브랜드 포털(A-049, 그 파일 안). 그런데 `auth/profile.html` 은 `admin.css` 를
+   싣지 않아 빠져 있었다. 세 번째로 같은 규칙을 또 베끼지 않고 **공용으로 올린다.**
+   `.topbar` 는 각 페이지 인라인 `<style>` 에 정의돼 있으므로 `body` 접두사가 필요하다.
+   (admin.css·brand-portal 의 같은 규칙은 값이 같으니 그대로 둔다 — 지우면
+   그 파일만 보는 사람이 왜 되는지 알 수 없다.) */
+@media (max-width: 768px) {
+  body .topbar { flex-wrap: wrap; height: auto; min-height: 56px; padding: 10px 16px; row-gap: 6px; }
+  body .topbar .user-info { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+  body .topbar .user-info > * { white-space: nowrap; }
+  body .topbar .user-email { max-width: 60vw; overflow: hidden; text-overflow: ellipsis; }
+  body .topbar .nav-links { flex-wrap: wrap; row-gap: 4px; }
+}
+
 /* 모서리 — 사진과 조작 요소에만 아주 살짝 */
 .art-img, .photo-band img, .photo-band,
 .hero-btn, .cta-btn, .main-nav a.nav-cta, .btn, .auth-btn,

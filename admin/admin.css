@@ -261,6 +261,14 @@ h1, h2, .adm-reg-body h1, .adm-reg-body h2, .adm-reg-body h3 {
   body .topbar .right { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
   body .topbar .right > * { white-space: nowrap; }
   body .topbar .admin-email { max-width: 60vw; overflow: hidden; text-overflow: ellipsis; }
+
+  /* R-016 와 같은 종류, 다른 자리 (A-217): `.head-actions { display:flex }` 에도
+     `flex-wrap` 이 없어 322px 에서 단추 줄(355px)이 `.page-head`(298px)를 넘쳤다.
+     `.page-head` 자신은 wrap 이 있어서 눈에 안 띄었고, 문서 폭만 367/322 로 늘었다.
+     세 페이지(bim-requests·newsletter·notify)가 같은 클래스를 각자 정의하고 있어
+     여기 한 곳에 둔다. 인라인 <style> 보다 뒤에 오려면 body 접두사가 필요하다. */
+  body .head-actions { flex-wrap: wrap; justify-content: flex-end; row-gap: 8px; }
+  body .head-actions > * { white-space: nowrap; }
 }
 
 
