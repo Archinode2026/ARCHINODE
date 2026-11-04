@@ -248,10 +248,10 @@ input, select, textarea { font-family: inherit; }
   transition: background 0.15s;
   font-weight: 500;
 }
-.lang-menu a:hover { background: var(--gray-100, #f6f6f6); }
-.lang-menu a.active { background: #FAF6EC; color: #C8A96E; }
-.lang-menu a small { font-size: 0.68rem; color: var(--gray-400, #999); font-weight: 400; letter-spacing: 0.5px; }
-.lang-menu a.active small { color: #C8A96E; }
+.lang-menu a:hover { background: var(--gray-100); }
+.lang-menu a.active { background: var(--band-beige); color: var(--accent-ink); }
+.lang-menu a small { font-size: 0.68rem; color: var(--ink-soft); font-weight: 400; letter-spacing: 0.5px; }
+.lang-menu a.active small { color: var(--accent-ink); }
 .lang-switcher-floating { position: fixed; top: 14px; right: 16px; z-index: 9999; }
 .lang-switcher-floating .lang-switch-btn { background: var(--white); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 
@@ -319,9 +319,9 @@ input, select, textarea { font-family: inherit; }
 }
 .search-box input::placeholder { color: rgba(255,255,255,0.4); }
 /* A-114: 키보드 접근성 — 검색 입력칸 포커스 시각 표시 */
-.search-box input:focus { border-bottom-color: #C8A96E; box-shadow: 0 2px 0 0 #C8A96E; }
-.search-box input:focus-visible { outline: 2px solid #C8A96E; outline-offset: 2px; }
-.search-box button:focus-visible { outline: 2px solid #C8A96E; outline-offset: 4px; border-radius: 4px; }
+.search-box input:focus { border-bottom-color: var(--accent); box-shadow: 0 2px 0 0 var(--accent); }
+.search-box input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.search-box button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
 .search-box button { position: absolute; right: 30px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--white); }
 .search-close { position: absolute; top: 40px; right: 40px; color: var(--white); font-size: 1.8rem; cursor: pointer; }
 
@@ -2098,16 +2098,17 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* List Your Brand — Category Checkboxes (Custom UI) */
-.cat-checkbox { border: 1px solid #ddd !important; border-radius: 6px !important; transition: all 0.2s !important; }
-.cat-checkbox:hover { border-color: #C8A96E !important; }
-.cat-checkbox:has(input:checked) { background: #FAF6EC; border-color: #C8A96E !important; }
+.cat-checkbox { border: 1px solid var(--gray-300) !important; border-radius: 6px !important; transition: all 0.2s !important; }
+.cat-checkbox:hover { border-color: var(--accent) !important; }
+.cat-checkbox:has(input:checked) { background: var(--band-beige); border-color: var(--accent) !important; }
 .cat-checkbox input[type="checkbox"] {
   appearance: none !important; -webkit-appearance: none !important;
   width: 18px !important; height: 18px !important;
   background: #f0f0f0; border-radius: 3px; cursor: pointer;
   position: relative; display: inline-block !important; border: none !important;
 }
-.cat-checkbox input[type="checkbox"]:checked { background: #C8A96E; }
+/* 체크 표시가 흰색이라 --accent(3.26:1)로는 약하다 (A-186) */
+.cat-checkbox input[type="checkbox"]:checked { background: var(--accent-ink); }
 .cat-checkbox input[type="checkbox"]:checked::after {
   content: '✓'; color: #fdfbf7; font-size: 12px; font-weight: 900;
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -2115,8 +2116,8 @@ input, select, textarea { font-family: inherit; }
 
 /* List Your Brand — Success Screen (Friendly Card) */
 .form-success .credentials {
-  background: #FAF6EC !important; color: #333 !important;
-  border: 1px solid #C8A96E !important; border-radius: 8px;
+  background: var(--band-beige) !important; color: var(--black) !important;
+  border: 1px solid var(--accent) !important; border-radius: 8px;
   padding: 24px; margin: 24px 0; text-align: left;
   font-family: 'Inter', 'Noto Sans KR', sans-serif !important;
 }
@@ -2132,7 +2133,8 @@ input, select, textarea { font-family: inherit; }
   border: 1px solid #e5e5e5; flex: 1; word-break: break-all;
 }
 .form-success .copy-btn {
-  background: #C8A96E; color: #fdfbf7; border: none;
+  /* 흰 글자가 얹히는데 옛 금색은 1.9:1 이었다 — --accent-ink 에서 5.97:1 (A-186) */
+  background: var(--accent-ink); color: #fdfbf7; border: none;
   padding: 6px 14px; border-radius: 4px; font-size: 0.78rem;
   cursor: pointer; font-family: inherit; white-space: nowrap;
   transition: background 0.2s;

@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="admin.css?v=20260912f">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -23,57 +24,57 @@
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; color: #333; }
+body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-200); color: var(--black); }
 
-.topbar { background: #332e27; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
-.topbar .logo { color: #fff; font-size: 1.1rem; font-weight: 800; text-decoration: none; }
-.topbar .logo span { color: #ff6b6b; font-size: 0.7rem; font-weight: 600; margin-left: 8px; background: rgba(255,107,107,0.15); padding: 2px 8px; border-radius: 3px; }
+.topbar { background: var(--black); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.topbar .logo { color: var(--white); font-size: 1.1rem; font-weight: 800; text-decoration: none; }
+.topbar .logo span { color: var(--navy-gold); font-size: 0.7rem; font-weight: 600; margin-left: 8px; background: rgba(201,163,106,0.15); padding: 2px 8px; border-radius: 3px; }
 .topbar .right { display: flex; align-items: center; gap: 16px; }
-.topbar .admin-email { color: #888; font-size: 0.8rem; }
-.topbar .nav-link { color: #aaa; font-size: 0.82rem; font-weight: 500; text-decoration: none; padding: 6px 10px; border-radius: 3px; transition: all 0.2s; }
-.topbar .nav-link:hover { color: #C8A96E; }
-.topbar .nav-link.active { color: #C8A96E; }
-.topbar .logout-btn { background: none; border: 1px solid #444; color: #aaa; padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
-.topbar .logout-btn:hover { border-color: #ff6b6b; color: #ff6b6b; }
+.topbar .admin-email { color: var(--gray-400); font-size: 0.8rem; }
+.topbar .nav-link { color: var(--gray-400); font-size: 0.82rem; font-weight: 500; text-decoration: none; padding: 6px 10px; border-radius: 3px; transition: all 0.2s; }
+.topbar .nav-link:hover { color: var(--navy-gold); }
+.topbar .nav-link.active { color: var(--navy-gold); }
+.topbar .logout-btn { background: none; border: 1px solid var(--gray-400); color: var(--gray-400); padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+.topbar .logout-btn:hover { border-color: var(--navy-gold); color: var(--navy-gold); }
 
 .admin { max-width: 1080px; margin: 0 auto; padding: 32px 24px; }
 .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
 .page-head h1 { font-size: 1.4rem; font-weight: 800; }
-.page-head .sub { font-size: 0.82rem; color: #888; margin-top: 4px; }
+.page-head .sub { font-size: 0.82rem; color: var(--ink-soft); margin-top: 4px; }
 .head-actions { display: flex; gap: 8px; }
-.btn { background: #332e27; color: #fff; border: none; padding: 9px 18px; border-radius: 5px; font-size: 0.85rem; cursor: pointer; font-family: inherit; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-.btn:hover { background: #C8A96E; }
-.btn.secondary { background: #fff; color: #332e27; border: 1px solid #ddd; }
-.btn.secondary:hover { background: #f4efe6; color: #C8A96E; }
+.btn { background: var(--black); color: var(--white); border: none; padding: 9px 18px; border-radius: 5px; font-size: 0.85rem; cursor: pointer; font-family: inherit; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: var(--accent); }
+.btn.secondary { background: var(--white); color: var(--black); border: 1px solid var(--gray-400); }
+.btn.secondary:hover { background: var(--gray-100); color: var(--navy-gold); }
 
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-.stat-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.stat-card .number { font-size: 1.8rem; font-weight: 800; color: #332e27; }
-.stat-card .label { font-size: 0.75rem; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-.stat-card.total { border-left: 4px solid #C8A96E; }
-.stat-card.week { border-left: 4px solid #3b82f6; }
-.stat-card.today { border-left: 4px solid #10b981; }
+.stat-card { background: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.stat-card .number { font-size: 1.8rem; font-weight: 800; color: var(--black); }
+.stat-card .label { font-size: 0.75rem; color: var(--ink-soft); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-card.total { border-left: 4px solid var(--accent); }
+.stat-card.week { border-left: 4px solid #1d4ed8; }
+.stat-card.today { border-left: 4px solid #047857; }
 
-.section-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 24px; }
+.section-card { background: var(--white); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 24px; }
 table { width: 100%; border-collapse: collapse; }
-th { text-align: left; padding: 10px 12px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f0f0; }
-td { padding: 14px 12px; font-size: 0.88rem; border-bottom: 1px solid #f4efe6; vertical-align: middle; }
-tr:hover { background: #fafafa; }
-td a { color: #3b82f6; text-decoration: none; }
+th { text-align: left; padding: 10px 12px; font-size: 0.75rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--gray-200); }
+td { padding: 14px 12px; font-size: 0.88rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+tr:hover { background: var(--gray-50); }
+td a { color: #1d4ed8; text-decoration: none; }
 td a:hover { text-decoration: underline; }
 .del-btn { background: #fef2f2; color: #991b1b; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: inherit; }
 .del-btn:hover { background: #fee2e2; }
 
-.empty-state { background: #fff; border-radius: 10px; padding: 60px 24px; text-align: center; color: #999; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.empty-state i { font-size: 3rem; color: #e5e5e5; margin-bottom: 16px; }
+.empty-state { background: var(--white); border-radius: 10px; padding: 60px 24px; text-align: center; color: var(--ink-soft); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.empty-state i { font-size: 3rem; color: var(--gray-300); margin-bottom: 16px; }
 .empty-state p { font-size: 0.95rem; }
 
-.loading { text-align: center; padding: 60px; color: #999; }
+.loading { text-align: center; padding: 60px; color: var(--ink-soft); }
 
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #332e27; color: #fff; padding: 12px 22px; border-radius: 6px; font-size: 0.88rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 2000; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--black); color: var(--white); padding: 12px 22px; border-radius: 6px; font-size: 0.88rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 2000; }
 .toast.show { opacity: 1; }
-.toast.error { background: #ef4444; }
-.toast.success { background: #10b981; }
+.toast.error { background: #b91c1c; }
+.toast.success { background: #047857; }
 .toast.warn { background: #b45309; }
 
 @media (max-width: 768px) {
@@ -99,7 +100,7 @@ td a:hover { text-decoration: underline; }
 </div>
 
 <div class="loading" id="loadingScreen">
-  <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#C8A96E;"></i>
+  <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#7a5c32;"></i>
   <p style="margin-top:12px;" data-en="Authenticating..." data-ko="인증 중...">Authenticating...</p>
 </div>
 
@@ -128,7 +129,7 @@ td a:hover { text-decoration: underline; }
   </div>
 
   <div id="contentArea">
-    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#C8A96E;"></i><p style="margin-top:12px;">Loading subscribers...</p></div>
+    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;">Loading subscribers...</p></div>
   </div>
 
 </div><!-- /.adm-main -->
@@ -151,7 +152,7 @@ auth.onAuthStateChanged(function(user) {
     return;
   }
   if (!isAdmin(user.email)) {
-    document.body.innerHTML = '<div style="text-align:center;padding:80px 24px;font-family:Inter,sans-serif;"><h1 style="font-size:1.5rem;margin-bottom:12px;">Access Denied</h1><p style="color:#888;">This page is restricted to ARCHINODE editorial team.</p><p style="margin-top:18px;"><a href="/" style="color:#C8A96E;">Return to homepage</a></p></div>';
+    document.body.innerHTML = '<div style="text-align:center;padding:80px 24px;font-family:Inter,sans-serif;"><h1 style="font-size:1.5rem;margin-bottom:12px;">Access Denied</h1><p style="color:#6b6459;">This page is restricted to ARCHINODE editorial team.</p><p style="margin-top:18px;"><a href="/" style="color:#7a5c32;">Return to homepage</a></p></div>';
     return;
   }
   document.getElementById('adminEmail').textContent = user.email;
@@ -169,7 +170,7 @@ document.getElementById('csvBtn').addEventListener('click', downloadCSV);
 
 function loadSubscribers() {
   const container = document.getElementById('contentArea');
-  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#C8A96E;"></i><p style="margin-top:12px;">Loading subscribers...</p></div>';
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;">Loading subscribers...</p></div>';
 
   db.collection('newsletter-subscribers').orderBy('createdAt', 'desc').get()
     .then(function(snap) {

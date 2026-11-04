@@ -167,7 +167,7 @@ function notices_rowsHtml(list) {
         var titleCur = String(t(it.title_en || it.title_ko, it.title_ko || it.title_en) || '');
         var titleOther = String(t(it.title_ko, it.title_en) || '');
         html += '<tr>'
-            + '<td class="adm-nowrap">' + (it.pinned ? '<i class="fas fa-thumbtack" style="color:#C8A96E;" title="' + escapeAttr(t('Pinned', '고정')) + '"></i>' : '') + '</td>'
+            + '<td class="adm-nowrap">' + (it.pinned ? '<i class="fas fa-thumbtack" style="color:#a07c4a;" title="' + escapeAttr(t('Pinned', '고정')) + '"></i>' : '') + '</td>'
             + '<td>' + ntc_visibleBadge(!!it.visible) + '</td>'
             + '<td>' + ntc_audienceBadge(it.audience) + '</td>'
             + '<td>' + escapeHtml(titleCur || '-') + (titleOther && titleOther !== titleCur ? '<small class="adm-log-sub">' + escapeHtml(titleOther) + '</small>' : '') + '</td>'
@@ -195,7 +195,7 @@ function ntc_preview(id) {
     var it = ntc_findItem(id);
     if (!it) return;
     var html = '<h2 ' + tAttr('Preview', '미리보기') + '>' + escapeHtml(t('Preview', '미리보기')) + '</h2>'
-        + '<p class="adm-set-intro">' + ntc_audienceBadge(it.audience) + ' ' + ntc_visibleBadge(!!it.visible) + (it.pinned ? ' <i class="fas fa-thumbtack" style="color:#C8A96E;"></i>' : '') + '</p>'
+        + '<p class="adm-set-intro">' + ntc_audienceBadge(it.audience) + ' ' + ntc_visibleBadge(!!it.visible) + (it.pinned ? ' <i class="fas fa-thumbtack" style="color:#a07c4a;"></i>' : '') + '</p>'
         + '<dl class="adm-dl">'
         + '<dt>EN</dt><dd><strong>' + escapeHtml(it.title_en || '-') + '</strong><br>' + ntc_bodyHtml(it.body_en || '') + '</dd>'
         + '<dt>KO</dt><dd><strong>' + escapeHtml(it.title_ko || '-') + '</strong><br>' + ntc_bodyHtml(it.body_ko || '') + '</dd>'

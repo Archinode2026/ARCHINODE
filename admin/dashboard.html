@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="admin.css?v=20261102a">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -27,42 +28,42 @@
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f0f0f0; color: #333; }
+body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-200); color: var(--black); }
 
 /* TOPBAR */
-.topbar { background: #332e27; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
-.topbar .logo { color: #fff; font-size: 1.1rem; font-weight: 800; text-decoration: none; }
-.topbar .logo span { color: #ff6b6b; font-size: 0.7rem; font-weight: 600; margin-left: 8px; background: rgba(255,107,107,0.15); padding: 2px 8px; border-radius: 3px; }
+.topbar { background: var(--black); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.topbar .logo { color: var(--white); font-size: 1.1rem; font-weight: 800; text-decoration: none; }
+.topbar .logo span { color: var(--navy-gold); font-size: 0.7rem; font-weight: 600; margin-left: 8px; background: rgba(201,163,106,0.15); padding: 2px 8px; border-radius: 3px; }
 .topbar .right { display: flex; align-items: center; gap: 16px; }
-.topbar .admin-email { color: #888; font-size: 0.8rem; }
-.topbar .logout-btn { background: none; border: 1px solid #444; color: #aaa; padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
-.topbar .logout-btn:hover { border-color: #ff6b6b; color: #ff6b6b; }
+.topbar .admin-email { color: var(--gray-400); font-size: 0.8rem; }
+.topbar .logout-btn { background: none; border: 1px solid var(--gray-400); color: var(--gray-400); padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+.topbar .logout-btn:hover { border-color: var(--navy-gold); color: var(--navy-gold); }
 
 /* LAYOUT */
 .admin { max-width: 1440px; margin: 0 auto; padding: 32px 24px; }
 
 /* STATS */
 .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-.stat-card { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.stat-card .number { font-size: 2rem; font-weight: 800; color: #332e27; }
-.stat-card .label { font-size: 0.8rem; color: #888; margin-top: 4px; }
-.stat-card .icon { float: right; font-size: 1.5rem; color: #e0e0e0; }
+.stat-card { background: var(--white); border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.stat-card .number { font-size: 2rem; font-weight: 800; color: var(--black); }
+.stat-card .label { font-size: 0.8rem; color: var(--ink-soft); margin-top: 4px; }
+.stat-card .icon { float: right; font-size: 1.5rem; color: var(--gray-300); }
 
 /* TABS */
-.tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid #ddd; background: #fff; border-radius: 10px 10px 0 0; padding: 0 8px; }
-.tab { padding: 14px 24px; font-size: 0.88rem; font-weight: 600; color: #999; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s; }
-.tab:hover { color: #666; }
-.tab.active { color: #332e27; border-bottom-color: #C8A96E; }
-.tab .count { background: #fee2e2; color: #dc2626; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
+.tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid var(--gray-300); background: var(--white); border-radius: 10px 10px 0 0; padding: 0 8px; }
+.tab { padding: 14px 24px; font-size: 0.88rem; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s; }
+.tab:hover { color: var(--gray-700); }
+.tab.active { color: var(--black); border-bottom-color: var(--accent); }
+.tab .count { background: #fee2e2; color: #b91c1c; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
 /* TABLE */
-.section-card { background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 24px; margin-bottom: 24px; }
+.section-card { background: var(--white); border-radius: 0 0 10px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 24px; margin-bottom: 24px; }
 table { width: 100%; border-collapse: collapse; }
-th { text-align: left; padding: 10px 12px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f0f0; }
-td { padding: 14px 12px; font-size: 0.88rem; border-bottom: 1px solid #f4efe6; vertical-align: middle; }
-tr:hover { background: #fafafa; }
+th { text-align: left; padding: 10px 12px; font-size: 0.75rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--gray-200); }
+td { padding: 14px 12px; font-size: 0.88rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+tr:hover { background: var(--gray-50); }
 
 /* STATUS */
 .status { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
@@ -73,41 +74,41 @@ tr:hover { background: #fafafa; }
 
 /* REVIEW BOARD (검수관리 탭 — 2026-09-12, 정식 오픈 전 임시 도구) */
 .rv-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-.rv-toolbar select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.82rem; background: #fff; }
+.rv-toolbar select { padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-family: inherit; font-size: 0.82rem; background: var(--white); }
 .rv-toolbar .rv-spacer { flex: 1; }
-.rv-msg { font-size: 0.8rem; color: #666; margin-bottom: 12px; min-height: 1em; }
-.rv-msg.err { color: #dc2626; }
-.act-add { background: #332e27; color: #fff; }
-.act-import { background: #f5edd8; color: #8a6a2a; }
+.rv-msg { font-size: 0.8rem; color: var(--gray-700); margin-bottom: 12px; min-height: 1em; }
+.rv-msg.err { color: #b91c1c; }
+.act-add { background: var(--black); color: var(--white); }
+.act-import { background: #f5edd8; color: var(--accent-ink); }
 .status-rv-wait { background: #fef3c7; color: #92400e; }
 .status-rv-progress { background: #dbeafe; color: #1e40af; }
-.status-rv-hold { background: #f3f4f6; color: #555; }
-.status-rv-false { background: #e5e7eb; color: #6b7280; text-decoration: line-through; }
-.status-rv-verify { background: #f5edd8; color: #8a6a2a; }
+.status-rv-hold { background: var(--gray-200); color: var(--gray-700); }
+.status-rv-false { background: var(--gray-300); color: var(--gray-700); text-decoration: line-through; }
+.status-rv-verify { background: #f5edd8; color: var(--accent-ink); }
 .status-rv-done { background: #d1fae5; color: #065f46; }
 .status-rv-redo { background: #fee2e2; color: #991b1b; }
 .prio-high { background: #fee2e2; color: #991b1b; }
-.prio-medium { background: #f5edd8; color: #8a6a2a; }
-.prio-low { background: #f3f4f6; color: #666; }
+.prio-medium { background: #f5edd8; color: var(--accent-ink); }
+.prio-low { background: var(--gray-200); color: var(--gray-700); }
 .rv-ellip { display: inline-block; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
-.rv-err { color: #dc2626; font-size: 0.8rem; margin-top: 10px; display: none; }
-.rv-form label { display: block; font-size: 0.82rem; font-weight: 600; color: #444; margin: 12px 0 6px; }
-.rv-form input, .rv-form select, .rv-form textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.86rem; }
+.rv-err { color: #b91c1c; font-size: 0.8rem; margin-top: 10px; display: none; }
+.rv-form label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--gray-700); margin: 12px 0 6px; }
+.rv-form input, .rv-form select, .rv-form textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-300); border-radius: 6px; font-family: inherit; font-size: 0.86rem; }
 .rv-form textarea { min-height: 70px; resize: vertical; }
-.rv-form input:focus, .rv-form select:focus, .rv-form textarea:focus { outline: none; border-color: #C8A96E; }
+.rv-form input:focus, .rv-form select:focus, .rv-form textarea:focus { outline: none; border-color: var(--accent); }
 .rv-form .rv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
 .rv-form .rv-actions { margin-top: 18px; display: flex; gap: 8px; justify-content: flex-end; }
 .rv-detail dl { margin: 12px 0; }
-.rv-detail dt { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 12px; }
-.rv-detail dd { font-size: 0.88rem; color: #333; margin: 4px 0 0; white-space: pre-wrap; }
+.rv-detail dt { font-size: 0.75rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 12px; }
+.rv-detail dd { font-size: 0.88rem; color: var(--black); margin: 4px 0 0; white-space: pre-wrap; }
 .rv-detail details { margin: 14px 0; font-size: 0.82rem; }
-.rv-detail details summary { cursor: pointer; color: #666; font-weight: 600; }
-.rv-detail details pre { white-space: pre-wrap; background: #f7f7f7; padding: 10px; border-radius: 6px; margin-top: 8px; font-family: inherit; font-size: 0.8rem; color: #444; }
-.rv-history { list-style: none; margin: 8px 0 0; font-size: 0.8rem; color: #555; }
-.rv-history li { padding: 6px 0; border-bottom: 1px solid #f4efe6; }
-.rv-history li small { color: #999; margin-left: 6px; }
-.rv-statusbar { margin-top: 18px; padding-top: 14px; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.rv-statusbar select, .rv-statusbar input { padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.82rem; }
+.rv-detail details summary { cursor: pointer; color: var(--gray-700); font-weight: 600; }
+.rv-detail details pre { white-space: pre-wrap; background: var(--gray-50); padding: 10px; border-radius: 6px; margin-top: 8px; font-family: inherit; font-size: 0.8rem; color: var(--gray-700); }
+.rv-history { list-style: none; margin: 8px 0 0; font-size: 0.8rem; color: var(--gray-700); }
+.rv-history li { padding: 6px 0; border-bottom: 1px solid var(--gray-100); }
+.rv-history li small { color: var(--ink-soft); margin-left: 6px; }
+.rv-statusbar { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rv-statusbar select, .rv-statusbar input { padding: 7px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-family: inherit; font-size: 0.82rem; }
 .rv-statusbar input { flex: 1; min-width: 160px; }
 
 /* ACTION BUTTONS */
@@ -121,25 +122,25 @@ tr:hover { background: #fafafa; }
 
 /* REASON MODAL */
 .reason-modal-content { padding: 8px 0; }
-.reason-modal-content label { display: block; font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 8px; }
-.reason-modal-content textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.88rem; resize: vertical; }
-.reason-modal-content textarea:focus { outline: none; border-color: #C8A96E; }
-.reason-modal-content .char-count { font-size: 0.72rem; color: #999; margin-top: 6px; text-align: right; }
+.reason-modal-content label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--gray-700); margin-bottom: 8px; }
+.reason-modal-content textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid var(--gray-300); border-radius: 6px; font-family: inherit; font-size: 0.88rem; resize: vertical; }
+.reason-modal-content textarea:focus { outline: none; border-color: var(--accent); }
+.reason-modal-content .char-count { font-size: 0.72rem; color: var(--ink-soft); margin-top: 6px; text-align: right; }
 .reason-modal-content .reason-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
-.reason-modal-content .btn-cancel { background: #f3f4f6; color: #555; padding: 8px 16px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.82rem; }
+.reason-modal-content .btn-cancel { background: var(--gray-200); color: var(--gray-700); padding: 8px 16px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.82rem; }
 .reason-modal-content .btn-confirm { padding: 8px 16px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.82rem; }
 
 /* DETAIL MODAL */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
 .modal-overlay.show { display: flex; }
-.modal { background: #fff; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 32px; }
+.modal { background: var(--white); border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 32px; }
 .modal h2 { font-size: 1.2rem; margin-bottom: 20px; }
-.modal .close-btn { float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
-.modal .detail-row { display: flex; padding: 8px 0; border-bottom: 1px solid #f4efe6; }
-.modal .detail-label { width: 140px; font-size: 0.82rem; font-weight: 600; color: #888; }
-.modal .detail-value { flex: 1; font-size: 0.88rem; color: #333; }
+.modal .close-btn { float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--ink-soft); }
+.modal .detail-row { display: flex; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
+.modal .detail-label { width: 140px; font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+.modal .detail-value { flex: 1; font-size: 0.88rem; color: var(--black); }
 
-.loading { text-align: center; padding: 60px; color: #999; }
+.loading { text-align: center; padding: 60px; color: var(--ink-soft); }
 
 @media (max-width: 768px) {
     .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -160,19 +161,19 @@ tr:hover { background: #fafafa; }
 <div class="topbar">
     <a href="../index.html" class="logo">ARCHINODE <span>ADMIN</span></a>
     <div class="right">
-        <a href="trend-submissions.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-inbox"></i> Trend Submissions</a>
-        <a href="consultations.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-comments"></i> Consultations</a>
-        <a href="notify-subscribers.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-bell"></i> Notify Subscribers</a>
-        <a href="newsletter-subscribers.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-envelope-open-text"></i> Newsletter</a>
-        <a href="articles.html" style="display:none;font-size:0.82rem;color:#aaa;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#C8A96E'" onmouseout="this.style.color='#aaa'"><i class="fas fa-newspaper"></i> Articles</a>
+        <a href="trend-submissions.html" style="display:none;font-size:0.82rem;color:#6b6459;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#c9a36a'" onmouseout="this.style.color='#b5ab9b'"><i class="fas fa-inbox"></i> Trend Submissions</a>
+        <a href="consultations.html" style="display:none;font-size:0.82rem;color:#6b6459;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#c9a36a'" onmouseout="this.style.color='#b5ab9b'"><i class="fas fa-comments"></i> Consultations</a>
+        <a href="notify-subscribers.html" style="display:none;font-size:0.82rem;color:#6b6459;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#c9a36a'" onmouseout="this.style.color='#b5ab9b'"><i class="fas fa-bell"></i> Notify Subscribers</a>
+        <a href="newsletter-subscribers.html" style="display:none;font-size:0.82rem;color:#6b6459;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#c9a36a'" onmouseout="this.style.color='#b5ab9b'"><i class="fas fa-envelope-open-text"></i> Newsletter</a>
+        <a href="articles.html" style="display:none;font-size:0.82rem;color:#6b6459;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#c9a36a'" onmouseout="this.style.color='#b5ab9b'"><i class="fas fa-newspaper"></i> Articles</a>
         <span class="admin-email" id="adminEmail"></span>
-        <a href="../auth/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
+        <a href="../auth/login.html" style="font-size:0.82rem;color:#c9a36a;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
         <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
     </div>
 </div>
 
 <div class="loading" id="loadingScreen">
-    <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#C8A96E;"></i>
+    <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#7a5c32;"></i>
     <p style="margin-top:12px;">Loading admin dashboard...</p>
 </div>
 
@@ -441,8 +442,8 @@ async function loadBrands() {
                 <td><strong>${escapeHtml(b.brandName)}</strong></td>
                 <td>${escapeHtml(b.country || '-')}</td>
                 <td>${escapeHtml(b.category || '-')}</td>
-                <td>${escapeHtml(b.contactName || '-')}<br><small style="color:#999;">${escapeHtml(b.email)}</small></td>
-                <td>${b.koreanDealer && b.koreanDealer.name ? `<strong>${escapeHtml(b.koreanDealer.name)}</strong><br><small style="color:#999;">${escapeHtml(b.koreanDealer.contact || '')}</small>` : '<span style="color:#ccc;">—</span>'}</td>
+                <td>${escapeHtml(b.contactName || '-')}<br><small style="color:#6b6459;">${escapeHtml(b.email)}</small></td>
+                <td>${b.koreanDealer && b.koreanDealer.name ? `<strong>${escapeHtml(b.koreanDealer.name)}</strong><br><small style="color:#6b6459;">${escapeHtml(b.koreanDealer.contact || '')}</small>` : '<span style="color:#ddd5c7;">—</span>'}</td>
                 <td><span class="status status-${b.status}">${b.status}</span></td>
                 <td>${brandActionButtons(b, doc.id)}</td>
             </tr>`;
@@ -577,9 +578,9 @@ function openReasonModal(opts) {
             : 'Optional — note for internal record (max 200 chars)';
         content.innerHTML = `
             <h2>${opts.title}</h2>
-            ${opts.brandName ? `<p style="color:#888;font-size:0.85rem;margin-bottom:16px;">${opts.brandName} → <strong>${opts.newStatus}</strong></p>` : ''}
+            ${opts.brandName ? `<p style="color:#6b6459;font-size:0.85rem;margin-bottom:16px;">${opts.brandName} → <strong>${opts.newStatus}</strong></p>` : ''}
             <div class="reason-modal-content">
-                <label for="reasonInput">Reason ${opts.required ? '<span style="color:#dc2626;">*</span>' : '<span style="color:#999;font-weight:400;">(optional)</span>'}</label>
+                <label for="reasonInput">Reason ${opts.required ? '<span style="color:#b91c1c;">*</span>' : '<span style="color:#6b6459;font-weight:400;">(optional)</span>'}</label>
                 <textarea id="reasonInput" maxlength="200" placeholder="${placeholderText}"></textarea>
                 <div class="char-count"><span id="reasonCount">0</span>/200</div>
                 <div class="reason-actions">
@@ -742,9 +743,9 @@ async function loadProducts() {
         if (p.status === 'pending') pending++;
         tbody.innerHTML += `
             <tr>
-                <td><strong>${escapeHtml(p.name)}</strong><br><small style="color:#999;">${escapeHtml(p.collection || '')}</small></td>
+                <td><strong>${escapeHtml(p.name)}</strong><br><small style="color:#6b6459;">${escapeHtml(p.collection || '')}</small></td>
                 <td>${escapeHtml(p.brandName)}</td>
-                <td>${escapeHtml(p.category || '-')}<br><small style="color:#999;">${escapeHtml(p.subcategory || '')}</small></td>
+                <td>${escapeHtml(p.category || '-')}<br><small style="color:#6b6459;">${escapeHtml(p.subcategory || '')}</small></td>
                 <td>${escapeHtml(p.materials || '-')}</td>
                 <td>${p.imageUrl ? `<img loading="lazy" src="${escapeHtml(p.imageUrl)}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
                 <td><span class="status status-${p.status}">${p.status}</span></td>
@@ -753,7 +754,7 @@ async function loadProducts() {
                     ${p.status === 'pending' ? `
                         <button class="act-btn act-approve" onclick="updateDoc('products','${doc.id}','approved')">Approve</button>
                         <button class="act-btn act-reject" onclick="rejectDoc('products','${doc.id}')">Reject</button>
-                    ` : `<span style="font-size:0.78rem;color:#999;">${p.status}</span>`}
+                    ` : `<span style="font-size:0.78rem;color:#6b6459;">${p.status}</span>`}
                 </td>
             </tr>`;
     });
@@ -779,9 +780,9 @@ async function viewProduct(docId) {
     const gallery = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.imageUrl ? [p.imageUrl] : []);
     const galleryHtml = gallery.length > 0
         ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">${gallery.map(url =>
-              `<img loading="lazy" src="${escapeHtml(url)}" style="width:120px;height:120px;object-fit:cover;border-radius:6px;border:1px solid #eee;">`
+              `<img loading="lazy" src="${escapeHtml(url)}" style="width:120px;height:120px;object-fit:cover;border-radius:6px;border:1px solid #ede7dc;">`
           ).join('')}</div>`
-        : `<p style="color:#999;font-size:0.85rem;margin-bottom:16px;">No images uploaded.</p>`;
+        : `<p style="color:#6b6459;font-size:0.85rem;margin-bottom:16px;">No images uploaded.</p>`;
 
     const priceLabel = p.priceRange ? (p.priceRange === 'Contact' ? 'Contact for price' : p.priceRange) : '-';
     const supplyLabels = { direct: 'Direct', 'dealer-seeking': 'Dealer seeking', 'dealer-appointed': 'Dealer appointed' };
@@ -793,7 +794,7 @@ async function viewProduct(docId) {
         const url = p[key] && /^https?:\/\//i.test(p[key]) ? p[key] : null;
         return url
             ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="margin-right:12px;">${labelMap[key]}</a>`
-            : `<span style="color:#ccc;margin-right:12px;">${labelMap[key]} (none)</span>`;
+            : `<span style="color:#ddd5c7;margin-right:12px;">${labelMap[key]} (none)</span>`;
     }).join('');
 
     const actionsHtml = p.status === 'pending' ? `
@@ -803,7 +804,7 @@ async function viewProduct(docId) {
 
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(p.name)}</h2>
-        <p style="color:#C8A96E;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(p.brandName || '-')} · <span class="status status-${escapeHtml(p.status || '')}">${escapeHtml(p.status || '')}</span></p>
+        <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(p.brandName || '-')} · <span class="status status-${escapeHtml(p.status || '')}">${escapeHtml(p.status || '')}</span></p>
         ${galleryHtml}
         <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${escapeHtml(p.category || '-')}${p.subcategory ? ' / ' + escapeHtml(p.subcategory) : ''}</div></div>
         <div class="detail-row"><div class="detail-label">Designer</div><div class="detail-value">${escapeHtml(p.designer || '-')}</div></div>
@@ -833,14 +834,14 @@ async function loadArticles() {
             <tr>
                 <td><strong>${escapeHtml(a.title)}</strong></td>
                 <td>${escapeHtml(a.brandName)}</td>
-                <td><span style="color:#C8A96E;font-size:0.8rem;">${escapeHtml(a.tag || '')}</span></td>
+                <td><span style="color:#7a5c32;font-size:0.8rem;">${escapeHtml(a.tag || '')}</span></td>
                 <td><span class="status status-${a.status}">${a.status}</span></td>
                 <td>
                     ${a.status === 'pending' ? `
                         <button class="act-btn act-view" onclick="viewArticle('${doc.id}')">Review</button>
                         <button class="act-btn act-approve" onclick="updateDoc('articles','${doc.id}','approved')">Approve</button>
                         <button class="act-btn act-reject" onclick="rejectDoc('articles','${doc.id}')">Reject</button>
-                    ` : `<span style="font-size:0.78rem;color:#999;">${a.status}</span>`}
+                    ` : `<span style="font-size:0.78rem;color:#6b6459;">${a.status}</span>`}
                 </td>
             </tr>`;
     });
@@ -865,9 +866,9 @@ async function viewArticle(docId) {
     const a = doc.data();
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(a.title)}</h2>
-        <p style="color:#C8A96E;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(a.tag || '')} · ${escapeHtml(a.brandName)}</p>
+        <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(a.tag || '')} · ${escapeHtml(a.brandName)}</p>
         ${a.imageUrl ? `<img loading="lazy" src="${escapeHtml(a.imageUrl)}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
-        <div style="white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:#444;">${escapeHtml(a.content || '')}</div>
+        <div style="white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:#5d564c;">${escapeHtml(a.content || '')}</div>
         <div style="margin-top:24px;">
             <button class="act-btn act-approve" onclick="updateDoc('articles','${docId}','approved');closeModal();">Approve</button>
             <button class="act-btn act-reject" onclick="rejectDoc('articles','${docId}')">Reject</button>
@@ -899,11 +900,11 @@ function rejectDoc(collection, docId) {
             입력한 내용은 <strong>브랜드에게 그대로 보입니다.</strong> 비워두면 사유 없이 반려됩니다.
         </p>
         <textarea id="rejectReason" rows="5"
-            style="width:100%;padding:12px 14px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.9rem;line-height:1.6;resize:vertical;"
+            style="width:100%;padding:12px 14px;border:1px solid #ddd5c7;border-radius:8px;font-family:inherit;font-size:0.9rem;line-height:1.6;resize:vertical;"
             placeholder="예) 제품 사진 해상도가 낮습니다. 1200px 이상으로 다시 올려주세요."></textarea>
         <div style="margin-top:18px;display:flex;gap:8px;">
             <button class="act-btn act-reject" id="rejectConfirm">반려</button>
-            <button class="act-btn" id="rejectCancel" style="background:#eee;color:#403a30;">취소</button>
+            <button class="act-btn" id="rejectCancel" style="background:#ede7dc;color:#403a30;">취소</button>
         </div>`;
     document.getElementById('modal').classList.add('show');
     const ta = document.getElementById('rejectReason');
@@ -1034,7 +1035,7 @@ function renderReview() {
     });
 
     if (rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="color:#999;text-align:center;padding:30px;">${rvSpan('No issues.', '등록된 건이 없습니다.')}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="color:#6b6459;text-align:center;padding:30px;">${rvSpan('No issues.', '등록된 건이 없습니다.')}</td></tr>`;
         return;
     }
     tbody.innerHTML = rows.map(d => {
@@ -1043,7 +1044,7 @@ function renderReview() {
         return `
             <tr>
                 <td><strong>${escapeHtml(d.no || '-')}</strong></td>
-                <td>${escapeHtml(d.area || '-')}${d.screen ? `<br><small style="color:#999;">${escapeHtml(d.screen)}</small>` : ''}</td>
+                <td>${escapeHtml(d.area || '-')}${d.screen ? `<br><small style="color:#6b6459;">${escapeHtml(d.screen)}</small>` : ''}</td>
                 <td><span class="rv-ellip" title="${escapeHtml(gap)}">${escapeHtml(gapShort)}</span></td>
                 <td>${rvPriorityBadge(d.priority)}</td>
                 <td>${rvStatusBadge(d.status)}</td>
@@ -1084,7 +1085,7 @@ function openReviewForm() {
             ${field('rvTechNote', 'Dev note — technical terms go here only', '개발 메모 — 기술 용어는 여기에만', 'textarea')}
             <div class="rv-err" id="rvFormErr">${rvSpan('Please fill in every field marked *.', '* 표시된 칸을 모두 채워 주세요.')}</div>
             <div class="rv-actions">
-                <button class="act-btn" style="background:#f3f4f6;color:#555;" onclick="closeModal()" ${rvAttr('Cancel', '취소')}>${escapeHtml(rvT('Cancel', '취소'))}</button>
+                <button class="act-btn" style="background:#ede7dc;color:#5d564c;" onclick="closeModal()" ${rvAttr('Cancel', '취소')}>${escapeHtml(rvT('Cancel', '취소'))}</button>
                 <button class="act-btn act-add" id="rvSaveBtn" onclick="saveReview()" ${rvAttr('Save', '저장')}>${escapeHtml(rvT('Save', '저장'))}</button>
             </div>
         </div>`;
@@ -1149,19 +1150,19 @@ function viewReview(id) {
     document.getElementById('modalContent').innerHTML = `
         <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">${escapeHtml(d.no || '-')} ${rvPriorityBadge(d.priority)} ${rvStatusBadge(d.status)}</h2>
         <div class="rv-detail">
-            <p style="font-size:0.85rem;color:#666;">${escapeHtml(d.area || '-')}${d.screen ? ' · ' + escapeHtml(d.screen) : ''}</p>
-            ${url ? `<p style="font-size:0.82rem;margin-top:6px;"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:#C8A96E;">${escapeHtml(url)}</a></p>` : ''}
+            <p style="font-size:0.85rem;color:#5d564c;">${escapeHtml(d.area || '-')}${d.screen ? ' · ' + escapeHtml(d.screen) : ''}</p>
+            ${url ? `<p style="font-size:0.82rem;margin-top:6px;"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:#7a5c32;">${escapeHtml(url)}</a></p>` : ''}
             <dl>
                 ${dd('What was clicked', '무엇을 눌렀나', d.action)}
                 ${dd('Expected', '무엇을 기대했나', d.expectation)}
                 ${dd('Actual', '실제로 뭐가 보였나', d.current)}
                 ${dd('Problem', '그래서 뭐가 문제인가', d.gap)}
             </dl>
-            <p style="font-size:0.78rem;color:#999;">${rvSpan('Reported by', '등록자')} ${escapeHtml(d.reportedBy || '-')} · ${escapeHtml(rvDate(d.reportedAt))}</p>
+            <p style="font-size:0.78rem;color:#6b6459;">${rvSpan('Reported by', '등록자')} ${escapeHtml(d.reportedBy || '-')} · ${escapeHtml(rvDate(d.reportedAt))}</p>
             <details><summary>${rvSpan('Dev note (technical)', '개발 메모 (기술 근거)')}</summary><pre>${escapeHtml(d.techNote || '-')}</pre></details>
-            <div style="font-size:0.75rem;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;">${rvSpan('History', '이력')}</div>
+            <div style="font-size:0.75rem;font-weight:700;color:#6b6459;text-transform:uppercase;letter-spacing:0.5px;">${rvSpan('History', '이력')}</div>
             <ul class="rv-history">
-                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)} <small>${escapeHtml(rvDateTime(h.at))} · ${escapeHtml(h.by || '-')}</small>${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#999;">-</li>'}
+                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)} <small>${escapeHtml(rvDateTime(h.at))} · ${escapeHtml(h.by || '-')}</small>${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#6b6459;">-</li>'}
             </ul>
             <div class="rv-statusbar">
                 <select id="rvNewStatus">
