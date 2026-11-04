@@ -19,7 +19,7 @@ var REG_FILES = [
     { key: 'ledger',   path: '../docs/검수대장.md',          en: 'Review Ledger', ko: '검수대장' }
 ];
 
-var reg_state = { tab: 'rulebook', cache: {}, loading: '' };
+var reg_state = { tab: 'rulebook', cache: {}, fetchedAt: {}, loading: '' };   // fetchedAt — '언제 받은 사본인지' 표시용 (A-199)
 
 // ── 화면 그리기. el = #tab-regulations. 뼈대는 한 번만 ──
 function reg_render(el) {
@@ -27,7 +27,10 @@ function reg_render(el) {
     if (!el) return;
     if (!document.getElementById('regBody')) {
         var html = '<div class="section-card adm-regs">'
-            + '<div class="adm-subtabs" id="regSubtabs">' + reg_subtabsHtml() + '</div>'
+            + '<div class="adm-subtabs" id="regSubtabs">' + reg_subtabsHtml()
+            +   '<div class="adm-spacer"></div>'
+            +   '<button type="button" class="act-btn act-view adm-reg-refresh" id="regRefreshBtn" ' + tAttr('Refresh', '새로고침') + '>' + escapeHtml(t('Refresh', '새로고침')) + '</button>'
+            + '</div>'
             + '<div class="adm-msg" id="regMsg"></div>'
             + '<div class="adm-reg-layout">'
             +   '<nav class="adm-reg-toc" id="regToc"></nav>'
@@ -40,6 +43,10 @@ function reg_render(el) {
             reg_show(b.dataset.tab);
         });
         // 목차·본문 링크 — 해시를 바꾸지 않고 스크롤. 외부 링크는 새 창. md 파일 링크는 탭 전환
+        document.getElementById('regRefreshBtn').addEventListener('click', function () {
+            delete reg_state.cache[reg_state.tab];        // 세션 캐시를 버리고 다시 받는다 (A-199)
+            reg_load(reg_file(reg_state.tab));
+        });
         document.getElementById('regToc').addEventListener('click', reg_onLinkClick);
         document.getElementById('regBody').addEventListener('click', reg_onLinkClick);
     }
@@ -75,12 +82,13 @@ function reg_load(f) {
     reg_msg('Loading…', '불러오는 중…', false);
     document.getElementById('regBody').innerHTML = '';
     document.getElementById('regToc').innerHTML = '';
-    fetch(encodeURI(f.path)).then(function (r) {
+    fetch(encodeURI(f.path), { cache: 'no-store' }).then(function (r) {   // A-199 — 브라우저 캐시를 건너뛴다
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.text();
     }).then(function (md) {
         reg_state.loading = '';
         reg_state.cache[f.key] = md;
+        reg_state.fetchedAt[f.key] = new Date();
         if (reg_state.tab === f.key) reg_draw(f, md);
     }).catch(function (err) {
         reg_state.loading = '';
@@ -113,7 +121,15 @@ function reg_draw(f, md) {
         return;
     }
     body.innerHTML = html;   // DOMPurify 를 거친 HTML 만 여기 온다
-    reg_msg(f.path + ' · ' + t(String(md.length) + ' chars', String(md.length) + '자'), false);
+    // '몇 자' 는 내용이 얼마나 오래된 것인지 말해 주지 않는다. 이 화면은 **배포된 사본**을
+    // 읽으므로 커밋만 하고 push 하지 않은 변경은 보이지 않는다 — 그 사실을 화면에 적는다.
+    // Netlify 는 last-modified 를 주지 않아(etag 만) 배포 시각은 알 수 없다. 그래서
+    // 없는 시각을 꾸며 쓰지 않고, '언제 받았는지' 만 정확히 적는다 (A-199).
+    var at = reg_state.fetchedAt[f.key];
+    var hhmm = at ? (('0' + at.getHours()).slice(-2) + ':' + ('0' + at.getMinutes()).slice(-2)) : '';
+    reg_msg('Deployed copy · fetched ' + hhmm + ' · ' + md.length + ' chars — commits not yet pushed will not appear',
+            '배포된 사본 · ' + hhmm + ' 받음 · ' + md.length + '자 — 아직 push 하지 않은 변경은 보이지 않습니다',
+            false);
     toc.innerHTML = reg_tocHtml(body);
     body.scrollTop = 0;
 }

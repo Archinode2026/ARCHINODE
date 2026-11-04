@@ -293,3 +293,6 @@ h1, h2, .adm-reg-body h1, .adm-reg-body h2, .adm-reg-body h3 {
   body .adm-table-wrap th,
   body .adm-table-wrap td { padding: 9px 6px; }
 }
+
+/* A-199 — 규정집 서브탭 줄의 새로고침 버튼 (탭과 밑줄 높이를 맞춘다) */
+.adm-reg-refresh { align-self: center; margin-bottom: 6px; }
