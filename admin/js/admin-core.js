@@ -72,6 +72,22 @@ function openModal(html) {
     if (content) content.innerHTML = html;   // 호출자가 escapeHtml 을 마친 HTML 을 넘긴다
     el.classList.add('show');
 }
+// R-047: Esc 로도 닫는다. 지금까지는 오른쪽 위 작은 × 하나뿐이라, 키보드로 일하는 담당자나
+// 그 단추를 못 찾은 사람이 막혔다. 문서 하나에만 걸어 두면 #modal 을 쓰는 모든 어드민 화면이
+// 함께 얻는다(대시보드·BIM 요청·뉴스레터·디지털 알림). #modalOverlay 를 쓰는 세 화면
+// (아티클·자문·트렌드 투고)은 자기 Esc 처리가 이미 있어 건드리지 않는다.
+if (typeof document !== 'undefined' && !window.__admEscBound) {
+    window.__admEscBound = true;
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape' && e.key !== 'Esc') return;
+        var el = document.getElementById('modal');
+        if (el && el.classList.contains('show')) {
+            el.classList.remove('show');
+            e.stopPropagation();
+        }
+    });
+}
+
 function closeModal() {
     var el = document.getElementById('modal');
     if (el) el.classList.remove('show');
