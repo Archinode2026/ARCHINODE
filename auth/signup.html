@@ -17,89 +17,101 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
+<link rel="stylesheet" href="../style.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; min-height: 100vh; display: flex; flex-direction: column; }
+body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-100); min-height: 100vh; display: flex; flex-direction: column; }
 
 .auth-header {
-    background: #332e27; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+    background: var(--black); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
 }
-.auth-header .logo { color: #fff; font-size: 1.3rem; font-weight: 800; text-decoration: none; letter-spacing: -0.5px; }
-.auth-header .logo span { font-size: 0.6rem; font-weight: 400; color: #666; margin-left: 4px; }
-.auth-header .nav-link { color: #999; font-size: 0.82rem; text-decoration: none; }
-.auth-header .nav-link:hover { color: #C8A96E; }
+.auth-header .logo { color: var(--white); font-size: 1.3rem; font-weight: 800; text-decoration: none; letter-spacing: -0.5px; }
+.auth-header .logo span { font-size: 0.6rem; font-weight: 400; color: var(--gray-400); margin-left: 4px; }
+.auth-header .nav-link { color: var(--gray-400); font-size: 0.82rem; text-decoration: none; }
+.auth-header .nav-link:hover { color: var(--navy-gold); }
 
 .auth-container {
     flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px;
 }
 .auth-box {
-    background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    background: var(--white); border-radius: var(--radius); box-shadow: 0 4px 24px rgba(0,0,0,0.06);
     padding: 48px 40px; max-width: 520px; width: 100%;
 }
-.auth-box h1 { font-size: 1.6rem; font-weight: 800; color: #332e27; margin-bottom: 6px; }
-.auth-box .subtitle { font-size: 0.88rem; color: #999; margin-bottom: 28px; line-height: 1.5; }
+.auth-box h1 { font-size: 1.6rem; font-weight: 800; color: var(--black); margin-bottom: 6px; }
+.auth-box .subtitle { font-size: 0.88rem; color: var(--ink-soft); margin-bottom: 28px; line-height: 1.5; }
 
 .field { margin-bottom: 18px; }
-.field label { display: block; font-size: 0.82rem; font-weight: 600; color: #333; margin-bottom: 6px; }
+.field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--black); margin-bottom: 6px; }
 .field input, .field select {
-    width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 6px;
-    font-size: 0.92rem; font-family: inherit; transition: border-color 0.3s; background: #fff;
+    width: 100%; padding: 12px 16px; border: 1px solid var(--gray-300); border-radius: var(--radius);
+    font-size: 0.92rem; font-family: inherit; transition: border-color 0.3s; background: var(--white);
 }
-.field input:focus, .field select:focus { outline: none; border-color: #C8A96E; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.field .hint { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
+.field .hint { font-size: 0.75rem; color: var(--ink-soft); margin-top: 4px; }
 
 .auth-btn {
-    width: 100%; background: #332e27; color: #fff; border: none; padding: 14px;
+    width: 100%; background: var(--black); color: var(--white); border: none; padding: 14px;
     border-radius: 999px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
     transition: background 0.3s; font-family: inherit; margin-top: 8px;
 }
-.auth-btn:hover { background: #C8A96E; }
-.auth-btn:disabled { background: #999; cursor: not-allowed; }
+.auth-btn:hover { background: var(--accent); }
+.auth-btn:disabled { background: var(--gray-400); cursor: not-allowed; }
 
-.auth-links { text-align: center; margin-top: 20px; font-size: 0.82rem; color: #999; }
-.auth-links a { color: #C8A96E; text-decoration: none; }
+.auth-links { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--ink-soft); }
+.auth-links a { color: var(--accent-ink); text-decoration: none; }
 .auth-links a:hover { text-decoration: underline; }
 
 .error-msg {
-    display: none; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626;
-    padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem;
+    display: none; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+    padding: 10px 14px; border-radius: var(--radius); margin-bottom: 16px; font-size: 0.85rem;
 }
 .success-msg {
-    display: none; background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a;
-    padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem;
+    display: none; background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;
+    padding: 10px 14px; border-radius: var(--radius); margin-bottom: 16px; font-size: 0.85rem;
 }
 
 .divider { display: flex; align-items: center; margin: 24px 0 20px; }
-.divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
-.divider span { padding: 0 14px; font-size: 0.78rem; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+.divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--gray-200); }
+.divider span { padding: 0 14px; font-size: 0.78rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 1px; }
 
-.benefits { background: #fafaf7; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+.benefits { background: var(--band-beige); border-radius: var(--radius); padding: 20px; margin-bottom: 24px; }
         /* 2026-11-03 A-148: 가입 유형 선택(회원 / 브랜드) */
         .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0 8px; }
-        .role-card { display: block; text-align: left; background: #fff; border: 1px solid #e3e3e3; border-radius: 10px;
+        .role-card { display: block; text-align: left; background: var(--white); border: 1px solid var(--gray-300); border-radius: var(--radius);
             padding: 22px 20px; cursor: pointer; font-family: inherit; transition: all 0.18s; text-decoration: none; }
-        .role-card:hover { border-color: #C8A96E; box-shadow: 0 4px 16px rgba(200,169,110,0.16); transform: translateY(-2px); }
-        .role-card i { font-size: 1.35rem; color: #C8A96E; margin-bottom: 10px; display: block; }
-        .role-card .role-title { font-size: 0.98rem; font-weight: 700; color: #332e27; margin-bottom: 6px; }
-        .role-card .role-desc { font-size: 0.8rem; color: #777; line-height: 1.5; }
-        .role-card .role-go { font-size: 0.78rem; font-weight: 600; color: #C8A96E; margin-top: 12px; display: block; }
-        .role-back { display: inline-block; margin-bottom: 18px; font-size: 0.8rem; color: #999; text-decoration: none; }
-        .role-back:hover { color: #332e27; }
+        .role-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(200,169,110,0.16); transform: translateY(-2px); }
+        .role-card i { font-size: 1.35rem; color: var(--accent); margin-bottom: 10px; display: block; }
+        .role-card .role-title { font-size: 0.98rem; font-weight: 700; color: var(--black); margin-bottom: 6px; }
+        .role-card .role-desc { font-size: 0.8rem; color: var(--gray-700); line-height: 1.5; }
+        .role-card .role-go { font-size: 0.78rem; font-weight: 600; color: var(--accent-ink); margin-top: 12px; display: block; }
+        .role-back { display: inline-block; margin-bottom: 18px; font-size: 0.8rem; color: var(--ink-soft); text-decoration: none; }
+        .role-back:hover { color: var(--black); }
         @media (max-width: 560px) { .role-grid { grid-template-columns: 1fr; } }
-.benefits h3 { font-size: 0.85rem; font-weight: 700; color: #333; margin-bottom: 10px; }
+.benefits h3 { font-size: 0.85rem; font-weight: 700; color: var(--black); margin-bottom: 10px; }
 .benefits ul { list-style: none; padding: 0; }
-.benefits li { font-size: 0.82rem; color: #666; padding: 4px 0; }
-.benefits li i { color: #C8A96E; margin-right: 8px; width: 14px; }
+.benefits li { font-size: 0.82rem; color: var(--gray-700); padding: 4px 0; }
+.benefits li i { color: var(--accent); margin-right: 8px; width: 14px; }
 
-.terms-check { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0 8px; font-size: 0.8rem; color: #666; }
-.terms-check input { margin-top: 2px; accent-color: #C8A96E; }
-.terms-check a { color: #C8A96E; }
+.terms-check { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0 8px; font-size: 0.8rem; color: var(--gray-700); }
+.terms-check input { margin-top: 2px; accent-color: var(--accent); }
+.terms-check a { color: var(--accent-ink); }
 
 @media (max-width: 560px) {
     .auth-box { padding: 32px 24px; }
     .field-row { grid-template-columns: 1fr; }
 }
+
+/* 제목은 사이트 공통 서체로, 한글 제목은 어절 단위로 끊는다 (A-184) */
+.auth-box h1, .reset-box h1, .success-box h2, .invalid-box h2,
+.welcome h1, .section-card h2, .benefits h3, .role-card .role-title, .empty-state h3 {
+    font-family: 'Lora', 'Noto Serif KR', Georgia, serif;
+    font-weight: 500; letter-spacing: -0.012em; word-break: keep-all;
+}
+html[lang="ko"] .auth-box h1, html[lang="ko"] .reset-box h1,
+html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
+.auth-box .subtitle, .reset-box .subtitle, .auth-links, .field label,
+.benefits li, .terms-check, .role-card .role-desc { word-break: keep-all; }
 </style>
 </head>
 <body>
@@ -120,8 +132,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; mi
         <div id="alreadyLoggedIn" style="display:none;">
             <div class="benefits" style="margin-top:24px;">
                 <h3 style="margin-bottom:8px;" data-en="You're already signed in" data-ko="이미 로그인되어 있습니다">You're already signed in</h3>
-                <p style="font-size:0.84rem;color:#666;line-height:1.6;margin:0;">
-                    <strong id="aliEmail" style="color:#332e27;"></strong>
+                <p style="font-size:0.84rem;color:var(--gray-700);line-height:1.6;margin:0;">
+                    <strong id="aliEmail" style="color:var(--black);"></strong>
                     <span data-en="is signed in on this browser. To create a different account, log out first." data-ko=" 계정으로 로그인된 상태입니다. 다른 계정을 만들려면 먼저 로그아웃해 주세요.">is signed in on this browser. To create a different account, log out first.</span>
                 </p>
             </div>

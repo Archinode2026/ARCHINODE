@@ -40,7 +40,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 /* STATUS BANNER (suspended/rejected 알림) */
 .status-banner { display: none; padding: 16px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid; }
 .status-banner.banner-suspended { background: #fff7ed; border-color: #ea580c; color: #9a3412; }
-.status-banner.banner-rejected { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+.status-banner.banner-rejected { background: #fef2f2; border-color: #b91c1c; color: #991b1b; }
 .status-banner h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
 .status-banner p { font-size: 0.85rem; line-height: 1.5; margin: 0; }
 .status-banner .reason-text { margin-top: 8px; padding: 10px 12px; background: rgba(255,255,255,0.6); border-radius: 6px; font-size: 0.85rem; white-space: pre-wrap; }
@@ -82,7 +82,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .btn-secondary:hover { background: #e0e0e0; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.save-msg { display: inline-block; margin-left: 12px; font-size: 0.82rem; color: #16a34a; opacity: 0; transition: opacity 0.3s; }
+.save-msg { display: inline-block; margin-left: 12px; font-size: 0.82rem; color: #15803d; opacity: 0; transition: opacity 0.3s; }
 .save-msg.show { opacity: 1; }
 
 /* PRODUCT LIST */
@@ -117,7 +117,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .tab-content.active { display: block; }
 
 /* INBOX (2026-09-12 어드민 개편 4a — 배정된 리드. 모달은 admin/dashboard.html .modal-overlay 와 같은 모양, 확인창 없음) */
-.tab .tab-badge { background: #fee2e2; color: #dc2626; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
+.tab .tab-badge { background: #fee2e2; color: #b91c1c; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px; font-weight: 700; }
 /* NOTICE BANNER + SUPPORT (2026-09-12 어드민 개편 5단계 — notices 배너 · inquiries Support 탭. 확인창 없음, 값은 inbox_esc) */
 .notice-banner { display: none; background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #C8A96E; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; }
 .notice-banner .notice-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
@@ -142,7 +142,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 
 .inbox-intro { font-size: 0.85rem; color: #666; margin-bottom: 8px; line-height: 1.6; }
 .inbox-msg { font-size: 0.82rem; color: #666; margin-bottom: 12px; min-height: 1em; }
-.inbox-msg.err { color: #dc2626; }
+.inbox-msg.err { color: #b91c1c; }
 .inbox-table { width: 100%; border-collapse: collapse; }
 .inbox-table th { text-align: left; padding: 10px 12px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f0f0; }
 .inbox-table td { padding: 12px; font-size: 0.86rem; border-bottom: 1px solid #f4efe6; vertical-align: middle; }
@@ -164,7 +164,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
 .inbox-bar label { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
 .inbox-bar select, .inbox-bar input { padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-family: inherit; font-size: 0.85rem; background: #fafafa; }
 .inbox-bar input { flex: 1; min-width: 160px; }
-.inbox-err { color: #dc2626; font-size: 0.8rem; margin-top: 10px; display: none; }
+.inbox-err { color: #b91c1c; font-size: 0.8rem; margin-top: 10px; display: none; }
 .inbox-actions { margin-top: 14px; display: flex; gap: 8px; justify-content: flex-end; }
 .inbox-hist-head { margin-top: 16px; font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
 .inbox-hist { list-style: none; margin: 8px 0 0; font-size: 0.8rem; color: #555; }
@@ -254,7 +254,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
     <div id="statsCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;">
         <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Brand Saves" data-ko="브랜드 저장 수">Brand Saves</div>
-            <div id="statBrandLikes" style="font-size:1.8rem;font-weight:800;color:#e11d48;">0</div>
+            <div id="statBrandLikes" style="font-size:1.8rem;font-weight:800;color:#be123c;">0</div>
         </div>
         <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Product Saves" data-ko="제품 저장 수">Product Saves</div>
@@ -1151,17 +1151,17 @@ document.getElementById('passwordForm').addEventListener('submit', async (e) => 
     const pw = document.getElementById('newPassword').value;
     const confirm = document.getElementById('confirmPassword').value;
     const msg = document.getElementById('pwSaveMsg');
-    if (pw !== confirm) { msg.textContent = 'Passwords do not match'; msg.style.color = '#dc2626'; msg.classList.add('show'); return; }
-    if (pw.length < 6) { msg.textContent = 'Min 6 characters'; msg.style.color = '#dc2626'; msg.classList.add('show'); return; }
+    if (pw !== confirm) { msg.textContent = 'Passwords do not match'; msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
+    if (pw.length < 6) { msg.textContent = 'Min 6 characters'; msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
     try {
         await currentUser.updatePassword(pw);
         msg.innerHTML = '<i class="fas fa-check"></i> Password changed!';
-        msg.style.color = '#16a34a';
+        msg.style.color = '#15803d';
         msg.classList.add('show');
         setTimeout(() => msg.classList.remove('show'), 3000);
     } catch (err) {
         msg.textContent = 'Please log out and log in again, then retry.';
-        msg.style.color = '#dc2626';
+        msg.style.color = '#b91c1c';
         msg.classList.add('show');
     }
 });
@@ -1339,7 +1339,7 @@ function rejectReasonHtml(status, note) {
     const body = (note || '').trim()
         ? escapeHtml(note.trim())
         : (ko ? '사유가 입력되지 않았습니다. 문의해 주세요.' : 'No reason was given. Please contact us.');
-    return `<p style="margin-top:8px;padding:10px 12px;border-left:3px solid #dc2626;background:#fef2f2;
+    return `<p style="margin-top:8px;padding:10px 12px;border-left:3px solid #b91c1c;background:#fef2f2;
                       color:#991b1b;font-size:0.8rem;line-height:1.65;border-radius:0 6px 6px 0;white-space:pre-wrap;">
                 <strong style="display:block;margin-bottom:3px;font-size:0.74rem;letter-spacing:0.04em;">
                     ${ko ? '반려 사유' : 'Reason for rejection'}</strong>${body}</p>`;

@@ -17,100 +17,112 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
+<link rel="stylesheet" href="../style.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; color: #333; }
+body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-100); color: var(--black); }
 
 /* TOPBAR */
-.topbar { background: #332e27; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
-.topbar .logo { color: #fff; font-size: 1.1rem; font-weight: 800; text-decoration: none; }
-.topbar .logo span { color: #C8A96E; font-size: 0.7rem; font-weight: 400; margin-left: 8px; }
+.topbar { background: var(--black); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.topbar .logo { color: var(--white); font-size: 1.1rem; font-weight: 800; text-decoration: none; }
+.topbar .logo span { color: var(--navy-gold); font-size: 0.7rem; font-weight: 400; margin-left: 8px; }
 .topbar .user-info { display: flex; align-items: center; gap: 16px; }
-.topbar .user-email { color: #888; font-size: 0.8rem; }
+.topbar .user-email { color: var(--gray-400); font-size: 0.8rem; }
 .topbar .nav-links { display: flex; gap: 16px; }
-.topbar .nav-links a { color: #999; font-size: 0.82rem; text-decoration: none; }
-.topbar .nav-links a:hover { color: #C8A96E; }
-.topbar .logout-btn { background: none; border: 1px solid #444; color: #aaa; padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
-.topbar .logout-btn:hover { border-color: #C8A96E; color: #C8A96E; }
+.topbar .nav-links a { color: var(--gray-400); font-size: 0.82rem; text-decoration: none; }
+.topbar .nav-links a:hover { color: var(--navy-gold); }
+.topbar .logout-btn { background: none; border: 1px solid var(--gray-800); color: var(--gray-400); padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+.topbar .logout-btn:hover { border-color: var(--navy-gold); color: var(--navy-gold); }
 
 /* LOADING */
-.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; color: #999; font-size: 0.9rem; gap: 12px; }
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; color: var(--ink-soft); font-size: 0.9rem; gap: 12px; }
 
 /* LAYOUT */
 .dashboard { max-width: 1000px; margin: 0 auto; padding: 32px 24px; }
 .welcome { margin-bottom: 32px; }
-.welcome h1 { font-size: 1.6rem; font-weight: 800; color: #332e27; margin-bottom: 4px; }
-.welcome p { font-size: 0.9rem; color: #888; }
+.welcome h1 { font-size: 1.6rem; font-weight: 800; color: var(--black); margin-bottom: 4px; }
+.welcome p { font-size: 0.9rem; color: var(--ink-soft); }
 
 /* TABS */
-.tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 24px; }
-.tab { padding: 12px 20px; font-size: 0.88rem; font-weight: 600; color: #999; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-.tab:hover { color: #333; }
-.tab.active { color: #332e27; border-bottom-color: #C8A96E; }
+.tabs { display: flex; border-bottom: 2px solid var(--gray-200); margin-bottom: 24px; }
+.tab { padding: 12px 20px; font-size: 0.88rem; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+.tab:hover { color: var(--black); }
+.tab.active { color: var(--black); border-bottom-color: var(--accent); }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
 /* CARDS */
 .section-card {
-    background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    background: var(--white); border-radius: var(--radius); box-shadow: 0 2px 12px rgba(0,0,0,0.04);
     padding: 32px; margin-bottom: 24px;
 }
 .section-card h2 {
-    font-size: 1.1rem; font-weight: 700; color: #332e27; margin-bottom: 20px;
-    padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
+    font-size: 1.1rem; font-weight: 700; color: var(--black); margin-bottom: 20px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--gray-200);
 }
-.section-card h2 i { color: #C8A96E; margin-right: 8px; }
+.section-card h2 i { color: var(--accent); margin-right: 8px; }
 
 /* FORM */
 .field { margin-bottom: 18px; }
-.field label { display: block; font-size: 0.82rem; font-weight: 600; color: #333; margin-bottom: 6px; }
+.field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--black); margin-bottom: 6px; }
 .field input, .field select {
-    width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 6px;
-    font-size: 0.92rem; font-family: inherit; transition: border-color 0.3s; background: #fff;
+    width: 100%; padding: 11px 14px; border: 1px solid var(--gray-300); border-radius: var(--radius);
+    font-size: 0.92rem; font-family: inherit; transition: border-color 0.3s; background: var(--white);
 }
-.field input:focus, .field select:focus { outline: none; border-color: #C8A96E; }
-.field input.readonly { background: #f4efe6; color: #999; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+.field input.readonly { background: var(--gray-100); color: var(--gray-700); }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 .btn { padding: 11px 24px; border: none; border-radius: 999px; font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.3s; }
-.btn-primary { background: #332e27; color: #fff; }
-.btn-primary:hover { background: #C8A96E; }
+.btn-primary { background: var(--black); color: var(--white); }
+.btn-primary:hover { background: var(--accent); }
 
-.save-msg { display: inline-block; margin-left: 12px; font-size: 0.85rem; color: #16a34a; opacity: 0; transition: opacity 0.3s; }
+.save-msg { display: inline-block; margin-left: 12px; font-size: 0.85rem; color: #15803d; opacity: 0; transition: opacity 0.3s; }
 .save-msg.show { opacity: 1; }
 
 /* LIKED GRID */
 .liked-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
 .liked-card {
-    background: #fff; border-radius: 8px; overflow: hidden;
+    background: var(--white); border-radius: var(--radius); overflow: hidden;
     box-shadow: 0 1px 6px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s;
     text-decoration: none; color: inherit; position: relative;
 }
 .liked-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-.liked-card-img { aspect-ratio: 4/3; background: #f0f0f0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.liked-card-img { aspect-ratio: 4/3; background: var(--gray-200); overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .liked-card-img img { width: 100%; height: 100%; object-fit: cover; }
 .liked-card-body { padding: 14px; }
-.liked-card-body h3 { font-size: 0.9rem; font-weight: 600; color: #332e27; margin-bottom: 4px; }
-.liked-card-body p { font-size: 0.78rem; color: #999; }
+.liked-card-body h3 { font-size: 0.9rem; font-weight: 600; color: var(--black); margin-bottom: 4px; }
+.liked-card-body p { font-size: 0.78rem; color: var(--ink-soft); }
 .unlike-btn {
     position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); border: none;
-    width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: #e11d48;
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: #be123c;
     font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
     transition: background 0.2s;
 }
-.unlike-btn:hover { background: #fff; }
+.unlike-btn:hover { background: var(--white); }
 
-.empty-state { text-align: center; padding: 48px 20px; color: #999; }
-.empty-state i { font-size: 2.5rem; color: #ddd; margin-bottom: 12px; }
-.empty-state h3 { font-size: 1rem; color: #666; margin-bottom: 8px; }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--ink-soft); }
+.empty-state i { font-size: 2.5rem; color: var(--gray-300); margin-bottom: 12px; }
+.empty-state h3 { font-size: 1rem; color: var(--gray-700); margin-bottom: 8px; }
 .empty-state p { font-size: 0.85rem; }
-.empty-state a { color: #C8A96E; text-decoration: none; font-weight: 600; }
+.empty-state a { color: var(--accent-ink); text-decoration: none; font-weight: 600; }
 
 @media (max-width: 768px) {
     .field-row { grid-template-columns: 1fr; }
     .liked-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
     .topbar .nav-links { display: none; }
 }
+
+/* 제목은 사이트 공통 서체로, 한글 제목은 어절 단위로 끊는다 (A-184) */
+.auth-box h1, .reset-box h1, .success-box h2, .invalid-box h2,
+.welcome h1, .section-card h2, .benefits h3, .role-card .role-title, .empty-state h3 {
+    font-family: 'Lora', 'Noto Serif KR', Georgia, serif;
+    font-weight: 500; letter-spacing: -0.012em; word-break: keep-all;
+}
+html[lang="ko"] .auth-box h1, html[lang="ko"] .reset-box h1,
+html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
+.auth-box .subtitle, .reset-box .subtitle, .auth-links, .field label,
+.benefits li, .terms-check, .role-card .role-desc { word-break: keep-all; }
 </style>
 </head>
 <body>
@@ -247,7 +259,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: #f4efe6; co
         </div>
         <div class="section-card">
             <h2><i class="fas fa-sign-out-alt"></i> <span data-en="Account" data-ko="계정">Account</span></h2>
-            <p style="font-size:0.88rem;color:#666;margin-bottom:16px;" data-en="Need to delete your account? Contact us at office@archinode.org" data-ko="계정 삭제가 필요하신가요? office@archinode.org로 연락해주세요.">Need to delete your account? Contact us at office@archinode.org</p>
+            <p style="font-size:0.88rem;color:var(--gray-700);margin-bottom:16px;" data-en="Need to delete your account? Contact us at office@archinode.org" data-ko="계정 삭제가 필요하신가요? office@archinode.org로 연락해주세요.">Need to delete your account? Contact us at office@archinode.org</p>
         </div>
     </div>
 </div>
@@ -351,7 +363,7 @@ async function loadLikedProducts() {
                 <button class="unlike-btn" onclick="unlikeProduct('${doc.id}')" title="Remove from saved"><i class="fas fa-bookmark"></i></button>
                 <a href="../products/view.html?id=${p.slug || ''}" style="text-decoration:none;color:inherit;">
                     <div class="liked-card-img">
-                        ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<i class="fas fa-cube" style="font-size:2rem;color:#ddd;"></i>'}
+                        ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<i class="fas fa-cube" style="font-size:2rem;color:var(--gray-300);"></i>'}
                     </div>
                     <div class="liked-card-body">
                         <h3>${p.name || 'Product'}</h3>
@@ -383,7 +395,7 @@ async function loadLikedBrands() {
                 <button class="unlike-btn" onclick="unlikeBrand('${doc.id}')" title="Remove from saved"><i class="fas fa-bookmark"></i></button>
                 <a href="../brands/view.html?id=${b.slug || ''}" style="text-decoration:none;color:inherit;">
                     <div class="liked-card-img">
-                        ${b.logoUrl ? `<img loading="lazy" src="${b.logoUrl}" alt="${b.brandName}" style="object-fit:contain;padding:20px;">` : '<i class="fas fa-building" style="font-size:2rem;color:#ddd;"></i>'}
+                        ${b.logoUrl ? `<img loading="lazy" src="${b.logoUrl}" alt="${b.brandName}" style="object-fit:contain;padding:20px;">` : '<i class="fas fa-building" style="font-size:2rem;color:var(--gray-300);"></i>'}
                     </div>
                     <div class="liked-card-body">
                         <h3>${b.brandName || 'Brand'}</h3>
@@ -451,19 +463,19 @@ document.getElementById('passwordForm').addEventListener('submit', async (e) => 
     const pw = document.getElementById('newPassword').value;
     const confirm = document.getElementById('confirmPassword').value;
     const msg = document.getElementById('pwSaveMsg');
-    if (pw !== confirm) { msg.textContent = '비밀번호가 일치하지 않습니다'; msg.style.color = '#dc2626'; msg.classList.add('show'); return; }
-    if (pw.length < 6) { msg.textContent = '6자 이상 입력해주세요'; msg.style.color = '#dc2626'; msg.classList.add('show'); return; }
+    if (pw !== confirm) { msg.textContent = '비밀번호가 일치하지 않습니다'; msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
+    if (pw.length < 6) { msg.textContent = '6자 이상 입력해주세요'; msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
     try {
         await currentUser.updatePassword(pw);
         msg.innerHTML = '<i class="fas fa-check"></i> 비밀번호가 변경되었습니다!';
-        msg.style.color = '#16a34a';
+        msg.style.color = '#15803d';
         msg.classList.add('show');
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
         setTimeout(() => msg.classList.remove('show'), 3000);
     } catch (err) {
         msg.textContent = '다시 로그인 후 시도해주세요.';
-        msg.style.color = '#dc2626';
+        msg.style.color = '#b91c1c';
         msg.classList.add('show');
     }
 });
