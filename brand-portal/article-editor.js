@@ -209,6 +209,8 @@
     if (!$('addArticleBtn') || !$('artBlocks')) return;
 
     $('addArticleBtn').addEventListener('click', () => {
+      // A-213 — 이 폼의 주인을 기록한다 (dashboard.html 의 bpFormUid)
+      try { window.bpFormUid = (auth.currentUser && auth.currentUser.uid) || null; } catch (e) {}
       // status 가드 (입점 승인 후만 작성 가능)
       const status = window.brandData && window.brandData.status;
       if (status !== 'approved') {
@@ -248,6 +250,23 @@
       const btn = $('submitArticle');
       btn.disabled = true; btn.textContent = 'Submitting...';
 
+      /* A-213 / R-031: brandId 는 실시간 currentUser.uid, brandName 은 페이지가 불러둔
+         brandData 에서 왔다 — 수명이 다른 두 출처다. 계정이 바뀌는 틈에 제출하면
+         brandId 는 새 계정, brandName 은 옛 브랜드로 저장되고 화면은 정상으로 보인다.
+         dashboard.html 의 bpIdentity() 가 둘을 한 객체로 묶어 주고, 어긋나면 멈춘다.
+         (본문 이미지는 이미 올라가 있을 수 있다 — 그래도 **문서를 안 만드는 쪽**이 맞다.
+          임시 경로(articles/<uid>/temp/)에 남은 파일은 소유권을 어기지 않는다.) */
+      const bpId = (typeof bpIdentity === 'function')
+          ? bpIdentity(window.bpFormUid) : { ok: false, reason: 'mismatch' };
+      if (!bpId.ok) {
+        msg.textContent = (typeof bpIdentityMessage === 'function')
+            ? bpIdentityMessage(bpId.reason)
+            : 'The signed-in account changed. Please reload and resubmit.';
+        msg.style.color = '#c00';
+        btn.disabled = false; btn.textContent = 'Submit for Review';
+        return;
+      }
+
       try {
         const cleanBlocks = blocks
           .filter(b => (b.type === 'text' && b.content && b.content.trim()) || (b.type === 'image' && b.url))
@@ -257,8 +276,8 @@
           );
 
         await archinodeWithTimeout(db.collection('articles').add({
-          brandId: currentUser.uid,
-          brandName: brandData.brandName || '',
+          brandId: bpId.uid,                 // A-213 — 둘을 한 객체에서 함께
+          brandName: bpId.brandName,
           title: title,
           slug: generateSlug(title),
           tag: $('artTag').value,
@@ -275,11 +294,11 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
             to: 'office@archinode.org',
             message: {
-              subject: ('[ARCHINODE] 매거진 원고 - ' + (brandData.brandName || 'Unknown') + ': ' + title).substring(0, 180),  // 2026-11-03 QA: rules의 subject<200 제한 초과로 조용히 거부되는 것 방지
+              subject: ('[ARCHINODE] 매거진 원고 - ' + (bpId.brandName || 'Unknown') + ': ' + title).substring(0, 180),  // 2026-11-03 QA: rules의 subject<200 제한 초과로 조용히 거부되는 것 방지
               text: [
                 '브랜드가 매거진 원고를 제출했습니다.',
                 '',
-                'Brand: ' + (brandData.brandName || '-'),
+                'Brand: ' + (bpId.brandName || '-'),
                 'Title: ' + title,
                 'Tag: ' + ($('artTag') ? $('artTag').value : '-'),
                 'Lang: ' + ($('artLang') ? $('artLang').value : 'en'),

@@ -784,6 +784,51 @@ h1, h2, .section-card h2 {
 <script src="../lang.js?v=20261104b"></script>
 <script>
 let currentUser = null;
+let brandDataUid = null;   // brandData 를 '어느 계정으로' 불러왔는지 (R-031 = A-213)
+
+/* ── 제출 직전 신원 확정 (R-031 = A-213) ─────────────────────────────────
+   제품·글을 저장할 때 `brandId` 는 실시간 `currentUser.uid` 에서, `brandName` 은
+   페이지가 불러둔 `brandData` 에서 가져왔다. **두 출처의 수명이 다르다.**
+   같은 브라우저에서 계정이 바뀌면(세션 꼬임, 다중 탭, 자동 재로그인)
+   `onAuthStateChanged` 가 `currentUser` 를 즉시 갈아치우는데 `loadBrandData()` 는
+   비동기라 아직 끝나지 않았거나 실패할 수 있다. 그 틈에 제출하면
+   **`brandId` 는 새 계정, `brandName` 은 옛 브랜드**로 저장된다 —
+   화면에는 옛 브랜드 이름이 그대로 떠 있으니 아무도 눈치채지 못한다. 3/3 재현.
+
+   `firestore.rules` 로는 막을 수 없다. 규칙은 `isApprovedBrand()` 로
+   `request.auth.uid == brandId` 를 요구하므로 이 쓰기는 **정당하게 허가된다** —
+   두 계정 모두 승인된 브랜드일 수 있기 때문이다. 규칙은 "이 폼을 누가 채웠나" 를
+   알 수 없다. 그래서 클라이언트에서 막아야 한다.
+
+   방법: 쓰기 직전에 `brandId` 와 `brandName` 을 **한 객체에서 함께** 받는다.
+   살아 있는 인증과 `brandData` 의 주인이 어긋나면 **저장하지 않고 멈춘다.**
+   어느 한쪽으로 추측해 쓰는 것보다 멈추는 게 낫다 — 소유권은 조용히 틀리면 안 된다.
+   업로드가 await 를 여러 번 거치므로 **업로드 전과 쓰기 직전에 각각** 확인한다.
+   ──────────────────────────────────────────────────────────────────────── */
+let bpFormUid = null;   // 이 폼을 '누가 열었는지' (A-213)
+
+function bpIdentity(expectUid) {
+    const live = auth.currentUser;
+    if (!live) return { ok: false, reason: 'signed-out' };
+    // 폼을 연 계정과 지금 계정이 다르면 멈춘다. 새 계정도 **유효한 브랜드일 수 있다** —
+    // 그러면 저장 내용끼리는 서로 맞지만 **폼을 채운 브랜드가 아니다.** 실측으로 이 구멍을 찾았다.
+    if (expectUid && expectUid !== live.uid) return { ok: false, reason: 'mismatch' };
+    if (!brandData || brandDataUid !== live.uid) return { ok: false, reason: 'mismatch' };
+    return { ok: true, uid: live.uid,
+             brandName: brandData.brandName || '',
+             brandSlug: brandData.slug || generateSlug(brandData.brandName || '') };
+}
+function bpIdentityMessage(reason) {
+    const ko = document.documentElement.lang !== 'en';
+    if (reason === 'signed-out') {
+        return ko ? '로그인이 풀렸습니다. 다시 로그인한 뒤 제출해 주세요. (작성한 내용은 저장되지 않았습니다)'
+                  : 'You are signed out. Please log in again and resubmit. Nothing was saved.';
+    }
+    return ko ? '로그인된 계정이 바뀌었습니다. 엉뚱한 브랜드로 저장되지 않도록 멈췄습니다 — 페이지를 새로 고친 뒤 다시 제출해 주세요. (작성한 내용은 저장되지 않았습니다)'
+              : 'The signed-in account changed. Saving was stopped so this would not be filed under the wrong brand — reload and resubmit. Nothing was saved.';
+}
+window.bpIdentity = bpIdentity;
+window.bpIdentityMessage = bpIdentityMessage;
 let brandData = null;
 
 // A-030: 브랜드 포털에서 사용자 입력(제품명·설명·태그·article content 등)을 그대로
@@ -921,11 +966,22 @@ async function loadBrandData(uid) {
     try {
         const doc = await db.collection('brands').doc(uid).get();
         if (!doc.exists) {
-            alert('Brand data not found. Please contact support.');
+            // A-213: 전에는 여기서 그냥 돌아가 **옛 브랜드의 화면과 brandData 가 그대로 남았다.**
+            // 계정은 바뀌었는데 화면은 옛 브랜드라, 그 상태로 제출하면 소유권이 어긋난다.
+            brandData = null; window.brandData = null; brandDataUid = null;
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('loadingScreen').innerHTML =
+                '<p style="color:#991b1b;font-size:0.92rem;line-height:1.7;text-align:center;padding:40px 20px;">'
+              + (document.documentElement.lang !== 'en'
+                  ? '이 계정에 연결된 브랜드 정보를 찾지 못했습니다.<br>다른 계정으로 로그인되어 있지 않은지 확인해 주세요. 계속 이러면 office@archinode.org 로 문의해 주세요.'
+                  : 'No brand record is linked to this account.<br>Check whether you are signed in with a different account. If this persists, contact office@archinode.org.')
+              + '</p>';
+            document.getElementById('loadingScreen').style.display = 'block';
             return;
         }
         brandData = doc.data();
         window.brandData = brandData;
+        brandDataUid = uid;   // A-213 — 이 데이터가 '누구 것인지' 못 박는다
         populateDashboard();
         loadStats();
         document.getElementById('loadingScreen').style.display = 'none';
@@ -1180,6 +1236,8 @@ document.getElementById('passwordForm').addEventListener('submit', async (e) => 
 
 // ── 제품 추가 ──
 document.getElementById('addProductBtn').addEventListener('click', () => {
+    bpFormUid = (auth.currentUser && auth.currentUser.uid) || null;   // A-213 — 이 폼의 주인
+    window.bpFormUid = bpFormUid;
     document.getElementById('productForm').style.display = 'block';
     document.getElementById('addProductBtn').style.display = 'none';
 });
@@ -1231,14 +1289,22 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     const subcategory = document.getElementById('prodSubcategory').value;
     if (!category || !subcategory) { alert('Category and subcategory are required'); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
 
+    // A-213: 업로드 전에 한 번 — 파일을 올리고 나서 멈추면 쓰레기 파일이 남는다
+    let bpId = bpIdentity(bpFormUid);
+    if (!bpId.ok) { alert(bpIdentityMessage(bpId.reason)); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+
     const catalogPdf = await uploadIfPresent('prodCatalogFile', 'products-specs');
     const bimFile = await uploadIfPresent('prodBimFile', 'products-specs');
     const model3d = await uploadIfPresent('prodModel3dFile', 'products-specs');
 
+    // A-213: 업로드는 await 를 여러 번 거친다. 그 사이에 계정이 바뀌었을 수 있으므로 다시 확인한다.
+    bpId = bpIdentity(bpFormUid);
+    if (!bpId.ok) { alert(bpIdentityMessage(bpId.reason)); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+
     await db.collection('products').add({
-        brandId: currentUser.uid,
-        brandName: brandData.brandName,
-        brandSlug: brandData.slug || generateSlug(brandData.brandName),
+        brandId: bpId.uid,            // A-213 — brandId·brandName·brandSlug 를 한 객체에서 함께
+        brandName: bpId.brandName,
+        brandSlug: bpId.brandSlug,
         name: name,
         slug: generateSlug(name),
         collection: document.getElementById('prodCollection').value.trim(),
