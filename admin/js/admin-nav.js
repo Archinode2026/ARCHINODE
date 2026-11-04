@@ -311,9 +311,13 @@ function adm_drawSearch(q) {
             + '</a>';
     }
     // 바닥 줄 — 건수 + 아직 안 연 화면(캐시 없음 → 검색에 안 잡힌다는 것을 숨기지 않는다)
+    // A-203: 잘렸을 때 **몇 건 중** 몇 건인지 말한다. 전에는 "상위 30건만 표시" 라고만 해서
+    //         실제로 몇 건이 더 있는지 알 수 없었고, 안 보이는 결과를 "없다" 고 오해하기 쉬웠다.
+    var total = (typeof results.totalMatches === 'number') ? results.totalMatches : results.length;
     var foot = !results.length ? t('No results', '결과 없음')
-        : (results.length >= ADM_SEARCH_MAX ? t('Top ' + ADM_SEARCH_MAX + ' shown — narrow the search', '상위 ' + ADM_SEARCH_MAX + '건만 표시 — 검색어를 좁히세요')
-                                            : t(results.length + ' results', results.length + '건'));
+        : (results.truncated ? t(total + ' matches · showing ' + results.length + ' — narrow the search',
+                                 '총 ' + total + '건 중 ' + results.length + '건 표시 — 검색어를 좁히세요')
+                             : t(results.length + ' results', results.length + '건'));
     var kinds = (typeof admSearchLoadedKinds === 'function') ? admSearchLoadedKinds() : { missing: [] };
     if (kinds.missing.length) {
         foot += ' · ' + t('Not loaded yet: ', '아직 안 연 화면: ') + kinds.missing.map(function (m) { return t(m.en, m.ko); }).join(', ');

@@ -240,30 +240,73 @@ var ADM_SEARCH_MAX = 30;
 function searchAll(q) {
     var query = String(q == null ? '' : q).trim();
     var out = [];
+    out.totalMatches = 0;
+    out.truncated = false;
     if (!query) return out;
-    for (var s = 0; s < ADM_SEARCH_SOURCES.length && out.length < ADM_SEARCH_MAX; s++) {
+
+    /* ── 1단계: 카테고리별로 따로 모은다 ────────────────────────────────
+       R-066(=A-203) 이전에는 소스 배열 순서대로 하나의 `out` 을 30건까지
+       채우고 멈췄다. 그래서 6번째인 `reviewIssues`(65건, 계속 증가)가
+       "검토대기" 같은 흔한 낱말로 30칸을 전부 먹으면, 뒤에 있는 공지·문의·
+       페이지는 **매치 여부를 검사조차 받지 못했다.** 목록이 자랄수록 뒤
+       카테고리가 점점 더 안 보이는 구조였다.
+
+       각 통은 전체 상한만큼만 담되 **진짜 매치 수는 끝까지 센다** — 사용자에게
+       "몇 건 중 몇 건" 을 말해 주려면 실제 수를 알아야 한다. */
+    var buckets = [];
+    for (var s = 0; s < ADM_SEARCH_SOURCES.length; s++) {
         var src = ADM_SEARCH_SOURCES[s];
         var list = admGetCache(src.key);
         if (!list) continue;   // 그 화면을 아직 안 열었으면 건너뛴다(읽지 않는다)
-        for (var i = 0; i < list.length && out.length < ADM_SEARCH_MAX; i++) {
+        var hits = [], total = 0;
+        for (var i = 0; i < list.length; i++) {
             var d = list[i] || {};
             if (!matchText(src.hay(d), query)) continue;
-            out.push({ kind: src.key, en: src.en, ko: src.ko, cls: src.cls, id: String(d.id || ''),
-                       label: String(src.label(d) || ''), sub: String(src.sub(d) || ''), menu: src.menu, view: src.view, href: '' });
+            total++;
+            if (hits.length < ADM_SEARCH_MAX) {
+                hits.push({ kind: src.key, en: src.en, ko: src.ko, cls: src.cls, id: String(d.id || ''),
+                            label: String(src.label(d) || ''), sub: String(src.sub(d) || ''),
+                            menu: src.menu, view: src.view, href: '' });
+            }
         }
+        if (total) buckets.push({ hits: hits, total: total });
     }
-    if (typeof ADMIN_MENUS !== 'undefined' && out.length < ADM_SEARCH_MAX) {
-        for (var g = 0; g < ADMIN_MENUS.length && out.length < ADM_SEARCH_MAX; g++) {
+    // 페이지 이동 항목도 하나의 통으로 — 전에는 맨 뒤라 남는 자리만 받았다.
+    if (typeof ADMIN_MENUS !== 'undefined') {
+        var pageHits = [];
+        for (var g = 0; g < ADMIN_MENUS.length; g++) {
             var items = ADMIN_MENUS[g].items || [];
-            for (var k = 0; k < items.length && out.length < ADM_SEARCH_MAX; k++) {
+            for (var k = 0; k < items.length; k++) {
                 var it = items[k];
                 if (it.kind !== 'page' || !it.ready) continue;
                 if (!matchText(it.en + ' ' + it.ko + ' ' + it.id, query)) continue;
-                out.push({ kind: 'page', en: 'Page', ko: '페이지', cls: 'adm-kind-page', id: it.id,
-                           label: it.en, labelKo: it.ko, sub: 'Go to page', subKo: '페이지로 이동', menu: it.id, view: '', href: it.target });
+                pageHits.push({ kind: 'page', en: 'Page', ko: '페이지', cls: 'adm-kind-page', id: it.id,
+                                label: it.en, labelKo: it.ko, sub: 'Go to page', subKo: '페이지로 이동',
+                                menu: it.id, view: '', href: it.target });
             }
         }
+        if (pageHits.length) buckets.push({ hits: pageHits, total: pageHits.length });
     }
+
+    /* ── 2단계: 돌아가며 한 건씩 배정한다 ──────────────────────────────
+       한 통이 상한을 독차지하지 못한다. 매치가 있는 카테고리는 **적어도 한
+       건은 반드시** 자리를 얻고, 남는 자리는 많이 가진 쪽이 더 받는다.
+       배정은 돌아가며 하지만 **출력은 카테고리 순서대로 묶는다** — 목록이
+       카테고리별로 읽히는 지금 모양을 바꾸지 않으려고. */
+    var take = [], remaining = ADM_SEARCH_MAX, anyLeft = true, b;
+    for (b = 0; b < buckets.length; b++) take.push(0);
+    while (remaining > 0 && anyLeft) {
+        anyLeft = false;
+        for (b = 0; b < buckets.length && remaining > 0; b++) {
+            if (take[b] >= buckets[b].hits.length) continue;
+            take[b]++; remaining--; anyLeft = true;
+        }
+    }
+    for (b = 0; b < buckets.length; b++) {
+        out.totalMatches += buckets[b].total;
+        for (var j = 0; j < take[b]; j++) out.push(buckets[b].hits[j]);
+    }
+    out.truncated = out.totalMatches > out.length;
     return out;
 }
 // 검색창 안내용 — 등록된 캐시 이름 목록(아직 안 연 화면은 검색에 안 잡힌다는 것을 사용자가 알게)
