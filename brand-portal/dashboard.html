@@ -1310,6 +1310,7 @@ async function loadProducts() {
                     <h4>${pName}</h4>
                     <p>${pCollection} ${p.materials ? '· ' + pMaterials : ''}</p>
                     <span class="status-badge ${statusClass}" style="margin-top:8px;">${pStatus}</span>
+                    ${rejectReasonHtml(pSt, p.reviewerNote)}
                 </div>
             </div>`;
     });
@@ -1329,6 +1330,21 @@ function articleMillis(a) {
     if (a && a.createdAt && a.createdAt.seconds) return a.createdAt.seconds * 1000;
     return 0;
 }
+// ── 반려 사유 (A-154) ──
+// 어드민은 같은 reviewerNote 칸을 "게시 시 내부 메모"로도 쓴다.
+// 그래서 status === 'rejected' 일 때만 노출한다 — 승인 건의 내부 메모는 보이지 않는다.
+function rejectReasonHtml(status, note) {
+    if (status !== 'rejected') return '';
+    const ko = (document.documentElement.lang || 'ko').indexOf('ko') === 0;
+    const body = (note || '').trim()
+        ? escapeHtml(note.trim())
+        : (ko ? '사유가 입력되지 않았습니다. 문의해 주세요.' : 'No reason was given. Please contact us.');
+    return `<p style="margin-top:8px;padding:10px 12px;border-left:3px solid #dc2626;background:#fef2f2;
+                      color:#991b1b;font-size:0.8rem;line-height:1.65;border-radius:0 6px 6px 0;white-space:pre-wrap;">
+                <strong style="display:block;margin-bottom:3px;font-size:0.74rem;letter-spacing:0.04em;">
+                    ${ko ? '반려 사유' : 'Reason for rejection'}</strong>${body}</p>`;
+}
+
 async function loadArticles() {
     const list = document.getElementById('articleList');
     const empty = document.getElementById('emptyArticles');
@@ -1377,6 +1393,7 @@ async function loadArticles() {
                     <span style="font-size:0.75rem;color:#C8A96E;margin-left:8px;">${aTag}</span>
                     <p style="font-size:0.8rem;color:#999;margin-top:4px;">${aContent}${aContent ? '...' : ''}</p>
                     ${when ? `<p style="font-size:0.72rem;color:#bbb;margin-top:4px;">${ko ? '제출일' : 'Submitted'} ${when}</p>` : ''}
+                    ${rejectReasonHtml(st, a.reviewerNote)}
                 </div>
                 <span class="status-badge ${statusClass}" style="white-space:nowrap;">${LABEL[st]}</span>
             </div>`;

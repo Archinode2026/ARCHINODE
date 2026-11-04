@@ -752,7 +752,7 @@ async function loadProducts() {
                     <button class="act-btn act-view" onclick="viewProduct('${doc.id}')">View</button>
                     ${p.status === 'pending' ? `
                         <button class="act-btn act-approve" onclick="updateDoc('products','${doc.id}','approved')">Approve</button>
-                        <button class="act-btn act-reject" onclick="updateDoc('products','${doc.id}','rejected')">Reject</button>
+                        <button class="act-btn act-reject" onclick="rejectDoc('products','${doc.id}')">Reject</button>
                     ` : `<span style="font-size:0.78rem;color:#999;">${p.status}</span>`}
                 </td>
             </tr>`;
@@ -798,7 +798,7 @@ async function viewProduct(docId) {
 
     const actionsHtml = p.status === 'pending' ? `
         <button class="act-btn act-approve" onclick="updateDoc('products','${docId}','approved');closeModal();">Approve</button>
-        <button class="act-btn act-reject" onclick="updateDoc('products','${docId}','rejected');closeModal();">Reject</button>
+        <button class="act-btn act-reject" onclick="rejectDoc('products','${docId}')">Reject</button>
     ` : '';
 
     document.getElementById('modalContent').innerHTML = `
@@ -839,7 +839,7 @@ async function loadArticles() {
                     ${a.status === 'pending' ? `
                         <button class="act-btn act-view" onclick="viewArticle('${doc.id}')">Review</button>
                         <button class="act-btn act-approve" onclick="updateDoc('articles','${doc.id}','approved')">Approve</button>
-                        <button class="act-btn act-reject" onclick="updateDoc('articles','${doc.id}','rejected')">Reject</button>
+                        <button class="act-btn act-reject" onclick="rejectDoc('articles','${doc.id}')">Reject</button>
                     ` : `<span style="font-size:0.78rem;color:#999;">${a.status}</span>`}
                 </td>
             </tr>`;
@@ -870,19 +870,59 @@ async function viewArticle(docId) {
         <div style="white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:#444;">${escapeHtml(a.content || '')}</div>
         <div style="margin-top:24px;">
             <button class="act-btn act-approve" onclick="updateDoc('articles','${docId}','approved');closeModal();">Approve</button>
-            <button class="act-btn act-reject" onclick="updateDoc('articles','${docId}','rejected');closeModal();">Reject</button>
+            <button class="act-btn act-reject" onclick="rejectDoc('articles','${docId}')">Reject</button>
         </div>`;
     document.getElementById('modal').classList.add('show');
 }
 
 // ── 범용 상태 업데이트 ──
-async function updateDoc(collection, docId, status) {
-    if (!confirm(`${status === 'approved' ? 'Approve' : 'Reject'} this item?`)) return;
+// A-154: 반려는 rejectDoc() 이 사유를 받아 reviewerNote 에 저장한다.
+// 브랜드 포털은 status === 'rejected' 일 때만 이 값을 보여준다(승인 건의 내부 메모는 노출되지 않는다).
+async function updateDoc(collection, docId, status, reason, skipConfirm) {
+    if (!skipConfirm && !confirm(`${status === 'approved' ? 'Approve' : 'Reject'} this item?`)) return;
     let prev = null;   // 2단계: 활동 로그 from·label 용 — 이 흐름은 get() 이 없어 한 번 읽는다
     try { prev = (await db.collection(collection).doc(docId).get()).data() || null; } catch (e) {}
-    await db.collection(collection).doc(docId).update({ status: status });
-    logAdmin({ action: collection === 'products' ? 'product.status' : 'article.status', target: { col: collection, id: docId, label: (prev && (prev.name || prev.title)) || '' }, from: (prev && prev.status) || '', to: status, note: '' });   // 2단계: 활동 로그
+    const updates = { status: status };
+    if (status === 'rejected') updates.reviewerNote = (reason || '').trim() || null;
+    await db.collection(collection).doc(docId).update(updates);
+    logAdmin({ action: collection === 'products' ? 'product.status' : 'article.status', target: { col: collection, id: docId, label: (prev && (prev.name || prev.title)) || '' }, from: (prev && prev.status) || '', to: status, note: (reason || '').trim() });   // 2단계: 활동 로그
     await loadAll();
+}
+
+// ── 반려 사유 입력 (A-154) ──
+// 이 화면 규칙상 prompt()/alert() 를 쓰지 않는다 — 이미 있는 모달을 그대로 재사용한다.
+function rejectDoc(collection, docId) {
+    const mc = document.getElementById('modalContent');
+    mc.innerHTML = `
+        <h2 style="margin-bottom:6px;">반려 사유</h2>
+        <p style="color:#7a7164;font-size:0.85rem;margin-bottom:14px;">
+            입력한 내용은 <strong>브랜드에게 그대로 보입니다.</strong> 비워두면 사유 없이 반려됩니다.
+        </p>
+        <textarea id="rejectReason" rows="5"
+            style="width:100%;padding:12px 14px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.9rem;line-height:1.6;resize:vertical;"
+            placeholder="예) 제품 사진 해상도가 낮습니다. 1200px 이상으로 다시 올려주세요."></textarea>
+        <div style="margin-top:18px;display:flex;gap:8px;">
+            <button class="act-btn act-reject" id="rejectConfirm">반려</button>
+            <button class="act-btn" id="rejectCancel" style="background:#eee;color:#403a30;">취소</button>
+        </div>`;
+    document.getElementById('modal').classList.add('show');
+    const ta = document.getElementById('rejectReason');
+    ta.focus();
+    document.getElementById('rejectCancel').onclick = closeModal;
+    document.getElementById('rejectConfirm').onclick = async function () {
+        this.disabled = true;
+        this.textContent = '처리 중…';
+        try {
+            await updateDoc(collection, docId, 'rejected', ta.value, true);
+            closeModal();
+        } catch (err) {
+            console.error(err);
+            this.disabled = false;
+            this.textContent = '반려';
+            mc.insertAdjacentHTML('beforeend',
+                '<p style="color:#991b1b;font-size:0.85rem;margin-top:10px;">저장에 실패했습니다. 다시 시도해 주세요.</p>');
+        }
+    };
 }
 
 // ══════════════════════════════════════════════════════════════════════
