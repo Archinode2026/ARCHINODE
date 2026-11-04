@@ -319,6 +319,8 @@
           $('addArticleBtn').style.display = 'inline-block';
           msg.textContent = '';
           if (typeof loadArticles === 'function') loadArticles();
+          // R-027: 목록만 다시 읽으면 위쪽 통계 카드가 옛 숫자로 남는다 (제품 쪽과 같은 문제)
+          if (typeof window.loadStats === 'function') window.loadStats();
         }, 1500);
       } catch (e) {
         msg.textContent = (e.message === 'ARCHINODE_TIMEOUT')

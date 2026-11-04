@@ -1010,6 +1010,7 @@ async function loadBrandData(uid) {
 }
 
 // ── 통계 로드 ──
+window.loadStats = loadStats;   // R-027 — article-editor.js 에서도 부른다
 async function loadStats() {
     try {
         // 브랜드 저장 수 (공개 페이지에서는 숨기고 여기서만 노출 — 2026-11-03)
@@ -1438,6 +1439,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     document.getElementById('prodImagePreview').style.display = 'none';
 
     loadProducts();
+    loadStats();   // R-027: 목록만 다시 읽고 위쪽 카드 숫자는 그대로여서, 방금 올린 제품이 카드에 안 잡혔다
 });
 
 // ── 제품 목록 로드 ──
