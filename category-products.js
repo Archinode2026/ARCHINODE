@@ -50,28 +50,28 @@
 
             if (snap.empty) {
                 container.innerHTML = `
-                <div style="text-align:center;padding:60px 20px;color:#a3a3a3;">
-                    <i class="fas fa-box-open" style="font-size:2.5rem;margin-bottom:16px;display:block;"></i>
-                    <p style="font-size:0.9rem;" data-en="No products listed yet. Brands can register their products through the brand portal." data-ko="아직 등록된 제품이 없습니다. 브랜드 포털을 통해 제품을 등록할 수 있습니다.">No products listed yet. Brands can register their products through the brand portal.</p>
-                    <a href="${base}list-your-brand.html" style="display:inline-block;margin-top:20px;padding:10px 24px;background:#332e27;color:#fff;font-size:0.82rem;font-weight:600;text-decoration:none;" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+                <div class="cp-empty">
+                    <i class="fas fa-box-open"></i>
+                    <p data-en="No products listed yet. Brands can register their products through the brand portal." data-ko="아직 등록된 제품이 없습니다. 브랜드 포털을 통해 제품을 등록할 수 있습니다.">No products listed yet. Brands can register their products through the brand portal.</p>
+                    <a href="${base}list-your-brand.html" class="pill-btn" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
                 </div>`;
                 if (window.applyLang) window.applyLang();   // A-062: 비동기로 끼워넣는 조각이라 언어 재적용 필요
                 return;
             }
 
-            let html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:40px;">';
+            let html = '<div class="cp-grid">';
 
             snap.forEach(doc => {
                 const p = doc.data();
                 html += `
-                <a href="${base}products/view.html?id=${p.slug || ''}" style="border:1px solid #e5e5e5;overflow:hidden;text-decoration:none;color:inherit;display:block;transition:all 0.3s;" onmouseover="this.style.borderColor='#332e27';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)'" onmouseout="this.style.borderColor='#e5e5e5';this.style.boxShadow='none'">
-                    <div style="width:100%;aspect-ratio:1;overflow:hidden;background:#f5f5f5;">
-                        ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s;">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#d4d4d4;font-size:2rem;"><i class="fas fa-cube"></i></div>'}
+                <a href="${base}products/view.html?id=${p.slug || ''}" class="cp-card">
+                    <div class="cp-thumb">
+                        ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<span class="cp-noimg"><i class="fas fa-cube"></i></span>'}
                     </div>
-                    <div style="padding:16px;">
-                        <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#737373;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.brandName}</div>
-                        <div style="font-size:0.88rem;font-weight:600;color:#332e27;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3;">${p.name}</div>
-                        ${p.materials ? `<div style="font-size:0.78rem;color:#a3a3a3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.materials}</div>` : ''}
+                    <div class="cp-body">
+                        <div class="cp-brand">${p.brandName}</div>
+                        <div class="cp-name">${p.name}</div>
+                        ${p.materials ? `<div class="cp-mat">${p.materials}</div>` : ''}
                     </div>
                 </a>`;
             });
@@ -82,7 +82,7 @@
 
         } catch (err) {
             console.error('Error loading products:', err);
-            container.innerHTML = '<p style="text-align:center;color:#a3a3a3;padding:40px;" data-en="Unable to load products." data-ko="제품을 불러올 수 없습니다.">Unable to load products.</p>';
+            container.innerHTML = '<p class="cp-error" data-en="Unable to load products." data-ko="제품을 불러올 수 없습니다.">Unable to load products.</p>';
             if (window.applyLang) window.applyLang();
         }
     }
