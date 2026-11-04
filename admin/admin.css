@@ -57,12 +57,41 @@
 .adm-msg { font-size: 0.8rem; color: var(--gray-700); margin-bottom: 12px; min-height: 1em; }
 .adm-msg.err { color: #b91c1c; }
 .adm-nowrap { white-space: nowrap; }
-.adm-log-sub { display: block; font-size: 0.7rem; color: var(--ink-soft); margin-top: 2px; word-break: break-all; }
+.adm-log-sub { display: block; font-size: 0.7rem; color: var(--ink-soft); margin-top: 2px;
+               overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }   /* R-072: break-all 이 51px 칸에서 1글자씩 쌓았다 */
 .adm-log-arrow { color: var(--accent-ink); font-weight: 700; }
-.adm-log-note { max-width: 320px; white-space: pre-wrap; word-break: break-word; font-size: 0.82rem; color: var(--gray-700); }
+/* R-072: 메모 열이 표 안에서 59px 까지 눌려, 긴 메모 한 건이 행 하나를 1800px 높이로 밀어 올렸다.
+   칸(td)에 max-width 를 주는 방식은 table-layout:auto 에서 듣지 않는다 — 다른 열이 먼저 자기
+   콘텐츠 폭을 가져가고 메모 칸이 나머지를 떠안기 때문이다. 그래서 안쪽 span 을 inline-block 으로
+   두고 거기서 한 줄로 자른다(검수관리 표의 .rv-ellip 과 같은 수법). 잘린 것만 눌러서 전체를 본다. */
+.adm-log-note { font-size: 0.82rem; color: var(--gray-700); }
+.adm-log-note-text { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+                     white-space: nowrap; }
+.adm-log-note-text.is-clip { cursor: pointer; border-bottom: 1px dotted var(--gray-400); }
+.adm-log-note-text.is-clip:hover,
+.adm-log-note-text.is-clip:focus { color: var(--accent-ink); border-bottom-color: var(--accent-ink); outline: none; }
+.adm-log-note-text.is-clip:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.adm-log-note-full { white-space: pre-wrap; word-break: break-word; background: var(--gray-50);
+                     padding: 12px 14px; border-radius: 6px; font-family: inherit; font-size: 0.86rem;
+                     color: var(--black); margin: 10px 0 0; max-height: 60vh; overflow: auto; }
 .adm-more { margin-top: 14px; text-align: center; font-size: 0.82rem; }
 .adm-more a { color: var(--accent-ink); font-weight: 600; }
-.adm-log-table td { padding: 10px 12px; font-size: 0.82rem; }
+.adm-log-table td { padding: 10px 12px; font-size: 0.82rem; overflow: hidden; }
+/* R-072: 폭 규칙이 없으면 어느 한 열이 1글자씩 세로로 쌓인다 — 어느 열이 희생될지는 그때그때 다르다.
+   메모 열만 고쳤더니 이번엔 「대상」 열이 51px 로 눌려 똑같은 탑이 섰다(실측). 열 폭을 고정하고
+   좁은 화면에서는 표를 가로로 스크롤시킨다(.adm-table-wrap — A-197 에서 쓰던 그 상자). */
+.adm-log-table { table-layout: fixed; width: 100%; }
+/* ★ min-width 는 .adm-table-wrap > table { min-width:100% } 보다 더 또렷하게 적어야 이긴다.
+   그냥 .adm-log-table 로 적었더니 상자 폭(684px)으로 눌려 메모 열이 **0px** 가 됐다(실측). */
+.adm-table-wrap > table.adm-log-table { min-width: 1100px; }
+.adm-log-table th:nth-child(1), .adm-log-table td:nth-child(1) { width: 140px; }   /* 시간 */
+.adm-log-table th:nth-child(2), .adm-log-table td:nth-child(2) { width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }  /* 누가 */
+.adm-log-table th:nth-child(3), .adm-log-table td:nth-child(3) { width: 120px; }   /* 무엇을 */
+.adm-log-table th:nth-child(4), .adm-log-table td:nth-child(4) { width: 160px; }   /* 대상 */
+.adm-log-table th:nth-child(5), .adm-log-table td:nth-child(5) { width: 150px; }   /* 어디서 → 어디로 */
+.adm-log-table th:nth-child(7), .adm-log-table td:nth-child(7) { width: 100px; }   /* 화면 */
+/* 나머지(메모)가 남는 폭을 가져간다 — 1100px 기준 270px */
 .brand-history li small { display: block; color: var(--gray-700); margin: 2px 0 0; white-space: pre-wrap; }
 
 /* MODAL — admin-core.js 가 #modal 을 만들었을 때(페이지에 .modal-overlay 가 없을 때) 쓰는 모양 */

@@ -85,6 +85,7 @@ function dash_loadRecent() {
             var items = [];
             snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
             box.innerHTML = logs_tableHtml(items);
+            if (typeof logs_afterInsert === 'function') logs_afterInsert(box);   // R-072 — 잘린 메모 표시
         })
         .catch(function (err) {
             console.error('[dashboard] adminLogs read failed', err);

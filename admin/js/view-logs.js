@@ -108,7 +108,7 @@ function logs_render(el) {
             + '<button type="button" class="act-btn act-view" id="logRefreshBtn" ' + tAttr('Refresh', '새로고침') + '>' + escapeHtml(t('Refresh', '새로고침')) + '</button>'
             + '</div>'
             + '<div class="adm-msg" id="logMsg"></div>'
-            + '<table><thead>' + logs_theadHtml() + '</thead><tbody id="logTable"></tbody></table>'
+            + '<div class="adm-table-wrap"><table class="adm-log-table"><thead>' + logs_theadHtml() + '</thead><tbody id="logTable"></tbody></table></div>'   // R-072: 탭 쪽 표에는 클래스가 없어 폭 규칙이 닿지 않았다
             + '<div class="adm-more"><button type="button" class="act-btn act-add" id="logMoreBtn" style="display:none;" ' + tAttr('Load more', '더 보기') + '>' + escapeHtml(t('Load more', '더 보기')) + '</button></div>'
             + '</div>';
         el.innerHTML = html;
@@ -204,6 +204,7 @@ function logs_draw() {
     tbody.innerHTML = list.length
         ? logs_rowsHtml(list)
         : '<tr><td colspan="' + LOG_COLUMNS.length + '" class="adm-muted">' + tSpan('No activity', '활동 없음') + '</td></tr>';
+    logs_markClipped(tbody);   // R-072 — 심어 넣은 뒤에야 잘렸는지 잴 수 있다
     var more = document.getElementById('logMoreBtn');
     if (more) more.style.display = log_state.hasMore ? '' : 'none';
     if (!log_state.loading && !log_state.error) {   // 오류 상태면 요약문으로 덮지 않는다
@@ -234,6 +235,52 @@ function logs_msg(enOrText, koOrIsErr, maybeIsErr) {
 }
 
 // ── 행 HTML — 대시보드 「최근 활동」과 공유. 모든 값 escapeHtml ──
+// ── R-072: 메모 칸 ──
+// 메모를 날것으로 넣으면 좁은 칸 안에서 세로로 쌓여 행 하나가 화면을 다 먹는다.
+// 한 줄로 자르고, 실제로 잘린 것만 눌러서 전체를 본다(잘릴지는 폭에 달려 있어 그릴 때는 알 수 없다 —
+// 그래서 심어 넣은 뒤 logs_markClipped() 가 재어서 표시한다).
+function logs_noteCell(note) {
+    var s = String(note == null ? '' : note);
+    if (!s) return '';
+    return '<span class="adm-log-note-text" title="' + escapeAttr(s) + '">' + escapeHtml(s) + '</span>';
+}
+
+// 그려 넣은 뒤 부른다. scrollWidth > clientWidth 인 것만 '누를 수 있음' 으로 바꾼다.
+// (부모 상자와 비교하는 방식으로는 overflow:hidden 으로 잘린 글자를 못 잡는다 — A-214 에서 배운 것)
+function logs_markClipped(root) {
+    root = root || document;
+    var list = root.querySelectorAll('.adm-log-note-text');
+    for (var i = 0; i < list.length; i++) {
+        var el = list[i];
+        var clipped = el.scrollWidth > el.clientWidth + 1;
+        if (clipped) {
+            el.classList.add('is-clip');
+            el.setAttribute('role', 'button');
+            el.setAttribute('tabindex', '0');
+        } else {
+            el.classList.remove('is-clip');
+            el.removeAttribute('role');
+            el.removeAttribute('tabindex');
+        }
+    }
+}
+
+// 잘린 메모를 눌렀을 때. 표 전체에 하나만 붙여 두고 위임으로 받는다(행이 다시 그려져도 살아 있게).
+function logs_noteClickHandler(e) {
+    var el = e.target && e.target.closest ? e.target.closest('.adm-log-note-text.is-clip') : null;
+    if (!el) return;
+    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.type === 'keydown') e.preventDefault();
+    if (typeof openModal !== 'function') return;
+    openModal('<h2 style="font-size:1rem;margin-bottom:4px;">' + tSpan('Note', '메모') + '</h2>'
+            + '<pre class="adm-log-note-full">' + escapeHtml(el.getAttribute('title') || '') + '</pre>');
+}
+if (typeof document !== 'undefined' && !window.__logsNoteBound) {
+    window.__logsNoteBound = true;
+    document.addEventListener('click', logs_noteClickHandler);
+    document.addEventListener('keydown', logs_noteClickHandler);
+}
+
 function logs_rowsHtml(list) {
     var html = '';
     for (var i = 0; i < list.length; i++) {
@@ -246,7 +293,7 @@ function logs_rowsHtml(list) {
             + '<td>' + logs_actionLabel(it.action) + '</td>'
             + '<td>' + escapeHtml(tg.label || '-') + '<small class="adm-log-sub">' + escapeHtml(ref) + '</small></td>'
             + '<td class="adm-nowrap">' + escapeHtml(it.from || '') + ' <span class="adm-log-arrow">→</span> ' + escapeHtml(it.to || '') + '</td>'
-            + '<td class="adm-log-note">' + escapeHtml(it.note || '') + '</td>'
+            + '<td class="adm-log-note">' + logs_noteCell(it.note) + '</td>'
             + '<td>' + escapeHtml(it.page || '') + '</td>'
             + '</tr>';
     }
@@ -258,10 +305,13 @@ function logs_actionLabel(action) {
     return meta ? tSpan(meta.en, meta.ko) : escapeHtml(action || '');   // 모르는 action 은 원문 그대로(이스케이프)
 }
 
+// 대시보드 위젯처럼 logs_tableHtml() 을 innerHTML 로 꽂는 쪽은 꽂은 뒤 이걸 부른다.
+function logs_afterInsert(root) { logs_markClipped(root); }
+
 // ── 표 전체 HTML (thead + tbody). 대시보드가 재사용 ──
 function logs_tableHtml(list) {
-    return '<table class="adm-log-table"><thead>' + logs_theadHtml() + '</thead><tbody>'
+    return '<div class="adm-table-wrap"><table class="adm-log-table"><thead>' + logs_theadHtml() + '</thead><tbody>'
         + (list && list.length ? logs_rowsHtml(list)
             : '<tr><td colspan="' + LOG_COLUMNS.length + '" class="adm-muted">' + tSpan('No activity yet', '아직 활동 없음') + '</td></tr>')
-        + '</tbody></table>';
+        + '</tbody></table></div>';
 }
