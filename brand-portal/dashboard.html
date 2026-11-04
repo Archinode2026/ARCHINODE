@@ -34,6 +34,9 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 /* STATUS BADGE */
 .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 .status-pending { background: #fef3c7; color: #92400e; }
+/* A-204 — '수정 요청됨'. 반려(빨강)와 구분되고, 끝이 아니라 할 일이 있다는 뜻의 앰버.
+   #faf0e0 위 #6b4f2a = 6.07:1 */
+.status-revision { background: #faf0e0; color: #6b4f2a; }
 .status-approved { background: #d1fae5; color: #065f46; }
 .status-suspended { background: #fed7aa; color: #9a3412; }
 .status-rejected { background: #fee2e2; color: #991b1b; }
@@ -777,7 +780,7 @@ h1, h2, .section-card h2 {
 
 <script src="../firebase-config.js"></script>
 <script src="../search.js"></script>
-<script src="../lang.js?v=20260630"></script>
+<script src="../lang.js?v=20261104a"></script>
 <script>
 let currentUser = null;
 let brandData = null;
@@ -986,11 +989,12 @@ function populateDashboard() {
             reasonBox.style.display = 'none';
         }
 
-        // W1 fix: innerHTML로 동적 삽입된 data-en/data-ko를 lang.js에 재적용
-        // (lang.js의 applyLanguage는 IIFE 안이지만, window.setLang을 호출하면 querySelectorAll로 다시 처리됨)
-        if (window.setLang) {
-            try { window.setLang(document.documentElement.lang || 'ko'); } catch(e) {}
-        }
+        // W1 fix: innerHTML로 동적 삽입된 data-en/data-ko를 lang.js에 재적용.
+        // A-204: 전에는 setLang(documentElement.lang || 'ko') 를 불렀는데, setLang 은 '사용자 선택'
+        // 이라 localStorage 에 저장한다. lang.js 는 DOMContentLoaded 에 언어를 입히므로 그보다
+        // 먼저 이 줄이 돌면 값이 HTML 시작값 'en' 이고, 한국어 선호가 영구히 'en' 으로 덮였다.
+        // applyLangAgain() 은 저장하지 않고 현재 언어만 다시 입힌다.
+        if (window.applyLangAgain) { try { window.applyLangAgain(); } catch(e) {} }
     } else {
         banner.style.display = 'none';
     }
@@ -1340,17 +1344,28 @@ function articleMillis(a) {
 // ── 반려 사유 (A-154) ──
 // 어드민은 같은 reviewerNote 칸을 "게시 시 내부 메모"로도 쓴다.
 // 그래서 status === 'rejected' 일 때만 노출한다 — 승인 건의 내부 메모는 보이지 않는다.
-function rejectReasonHtml(status, note) {
-    if (status !== 'rejected') return '';
+/* A-204: 반려 사유만 보여주던 함수 — 수정 요청 사유도 보여준다.
+   수정 요청은 '끝' 이 아니라 '고쳐서 다시 내라' 는 뜻이므로 빨강이 아니라 앰버로 쓴다.
+   이름도 rejectReasonHtml → reviewerNoteHtml 로 (이제 반려 전용이 아니다). */
+function reviewerNoteHtml(status, note) {
+    if (status !== 'rejected' && status !== 'revision-requested') return '';
     const ko = (document.documentElement.lang || 'ko').indexOf('ko') === 0;
+    const rejected = (status === 'rejected');
+    const headEn = rejected ? 'Reason for rejection' : 'Requested changes';
+    const headKo = rejected ? '반려 사유' : '수정 요청 사유';
     const body = (note || '').trim()
         ? escapeHtml(note.trim())
         : (ko ? '사유가 입력되지 않았습니다. 문의해 주세요.' : 'No reason was given. Please contact us.');
-    return `<p style="margin-top:8px;padding:10px 12px;border-left:3px solid #b91c1c;background:#fef2f2;
-                      color:#991b1b;font-size:0.8rem;line-height:1.65;border-radius:0 6px 6px 0;white-space:pre-wrap;">
-                <strong style="display:block;margin-bottom:3px;font-size:0.74rem;letter-spacing:0.04em;">
-                    ${ko ? '반려 사유' : 'Reason for rejection'}</strong>${body}</p>`;
+    const line = rejected ? '#b91c1c' : '#a07c4a';
+    const bg   = rejected ? '#fef2f2' : '#faf6ef';
+    const fg   = rejected ? '#991b1b' : '#6b4f2a';
+    return `<p style="margin-top:8px;padding:10px 12px;border-left:3px solid ${line};background:${bg};
+                      color:${fg};font-size:0.8rem;line-height:1.65;border-radius:0 6px 6px 0;white-space:pre-wrap;">
+                <strong style="display:block;margin-bottom:3px;font-size:0.74rem;letter-spacing:0.04em;"
+                        data-en="${escapeHtml(headEn)}" data-ko="${escapeHtml(headKo)}">${escapeHtml(ko ? headKo : headEn)}</strong>${body}</p>`;
 }
+// 옛 이름으로 부르는 곳이 남아 있어도 깨지지 않게 (제품 카드가 쓴다)
+function rejectReasonHtml(status, note) { return reviewerNoteHtml(status, note); }
 
 async function loadArticles() {
     const list = document.getElementById('articleList');
@@ -1379,15 +1394,25 @@ async function loadArticles() {
     snap.forEach(doc => rows.push(doc.data()));
     rows.sort((x, y) => articleMillis(y) - articleMillis(x));
 
+    /* A-204 / R-063: 어드민(admin/articles.html)은 status 를 5단계로 쓴다 —
+       pending · reviewing · revision-requested · approved · rejected.
+       여기서는 앞의 셋만 알아서 나머지를 pending 으로 접었는데(A-153),
+       그 결과 **수정 요청이 브랜드에게 전달되지 않았다**: 어드민은 사유 입력을
+       강제당하고 저장까지 되는데, 브랜드 화면에는 "심사 대기중" 만 떴다.
+       다섯 상태를 모두 알아듣고, 모르는 값만 pending 으로 접는다. */
     const LABEL = {
-        pending:  ko ? '심사 대기중' : 'Pending',
-        approved: ko ? '승인됨'      : 'Approved',
-        rejected: ko ? '반려됨'      : 'Rejected'
+        pending:                { ko: '심사 대기중', en: 'Pending' },
+        reviewing:              { ko: '검토 중',     en: 'In review' },
+        'revision-requested':   { ko: '수정 요청됨', en: 'Revision requested' },
+        approved:               { ko: '승인됨',      en: 'Approved' },
+        rejected:               { ko: '반려됨',      en: 'Rejected' }
     };
 
     rows.forEach(a => {
-        const st = (a.status === 'approved' || a.status === 'rejected') ? a.status : 'pending';
-        const statusClass = st === 'approved' ? 'status-approved' : st === 'rejected' ? 'status-rejected' : 'status-pending';
+        const st = LABEL[a.status] ? a.status : 'pending';   // 모르는 값만 pending 으로 (A-204)
+        const statusClass = st === 'approved' ? 'status-approved'
+                          : st === 'rejected' ? 'status-rejected'
+                          : st === 'revision-requested' ? 'status-revision' : 'status-pending';
         const aTitle = escapeHtml(a.title || (ko ? '(제목 없음)' : '(untitled)'));
         const aTag = escapeHtml(a.tag || '');
         const aContent = escapeHtml((a.content || '').substring(0, 100));
@@ -1400,11 +1425,15 @@ async function loadArticles() {
                     <span style="font-size:0.75rem;color:#7a5c32;margin-left:8px;">${aTag}</span>
                     <p style="font-size:0.8rem;color:#6b6459;margin-top:4px;">${aContent}${aContent ? '...' : ''}</p>
                     ${when ? `<p style="font-size:0.72rem;color:#6b6459;margin-top:4px;">${ko ? '제출일' : 'Submitted'} ${when}</p>` : ''}
-                    ${rejectReasonHtml(st, a.reviewerNote)}
+                    ${reviewerNoteHtml(st, a.reviewerNote)}
                 </div>
-                <span class="status-badge ${statusClass}" style="white-space:nowrap;">${LABEL[st]}</span>
+                <span class="status-badge ${statusClass}" style="white-space:nowrap;"
+                      data-en="${escapeHtml(LABEL[st].en)}" data-ko="${escapeHtml(LABEL[st].ko)}">${escapeHtml(ko ? LABEL[st].ko : LABEL[st].en)}</span>
             </div>`;
     });
+    // A-204: 이 목록이 lang.js 보다 먼저 그려질 수 있다(html lang="en" 이 시작값).
+    // data-en/data-ko 를 달았으므로 setLang 에 다시 맡겨 뒤늦게라도 바로잡는다(992행과 같은 수법).
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
 }
 
 // ── 로그아웃 ──

@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/vendor/fontawesome-6.5.1/css/all.min.css">
 <link rel="stylesheet" href="../style.css">
-<link rel="stylesheet" href="admin.css?v=20261104d">
+<link rel="stylesheet" href="admin.css?v=20261104e">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -203,12 +203,11 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       <div class="modal-section">
         <h3>Submission Details</h3>
         <dl class="detail-grid">
-          <dt>Contact</dt><dd id="mContact">—</dd>
-          <dt>Email</dt><dd id="mEmail">—</dd>
-          <dt>Country</dt><dd id="mCountry">—</dd>
-          <dt>Category</dt><dd id="mCategory">—</dd>
-          <dt>Original Lang</dt><dd id="mOriginalLang">—</dd>
-          <dt>Source</dt><dd id="mSource">—</dd>
+          <!-- A-204: Contact·Email·Country·Source 는 articles 문서에 없는 필드라 항상 "—" 였다.
+               이 파일은 trend-submissions.html 을 복사해 만들어진 탓(A-042 와 같은 원인).
+               Category→tag, Original Lang→lang 은 이름만 틀렸던 것이라 고쳐서 살렸다. -->
+          <dt>Tag</dt><dd id="mCategory">—</dd>
+          <dt>Language</dt><dd id="mOriginalLang">—</dd>
           <dt>Submitted</dt><dd id="mCreatedAt">—</dd>
           <dt>Current Status</dt><dd id="mStatus">—</dd>
         </dl>
@@ -235,6 +234,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
         <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Korean Translation (편집부)</label>
         <textarea class="editor-input" id="inKorean" placeholder="한국어 번역을 입력하세요. 한국 디자이너 어휘 우선."></textarea>
         <div class="editor-hint">게시 시 trend-editor 에이전트와 함께 사용. 어휘는 한국 건축·디자인 업계 어휘 우선.</div>
+        <div class="editor-hint" style="color:#991b1b;">⚠ 지금은 이 번역을 <strong>사이트에 보여주는 화면이 아직 없습니다</strong> — 저장만 됩니다(검수대장 A-205). 한국어 기사 노출 기능이 생길 때까지는 게시용 초안으로만 쓰세요.</div>
 
         <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Reviewer Note (사유 / 메모)</label>
         <textarea class="editor-input" id="inNote" placeholder="거절·수정 요청 시 사유. 게시 시 내부 메모로도 사용." style="min-height:80px;"></textarea>
@@ -248,6 +248,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
     </div>
     <div class="modal-foot">
       <button class="act-btn act-review" id="btnReview"><i class="fas fa-magnifying-glass"></i> 검토 시작</button>
+      <button class="act-btn" id="btnBackToPending" title="상태를 '대기'로 되돌리고 사유 메모를 지웁니다"><i class="fas fa-rotate-left"></i> 대기로 되돌리기</button>
       <button class="act-btn act-revise" id="btnRevise"><i class="fas fa-pen"></i> 수정 요청</button>
       <button class="act-btn act-reject" id="btnReject"><i class="fas fa-xmark"></i> 거절</button>
       <button class="act-btn act-approve" id="btnApprove"><i class="fas fa-check"></i> 게시 승인</button>
@@ -258,9 +259,9 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 <div class="toast" id="toast"></div>
 
 <script src="../firebase-config.js"></script>
-<script src="js/admin-core.js?v=20261104d"></script>
-<script src="js/admin-nav.js?v=20261104d"></script>
-<script src="../lang.js?v=20260630"></script>
+<script src="js/admin-core.js?v=20261104e"></script>
+<script src="js/admin-nav.js?v=20261104e"></script>
+<script src="../lang.js?v=20261104a"></script>
 <script>
 // ADMIN_EMAILS, isAdmin() 는 firebase-config.js 에서 제공
 let currentStatus = 'pending';
@@ -382,16 +383,12 @@ window.openModal = function(id) {
   if (!d) return;
   currentDoc = d;
   document.getElementById('mTitle').textContent = d.title || '—';
-  document.getElementById('mBrandMeta').textContent = (d.brandName || '—') + ' · ' + (d.country || '—');
-  document.getElementById('mContact').textContent = d.contactName || '—';
-  document.getElementById('mEmail').innerHTML = d.email ? '<a href="mailto:' + escapeAttr(d.email) + '">' + escapeHtml(d.email) + '</a>' : '—';
-  document.getElementById('mCountry').textContent = d.country || '—';
-  document.getElementById('mCategory').textContent = d.category || '—';
-  document.getElementById('mOriginalLang').textContent = (d.originalLang || '—').toUpperCase();
-  document.getElementById('mSource').textContent = d.source || '—';
+  document.getElementById('mBrandMeta').textContent = d.brandName || '—';   // A-204 — country 는 articles 에 없다
+  document.getElementById('mCategory').textContent = d.tag || '—';            // 스키마 필드는 tag
+  document.getElementById('mOriginalLang').textContent = (d.lang || '—').toUpperCase();   // 스키마 필드는 lang
   document.getElementById('mCreatedAt').textContent = formatDate(d.createdAt);
   document.getElementById('mStatus').textContent = d.status || '—';
-  document.getElementById('bOrigLang').textContent = (d.originalLang || '?').toUpperCase();
+  document.getElementById('bOrigLang').textContent = (d.lang || '?').toUpperCase();
   document.getElementById('bOrigContent').innerHTML = renderBlocks(d.blocks) || escapeHtml(d.originalBody || '(none)');
   document.getElementById('bEnContent').textContent = d.englishBody || d.englishBodyEdited || '(not provided)';
   document.getElementById('bKoContent').textContent = d.koreanBody || '(not yet translated)';
@@ -456,10 +453,22 @@ function updateActionButtons(status) {
   btnRevise.disabled = (status === 'approved' || status === 'rejected');
   btnReject.disabled = (status === 'approved' || status === 'rejected');
   btnApprove.disabled = (status === 'approved' || status === 'rejected');
+  // A-204: 되돌릴 경로가 UI 에 전혀 없었다 — 한 번 '검토 중' 으로 가면 '대기' 로 못 돌아왔다.
+  // 승인(approved)은 이미 매거진에 떠 있으므로 여기서 되돌리지 않는다(게시 회수는 별건).
+  var btnBack = document.getElementById('btnBackToPending');
+  if (btnBack) btnBack.disabled = (status !== 'reviewing' && status !== 'revision-requested' && status !== 'rejected');
 }
 
 // ─────────────── 액션 ───────────────
-document.getElementById('btnReview').addEventListener('click', function() { doAction('reviewing', '검토 시작'); });
+document.getElementById('btnReview').addEventListener('click', function() {
+  // A-204: 확인창이 없어 누르는 순간 바로 저장됐다. 이 상태는 브랜드 화면에도 '검토 중' 으로 보인다.
+  if (!confirm("상태를 '검토 중'으로 바꿉니다. 브랜드 포털에도 '검토 중'으로 보입니다. 계속할까요?")) return;
+  doAction('reviewing', '검토 시작');
+});
+document.getElementById('btnBackToPending').addEventListener('click', function() {
+  if (!confirm("상태를 '대기'로 되돌리고 Reviewer Note 를 지웁니다. 계속할까요?")) return;
+  doAction('pending', '대기로 되돌리기', { clearNote: true });
+});
 document.getElementById('btnRevise').addEventListener('click', function() {
   var note = document.getElementById('inNote').value.trim();
   if (!note) { showToast('수정 요청 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
@@ -479,14 +488,16 @@ document.getElementById('btnApprove').addEventListener('click', function() {
   doAction('approved', '게시 승인');
 });
 
-function doAction(newStatus, label) {
+function doAction(newStatus, label, opt) {
   if (!currentDoc) return;
+  opt = opt || {};
   var logDoc = currentDoc;   // 2단계: 활동 로그용 스냅샷 (then 시점엔 closeModal 로 null 일 수 있음)
   var updates = {
     status: newStatus,
     publishedAt: (newStatus === "approved" ? firebase.firestore.FieldValue.serverTimestamp() : null),
     reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    reviewerNote: document.getElementById('inNote').value.trim() || null,
+    // A-204: 대기로 되돌릴 때 사유를 남겨 두면 브랜드 화면에 옛 '수정 요청 사유' 가 계속 붙는다
+    reviewerNote: opt.clearNote ? null : (document.getElementById('inNote').value.trim() || null),
     englishBodyEdited: document.getElementById('inEnglish').value.trim() || null,
     koreanBody: document.getElementById('inKorean').value.trim() || null
   };

@@ -160,6 +160,18 @@
     }
   });
 
+  /* ── 동적으로 끼운 요소에 현재 언어를 '다시 입히기' (A-204) ────────────────
+     setLang(lang) 은 **사용자가 고른 선택**이라 localStorage('archinode-lang')에
+     저장한다. 그래서 innerHTML 로 넣은 요소를 다시 칠하려고 setLang 을 부르면
+     안 된다 — brand-portal 이 `setLang(document.documentElement.lang || 'ko')` 로
+     그렇게 했고, 이 적용이 DOMContentLoaded 에 일어나므로 그보다 먼저 호출되면
+     값이 HTML 시작값 `lang="en"` 이라 **한국어 선호가 'en' 으로 영구히 덮였다.**
+     다시 칠하기는 선택이 아니다. 저장하지 않고 현재 언어만 다시 입힌다. */
+  window.applyLangAgain = function() {
+    applyLanguage(currentLang);
+    updateLangButton(currentLang);
+  };
+
   window.setLang = function(lang, e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     if (availableLangs.indexOf(lang) === -1) return;
