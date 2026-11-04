@@ -37,28 +37,9 @@ img { max-width: 100%; height: auto; display: block; }
 ul { list-style: none; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 
-:root {
-  --black: #332e27;
-  --white: #fdfbf7;
-  /* A-163: style.css 의 웜 램프와 값을 맞춘다. 이 인라인 :root 가 link 뒤에 와서
-     style.css 를 이기기 때문에, 여기가 옛 값이면 이 페이지만 다른 색이 된다 */
-  --gray-50:  #f7f3ec;
-  --gray-100: #f4efe6;
-  --gray-200: #ede7dc;
-  --gray-300: #ddd5c7;
-  --gray-400: #b5ab9b;
-  --gray-500: #9a9183;
-  --gray-600: #7a7164;
-  --gray-700: #5d564c;
-  --gray-800: #464037;
-  --gray-900: #403a30;
-  --max-width: min(max(1440px, 85vw), 2400px);
-  /* A-169: 1440px 고정이면 1920 화면에서 양쪽 여백이 25%, 2560 에서 44% 가 된다.
-     85vw 를 바닥으로 깔아 넓은 화면에서는 양쪽 15% 로 고정하고,
-     1440px 보다 좁아지지 않게 max() 로 받치고, 초광폭은 2400px 에서 끊는다 */
-  --header-height: 64px;
-  --accent-gold: #C8A96E;
-}
+/* 토큰은 style.css 의 :root 가 단일 출처다 (A-181).
+   여기에 복제본을 두면 link 뒤라 이쪽이 이겨서, 토큰을 바꿔도 이 페이지만 안 따라온다.
+   실제로 A-159 에서 index.html 의 --accent 가 금색 대신 에스프레소로 들어가 20여 커밋 동안 방치됐다. */
 
 .container { max-width: var(--max-width); margin: 0 auto; padding: 0 40px; }
 @media (max-width: 768px) { .container { padding: 0 20px; } }

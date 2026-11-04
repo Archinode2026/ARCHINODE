@@ -45,7 +45,7 @@
             (isKo ? '모두 수락' : 'Accept All') + '</button>' +
           '<button id="cc-necessary" style="background:transparent;color:#fff;border:1px solid #444;padding:10px 18px;font-size:0.82rem;font-weight:600;border-radius:6px;cursor:pointer;font-family:inherit;">' +
             (isKo ? '필수만' : 'Necessary Only') + '</button>' +
-          '<a href="/privacy.html" style="align-self:center;font-size:0.76rem;color:#888;text-decoration:none;margin-left:auto;">' +
+          '<a href="/privacy.html" style="align-self:center;font-size:0.76rem;color:#b5ab9b;text-decoration:none;margin-left:auto;">' +
             (isKo ? '자세히' : 'Manage / Learn more') + '</a>' +
         '</div>' +
       '</div>';

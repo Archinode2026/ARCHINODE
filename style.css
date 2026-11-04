@@ -2194,6 +2194,13 @@ input, select, textarea { font-family: inherit; }
   --gray-700: #5d564c;
   --gray-800: #464037;
   --gray-900: #403a30;   /* 어두운 밴드·푸터 */
+
+  /* 밝은 배경 전용 변형 (A-183 — A-165 의 '밝은/어두운 분리' 첫 조각).
+     웜 램프의 --gray-400(2.05) · --gray-500(2.81) · --gray-600(4.34) 과
+     --accent(3.47) 는 베이지·연그레이 밴드 위 작은 글자에서 AA 에 못 미친다.
+     밝은 밴드 위 보조 텍스트와 금색 링크는 아래 두 개를 쓴다. */
+  --ink-soft:   #6b6459;   /* 보조 텍스트 — 화이트 5.66 · 베이지 5.29 · 연그레이 5.17 */
+  --accent-ink: #7a5c32;   /* 밝은 배경 위 금색 글자·링크 — 5.97 / 5.58 / 5.46 */
   --accent:       #a07c4a;   /* 골드-브론즈 */
   --accent-hover: #8a6a3d;
   --accent-gold:  #a07c4a;   /* 기존 코드가 쓰던 이름 호환 */
@@ -2443,10 +2450,10 @@ body.home .promo-overlay h3 {
 }
 body.home .promo-full .promo-overlay h3 { font-size: clamp(1.15rem, 1.9vw, 1.9rem); }
 body.home .promo-foot {
-  margin: 22px 0 0; font-size: 0.82rem; color: var(--gray-600);
+  margin: 22px 0 0; font-size: 0.82rem; color: var(--ink-soft);
   display: flex; gap: 8px; flex-wrap: wrap;
 }
-body.home .promo-foot a { color: var(--accent); border-bottom: 1px solid currentColor; }
+body.home .promo-foot a { color: var(--accent-ink); border-bottom: 1px solid currentColor; }
 /* 열 수가 줄면 슬롯 폭도 다시 나눈다 */
 @media (max-width: 900px) {
   body.home .promo-third { grid-column: span 3; aspect-ratio: 16 / 11; }
@@ -3075,4 +3082,147 @@ html[lang="ko"] .band-title { letter-spacing: -0.005em; }
 @media (prefers-reduced-motion: reduce) {
   .band-tile, .band-tile img { transition: none; }
   .band-tile:hover { transform: none; box-shadow: none; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   매거진 · 브랜드 매거진 — magazine.html / trend-report.html (A-182)
+
+   두 페이지는 link 뒤 인라인 <style> 에 7.5KB 짜리 자체 디자인을 들고 있었다.
+   link 뒤라 동급 특이성에서 인라인이 이기므로, style.css 토큰을 바꿔도
+   이 두 페이지만 따라오지 않는 구조였다 — A-181 과 같은 함정이다.
+   그 블록을 통째로 여기로 옮기고 메인의 언어(밴드 리듬 · Lora 세리프 ·
+   알약 입력칸 · 따뜻한 중립색)로 바꿨다.
+
+   .section-title · .cta-btn · .breadcrumb 는 90여 파일이 공유하는 이름이라
+   전역으로 손대지 않는다. 반드시 body.mag 안에서만 덮는다.
+   미디어쿼리는 베이스와 '똑같은' 선택자를 쓴다 — A-161 에서 복합 선택자가
+   자기 미디어쿼리를 특이성으로 눌러 모바일이 안 먹은 적이 있다.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── 밴드 리듬: 히어로(사진) → 화이트 → 베이지 → 연그레이 → 베이지(전역 CTA) → 네이비 푸터 ── */
+body.mag .featured-article { background: var(--band-white); padding: clamp(46px, 5vw, 78px) 0 clamp(30px, 3.4vw, 52px); }
+body.mag .articles-section { background: var(--band-beige); padding: clamp(46px, 5vw, 78px) 0 var(--sec-y); }
+body.mag .mag-newsletter   { background: var(--band-grey); padding: clamp(52px, 5vw, 78px) 0; text-align: left; margin-bottom: 0; }
+
+/* ── 섹션 제목 ── */
+body.mag .section-title {
+  font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
+  font-size: clamp(1.5rem, 2.2vw, 2.2rem); line-height: 1.18;
+  letter-spacing: -0.012em; color: var(--black);
+  margin: 0 0 clamp(26px, 2.6vw, 40px); word-break: keep-all;
+}
+html[lang="ko"] body.mag .section-title { letter-spacing: -0.005em; }
+
+/* ── 머리기사 ── */
+body.mag .featured-card {
+  position: relative; overflow: hidden; cursor: pointer;
+  height: clamp(360px, 42vw, 560px); border-radius: var(--radius);
+}
+body.mag .featured-card img {
+  width: 100%; height: 100%; max-width: 100%; object-fit: cover; display: block;
+  transition: transform 1s cubic-bezier(.2,.6,.2,1);
+}
+body.mag .featured-card img[src$=".svg"] { min-width: 100%; min-height: 100%; }
+body.mag .featured-card:hover img { transform: scale(1.03); }
+body.mag .featured-overlay {
+  position: absolute; inset: auto 0 0 0; padding: clamp(26px, 3.2vw, 52px);
+  background: linear-gradient(180deg, rgba(51,46,39,0) 0%, rgba(51,46,39,.82) 100%);
+}
+/* 히어로 아이브로우와 같은 금색 — --navy-gold 는 이 위에서 4.41:1 로 AA 에 못 미친다 */
+body.mag .featured-tag {
+  display: inline-flex; align-items: center; gap: 11px;
+  font-size: 0.68rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+  color: #d2af78; margin-bottom: 16px; border: 0; padding: 0;
+}
+body.mag .featured-tag::before { content: ''; flex: 0 0 24px; height: 1px; background: #d2af78; opacity: .6; }
+body.mag .featured-overlay h2 {
+  font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
+  font-size: clamp(1.45rem, 2.6vw, 2.3rem); line-height: 1.18;
+  color: #fdfbf7; letter-spacing: -0.012em; margin: 0 0 12px; word-break: keep-all;
+}
+html[lang="ko"] body.mag .featured-overlay h2 { letter-spacing: -0.005em; }
+body.mag .featured-excerpt {
+  color: rgba(253,251,247,.84); font-size: 0.94rem; line-height: 1.75;
+  margin: 0 0 14px; max-width: 62ch; word-break: keep-all;
+}
+body.mag .featured-meta { color: rgba(253,251,247,.62); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.06em; }
+
+/* ── 기사 카드 ── */
+body.mag .articles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(18px, 1.9vw, 30px); }
+body.mag .article-card {
+  display: block; background: var(--band-white);
+  border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden;
+  transition: box-shadow .3s, transform .3s, border-color .3s;
+}
+body.mag .article-card:hover {
+  box-shadow: 0 10px 34px rgba(51,46,39,.10); transform: translateY(-4px); border-color: #e2d9c9;
+}
+body.mag .article-card-img { position: relative; height: clamp(150px, 13vw, 210px); overflow: hidden; }
+body.mag .article-card-img img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .8s cubic-bezier(.2,.6,.2,1);
+}
+body.mag .article-card:hover .article-card-img img { transform: scale(1.05); }
+body.mag .article-card-tag {
+  position: absolute; top: 12px; left: 12px; border-radius: 999px;
+  background: rgba(51,46,39,.78); color: #fdfbf7;
+  font-size: 0.6rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 5px 12px;
+}
+body.mag .article-card-body { padding: clamp(16px, 1.5vw, 22px); }
+body.mag .article-card-body h3 {
+  font-size: 0.95rem; font-weight: 600; line-height: 1.45; letter-spacing: -0.005em;
+  color: var(--black); margin: 0 0 8px; word-break: keep-all;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+/* --gray-500(3.01:1) · --gray-400(2.19:1) 은 작은 글자에서 AA 미달이라 한 칸씩 내렸다 (A-165) */
+body.mag .article-card-body p {
+  font-size: 0.82rem; color: var(--gray-700); line-height: 1.65; margin: 0 0 12px; word-break: keep-all;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+body.mag .article-card-date { font-size: 0.7rem; color: var(--ink-soft); font-weight: 500; letter-spacing: 0.04em; }
+
+/* ── 소식받기 — 메인과 같은 왼쪽 정렬 + 알약 ── */
+body.mag .mag-newsletter h2 {
+  font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
+  font-size: var(--t-h2); line-height: 1.14; letter-spacing: -0.012em;
+  color: var(--black); margin: 0 0 10px; word-break: keep-all;
+}
+html[lang="ko"] body.mag .mag-newsletter h2 { letter-spacing: -0.005em; }
+body.mag .mag-newsletter p {
+  font-size: 1rem; color: var(--gray-700); max-width: 46ch;
+  margin: 0 0 26px; line-height: 1.8; word-break: keep-all;
+}
+body.mag .mag-newsletter .newsletter-form { display: flex; gap: 10px; max-width: 520px; margin: 0; }
+body.mag .mag-newsletter .newsletter-form input {
+  flex: 1; min-width: 0; padding: 14px 24px; border-radius: 999px;
+  background: var(--band-white); color: var(--black);
+  border: 1px solid var(--gray-300); font-size: 0.88rem; outline: none;
+  font-family: inherit; transition: border-color .2s;
+}
+body.mag .mag-newsletter .newsletter-form input::placeholder { color: var(--ink-soft); }
+body.mag .mag-newsletter .newsletter-form input:focus { border-color: var(--accent); }
+body.mag .mag-newsletter .newsletter-form button {
+  background: var(--deep); color: #fdfbf7; border: 1px solid var(--deep);
+  border-radius: 999px; padding: 14px 32px; font-size: 0.82rem; font-weight: 500;
+  letter-spacing: 0.02em; font-family: inherit; transition: background .3s, border-color .3s;
+}
+body.mag .mag-newsletter .newsletter-form button:hover { background: var(--accent); border-color: var(--accent); }
+body.mag .newsletter-msg { text-align: left; color: var(--gray-700); }
+
+/* ── 입점 CTA — 배경·색은 전역 body .cta-listing 이 이미 베이지로 잡는다.
+      이 페이지엔 .cta-text 래퍼가 없어 글줄이 화면 끝까지 가므로 폭만 묶는다 ── */
+body.mag .cta-listing h2 { max-width: 24ch; word-break: keep-all; }
+body.mag .cta-listing p  { max-width: 60ch; word-break: keep-all; }
+
+@media (max-width: 1024px) {
+  body.mag .articles-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  body.mag .articles-grid { grid-template-columns: repeat(2, 1fr); }
+  body.mag .featured-card { height: clamp(300px, 54vw, 380px); }
+  body.mag .mag-newsletter .newsletter-form { flex-direction: column; }
+}
+@media (max-width: 480px) {
+  body.mag .articles-grid { grid-template-columns: 1fr; }
 }

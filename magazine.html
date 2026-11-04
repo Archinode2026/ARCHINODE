@@ -12,354 +12,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="style.css">
-<style>
-/* ===== MAGAZINE-SPECIFIC STYLES ===== */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; font-size: 16px; }
-body {
-  font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #332e27;
-  background: #ffffff;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-a { text-decoration: none; color: inherit; transition: color 0.3s; }
-img { max-width: 100%; height: auto; display: block; }
-ul { list-style: none; }
-button { cursor: pointer; border: none; background: none; font-family: inherit; }
-
-/* ===== VARIABLES ===== */
-:root {
-  --black: #332e27;
-  --white: #fdfbf7;
-  /* A-163: style.css 의 웜 램프와 값을 맞춘다. 이 인라인 :root 가 link 뒤에 와서
-     style.css 를 이기기 때문에, 여기가 옛 값이면 이 페이지만 다른 색이 된다 */
-  --gray-50:  #f7f3ec;
-  --gray-100: #f4efe6;
-  --gray-200: #ede7dc;
-  --gray-300: #ddd5c7;
-  --gray-400: #b5ab9b;
-  --gray-500: #9a9183;
-  --gray-600: #7a7164;
-  --gray-700: #5d564c;
-  --gray-800: #464037;
-  --gray-900: #403a30;
-  --accent: #a07c4a;
-  --accent-hover: #8a6a3d;
-  --max-width: min(max(1440px, 85vw), 2400px);
-  /* A-169: 1440px 고정이면 1920 화면에서 양쪽 여백이 25%, 2560 에서 44% 가 된다.
-     85vw 를 바닥으로 깔아 넓은 화면에서는 양쪽 15% 로 고정하고,
-     1440px 보다 좁아지지 않게 max() 로 받치고, 초광폭은 2400px 에서 끊는다 */
-  --header-height: 64px;
-}
-
-/* ===== UTILITY ===== */
-.container { max-width: var(--max-width); margin: 0 auto; padding: 0 40px; }
-@media (max-width: 768px) { .container { padding: 0 20px; } }
-
-/* ===== MAGAZINE HERO ===== */
-.magazine-hero {
-  background: var(--gray-900);
-  color: var(--white);
-  padding: 100px 0 80px;
-  text-align: center;
-}
-.magazine-hero .hero-tag {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--gray-400);
-  margin-bottom: 20px;
-}
-.magazine-hero h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 16px;
-}
-.magazine-hero p {
-  font-size: 1rem;
-  font-weight: 300;
-  color: rgba(255,255,255,0.6);
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.7;
-}
-
-/* ===== BREADCRUMB ===== */
-.breadcrumb {
-  padding: 16px 0;
-  font-size: 0.78rem;
-  color: var(--gray-500);
-}
-.breadcrumb a { color: var(--gray-500); }
-.breadcrumb a:hover { color: var(--black); }
-
-/* ===== FEATURED ARTICLE ===== */
-.featured-article {
-  padding: 60px 0 40px;
-}
-.featured-card {
-  position: relative;
-  height: 520px;
-  overflow: hidden;
-  cursor: pointer;
-}
-.featured-card img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.6s;
-}
-.featured-card img[src$=".svg"] {
-  min-width: 100%;
-  min-height: 100%;
-}
-.featured-card:hover img { transform: scale(1.03); }
-.featured-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 48px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.75));
-}
-.featured-tag {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--white);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  border: 1px solid rgba(255,255,255,0.3);
-  padding: 4px 12px;
-}
-.featured-overlay h2 {
-  color: var(--white);
-  font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 12px;
-  line-height: 1.3;
-}
-.featured-excerpt {
-  color: rgba(255,255,255,0.85);
-  font-size: 0.9rem;
-  line-height: 1.7;
-  margin-bottom: 12px;
-  max-width: 600px;
-}
-.featured-meta {
-  color: rgba(255,255,255,0.5);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
-
-/* ===== SECTION TITLE ===== */
-.section-title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 40px;
-}
-
-/* ===== ARTICLES GRID ===== */
-.articles-section {
-  padding: 40px 0 80px;
-}
-.articles-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 32px;
-}
-.article-card {
-  display: block;
-  background: var(--white);
-  border: 1px solid var(--gray-200);
-  overflow: hidden;
-  transition: box-shadow 0.3s, transform 0.3s;
-}
-.article-card:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-  transform: translateY(-4px);
-}
-.article-card-img {
-  position: relative;
-  height: 200px;
-  overflow: hidden;
-}
-.article-card-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s;
-}
-.article-card:hover .article-card-img img {
-  transform: scale(1.05);
-}
-.article-card-tag {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  background: rgba(0,0,0,0.75);
-  color: var(--white);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 4px 10px;
-}
-.article-card-body {
-  padding: 20px;
-}
-.article-card-body h3 {
-  font-size: 0.92rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.4;
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.article-card-body p {
-  font-size: 0.8rem;
-  color: var(--gray-500);
-  line-height: 1.6;
-  margin-bottom: 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.article-card-date {
-  font-size: 0.7rem;
-  color: var(--gray-400);
-  font-weight: 500;
-  letter-spacing: 0.03em;
-}
-
-/* ===== NEWSLETTER ===== */
-.mag-newsletter {
-  padding: 80px 0;
-  text-align: center;
-  background: var(--gray-100);
-  margin-bottom: 0;
-}
-.mag-newsletter h2 {
-  font-size: 1.8rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 16px;
-}
-.mag-newsletter p {
-  font-size: 0.9rem;
-  color: var(--gray-500);
-  max-width: 600px;
-  margin: 0 auto 40px;
-  line-height: 1.7;
-}
-.mag-newsletter .newsletter-form {
-  display: flex;
-  max-width: 480px;
-  margin: 0 auto;
-  gap: 0;
-}
-.mag-newsletter .newsletter-form input {
-  flex: 1;
-  padding: 14px 20px;
-  border: 1px solid var(--gray-300);
-  border-right: none;
-  font-size: 0.85rem;
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.2s;
-}
-.mag-newsletter .newsletter-form input:focus { border-color: var(--black); }
-.mag-newsletter .newsletter-form button {
-  background: var(--black);
-  color: var(--white);
-  padding: 14px 28px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  border: 1px solid var(--black);
-  font-family: inherit;
-  transition: all 0.2s;
-}
-.mag-newsletter .newsletter-form button:hover { background: var(--gray-800); }
-
-/* ===== CTA LISTING (same as index) ===== */
-.cta-listing {
-  padding: 120px 0;
-  background: var(--black);
-  color: var(--white);
-  text-align: center;
-}
-.cta-listing h2 {
-  font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 16px;
-}
-.cta-listing p {
-  font-size: 1rem;
-  color: rgba(255,255,255,0.6);
-  font-weight: 300;
-  max-width: 560px;
-  margin: 0 auto 40px;
-  line-height: 1.7;
-}
-.cta-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--white);
-  color: var(--black);
-  padding: 16px 40px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  transition: all 0.3s;
-}
-.cta-btn:hover { background: var(--gray-200); }
-
-/* ===== ANIMATIONS ===== */
-.fade-in {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.fade-in.visible { opacity: 1; transform: translateY(0); }
-
-@media (max-width: 768px) {
-  .magazine-hero h1 { font-size: 2rem; }
-  .magazine-hero { padding: 60px 0 50px; }
-  .featured-card { height: 380px; }
-  .featured-overlay { padding: 28px; }
-  .featured-overlay h2 { font-size: 1.3rem; }
-  .articles-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-  .article-card-img { height: 160px; }
-  .section-title { font-size: 1.3rem; margin-bottom: 24px; }
-  .mag-newsletter h2 { font-size: 1.4rem; }
-  .mag-newsletter .newsletter-form { flex-direction: column; gap: 8px; }
-  .mag-newsletter .newsletter-form input { border-right: 1px solid var(--gray-300); }
-  .cta-listing h2 { font-size: 1.6rem; }
-  .cta-listing { padding: 80px 0; }
-}
-@media (max-width: 1024px) {
-  .articles-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 480px) {
-  .articles-grid { grid-template-columns: 1fr; }
-}
-</style>
+<!-- 이 페이지의 디자인은 style.css 의 body.mag 블록이 단일 출처다 (A-182).
+     여기에 인라인 스타일 블록을 다시 두면 link 뒤라 이쪽이 이겨서, 토큰이나 밴드를
+     바꿔도 매거진 두 페이지만 안 따라온다. -->
 
 <!-- Open Graph / SEO -->
 <meta property="og:type" content="website">
@@ -374,7 +29,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 <meta name="twitter:description" content="ARCHINODE Magazine — Insights, trends, and stories from the world of architecture and design.">
 <meta name="twitter:image" content="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80">
 </head>
-<body>
+<body class="mag">
 
 <!-- ANNOUNCEMENT BAR -->
 <div class="announcement-bar">
@@ -428,11 +83,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 </div>
 
 <!-- MAGAZINE HERO -->
-<section class="magazine-hero">
-  <div class="container">
-    <span class="hero-tag" data-en="ARCHINODE MAGAZINE" data-ko="ARCHINODE 매거진">ARCHINODE MAGAZINE</span>
-    <h1 data-en="Magazine" data-ko="매거진">Magazine</h1>
-    <p data-en="Insights, trends, and stories from the world of architecture and design." data-ko="건축과 디자인 세계의 인사이트, 트렌드, 이야기.">Insights, trends, and stories from the world of architecture and design.</p>
+<section class="page-hero">
+  <img loading="lazy" class="page-hero-bg" src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=1600&q=80" alt="ARCHINODE Magazine">
+  <div class="page-hero-content">
+    <div class="page-hero-inner">
+      <span class="page-hero-tag" data-en="ARCHINODE MAGAZINE" data-ko="ARCHINODE 매거진">ARCHINODE MAGAZINE</span>
+      <h1 data-en="Magazine" data-ko="매거진">Magazine</h1>
+      <p data-en="Insights, trends, and stories from the world of architecture and design." data-ko="건축과 디자인 세계의 인사이트, 트렌드, 이야기.">Insights, trends, and stories from the world of architecture and design.</p>
+    </div>
   </div>
 </section>
 
@@ -1953,7 +1611,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         style="padding:14px 36px;background:#332e27;color:#fff;border:none;border-radius:999px;font-size:0.95rem;cursor:pointer;font-family:inherit;">
         Load More Articles
       </button>
-      <p id="loadMoreCount" style="margin-top:12px;color:#888;font-size:0.85rem;"></p>
+      <p id="loadMoreCount" style="margin-top:12px;color:var(--ink-soft);font-size:0.85rem;"></p>
     </div>
   </div>
 </section>
