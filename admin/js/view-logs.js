@@ -17,6 +17,8 @@ var LOG_ACTIONS = {
     'product.status':      { en: 'Product status',         ko: '제품 상태' },
     'article.status':      { en: 'Article status',         ko: '아티클 상태' },
     'review.status':       { en: 'Review issue status',    ko: '검수 상태' },
+    'review.priority':     { en: 'Review issue priority',  ko: '검수 우선순위' },   // A-196 (R-076) 상세보기에서 우선순위 수정
+    'review.edit':         { en: 'Review issue content',   ko: '검수 내용 수정' },  // A-219 (R-077) 상세보기에서 내용 수정
     'consultation.status': { en: 'Consultation status',    ko: '자문 상태' },
     'trend.status':        { en: 'Trend submission status', ko: '트렌드 투고 상태' },
     'newsletter.status':   { en: 'Newsletter subscriber',  ko: '뉴스레터 구독자' },

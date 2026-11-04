@@ -357,7 +357,7 @@ tr:hover { background: var(--gray-50); }
 <script src="js/admin-core.js?v=20261104g"></script>
 <script src="js/admin-nav.js?v=20261104g"></script>
 <script src="js/view-dashboard.js?v=20261104g"></script>
-<script src="js/view-logs.js?v=20261104g"></script>
+<script src="js/view-logs.js?v=20261104h"></script>
 <script src="js/view-settings.js?v=20261104g"></script>
 <script src="js/view-regulations.js?v=20261104g"></script>
 <script src="js/view-leads.js?v=20261104g"></script>
@@ -1195,16 +1195,53 @@ async function saveReview() {
     }
 }
 
-// ── [보기] 상세 + 상태 변경 ──
+// ── [보기] 상세 + 상태 변경 + 내용 수정 ──
+// R-077: 등록한 내용(메뉴·영역 · 네 칸 · 재현 주소 · 개발 메모)도 이 팝업에서 고칠 수 있어야 한다.
+//        전에는 상태·우선순위·메모만 바뀌고 본문은 읽기 전용이어서, 오타 한 글자를 바로잡으려 해도
+//        Firestore 를 직접 고치거나 같은 결함을 새 번호로 다시 등록해야 했다(A-076·A-196 과 같은 뿌리).
+//        등록 폼과 같은 칸을 그대로 보여 주되, 번호·등록자·등록일은 기록의 신원이므로 고칠 수 없게 둔다.
+const RV_EDIT_FIELDS = [
+    { k: 'area',        en: 'Menu / area *',             ko: '메뉴·영역 *',            req: true },
+    { k: 'screen',      en: 'Screen / path *',           ko: '화면·경로 *',            req: true },
+    { k: 'action',      en: 'What did you click? *',     ko: '무엇을 눌렀나 *',        req: true },
+    { k: 'expectation', en: 'What did you expect? *',    ko: '무엇을 기대했나 *',      req: true },
+    { k: 'current',     en: 'What actually appeared? *', ko: '실제로 뭐가 보였나 *',   req: true },
+    { k: 'gap',         en: 'So what is the problem? *', ko: '그래서 뭐가 문제인가 *', req: true, tag: 'textarea' },
+    { k: 'pageUrl',     en: 'Repro URL (optional)',      ko: '재현 주소 (선택)' },
+    { k: 'techNote',    en: 'Dev note (technical)',      ko: '개발 메모 (기술 근거)',  tag: 'textarea' }
+];
+
+// 이력에는 칸 이름(key)만 저장한다 — 화면 언어가 바뀌어도 그때 라벨로 번역되도록.
+function rvFieldLabel(k) {
+    const f = RV_EDIT_FIELDS.filter(x => x.k === k)[0];
+    if (!f) return k;
+    return rvT(f.en, f.ko).replace(/\s*\*$/, '').replace(/\s*\((optional|선택)\)$/, '');
+}
+
+// 읽기 ↔ 수정 전환. 저장 단추가 둘 보이지 않도록 상태 변경 칸까지 통째로 가린다.
+function rvEditMode(on) {
+    const r = document.getElementById('rvReadBox'), e = document.getElementById('rvEditBox');
+    if (!r || !e) return;
+    r.style.display = on ? 'none' : '';
+    e.style.display = on ? '' : 'none';
+    if (on) { const f = document.getElementById('rve_area'); if (f) f.focus(); }
+}
+
 function viewReview(id) {
     const d = reviewCache.find(x => x.id === id);
     if (!d) return;
     const url = rvSafeUrl(d.pageUrl);
     const hist = Array.isArray(d.history) ? d.history.slice().reverse() : [];   // 최신 위
     const dd = (en, ko, val) => `<dt>${rvSpan(en, ko)}</dt><dd>${escapeHtml(val || '-')}</dd>`;
+    const ef = (f) => `
+                <label for="rve_${f.k}">${rvSpan(f.en, f.ko)}</label>
+                ${f.tag === 'textarea' ? `<textarea id="rve_${f.k}">${escapeHtml(d[f.k] || '')}</textarea>` : `<input type="text" id="rve_${f.k}" value="${escapeHtml(d[f.k] || '')}">`}`;
     document.getElementById('modalContent').innerHTML = `
         <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">${escapeHtml(d.no || '-')} ${rvPriorityBadge(d.priority)} ${rvStatusBadge(d.status)}</h2>
-        <div class="rv-detail">
+        <div class="rv-detail" id="rvReadBox">
+            <div style="display:flex;justify-content:flex-end;">
+                <button class="act-btn act-view" id="rvEditBtn" onclick="rvEditMode(true)" ${rvAttr('Edit content', '내용 수정')}>${escapeHtml(rvT('Edit content', '내용 수정'))}</button>
+            </div>
             <p style="font-size:0.85rem;color:#5d564c;">${escapeHtml(d.area || '-')}${d.screen ? ' · ' + escapeHtml(d.screen) : ''}</p>
             ${url ? `<p style="font-size:0.82rem;margin-top:6px;"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:#7a5c32;">${escapeHtml(url)}</a></p>` : ''}
             <dl>
@@ -1217,7 +1254,7 @@ function viewReview(id) {
             <details><summary>${rvSpan('Dev note (technical)', '개발 메모 (기술 근거)')}</summary><pre>${escapeHtml(d.techNote || '-')}</pre></details>
             <div style="font-size:0.75rem;font-weight:700;color:#6b6459;text-transform:uppercase;letter-spacing:0.5px;">${rvSpan('History', '이력')}</div>
             <ul class="rv-history">
-                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)}${h.priTo ? ` ${rvPriorityBadge(h.priFrom)} → ${rvPriorityBadge(h.priTo)}` : ''} <small>${escapeHtml(rvDateTime(h.at))} · ${escapeHtml(h.by || '-')}</small>${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#6b6459;">-</li>'}
+                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)}${h.priTo ? ` ${rvPriorityBadge(h.priFrom)} → ${rvPriorityBadge(h.priTo)}` : ''} <small>${escapeHtml(rvDateTime(h.at))} · ${escapeHtml(h.by || '-')}</small>${Array.isArray(h.edited) && h.edited.length ? `<div style="margin-top:3px;color:#6b6459;">${rvSpan('Content edited', '내용 수정')}: ${escapeHtml(h.edited.map(k => rvFieldLabel(k)).join(', '))}</div>` : ''}${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#6b6459;">-</li>'}
             </ul>
             <div class="rv-statusbar">
                 <select id="rvNewStatus" ${rvAttr('Status', '상태')} title="${escapeHtml(rvT('Status', '상태'))}">
@@ -1234,8 +1271,74 @@ function viewReview(id) {
                 <button class="act-btn act-add" id="rvStatusBtn" onclick="saveReviewStatus('${escapeHtml(d.id)}')" ${rvAttr('Save', '저장')}>${escapeHtml(rvT('Save', '저장'))}</button>
             </div>
             <div class="rv-err" id="rvStatusErr"></div>
+        </div>
+        <div class="rv-form" id="rvEditBox" style="display:none;">
+            <div class="rv-grid">
+                <div>${ef(RV_EDIT_FIELDS[0])}</div>
+                <div>${ef(RV_EDIT_FIELDS[1])}</div>
+            </div>
+            ${RV_EDIT_FIELDS.slice(2).map(f => ef(f)).join('')}
+            <label for="rveNote">${rvSpan('Why this edit (optional)', '수정 이유 (선택)')}</label>
+            <input type="text" id="rveNote" maxlength="200">
+            <div class="rv-err" id="rvEditErr"></div>
+            <div class="rv-actions">
+                <button class="act-btn" style="background:#ede7dc;color:#5d564c;" onclick="rvEditMode(false)" ${rvAttr('Cancel', '취소')}>${escapeHtml(rvT('Cancel', '취소'))}</button>
+                <button class="act-btn act-add" id="rvEditSaveBtn" onclick="saveReviewEdit('${escapeHtml(d.id)}')" ${rvAttr('Save', '저장')}>${escapeHtml(rvT('Save', '저장'))}</button>
+            </div>
         </div>`;
     document.getElementById('modal').classList.add('show');
+}
+
+// R-077: 바뀐 칸만 patch 에 담고, 어느 칸을 고쳤는지 이력 한 줄에 남긴다 (A-196 의 from→to 방식과 같은 결).
+async function saveReviewEdit(id) {
+    const cur = reviewCache.find(x => x.id === id);
+    const err = document.getElementById('rvEditErr');
+    if (!cur || !err) return;
+    const next = {};
+    RV_EDIT_FIELDS.forEach(f => {
+        const el = document.getElementById('rve_' + f.k);
+        next[f.k] = el ? el.value.trim() : '';
+    });
+    // 원래 내용이 있던 필수 칸을 비우는 것만 막는다. 문서 대장에서 가져온 A-001~A-010 처럼
+    // 애초에 화면·경로가 빈 기록도 있어서, '필수니까 무조건 채워라' 로 막으면 그 열 건은
+    // 다른 칸 오타조차 고칠 수 없게 된다 (오히려 여기서 채워 넣을 수 있어야 한다).
+    const blanked = RV_EDIT_FIELDS.filter(f => f.req && !next[f.k] && String(cur[f.k] == null ? '' : cur[f.k]));
+    if (blanked.length) {
+        const names = blanked.map(f => rvFieldLabel(f.k)).join(', ');
+        err.innerHTML = rvSpan('These fields cannot be emptied: ' + names, '이 칸은 비울 수 없습니다: ' + names);
+        err.style.display = 'block';
+        return;
+    }
+    // 그대로인 칸은 patch 에 넣지 않는다 — 다른 사람이 그 사이에 고친 칸을 덮어쓰지 않게.
+    const changed = RV_EDIT_FIELDS.map(f => f.k).filter(k => next[k] !== String(cur[k] == null ? '' : cur[k]));
+    if (!changed.length) {
+        err.innerHTML = rvSpan('Nothing changed.', '바뀐 내용이 없습니다.');
+        err.style.display = 'block';
+        return;
+    }
+    err.style.display = 'none';
+    const btn = document.getElementById('rvEditSaveBtn');
+    btn.disabled = true;
+    try {
+        const by = (auth.currentUser && auth.currentUser.email) || '';
+        const noteEl = document.getElementById('rveNote');
+        const note = noteEl ? noteEl.value.trim() : '';
+        const patch = {
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            history: firebase.firestore.FieldValue.arrayUnion({
+                status: cur.status || '', by: by, at: new Date().toISOString(), note: note, edited: changed
+            })
+        };
+        changed.forEach(k => { patch[k] = next[k]; });
+        await db.collection('reviewIssues').doc(id).update(patch);
+        logAdmin({ action: 'review.edit', target: { col: 'reviewIssues', id: id, label: cur.no || '' }, to: changed.join(', '), note: note });
+        await loadReview();
+        viewReview(id);   // 고친 내용으로 다시 그린다 (읽기 모드로 돌아옴, 확인창 없음)
+    } catch (e) {
+        btn.disabled = false;
+        err.innerHTML = rvSpan('Save failed: ' + e.message, '저장 실패: ' + e.message);
+        err.style.display = 'block';
+    }
 }
 
 async function saveReviewStatus(id) {
