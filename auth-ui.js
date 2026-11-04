@@ -89,10 +89,12 @@
             // (A-056 가드). 그 경우 브랜드/회원 구분만 건너뛰고 이메일 표시·로그아웃은 그대로 동작한다.
             // 링크는 profile.html 로 가는데, profile.html 이 brands 문서를 보고 알아서 라우팅한다.
             let isBrand = false;
+            let known = false;   // 계정 종류를 '확인했는지'. 못 봤으면 단정하지 않는다 (A-194)
             if (db) {
                 try {
                     const brandDoc = await db.collection('brands').doc(user.uid).get();
                     isBrand = brandDoc.exists;
+                    known = true;
                 } catch (err) {
                     console.warn('auth-ui: brand lookup failed', err);
                 }
@@ -101,10 +103,19 @@
                 link.href = basePath + 'brand-portal/dashboard.html';
                 link.innerHTML = accountHtml('fa-building', user);
                 kindEn = 'Brand account'; kindKo = '브랜드 계정';
-            } else {
+            } else if (known) {
                 link.href = basePath + 'auth/profile.html';
                 link.innerHTML = accountHtml('fa-user', user);
                 kindEn = 'Member account'; kindKo = '회원 계정';
+            } else {
+                // A-194: db 가 null 이거나 조회가 실패하면 브랜드인지 회원인지 모른다.
+                // 전에는 그 경우도 '회원 계정' 이라고 적어서, 매거진 글 130개 페이지에서
+                // 브랜드로 로그인해도 헤더가 '회원 계정' 이라고 거짓을 말했다.
+                // 링크는 profile.html 로 두고(그쪽이 brands 문서를 보고 다시 라우팅한다)
+                // 라벨만 중립으로 바꾼다 — 모르는 것을 단정하지 않는 편이 맞다.
+                link.href = basePath + 'auth/profile.html';
+                link.innerHTML = accountHtml('fa-circle-user', user);
+                kindEn = 'My account'; kindKo = '내 계정';
             }
             link.style.cssText += 'background:#332e27;color:#fff;';
             link.addEventListener('mouseenter', () => { link.style.background = '#7a5c32'; });
