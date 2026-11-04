@@ -1167,14 +1167,21 @@ function viewReview(id) {
             <details><summary>${rvSpan('Dev note (technical)', '개발 메모 (기술 근거)')}</summary><pre>${escapeHtml(d.techNote || '-')}</pre></details>
             <div style="font-size:0.75rem;font-weight:700;color:#6b6459;text-transform:uppercase;letter-spacing:0.5px;">${rvSpan('History', '이력')}</div>
             <ul class="rv-history">
-                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)} <small>${escapeHtml(rvDateTime(h.at))} · ${escapeHtml(h.by || '-')}</small>${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#6b6459;">-</li>'}
+                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)}${h.priTo ? ` ${rvPriorityBadge(h.priFrom)} → ${rvPriorityBadge(h.priTo)}` : ''} <small>${escapeHtml(rvDateTime(h.at))} · ${escapeHtml(h.by || '-')}</small>${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#6b6459;">-</li>'}
             </ul>
             <div class="rv-statusbar">
-                <select id="rvNewStatus">
+                <select id="rvNewStatus" ${rvAttr('Status', '상태')} title="${escapeHtml(rvT('Status', '상태'))}">
                     ${REVIEW_STATUSES.map(s => `<option value="${escapeHtml(s)}"${s === d.status ? ' selected' : ''} ${rvAttr(REVIEW_STATUS_META[s].en, s)}>${escapeHtml(rvT(REVIEW_STATUS_META[s].en, s))}</option>`).join('')}
                 </select>
+                <!-- R-076: 등록할 때 정한 우선순위를 나중에 바로잡을 수 있어야 한다.
+                     전에는 배지로 보여주기만 해서, 영향이 커진 항목을 올리려면 Firestore 를
+                     직접 고치거나 같은 문제를 새로 등록해야 했다. 목록 정렬이 이 값 기준이라
+                     못 바꾸는 게 화면 맨 위에 무엇이 뜨는지에도 계속 영향을 줬다. -->
+                <select id="rvNewPriority" ${rvAttr('Priority', '우선순위')} title="${escapeHtml(rvT('Priority', '우선순위'))}">
+                    ${Object.keys(REVIEW_PRIORITY).map(k => `<option value="${escapeHtml(k)}"${k === (REVIEW_PRIORITY.hasOwnProperty(d.priority) ? d.priority : 'Medium') ? ' selected' : ''}>${escapeHtml(k)}</option>`).join('')}
+                </select>
                 <input type="text" id="rvNote" maxlength="200" placeholder="${escapeHtml(rvT('Note (optional)', '메모 (선택)'))}" data-en-placeholder="Note (optional)" data-ko-placeholder="메모 (선택)">
-                <button class="act-btn act-add" id="rvStatusBtn" onclick="saveReviewStatus('${escapeHtml(d.id)}')" ${rvAttr('Save status', '상태 저장')}>${escapeHtml(rvT('Save status', '상태 저장'))}</button>
+                <button class="act-btn act-add" id="rvStatusBtn" onclick="saveReviewStatus('${escapeHtml(d.id)}')" ${rvAttr('Save', '저장')}>${escapeHtml(rvT('Save', '저장'))}</button>
             </div>
             <div class="rv-err" id="rvStatusErr"></div>
         </div>`;
@@ -1186,19 +1193,34 @@ async function saveReviewStatus(id) {
     const note = document.getElementById('rvNote').value.trim();
     const err = document.getElementById('rvStatusErr');
     if (REVIEW_STATUSES.indexOf(status) === -1) return;
+    // R-076: 우선순위도 함께 저장한다. 등록 때와 같은 방식으로 값을 검증한다.
+    const priEl = document.getElementById('rvNewPriority');
+    let priority = priEl ? priEl.value : null;
+    if (priority !== null && !REVIEW_PRIORITY.hasOwnProperty(priority)) priority = null;
     const btn = document.getElementById('rvStatusBtn');
     btn.disabled = true;
     try {
         const by = (auth.currentUser && auth.currentUser.email) || '';
         const cur = reviewCache.find(x => x.id === id) || {};   // 2단계: 활동 로그 from·label
-        await db.collection('reviewIssues').doc(id).update({
+        const priFrom = REVIEW_PRIORITY.hasOwnProperty(cur.priority) ? cur.priority : 'Medium';
+        const priChanged = priority !== null && priority !== priFrom;
+        // 이력 한 줄에 '무엇이 바뀌었는지' 를 담는다. 우선순위가 그대로면 그 칸은 비워 둬서
+        // 이력 목록이 바뀐 것만 보여주게 한다.
+        const entry = { status: status, by: by, at: new Date().toISOString(), note: note };
+        if (priChanged) { entry.priFrom = priFrom; entry.priTo = priority; }
+        const patch = {
             status: status,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            history: firebase.firestore.FieldValue.arrayUnion({ status: status, by: by, at: new Date().toISOString(), note: note })
-        });
+            history: firebase.firestore.FieldValue.arrayUnion(entry)
+        };
+        if (priChanged) patch.priority = priority;
+        await db.collection('reviewIssues').doc(id).update(patch);
         logAdmin({ action: 'review.status', target: { col: 'reviewIssues', id: id, label: cur.no || '' }, from: cur.status || '', to: status, note: note });   // 2단계: 활동 로그
+        if (priChanged) {
+            logAdmin({ action: 'review.priority', target: { col: 'reviewIssues', id: id, label: cur.no || '' }, from: priFrom, to: priority, note: note });
+        }
         await loadReview();
-        viewReview(id);   // 갱신된 상태·이력으로 다시 그림 (확인창 없음)
+        viewReview(id);   // 갱신된 상태·우선순위·이력으로 다시 그림 (확인창 없음)
     } catch (e) {
         btn.disabled = false;
         err.innerHTML = rvSpan('Save failed: ' + e.message, '저장 실패: ' + e.message);
