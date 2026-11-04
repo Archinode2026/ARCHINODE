@@ -173,6 +173,25 @@
 .adm-reg-body pre code { background: none; padding: 0; }
 .adm-reg-body table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 0.82rem; display: block; overflow-x: auto; }
 .adm-reg-body th, .adm-reg-body td { border: 1px solid var(--gray-300); padding: 6px 10px; text-align: left; vertical-align: top; }
+/* ── 규정집 표가 눌려 한글이 한 글자씩 끊기던 문제 (R-029 = A-215) ──────────
+   `.adm-reg-body table` 은 `display:block; width:100%; overflow-x:auto` 다.
+   그런데 **표에 최소 폭이 없어서** 11열짜리 검수대장이 부모 폭(856px)에 맞춰
+   눌렸다 — 실측 th 폭 36~51px, 한글이 한 글자씩 세로로 끊겼다.
+   `overflow-x:auto` 는 있었지만 넘칠 것이 없으니 스크롤도 안 생겼다.
+
+   표가 아니라 **칸**에 최소 폭을 준다. 그러면 열 수에 따라 자동으로 맞는다 —
+   2열 표는 그대로 좁게, 11열 표는 11×110 = 1,210px 이 되어 비로소
+   `overflow-x:auto` 가 일한다. 표마다 숫자를 정해 주지 않아도 된다. */
+.adm-reg-body th, .adm-reg-body td { min-width: 110px; }
+/* 번호·날짜처럼 짧은 첫 두 칸은 자리를 덜 쓴다 */
+.adm-reg-body th:first-child, .adm-reg-body td:first-child,
+.adm-reg-body th:nth-child(2), .adm-reg-body td:nth-child(2) { min-width: 72px; }
+
+/* 넓은 화면에서 여백만 남던 것도 함께 — 검수대장은 원래 넓은 문서다.
+   `:has()` 를 못 쓰는 브라우저에서는 아무 일도 일어나지 않는다(그대로 1440px). */
+@media (min-width: 1600px) {
+  body .admin:has(#tab-regulations.active) { max-width: 1800px; }
+}
 .adm-reg-body th { background: var(--gray-50); font-size: 0.74rem; text-transform: none; letter-spacing: 0; }
 .adm-reg-body tr:hover { background: transparent; }
 .adm-reg-body a { color: var(--accent-ink); }

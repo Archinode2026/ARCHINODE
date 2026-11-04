@@ -165,7 +165,10 @@ function set_load() {
         set_fillForm(set_state.doc);
         var btn = document.getElementById('setDefaultsBtn');
         if (btn) btn.style.display = snap.exists ? 'none' : '';
-        set_msg(snap.exists ? '' : t('No settings document yet — press "Fill defaults" to create it from the current site text.', '아직 설정 문서가 없습니다 — 「기본값 채우기」로 현재 사이트 문구에서 만듭니다.'), false);
+        // A-215: 조건부여서 t() 로 미리 고르면 lang.js 가 못 바꾼다 — 짝으로 넘긴다
+        if (snap.exists) set_msg('', '', false);
+        else set_msg('No settings document yet — press "Fill defaults" to create it from the current site text.',
+                     '아직 설정 문서가 없습니다 — 「기본값 채우기」로 현재 사이트 문구에서 만듭니다.', false);
         set_drawUpdated();
     }).catch(function (err) {
         set_state.loading = false;
@@ -217,14 +220,19 @@ function set_drawPending() {
     for (var i = 0; i < marks.length; i++) marks[i].style.display = issue ? '' : 'none';
     var intro = document.getElementById('setPolicyIntro');
     if (!intro) return;
+    // A-215: textContent 만 쓰면 lang.js 가 나중에 바꿀 근거가 없다 — 짝을 함께 심는다
+    var introEn, introKo;
     if (issue) {
-        intro.style.display = '';
-        intro.textContent = t('Pending decision: ' + issue + ' (Rulebook part 2). These values are stored here but the public pages do not read them yet — values are copied from the current site text; change them only after the decision.',
-            '결정 대기: ' + issue + ' (규정집 2부). 이 값은 저장되지만 공개 페이지는 아직 읽지 않습니다(연동 전) — 현재 사이트 문구를 그대로 옮긴 것이라 결정 뒤에만 고칩니다.');
+        introEn = 'Pending decision: ' + issue + ' (Rulebook part 2). These values are stored here but the public pages do not read them yet — values are copied from the current site text; change them only after the decision.';
+        introKo = '결정 대기: ' + issue + ' (규정집 2부). 이 값은 저장되지만 공개 페이지는 아직 읽지 않습니다(연동 전) — 현재 사이트 문구를 그대로 옮긴 것이라 결정 뒤에만 고칩니다.';
     } else {
-        intro.style.display = '';
-        intro.textContent = t('Public pages do not read these values yet (to be connected in a later step).', '공개 페이지는 아직 이 값을 읽지 않습니다(연동은 다음 단계).');
+        introEn = 'Public pages do not read these values yet (to be connected in a later step).';
+        introKo = '공개 페이지는 아직 이 값을 읽지 않습니다(연동은 다음 단계).';
     }
+    intro.style.display = '';
+    intro.setAttribute('data-en', introEn);
+    intro.setAttribute('data-ko', introKo);
+    intro.textContent = admLang() === 'ko' ? introKo : introEn;
 }
 
 function set_drawUpdated() {
@@ -378,9 +386,12 @@ function set_parseCategories(src) {
 }
 
 function set_categoriesHtml(cats) {
-    var html = '<p class="adm-set-intro">'
-        + escapeHtml(t('Fixed in code — 1:1 with the static category pages (categories/). Source: brand-portal/dashboard.html SUBCATEGORIES. ',
-                       '코드 고정 — 정적 카테고리 페이지(categories/)와 1:1. 출처: brand-portal/dashboard.html SUBCATEGORIES. '))
+    // A-215: 문장은 data-en/ko 짝을 가진 span 안에, 개수는 그 밖에 둔다 —
+    //        안 그러면 lang.js 가 다시 칠할 때 개수가 사라진다.
+    var catIntroEn = 'Fixed in code — 1:1 with the static category pages (categories/). Source: brand-portal/dashboard.html SUBCATEGORIES. ';
+    var catIntroKo = '코드 고정 — 정적 카테고리 페이지(categories/)와 1:1. 출처: brand-portal/dashboard.html SUBCATEGORIES. ';
+    var html = '<p class="adm-set-intro"><span ' + tAttr(catIntroEn, catIntroKo) + '>'
+        + escapeHtml(t(catIntroEn, catIntroKo)) + '</span>'
         + escapeHtml(String(cats.mains.length) + ' + ' + String(cats.subCount)) + '</p>'
         + '<table class="adm-cat-table"><thead><tr>'
         + '<th ' + tAttr('Category', '대분류') + '>' + escapeHtml(t('Category', '대분류')) + '</th>'
@@ -391,7 +402,7 @@ function set_categoriesHtml(cats) {
         var subs = '';
         for (var j = 0; j < c.subs.length; j++) {
             var s = c.subs[j];
-            subs += '<span class="adm-cat-sub" title="' + escapeAttr(s.slug) + '">' + escapeHtml(t(s.en, s.ko)) + '</span>';
+            subs += '<span class="adm-cat-sub" title="' + escapeAttr(s.slug) + '" ' + tAttr(s.en, s.ko) + '>' + escapeHtml(t(s.en, s.ko)) + '</span>';   // A-215 — 데이터가 이중언어다
         }
         html += '<tr><td class="adm-nowrap"><strong>' + escapeHtml(c.en) + '</strong><small class="adm-log-sub">' + escapeHtml(c.ko) + ' · ' + escapeHtml(String(c.subs.length)) + '</small></td>'
             + '<td>' + subs + '</td></tr>';
@@ -402,10 +413,11 @@ function set_categoriesHtml(cats) {
 
 // 어드민 이메일 — firebase-config.js ADMIN_EMAILS(= firestore.rules isAdmin() 과 같은 2개). 규칙 파일 고정, 여기서 못 바꾼다.
 function set_adminsHtml() {
+    var admIntroEn = 'Fixed in the rules file (firestore.rules isAdmin() + firebase-config.js ADMIN_EMAILS) — cannot be changed here.';
+    var admIntroKo = '규칙 파일 고정(firestore.rules isAdmin() + firebase-config.js ADMIN_EMAILS) — 여기서는 못 바꿉니다.';   // A-215
     var list = (typeof ADMIN_EMAILS !== 'undefined' && ADMIN_EMAILS && ADMIN_EMAILS.length) ? ADMIN_EMAILS : [];
     var html = '<h4 class="adm-set-h4" ' + tAttr('Admin accounts', '어드민 계정') + '>' + escapeHtml(t('Admin accounts', '어드민 계정')) + '</h4>'
-        + '<p class="adm-set-intro">' + escapeHtml(t('Fixed in the rules file (firestore.rules isAdmin() + firebase-config.js ADMIN_EMAILS) — cannot be changed here.',
-                                                      '규칙 파일 고정(firestore.rules isAdmin() + firebase-config.js ADMIN_EMAILS) — 여기서는 못 바꿉니다.')) + '</p><ul class="adm-set-list">';
+        + '<p class="adm-set-intro" ' + tAttr(admIntroEn, admIntroKo) + '>' + escapeHtml(t(admIntroEn, admIntroKo)) + '</p><ul class="adm-set-list">';
     for (var i = 0; i < list.length; i++) html += '<li>' + escapeHtml(list[i]) + '</li>';
     if (!list.length) html += '<li class="adm-muted">' + escapeHtml(t('ADMIN_EMAILS not loaded', 'ADMIN_EMAILS 미로드')) + '</li>';
     return html + '</ul>';

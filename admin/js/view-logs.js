@@ -205,7 +205,7 @@ function logs_draw() {
     var more = document.getElementById('logMoreBtn');
     if (more) more.style.display = log_state.hasMore ? '' : 'none';
     if (!log_state.loading && !log_state.error) {   // 오류 상태면 요약문으로 덮지 않는다
-        logs_msg(t('Showing ' + list.length + ' of ' + log_state.items.length + ' loaded', '불러온 ' + log_state.items.length + '건 중 ' + list.length + '건 표시')
+        logs_msg('Showing ' + list.length + ' of ' + log_state.items.length + ' loaded', '불러온 ' + log_state.items.length + '건 중 ' + list.length + '건 표시'
             + (log_state.hasMore ? t(' — more available', ' — 더 있음') : ''), false);
     }
 }

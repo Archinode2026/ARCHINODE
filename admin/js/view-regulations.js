@@ -94,7 +94,8 @@ function reg_load(f) {
         reg_state.loading = '';
         console.error('[regulations] fetch failed', f.path, err);
         if (reg_state.tab !== f.key) return;
-        reg_msg(t('Could not load file', '파일을 불러오지 못했습니다') + ' — ' + f.path + ' (' + ((err && err.message) || '') + ')', true);
+        var tail = ' — ' + f.path + ' (' + ((err && err.message) || '') + ')';   // A-215 — 짝으로 넘긴다
+        reg_msg('Could not load file' + tail, '파일을 불러오지 못했습니다' + tail, true);
     });
 }
 
@@ -117,7 +118,8 @@ function reg_draw(f, md) {
     if (html == null) {
         body.innerHTML = '';
         toc.innerHTML = '';
-        reg_msg(t('Renderer not loaded (marked / DOMPurify) — check the CDN script tags in dashboard.html', '렌더러 미로드(marked / DOMPurify) — dashboard.html 의 CDN script 태그 확인'), true);
+        reg_msg('Renderer not loaded (marked / DOMPurify) — check the CDN script tags in dashboard.html',
+                '렌더러 미로드(marked / DOMPurify) — dashboard.html 의 CDN script 태그 확인', true);   // A-215
         return;
     }
     body.innerHTML = html;   // DOMPurify 를 거친 HTML 만 여기 온다
@@ -178,7 +180,8 @@ function reg_onLinkClick(e) {
         for (var j = 0; j < REG_FILES.length; j++) {
             if (REG_FILES[j].path.split('/').pop() === name) { reg_show(REG_FILES[j].key); return; }
         }
-        reg_msg(t('Only the three files above are available here: ', '이 화면에서는 위 3개 파일만 봅니다: ') + name, true);
+        reg_msg('Only the three files above are available here: ' + name,
+                '이 화면에서는 위 3개 파일만 봅니다: ' + name, true);   // A-215
         return;
     }
     if (safeUrl(href)) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); return; }

@@ -178,7 +178,7 @@ function users_draw() {
     var more = document.getElementById('usrMoreBtn');
     if (more) more.style.display = usr_state.hasMore ? '' : 'none';
     if (!usr_state.loading && !usr_state.error) {   // 오류 상태면 요약문으로 덮지 않는다
-        users_msg(t('Showing ' + list.length + ' of ' + usr_state.items.length + ' loaded', '불러온 ' + usr_state.items.length + '명 중 ' + list.length + '명 표시')
+        users_msg('Showing ' + list.length + ' of ' + usr_state.items.length + ' loaded', '불러온 ' + usr_state.items.length + '명 중 ' + list.length + '명 표시'
             + (usr_state.hasMore ? t(' — more available', ' — 더 있음') : ''), false);
     }
 }

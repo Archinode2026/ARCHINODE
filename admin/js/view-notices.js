@@ -98,7 +98,7 @@ function notices_load() {
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) { notices_waitAuth(); return; }   // 로그인 전 진입(#notices 직접 열기)
     ntc_state.loading = true;
     ntc_state.error = false;
-    notices_msg(t('Loading…', '불러오는 중…'), false);
+    notices_msg('Loading…', '불러오는 중…', false);
     db.collection('notices').orderBy('createdAt', 'desc').limit(NTC_PAGE_SIZE).get().then(function (snap) {
         var items = [];
         snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
@@ -131,7 +131,7 @@ function notices_sorted(items) {
 function notices_waitAuth() {
     if (ntc_state.authHooked || typeof auth === 'undefined') return;
     ntc_state.authHooked = true;
-    notices_msg(t('Sign in required', '로그인 필요'), false);
+    notices_msg('Sign in required', '로그인 필요', false);
     var un = auth.onAuthStateChanged(function (u) {
         if (!u) return;
         if (typeof un === 'function') un();
@@ -149,13 +149,28 @@ function notices_draw() {
     if (!ntc_state.loading && !ntc_state.error) {
         var visible = 0;
         for (var i = 0; i < list.length; i++) if (list[i].visible) visible++;
-        notices_msg(t(list.length + ' notices · ' + visible + ' visible', list.length + '건 · 노출 ' + visible + '건'), false);
+        notices_msg(list.length + ' notices · ' + visible + ' visible', list.length + '건 · 노출 ' + visible + '건', false);
     }
 }
-function notices_msg(text, isErr) {
+function notices_msg(enOrText, koOrIsErr, maybeIsErr) {
     var el = document.getElementById('ntcMsg');
     if (!el) return;
-    el.textContent = text || '';
+    var isErr;
+    if (typeof koOrIsErr === 'string') {
+        /* 이중언어 모드 (A-029 와 같은 꼴, R-029 = A-215 로 이 파일에도 추가).
+           `t(en, ko)` 로 **미리 고른 한 문자열**을 넘기면 lang.js 가 나중에 바꿀 근거가
+           없어, KO 로 그린 뒤 EN 으로 토글해도 한글이 그대로 남는다. 짝으로 넘겨야 한다. */
+        var en = enOrText, ko = koOrIsErr;
+        isErr = maybeIsErr;
+        el.setAttribute('data-en', en);
+        el.setAttribute('data-ko', ko);
+        el.textContent = admLang() === 'ko' ? ko : en;
+    } else {
+        el.removeAttribute('data-en');
+        el.removeAttribute('data-ko');
+        el.textContent = enOrText || '';
+        isErr = koOrIsErr;
+    }
     el.classList.toggle('err', !!isErr);
 }
 

@@ -117,7 +117,7 @@ function inquiries_load(more) {
     if (more && inq_state.lastDoc) q = q.startAfter(inq_state.lastDoc);
     inq_state.loading = true;
     inq_state.error = false;
-    inquiries_msg(t('Loading…', '불러오는 중…'), false);
+    inquiries_msg('Loading…', '불러오는 중…', false);
     q.get().then(function (snap) {
         snap.forEach(function (d) { inq_state.items.push(Object.assign({ id: d.id }, d.data())); });
         if (typeof admRegisterCache === 'function') admRegisterCache('inquiries', inq_state.items);   // 6단계 통합 검색 캐시(추가 읽기 없음 — 검수대장 A-041)
@@ -144,7 +144,7 @@ function inquiries_load(more) {
 function inquiries_waitAuth() {
     if (inq_state.authHooked || typeof auth === 'undefined') return;
     inq_state.authHooked = true;
-    inquiries_msg(t('Sign in required', '로그인 필요'), false);
+    inquiries_msg('Sign in required', '로그인 필요', false);
     var un = auth.onAuthStateChanged(function (u) {
         if (!u) return;
         if (typeof un === 'function') un();
@@ -173,14 +173,29 @@ function inquiries_draw() {
     var more = document.getElementById('inqMoreBtn');
     if (more) more.style.display = inq_state.hasMore ? '' : 'none';
     if (!inq_state.loading && !inq_state.error) {
-        inquiries_msg(t('Showing ' + list.length + ' of ' + inq_state.items.length + ' loaded', '불러온 ' + inq_state.items.length + '건 중 ' + list.length + '건 표시')
+        inquiries_msg('Showing ' + list.length + ' of ' + inq_state.items.length + ' loaded', '불러온 ' + inq_state.items.length + '건 중 ' + list.length + '건 표시'
             + (inq_state.hasMore ? t(' — more available', ' — 더 있음') : ''), false);
     }
 }
-function inquiries_msg(text, isErr) {
+function inquiries_msg(enOrText, koOrIsErr, maybeIsErr) {
     var el = document.getElementById('inqMsg');
     if (!el) return;
-    el.textContent = text || '';
+    var isErr;
+    if (typeof koOrIsErr === 'string') {
+        /* 이중언어 모드 (A-029 와 같은 꼴, R-029 = A-215 로 이 파일에도 추가).
+           `t(en, ko)` 로 **미리 고른 한 문자열**을 넘기면 lang.js 가 나중에 바꿀 근거가
+           없어, KO 로 그린 뒤 EN 으로 토글해도 한글이 그대로 남는다. 짝으로 넘겨야 한다. */
+        var en = enOrText, ko = koOrIsErr;
+        isErr = maybeIsErr;
+        el.setAttribute('data-en', en);
+        el.setAttribute('data-ko', ko);
+        el.textContent = admLang() === 'ko' ? ko : en;
+    } else {
+        el.removeAttribute('data-en');
+        el.removeAttribute('data-ko');
+        el.textContent = enOrText || '';
+        isErr = koOrIsErr;
+    }
     el.classList.toggle('err', !!isErr);
 }
 
