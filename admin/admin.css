@@ -243,3 +243,53 @@ h1, h2, .adm-reg-body h1, .adm-reg-body h2, .adm-reg-body h3 {
   body .topbar .right > * { white-space: nowrap; }
   body .topbar .admin-email { max-width: 60vw; overflow: hidden; text-overflow: ellipsis; }
 }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   R-076 → A-197: 휴대폰에서 대시보드 표 4개가 화면을 넘쳤다.
+   실측(375px, 행 4개): 브랜드 497 · 제품 549 · 아티클 422 · 검수관리 807px
+   (문서 폭 / 화면 375). 문서가 화면보다 넓으면 브라우저가 initial-scale 을
+   스스로 줄여 '전체가 축소된' 화면이 되고, 글씨가 작아져 읽기 어려워진다.
+
+   두 가지를 함께 한다.
+     ① 표를 자체 스크롤 상자에 담는다 → 문서는 더 이상 넓어지지 않으므로
+        축소가 사라지고 글자 크기가 돌아온다. 좌우 밀기는 표 안에서만.
+     ② 좁은 화면에서는 부차적인 열을 접는다 → 이름·상태·작업이 밀지 않아도
+        한 화면에 들어온다. 접은 정보는 사라지는 게 아니라 상세보기(View)
+        팝업에 그대로 있다.
+   ════════════════════════════════════════════════════════════════════ */
+.adm-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;   /* iOS 관성 스크롤 */
+  overscroll-behavior-x: contain;      /* 표 끝에서 페이지가 따라 밀리지 않게 */
+}
+/* 스크롤 상자 안에서 표가 줄어들지 않도록 — 좁아지면 글자가 세로로 쪼개진다 */
+.adm-table-wrap > table { min-width: 100%; }
+
+@media (max-width: 768px) {
+  /* 부차적인 열 접기. 어느 열인지는 각 표의 th/td 에 붙인 클래스가 정한다. */
+  body .adm-col-sub { display: none; }
+  /* 남은 열에 숨 쉴 공간 */
+  body .adm-table-wrap th,
+  body .adm-table-wrap td { padding: 10px 8px; }
+  body .adm-table-wrap td .act-btn { padding: 7px 10px; font-size: 0.74rem; }
+  /* 여백 회수 — 375 화면에서 .admin 24 + .section-card 24 = 좌우 96px(26%)가
+     여백이었다. 내용 상자가 279px 밖에 안 남아 표가 들어갈 자리가 없었다.
+     (두 규칙 모두 dashboard.html 인라인 <style> 에 있어 body 접두사가 필요하다) */
+  body .admin { padding: 20px 12px; }
+  body .section-card { padding: 16px 12px; }
+
+  /* 검수관리 '문제' 칸 — 고정 320px 는 375 화면의 85% 를 먹는다.
+     좁은 화면에서는 한 줄 말줄임 대신 두세 줄로 접는다: 폭이 줄고 더 읽힌다. */
+  body .rv-ellip { max-width: 34vw; white-space: normal; }
+}
+
+/* 휴대폰 — 검수관리의 '우선' 열까지 접는다. 목록이 이미 우선순위 순으로
+   정렬되므로 순서 자체가 우선순위를 말해 주고, 값은 상세보기에 그대로 있다.
+   태블릿(481~768)에서는 남긴다. */
+@media (max-width: 480px) {
+  body .adm-col-sub-xs { display: none; }
+  /* 셀 여백 한 번 더 — 제품 탭이 375px 에서 13px 모자랐다 (열 4 × 4px = 16px) */
+  body .adm-table-wrap th,
+  body .adm-table-wrap td { padding: 9px 6px; }
+}

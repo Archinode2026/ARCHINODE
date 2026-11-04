@@ -241,58 +241,64 @@ tr:hover { background: var(--gray-50); }
     <!-- TAB: BRANDS -->
     <div class="tab-content active" id="tab-brands">
         <div class="section-card">
-            <table>
-                <thead>
-                    <tr>
-                        <th data-en="Brand" data-ko="브랜드">Brand</th>
-                        <th data-en="Country" data-ko="국가">Country</th>
-                        <th data-en="Category" data-ko="카테고리">Category</th>
-                        <th data-en="Contact" data-ko="연락처">Contact</th>
-                        <th data-en="KR Dealer" data-ko="한국 딜러">KR Dealer</th>
-                        <th data-en="Status" data-ko="상태">Status</th>
-                        <th data-en="Actions" data-ko="작업">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="brandsTable"></tbody>
-            </table>
+            <div class="adm-table-wrap">
+    <table>
+                    <thead>
+                        <tr>
+                            <th data-en="Brand" data-ko="브랜드">Brand</th>
+                            <th class="adm-col-sub" data-en="Country" data-ko="국가">Country</th>
+                            <th class="adm-col-sub" data-en="Category" data-ko="카테고리">Category</th>
+                            <th class="adm-col-sub" data-en="Contact" data-ko="연락처">Contact</th>
+                            <th class="adm-col-sub" data-en="KR Dealer" data-ko="한국 딜러">KR Dealer</th>
+                            <th data-en="Status" data-ko="상태">Status</th>
+                            <th data-en="Actions" data-ko="작업">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="brandsTable"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <!-- TAB: PRODUCTS -->
     <div class="tab-content" id="tab-products">
         <div class="section-card">
-            <table>
-                <thead>
-                    <tr>
-                        <th data-en="Product" data-ko="제품">Product</th>
-                        <th data-en="Brand" data-ko="브랜드">Brand</th>
-                        <th data-en="Category" data-ko="카테고리">Category</th>
-                        <th data-en="Materials" data-ko="소재">Materials</th>
-                        <th data-en="Image" data-ko="이미지">Image</th>
-                        <th data-en="Status" data-ko="상태">Status</th>
-                        <th data-en="Actions" data-ko="작업">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="productsTable"></tbody>
-            </table>
+            <div class="adm-table-wrap">
+    <table>
+                    <thead>
+                        <tr>
+                            <th data-en="Product" data-ko="제품">Product</th>
+                            <th data-en="Brand" data-ko="브랜드">Brand</th>
+                            <th class="adm-col-sub" data-en="Category" data-ko="카테고리">Category</th>
+                            <th class="adm-col-sub" data-en="Materials" data-ko="소재">Materials</th>
+                            <th class="adm-col-sub" data-en="Image" data-ko="이미지">Image</th>
+                            <th data-en="Status" data-ko="상태">Status</th>
+                            <th data-en="Actions" data-ko="작업">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTable"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <!-- TAB: ARTICLES -->
     <div class="tab-content" id="tab-articles">
         <div class="section-card">
-            <table>
-                <thead>
-                    <tr>
-                        <th data-en="Title" data-ko="제목">Title</th>
-                        <th data-en="Brand" data-ko="브랜드">Brand</th>
-                        <th data-en="Tag" data-ko="태그">Tag</th>
-                        <th data-en="Status" data-ko="상태">Status</th>
-                        <th data-en="Actions" data-ko="작업">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="articlesTable"></tbody>
-            </table>
+            <div class="adm-table-wrap">
+    <table>
+                    <thead>
+                        <tr>
+                            <th data-en="Title" data-ko="제목">Title</th>
+                            <th data-en="Brand" data-ko="브랜드">Brand</th>
+                            <th class="adm-col-sub" data-en="Tag" data-ko="태그">Tag</th>
+                            <th data-en="Status" data-ko="상태">Status</th>
+                            <th data-en="Actions" data-ko="작업">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="articlesTable"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -316,21 +322,23 @@ tr:hover { background: var(--gray-50); }
                 <button class="act-btn act-add" id="reviewAddBtn" data-en="+ New issue" data-ko="+ 등록">+ New issue</button>
             </div>
             <div class="rv-msg" id="reviewMsg"></div>
-            <table>
-                <thead>
-                    <tr>
-                        <th data-en="No." data-ko="번호">No.</th>
-                        <th data-en="Screen" data-ko="화면">Screen</th>
-                        <th data-en="Problem" data-ko="문제">Problem</th>
-                        <th data-en="Priority" data-ko="우선">Priority</th>
-                        <th data-en="Status" data-ko="상태">Status</th>
-                        <th data-en="Reported" data-ko="등록일">Reported</th>
-                        <th data-en="By" data-ko="등록자">By</th>
-                        <th data-en="Actions" data-ko="작업">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="reviewTable"></tbody>
-            </table>
+            <div class="adm-table-wrap">
+    <table>
+                    <thead>
+                        <tr>
+                            <th data-en="No." data-ko="번호">No.</th>
+                            <th class="adm-col-sub" data-en="Screen" data-ko="화면">Screen</th>
+                            <th data-en="Problem" data-ko="문제">Problem</th>
+                            <th class="adm-col-sub-xs" data-en="Priority" data-ko="우선">Priority</th>
+                            <th data-en="Status" data-ko="상태">Status</th>
+                            <th class="adm-col-sub" data-en="Reported" data-ko="등록일">Reported</th>
+                            <th class="adm-col-sub" data-en="By" data-ko="등록자">By</th>
+                            <th data-en="Actions" data-ko="작업">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewTable"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div><!-- /.adm-main -->
@@ -445,10 +453,10 @@ async function loadBrands() {
         tbody.innerHTML += `
             <tr>
                 <td><strong>${escapeHtml(b.brandName)}</strong></td>
-                <td>${escapeHtml(b.country || '-')}</td>
-                <td>${escapeHtml(b.category || '-')}</td>
-                <td>${escapeHtml(b.contactName || '-')}<br><small style="color:#6b6459;">${escapeHtml(b.email)}</small></td>
-                <td>${b.koreanDealer && b.koreanDealer.name ? `<strong>${escapeHtml(b.koreanDealer.name)}</strong><br><small style="color:#6b6459;">${escapeHtml(b.koreanDealer.contact || '')}</small>` : '<span style="color:#ddd5c7;">—</span>'}</td>
+                <td class="adm-col-sub">${escapeHtml(b.country || '-')}</td>
+                <td class="adm-col-sub">${escapeHtml(b.category || '-')}</td>
+                <td class="adm-col-sub">${escapeHtml(b.contactName || '-')}<br><small style="color:#6b6459;">${escapeHtml(b.email)}</small></td>
+                <td class="adm-col-sub">${b.koreanDealer && b.koreanDealer.name ? `<strong>${escapeHtml(b.koreanDealer.name)}</strong><br><small style="color:#6b6459;">${escapeHtml(b.koreanDealer.contact || '')}</small>` : '<span style="color:#ddd5c7;">—</span>'}</td>
                 <td><span class="status status-${b.status}">${b.status}</span></td>
                 <td>${brandActionButtons(b, doc.id)}</td>
             </tr>`;
@@ -750,9 +758,9 @@ async function loadProducts() {
             <tr>
                 <td><strong>${escapeHtml(p.name)}</strong><br><small style="color:#6b6459;">${escapeHtml(p.collection || '')}</small></td>
                 <td>${escapeHtml(p.brandName)}</td>
-                <td>${escapeHtml(p.category || '-')}<br><small style="color:#6b6459;">${escapeHtml(p.subcategory || '')}</small></td>
-                <td>${escapeHtml(p.materials || '-')}</td>
-                <td>${p.imageUrl ? `<img loading="lazy" src="${escapeHtml(p.imageUrl)}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
+                <td class="adm-col-sub">${escapeHtml(p.category || '-')}<br><small style="color:#6b6459;">${escapeHtml(p.subcategory || '')}</small></td>
+                <td class="adm-col-sub">${escapeHtml(p.materials || '-')}</td>
+                <td class="adm-col-sub">${p.imageUrl ? `<img loading="lazy" src="${escapeHtml(p.imageUrl)}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
                 <td><span class="status status-${p.status}">${p.status}</span></td>
                 <td>
                     <button class="act-btn act-view" onclick="viewProduct('${doc.id}')">View</button>
@@ -839,7 +847,7 @@ async function loadArticles() {
             <tr>
                 <td><strong>${escapeHtml(a.title)}</strong></td>
                 <td>${escapeHtml(a.brandName)}</td>
-                <td><span style="color:#7a5c32;font-size:0.8rem;">${escapeHtml(a.tag || '')}</span></td>
+                <td class="adm-col-sub"><span style="color:#7a5c32;font-size:0.8rem;">${escapeHtml(a.tag || '')}</span></td>
                 <td><span class="status status-${a.status}">${a.status}</span></td>
                 <td>
                     ${a.status === 'pending' ? `
@@ -1049,12 +1057,12 @@ function renderReview() {
         return `
             <tr>
                 <td><strong>${escapeHtml(d.no || '-')}</strong></td>
-                <td>${escapeHtml(d.area || '-')}${d.screen ? `<br><small style="color:#6b6459;">${escapeHtml(d.screen)}</small>` : ''}</td>
+                <td class="adm-col-sub">${escapeHtml(d.area || '-')}${d.screen ? `<br><small style="color:#6b6459;">${escapeHtml(d.screen)}</small>` : ''}</td>
                 <td><span class="rv-ellip" title="${escapeHtml(gap)}">${escapeHtml(gapShort)}</span></td>
-                <td>${rvPriorityBadge(d.priority)}</td>
+                <td class="adm-col-sub-xs">${rvPriorityBadge(d.priority)}</td>
                 <td>${rvStatusBadge(d.status)}</td>
-                <td>${escapeHtml(rvDate(d.reportedAt))}</td>
-                <td><small>${escapeHtml(d.reportedBy || '-')}</small></td>
+                <td class="adm-col-sub">${escapeHtml(rvDate(d.reportedAt))}</td>
+                <td class="adm-col-sub"><small>${escapeHtml(d.reportedBy || '-')}</small></td>
                 <td><button class="act-btn act-view" onclick="viewReview('${escapeHtml(d.id)}')" ${rvAttr('View', '보기')}>${escapeHtml(rvT('View', '보기'))}</button></td>
             </tr>`;
     }).join('');
