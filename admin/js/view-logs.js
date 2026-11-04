@@ -41,8 +41,37 @@ var LOG_KINDS = [
     { key: 'newsletter',   en: 'Newsletter',     ko: '뉴스레터' },
     { key: 'notify',       en: 'Digital notify', ko: '디지털 알림' },
     { key: 'settings',     en: 'Settings',       ko: '설정' },
-    { key: 'lead',         en: 'Leads',          ko: '리드' }                // 4a단계
+    { key: 'lead',         en: 'Leads',          ko: '리드' },               // 4a단계
+    { key: 'notice',       en: 'Notices',        ko: '공지사항' },             // 5단계 — A-198
+    { key: 'inquiry',      en: 'Inquiries',      ko: '1:1 문의' }              // 5단계 — A-198
 ];
+
+/* ── 종류 옵션은 LOG_ACTIONS 에서 '유도'한다 ─────────────────────────────
+   R-074(=A-198)의 원인: 5단계에서 LOG_ACTIONS 에 notice.save·inquiry.answer 를
+   더하면서 LOG_KINDS 를 같이 고치지 않았다. 두 목록이 손으로만 묶여 있으면
+   action 을 더할 때마다 같은 누락이 다시 난다 — 필터에서 조용히 빠지고,
+   '전체 종류' 에서는 보이니 눈치채기도 어렵다.
+
+   그래서 LOG_KINDS 는 이제 '순서와 라벨' 만 정하고, 실제 옵션은 LOG_ACTIONS
+   의 접두어 집합으로 맞춘다. LOG_KINDS 에 없는 접두어는 action 라벨을 빌려
+   뒤에 붙이고 콘솔에 경고한다 — 라벨이 어설퍼도 '보이는' 쪽이 낫다.
+   ──────────────────────────────────────────────────────────────────── */
+function logs_kindOptions() {
+    var out = [], seen = {}, i, k;
+    for (i = 0; i < LOG_KINDS.length; i++) { out.push(LOG_KINDS[i]); seen[LOG_KINDS[i].key] = true; }
+    for (k in LOG_ACTIONS) {
+        if (!Object.prototype.hasOwnProperty.call(LOG_ACTIONS, k)) continue;
+        var pre = k.indexOf('.') > 0 ? k.slice(0, k.indexOf('.')) : k;
+        if (seen[pre]) continue;
+        seen[pre] = true;
+        out.push({ key: pre, en: LOG_ACTIONS[k].en, ko: LOG_ACTIONS[k].ko });
+        if (typeof console !== 'undefined' && console.warn) {
+            console.warn('view-logs: LOG_KINDS 에 "' + pre + '" 가 없어 라벨을 빌려 썼습니다. '
+                       + 'LOG_KINDS 에 제대로 된 종류 이름을 더해 주세요.');
+        }
+    }
+    return out;
+}
 
 // 기간 필터 (로컬 시간 기준 — toISOString 금지)
 var LOG_PERIODS = [
@@ -72,7 +101,7 @@ function logs_render(el) {
         var html = '<div class="section-card adm-logs">'
             + '<div class="adm-toolbar">'
             + logs_selectHtml('logPeriod', LOG_PERIODS, log_state.period)
-            + logs_selectHtml('logKind', LOG_KINDS, log_state.kind)
+            + logs_selectHtml('logKind', logs_kindOptions(), log_state.kind)
             + '<div class="adm-spacer"></div>'
             + '<button type="button" class="act-btn act-view" id="logRefreshBtn" ' + tAttr('Refresh', '새로고침') + '>' + escapeHtml(t('Refresh', '새로고침')) + '</button>'
             + '</div>'
