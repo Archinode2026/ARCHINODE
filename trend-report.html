@@ -322,8 +322,11 @@ fadeEls.forEach(el => fadeObserver.observe(el));
   var errBox = document.getElementById('articlesErrorState');
   if (!grid || typeof db === 'undefined') return;
   function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  /* A-218 / R-003: esc 는 `&<>"` 만 바꾼다 — `javascript:` 에는 그 글자가 없어
+     그대로 통과해 src 에 들어갔다(실측). URL 은 스킴을 따로 봐야 한다. */
+  function safeUrl(u){ return (u && /^https?:\/\//i.test(String(u))) ? String(u) : ''; }
   function cardHtml(id, a) {
-    var img = a.coverImage || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80';
+    var img = safeUrl(a.coverImage) || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80';   // A-218
     var date = a.publishedAt && a.publishedAt.toDate ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : '';
     var tagHtml = a.tag ? '<span class="article-card-tag">' + esc(a.tag) + '</span>' : '';
     return '<a href="trend-report/view.html?id=' + esc(id) + '" class="article-card">' +

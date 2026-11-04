@@ -844,6 +844,11 @@ function escapeHtml(text) {
     return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+/* A-218 / R-003: 이스케이프만으로는 URL 을 막을 수 없다 — `javascript:` 에는
+   `&<>"'` 가 없어 escapeHtml 을 그대로 통과한다. href·src 에 넣기 전에
+   스킴을 본다 (어드민의 rvSafeUrl 과 같은 방식). */
+function bpSafeUrl(u) { return (u && /^https?:\/\//i.test(String(u))) ? String(u) : ''; }
+
 // ── 카테고리 → 서브카테고리 매핑 ──
 const SUBCATEGORIES = {
   Furniture: [
@@ -1122,8 +1127,8 @@ function renderCertList(certs) {
     wrap.innerHTML = certs.map((cert, i) => `
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f7f3ec;border-radius:6px;">
             <div>
-                <a href="${cert.fileUrl}" target="_blank" style="font-weight:600;color:#332e27;text-decoration:none;" rel="noopener noreferrer"><i class="fas fa-file-certificate" style="margin-right:6px;color:#7a5c32;"></i>${cert.name}</a>
-                ${cert.issuer ? `<span style="color:#6b6459;font-size:0.8rem;margin-left:8px;">${cert.issuer}</span>` : ''}
+                <a href="${escapeHtml(bpSafeUrl(cert.fileUrl))}" target="_blank" style="font-weight:600;color:#332e27;text-decoration:none;" rel="noopener noreferrer"><i class="fas fa-file-certificate" style="margin-right:6px;color:#7a5c32;"></i>${escapeHtml(cert.name)}</a>
+                ${cert.issuer ? `<span style="color:#6b6459;font-size:0.8rem;margin-left:8px;">${escapeHtml(cert.issuer)}</span>` : ''}
             </div>
             <button type="button" onclick="deleteCertification(${i})" style="background:none;border:none;color:#b91c1c;cursor:pointer;font-size:0.9rem;"><i class="fas fa-trash"></i></button>
         </div>
@@ -1386,7 +1391,7 @@ async function loadProducts() {
     prows.forEach(p => {
         const statusClass = p.status === 'approved' ? 'status-approved' : p.status === 'rejected' ? 'status-rejected' : 'status-pending';
         const pName = escapeHtml(p.name || (ko ? '(이름 없음)' : '(untitled)'));
-        const pImageUrl = escapeHtml(p.imageUrl || '');
+        const pImageUrl = escapeHtml(bpSafeUrl(p.imageUrl));   // A-218 — 스킴까지 본다
         const pCollection = escapeHtml(p.collection || '');
         const pMaterials = escapeHtml(p.materials || '');
         const pSt = (p.status === 'approved' || p.status === 'rejected') ? p.status : 'pending';
@@ -1395,7 +1400,7 @@ async function loadProducts() {
                       : (ko ? '심사 대기중' : 'Pending');
         grid.innerHTML += `
             <div class="product-card">
-                <div class="img-area">${p.imageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : 'No image'}</div>
+                <div class="img-area">${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : 'No image'}</div>
                 <div class="info">
                     <h4>${pName}</h4>
                     <p>${pCollection} ${p.materials ? '· ' + pMaterials : ''}</p>

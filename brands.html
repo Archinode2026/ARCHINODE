@@ -441,6 +441,20 @@ async function loadRegisteredBrands() {
             return;
         }
 
+        /* ── R-003 = A-218 ────────────────────────────────────────────────
+           이 파일에는 `escapeHtml` 이 **한 번도 없었다.** 브랜드가 자기
+           `brandName`·`country`·`category` 에 넣은 HTML 이 `innerHTML` 로
+           그대로 들어가, **모든 방문자 화면에서 실행됐다**(저장형 XSS).
+           실측: 공격 문자열을 넣으니 핸들러가 14번 실행되고 주입 요소 24개.
+           브랜드는 `firestore.rules` 상 자기 문서를 고칠 수 있으므로 실제 경로다.
+
+           URL 은 이스케이프만으로 안 된다 — `javascript:` 는 `&<>"` 가 없어
+           그대로 통과한다. 스킴을 따로 봐야 한다(`safeUrl`). */
+        const escapeHtml = (v) => v === null || v === undefined ? '' : String(v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        const safeUrl = (u) => (u && /^https?:\/\//i.test(String(u))) ? String(u) : '';
+
         // 브랜드명 기준 정렬
         const brands = [];
         snapshot.forEach(doc => brands.push(doc.data()));
@@ -451,18 +465,19 @@ async function loadRegisteredBrands() {
 
         brands.forEach(b => {
             count++;
-            const initial = b.brandName ? b.brandName.charAt(0).toUpperCase() : '?';
-            const logoHtml = b.logoUrl
-                ? `<img loading="lazy" src="${b.logoUrl}" alt="${b.brandName}">`
+            const initial = b.brandName ? escapeHtml(b.brandName.charAt(0).toUpperCase()) : '?';
+            const logo = safeUrl(b.logoUrl);
+            const logoHtml = logo
+                ? `<img loading="lazy" src="${escapeHtml(logo)}" alt="${escapeHtml(b.brandName)}">`
                 : initial;
-            const link = b.slug ? `brands/view.html?id=${b.slug}` : '#';
+            const link = b.slug ? `brands/view.html?id=${encodeURIComponent(b.slug)}` : '#';
 
             html += `
-            <a href="${link}" class="reg-brand-card fade-in">
+            <a href="${escapeHtml(link)}" class="reg-brand-card fade-in">
                 <span class="reg-badge">Partner</span>
                 <div class="reg-logo">${logoHtml}</div>
-                <div class="reg-name">${b.brandName}</div>
-                <div class="reg-meta">${b.country || ''} ${b.category ? '· ' + b.category : ''}</div>
+                <div class="reg-name">${escapeHtml(b.brandName)}</div>
+                <div class="reg-meta">${escapeHtml(b.country || '')} ${b.category ? '· ' + escapeHtml(b.category) : ''}</div>
             </a>`;
         });
 
