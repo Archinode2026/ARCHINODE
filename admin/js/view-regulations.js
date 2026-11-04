@@ -4,7 +4,8 @@
 
    docs/ 의 md 3개(규정집·작업일지·검수대장)를 fetch 해 marked(GFM, 표 포함) → DOMPurify → innerHTML.
    ★ DOMPurify.sanitize(marked.parse(md)) 필수 — 리포 안 파일이어도 원칙(리스크 4). 두 라이브러리는
-     dashboard.html <head> 에 cdnjs 버전 고정(marked 12.0.2 · dompurify 3.1.6). 없으면 렌더하지 않고 안내.
+     dashboard.html <head> 에서 자체 호스팅으로 싣는다(assets/vendor/, marked 12.0.2 · dompurify 3.1.6).
+     A-032 에서 cdnjs 에서 옮겼다 — 같은 출처라 SRI 가 필요 없다. 없으면 렌더하지 않고 안내.
    ★ docs/ 가 GitHub Pages 에 공개 서빙되는 사실(검수대장 A-012, 한울님 결정 대기)을 이용할 뿐 새로 여는 게 아니다.
      비공개로 결정되면 settings/regulations(어드민이 md 붙여넣기)로 바꾼다 — 이번엔 안 한다.
    목차: 렌더된 h2/h3 에서 뽑는다. 앵커 = 소문자·마침표 제거·공백→하이픈. 링크 클릭은 JS 로 스크롤

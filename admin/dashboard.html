@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="../assets/vendor/fontawesome-6.5.1/css/all.min.css">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="admin.css?v=20261102a">
 
@@ -22,9 +22,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-<!-- 규정집 뷰어 (3단계, view-regulations.js) — cdnjs 버전 고정. DOMPurify.sanitize(marked.parse()) 필수 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<!-- 규정집 뷰어 (3단계, view-regulations.js). DOMPurify.sanitize(marked.parse()) 필수.
+     A-032: cdnjs 에서 자체 호스팅으로 옮겼다. CDN 에 두면 integrity 해시(SRI)로
+     바이트를 고정해야 하는데, 해시는 cdnjs 가 실제로 주는 바이트에서 나와야 한다 —
+     추측해 넣으면 해시가 어긋나는 순간 스크립트가 아예 로드되지 않아 규정집이 죽는다.
+     같은 출처에서 주면 SRI 가 필요 없고 CDN 장애·변조에도 영향받지 않는다.
+     파일은 npm 의 marked@12.0.2 · dompurify@3.1.6 원본이고 버전은 파일명에 박았다. -->
+<script src="../assets/vendor/marked-12.0.2.min.js"></script>
+<script src="../assets/vendor/dompurify-3.1.6.min.js"></script>
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
