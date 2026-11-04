@@ -1538,12 +1538,24 @@ window.subscribeNewsletter = async function(e, source) {
     var captchaData = await captchaResp.json();
     if (!captchaData.ok) { throw new Error('ARCHINODE_CAPTCHA_FAILED'); }
 
-    await archinodeWithTimeout(firebase.firestore().collection('newsletter-subscribers').add({
+    // R-065: 같은 이메일이 목록에 여러 줄로 쌓이지 않게, **문서 id 를 이메일로** 쓴다.
+    // 구독자 목록은 읽기가 어드민 전용이라(firestore.rules) 화면에서 "이미 있나" 를 물어볼 수 없다 —
+    // 물어보게 하려면 목록을 공개해야 하는데 그건 개인정보를 여는 일이다. id 를 이메일로 두면
+    // 두 번째 구독은 '새로 만들기' 가 아니라 '고치기' 가 되고, 규칙상 고치기는 어드민만 되므로
+    // permission-denied 로 막힌다. 아래 catch 에서 그걸 "이미 구독 중" 안내로 바꾼다.
+    var subKey = String(email || '').trim().toLowerCase();
+    var subCol = firebase.firestore().collection('newsletter-subscribers');
+    var subDoc = {
       email: email,
       source: source || 'unknown',
       hp: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }), 15000);
+    };
+    await archinodeWithTimeout(
+      (subKey && subKey.indexOf('/') === -1 && subKey.length <= 400)
+        ? subCol.doc(subKey).set(subDoc)   // 중복이면 '고치기' 가 되어 막힌다
+        : subCol.add(subDoc),              // id 로 쓸 수 없는 주소면 예전처럼
+      15000);
     try {
         await archinodeWithTimeout(firebase.firestore().collection('mail').add({
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
@@ -1568,6 +1580,11 @@ window.subscribeNewsletter = async function(e, source) {
     console.error('Subscribe failed:', err);
     if (err.message === 'ARCHINODE_CAPTCHA_FAILED') {
       showMsg(curLang === 'ko' ? '제출을 확인할 수 없습니다. 다시 시도해 주세요.' : 'We could not verify this submission. Please try again.', true);
+    } else if (err && (err.code === 'permission-denied' || /permission[- ]denied/i.test(err.message || ''))) {
+      // R-065: 이 폼에서 '쓰기 거부' 가 날 수 있는 경우는 사실상 '이미 그 주소로 문서가 있다' 뿐이다
+      // (honeypot 은 항상 빈 값으로 보내고, 주소 길이는 앞에서 검사한다).
+      showMsg(curLang === 'ko' ? '이미 구독하고 계십니다. 감사합니다!' : 'You are already subscribed. Thank you!', false);
+      form.reset();
     } else if (err.message === 'ARCHINODE_TIMEOUT') {
       showMsg(curLang === 'ko' ? '연결이 느리거나 끊긴 것 같습니다. 네트워크를 확인하고 다시 시도해 주세요.' : 'Your connection seems slow or offline. Please check your network and try again.', true);
     } else {

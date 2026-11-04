@@ -548,15 +548,24 @@ async function submitNotify(e) {
   btn.textContent = 'Submitting...';
   try {
     const dbRef = firebase.firestore();
-    await dbRef.collection('digital-products-notify').add({
-      email: email,
-      hp: '',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    // R-065: 뉴스레터와 같은 구조라 같은 문제가 있었다 — 같은 주소로 여러 번 신청하면 줄이 쌓인다.
+    // 문서 id 를 이메일로 두면 두 번째는 '고치기' 가 되고, 규칙상 고치기는 어드민만 되므로 막힌다.
+    const ntKey = String(email || '').trim().toLowerCase();
+    const ntCol = dbRef.collection('digital-products-notify');
+    const ntDoc = { email: email, hp: '', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+    await ((ntKey && ntKey.indexOf('/') === -1 && ntKey.length <= 400)
+      ? ntCol.doc(ntKey).set(ntDoc)
+      : ntCol.add(ntDoc));
     document.getElementById('notifyForm').style.display = 'none';
     document.getElementById('notifyMsg').style.display = 'block';
   } catch (err) {
     console.error(err);
+    // R-065: 이미 신청한 주소면 '쓰기 거부' 로 돌아온다 — 실패가 아니라 이미 된 것이므로 그렇게 말한다.
+    if (err && (err.code === 'permission-denied' || /permission[- ]denied/i.test(err.message || ''))) {
+      document.getElementById('notifyForm').style.display = 'none';
+      document.getElementById('notifyMsg').style.display = 'block';
+      return false;
+    }
     alert('Submission failed: ' + (err.message || 'Unknown error'));
     btn.disabled = false;
     btn.textContent = 'Notify Me';
