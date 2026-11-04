@@ -60,7 +60,7 @@
   white-space: nowrap;
   transition: background 0.2s;
 }
-.form-success .copy-btn:hover { background: #b8994e; }
+.form-success .copy-btn:hover { background: var(--accent-ink); }
 .form-success .copy-btn.copied { background: #10b981; }
 
 /* Warning icon — 30% size */

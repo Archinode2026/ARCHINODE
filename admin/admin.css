@@ -27,7 +27,8 @@
 .adm-install[hidden] { display: none; }   /* .adm-install 의 display:flex 가 UA [hidden] 을 이기므로 명시 */
 .adm-install { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 24px); margin: 6px 12px 2px; padding: 8px 10px; background: var(--black); color: var(--white); border: 1px solid var(--black); border-radius: 6px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s, color 0.2s; }
 .adm-install i { font-size: 0.8rem; color: var(--navy-gold); }
-.adm-install:hover { background: var(--accent); border-color: var(--accent); color: var(--black); }
+/* 어두운 글자가 얹히므로 --accent 는 3.51 — 밝은 금색 --navy-gold 가 5.72 (A-192) */
+.adm-install:hover { background: var(--navy-gold); border-color: var(--navy-gold); color: var(--black); }
 .adm-install:hover i { color: var(--black); }
 
 /* DASHBOARD CARDS */

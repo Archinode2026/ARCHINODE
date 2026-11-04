@@ -185,7 +185,8 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   transition: background 0.2s;
   font-family: inherit;
 }
-.submit-btn:hover { background: var(--accent-gold); }
+/* 흰 글자가 얹히는 버튼이라 --accent 계열은 3.71 이다 — --accent-ink 5.97 (A-192) */
+.submit-btn:hover { background: var(--accent-ink); }
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
 </head>

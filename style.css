@@ -2151,7 +2151,7 @@ body .stats-section.band-grey { color: var(--black); }
   /* A-007: 터치 타깃 44px 최소 확보(모바일) */
   min-height: 44px; min-width: 44px;
 }
-.form-success .copy-btn:hover { background: #b8994e; }
+.form-success .copy-btn:hover { background: var(--accent-ink); }
 .form-success .copy-btn.copied { background: #10b981; }
 
 /* ===== A-135: PRINT STYLES ===== */
@@ -2293,7 +2293,7 @@ body .logo-sub {
   font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase;
 }
 .main-nav a.nav-cta::after { display: none; }
-.main-nav a.nav-cta:hover { background: var(--accent); color: #fdfbf7; }
+.main-nav a.nav-cta:hover { background: var(--accent-ink); color: #fdfbf7; }
 
 /* 라벨·더보기 — 전 페이지에서 재사용 */
 .eyebrow {
@@ -2308,7 +2308,7 @@ body .logo-sub {
   color: var(--gray-700); text-decoration: none; white-space: nowrap;
   border-bottom: 1px solid var(--rule); padding-bottom: 5px; transition: .25s;
 }
-.link-more:hover { color: var(--accent); border-color: var(--accent); }
+.link-more:hover { color: var(--accent-ink); border-color: var(--accent-ink); }
 
 /* 푸터 — 전 페이지 공통. index.html 은 head 안에 같은 규칙을 인라인으로 또 갖고
    있어서(link 뒤에 오므로 인라인이 이긴다) `body` 를 붙여 명시도를 올린다 */
@@ -2378,7 +2378,7 @@ body.home .section-link {
   color: var(--gray-700); text-decoration: none; white-space: nowrap;
   border-bottom: 1px solid var(--rule); padding-bottom: 5px; transition: .25s;
 }
-body.home .section-link:hover { color: var(--accent); border-color: var(--accent); }
+body.home .section-link:hover { color: var(--accent-ink); border-color: var(--accent-ink); }
 body.home .section-link i { display: none; }   /* 화살표 아이콘 대신 밑줄로 */
 
 /* ── 히어로 — 사진이 먼저 말하도록 화면을 통째로 내준다 ── */
@@ -2412,7 +2412,7 @@ body.home .hero-btn {
   padding: 16px 32px; font-size: 0.79rem; font-weight: 600;
   letter-spacing: 0.11em; text-transform: uppercase; transition: .25s;
 }
-body.home .hero-btn:hover { background: var(--accent); color: #fff; }
+body.home .hero-btn:hover { background: var(--accent-ink); color: #fff; }
 @media (max-width: 860px) { body.home .hero-inner { max-width: 100%; } }
 
 /* ── 섹션 교차 배경 (A-168) — 화이트 / 베이지 / 화이트 / 연그레이 ──────
@@ -2498,7 +2498,7 @@ body.home .header.over-hero .main-nav > a:hover { color: #fdfbf7; }
 body.home .header.over-hero .main-nav > a::after { background: #fdfbf7; }
 /* .nav-cta 가 !important 로 박혀 있어 같은 무기가 아니면 진다 */
 body.home .header.over-hero .main-nav a.nav-cta { background: #fdfbf7 !important; color: var(--black) !important; }
-body.home .header.over-hero .main-nav a.nav-cta:hover { background: var(--accent) !important; color: #fdfbf7 !important; }
+body.home .header.over-hero .main-nav a.nav-cta:hover { background: var(--accent-ink) !important; color: #fdfbf7 !important; }
 body.home .header.over-hero .lang-switcher,
 body.home .header.over-hero .lang-switcher button { border-color: rgba(253,251,247,.5); color: #fdfbf7; }
 @media (prefers-reduced-motion: no-preference) {
@@ -2741,7 +2741,7 @@ body.home .cta-listing p { color: var(--gray-700); max-width: none; margin: 18px
 .nowrap { white-space: nowrap; }
 @media (max-width: 520px) { .nowrap { white-space: normal; } }
 body.home .cta-btn { background: var(--deep); color: #fdfbf7; padding: 14px 32px; font-size: 0.82rem; }
-body.home .cta-btn:hover { background: var(--accent); color: #fdfbf7; }
+body.home .cta-btn:hover { background: var(--accent-ink); color: #fdfbf7; }
 body.home .cta-free-tag { color: var(--gray-700); }
 
 /* ── 뉴스레터 ── */
@@ -2767,7 +2767,7 @@ body.home .newsletter .newsletter-form button {
   background: var(--deep); color: #fdfbf7; border: 1px solid var(--deep);
   padding: 14px 32px;
 }
-body.home .newsletter .newsletter-form button:hover { background: var(--accent); border-color: var(--accent); color: #fdfbf7; }
+body.home .newsletter .newsletter-form button:hover { background: var(--accent-ink); border-color: var(--accent-ink); color: #fdfbf7; }
 body.home .newsletter-msg { color: var(--gray-700); }
 body.home .newsletter h2 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
@@ -2815,7 +2815,7 @@ body.home .hero p {
   line-height: 1.75; color: rgba(253,251,247,.82); max-width: 44ch; margin: 0 0 38px;
 }
 body.home .hero-btn { padding: 16px 32px; font-size: 0.79rem; letter-spacing: 0.11em; }
-body.home .hero-btn:hover { background: var(--accent); color: #fff; }
+body.home .hero-btn:hover { background: var(--accent-ink); color: #fff; }
 
 /* 히어로 슬라이드 이미지가 100vh 를 채우도록 */
 body.home .hero-slide { position: absolute; inset: 0; z-index: 0; }
@@ -2994,7 +2994,7 @@ body .cta-listing p {
   max-width: 60ch; margin: 18px 0 34px;
 }
 body .cta-btn { background: var(--deep); color: #fdfbf7; padding: 14px 32px; font-size: 0.82rem; }
-body .cta-btn:hover { background: var(--accent); color: #fdfbf7; }
+body .cta-btn:hover { background: var(--accent-ink); color: #fdfbf7; }
 body .cta-free-tag { color: var(--gray-700); }   /* gray-600 은 베이지 위에서 4.34:1 로 AA 미달 */
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -3219,7 +3219,8 @@ body.mag .mag-newsletter .newsletter-form button {
   border-radius: 999px; padding: 14px 32px; font-size: 0.82rem; font-weight: 500;
   letter-spacing: 0.02em; font-family: inherit; transition: background .3s, border-color .3s;
 }
-body.mag .mag-newsletter .newsletter-form button:hover { background: var(--accent); border-color: var(--accent); }
+/* 기본 규칙의 글자색이 #fdfbf7 이라 --accent 는 3.26 이다 (A-192) */
+body.mag .mag-newsletter .newsletter-form button:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
 body.mag .newsletter-msg { text-align: left; color: var(--gray-700); }
 
 /* ── 입점 CTA — 배경·색은 전역 body .cta-listing 이 이미 베이지로 잡는다.

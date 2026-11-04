@@ -124,6 +124,27 @@ if ($rulesChanged) {
     Write-Host ''
 }
 
+# ── 2.5 이스케이프 계약 검사 (A-167) ──
+# 매거진 글이 새로 들어올 때 이중 이스케이프(`&amp;apos;`)가 다시 섞이거나,
+# 평문이어야 할 search-index.json 에 엔티티가 들어오는 일을 push 전에 잡는다.
+# 증상만 고치면 재발하므로 배포 경로에 묶어 둔다. python3 이 없으면 건너뛰고 경고만.
+# ?? 는 PowerShell 7+ 문법이다. 이 스크립트는 powershell.exe(5.1)로 돌아가므로 쓰지 않는다.
+$py = Get-Command python -ErrorAction SilentlyContinue
+if (-not $py) { $py = Get-Command python3 -ErrorAction SilentlyContinue }
+if ($py) {
+    Write-Host '[검사] 이스케이프 계약 (scripts/check_escaping.py)' -ForegroundColor Cyan
+    & $py.Source 'scripts/check_escaping.py'
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host ''
+        Write-Host '[중단] 이스케이프 위반이 있어 push 하지 않았습니다.' -ForegroundColor Red
+        Write-Host '       python3 scripts/check_escaping.py --fix  로 되돌린 뒤,' -ForegroundColor Red
+        Write-Host '       색인은 python3 scripts/make_search_index.py 로 재생성하세요.' -ForegroundColor Red
+        exit 1
+    }
+} else {
+    Write-Host '[경고] python 을 찾지 못해 이스케이프 검사를 건너뜁니다.' -ForegroundColor Yellow
+}
+
 # ── 3. push ──
 if (-not $NoPush) {
     Write-Host '[push] git push origin main' -ForegroundColor Cyan

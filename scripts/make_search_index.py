@@ -10,6 +10,7 @@
 """
 
 from __future__ import annotations
+import html as html_mod
 import json
 import os
 import re
@@ -96,6 +97,12 @@ def process_file(path: Path, relpath: str) -> dict | None:
         return None
 
     name_en, name_ko, desc_en, desc_ko = extract_title_desc(html)
+
+    # A-167: 여기서 뽑은 값은 '이스케이프된 HTML' 이다. search-index.json 의 계약은
+    # 평문이고, 소비자(search.js)가 출력할 때 이스케이프한다. 여기서 풀지 않으면
+    # 색인에 &apos; · &#x27; 같은 엔티티가 글자로 들어가고, 소비자가 제대로
+    # 이스케이프하는 순간 사용자 화면에 &apos; 가 그대로 찍힌다.
+    name_en, name_ko, desc_en, desc_ko = (html_mod.unescape(x) for x in (name_en, name_ko, desc_en, desc_ko))
 
     # 값 검증
     if not name_en and not name_ko:

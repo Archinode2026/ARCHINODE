@@ -199,6 +199,16 @@
   }
 
   // Render results
+  // A-167: 색인(search-index.json)의 계약은 '평문' 이다. innerHTML 로 넣으므로
+  // 출력할 때 한 번 이스케이프해야 한다. 이게 없으면 색인 값의 마크업이 그대로
+  // 실행되고(주입), 반대로 색인에 엔티티가 들어 있으면 두 겹이 되어 화면에 찍힌다.
+  // 색인을 만드는 scripts/make_search_index.py 가 unescape 로 평문을 보장한다.
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
   function renderResults(results) {
     if (!resultsContainer) return;
     var lang = localStorage.getItem('archinode-lang') || 'en';
@@ -236,11 +246,11 @@
         name = item.name_en; // Magazine titles stay in English
       }
 
-      html += '<a href="' + r.url + '" class="search-result-item">' +
+      html += '<a href="' + esc(r.url) + '" class="search-result-item">' +
         '<i class="' + getTypeIcon(item.type) + ' search-result-icon"></i>' +
         '<div class="search-result-text">' +
-          '<div class="search-result-name">' + name + '</div>' +
-          (sub ? '<div class="search-result-sub">' + sub + '</div>' : '') +
+          '<div class="search-result-name">' + esc(name) + '</div>' +
+          (sub ? '<div class="search-result-sub">' + esc(sub) + '</div>' : '') +
         '</div>' +
         '<span class="search-result-type">' + getTypeLabel(item.type, lang) + '</span>' +
       '</a>';
