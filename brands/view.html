@@ -49,7 +49,7 @@
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.bp-loading p { font-size: 0.9rem; color: var(--gray-500); }
+.bp-loading p { font-size: 0.9rem; color: var(--ink-soft); }
 
 /* Error State */
 .bp-error {
@@ -61,9 +61,9 @@
   text-align: center;
   gap: 16px;
 }
-.bp-error i { font-size: 3rem; color: var(--gray-300); }
+.bp-error i { font-size: 3rem; color: var(--ink-soft); }
 .bp-error h2 { font-size: 1.8rem; font-weight: 800; color: var(--black); }
-.bp-error p { font-size: 0.95rem; color: var(--gray-500); max-width: 400px; }
+.bp-error p { font-size: 0.95rem; color: var(--ink-soft); max-width: 400px; }
 .bp-error a {
   background: var(--black); color: var(--white);
   padding: 12px 24px; font-size: 0.85rem; font-weight: 600;
@@ -100,7 +100,7 @@
 }
 .bp-hero-image img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .bp-hero-image .placeholder-logo {
-  font-size: 4rem; font-weight: 900; color: var(--gray-300);
+  font-size: 4rem; font-weight: 900; color: var(--ink-soft);
   letter-spacing: -0.02em;
 }
 .bp-hero-image.no-image { aspect-ratio: auto; min-height: 240px; max-height: 320px; }
@@ -116,10 +116,10 @@
   text-transform: uppercase; padding: 6px 12px; border-radius: 3px; margin-bottom: 20px;
 }
 .bp-hero-subtitle {
-  font-size: 1.1rem; font-weight: 400; color: var(--gray-600);
+  font-size: 1.1rem; font-weight: 400; color: var(--gray-700);
   line-height: 1.8; margin-bottom: 24px; max-width: 95%;
 }
-.bp-hero-meta { font-size: 0.9rem; color: var(--gray-500); line-height: 1.8; margin-bottom: 32px; }
+.bp-hero-meta { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.8; margin-bottom: 32px; }
 .bp-hero-meta strong { font-weight: 600; color: var(--gray-700); }
 .bp-cta-group { display: flex; gap: 12px; flex-wrap: wrap; }
 .bp-cta-group .btn {
@@ -140,7 +140,7 @@
 @media (max-width: 1024px) { .bp-info-bar { grid-template-columns: repeat(2, 1fr); gap: 30px; padding: 30px; } }
 @media (max-width: 768px) { .bp-info-bar { grid-template-columns: 1fr; gap: 20px; padding: 24px; margin: 40px 0; } }
 .bp-info-item { display: flex; flex-direction: column; }
-.bp-info-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 8px; }
+.bp-info-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
 .bp-info-value { font-size: 1.1rem; font-weight: 600; color: var(--black); line-height: 1.5; }
 
 /* Description Section */
@@ -148,13 +148,13 @@
   padding: 80px 0; border-top: 1px solid var(--gray-200);
 }
 .bp-description h2 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 24px; color: var(--black); }
-.bp-description p { font-size: 0.95rem; color: var(--gray-600); line-height: 1.8; margin-bottom: 16px; }
+.bp-description p { font-size: 0.95rem; color: var(--gray-700); line-height: 1.8; margin-bottom: 16px; }
 
 /* Products Grid */
 .bp-products-section { padding: 80px 0; border-top: 1px solid var(--gray-200); }
 .bp-section-header { margin-bottom: 40px; }
 .bp-section-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; color: var(--black); margin-bottom: 12px; }
-.bp-section-desc { font-size: 0.95rem; color: var(--gray-500); }
+.bp-section-desc { font-size: 0.95rem; color: var(--ink-soft); }
 .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 @media (max-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -168,9 +168,9 @@
 .product-card-image img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.3s; }
 .product-card:hover .product-card-image img { transform: scale(1.05); }
 .product-card-content { padding: 20px; display: flex; flex-direction: column; flex: 1; }
-.product-card-brand { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 8px; }
+.product-card-brand { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
 .product-card-name { font-size: 0.95rem; font-weight: 600; color: var(--black); margin-bottom: 12px; line-height: 1.4; }
-.product-card-specs { font-size: 0.8rem; color: var(--gray-500); line-height: 1.6; }
+.product-card-specs { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.6; }
 
 /* Brand Magazine (A-005) — trend-report.html의 article-card와 동일 스타일 재사용 */
 .articles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
@@ -185,18 +185,18 @@
 .article-card-tag { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.75); color: var(--white); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; }
 .article-card-body { padding: 20px; }
 .article-card-body h3 { font-size: 0.92rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.article-card-body p { font-size: 0.8rem; color: var(--gray-500); line-height: 1.6; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.article-card-date { font-size: 0.7rem; color: var(--gray-400); font-weight: 500; letter-spacing: 0.03em; }
+.article-card-body p { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.6; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.article-card-date { font-size: 0.7rem; color: var(--ink-soft); font-weight: 500; letter-spacing: 0.03em; }
 
 /* Empty State */
-.bp-empty { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+.bp-empty { text-align: center; padding: 60px 20px; color: var(--ink-soft); }
 .bp-empty i { font-size: 2.5rem; margin-bottom: 16px; }
 .bp-empty p { font-size: 0.9rem; }
 
 /* CTA Section */
 .bp-cta-section { padding: 80px 0; border-top: 1px solid var(--gray-200); text-align: center; }
 .bp-cta-section h2 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 16px; color: var(--black); }
-.bp-cta-section p { font-size: 0.95rem; color: var(--gray-600); margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.bp-cta-section p { font-size: 0.95rem; color: var(--gray-700); margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto; }
 .bp-cta-button {
   background: var(--black); color: var(--white);
   padding: 14px 32px; font-size: 0.9rem; font-weight: 600;
@@ -207,7 +207,7 @@
 /* Brand Story Section */
 .bp-story-section { padding: 80px 0; border-top: 1px solid var(--gray-200); }
 .bp-story-content p {
-  font-size: 1rem; color: var(--gray-600); line-height: 2;
+  font-size: 1rem; color: var(--gray-700); line-height: 2;
   margin-bottom: 20px; max-width: 800px;
 }
 .bp-story-content p:last-child { margin-bottom: 0; }
@@ -232,7 +232,7 @@
 }
 .bp-social-links a {
   width: 40px; height: 40px; border-radius: 50%;
-  background: var(--gray-100); color: var(--gray-600);
+  background: var(--gray-100); color: var(--gray-700);
   display: flex; align-items: center; justify-content: center;
   font-size: 1rem; transition: all 0.2s; text-decoration: none;
 }
@@ -244,9 +244,9 @@
 .rfq-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9000; align-items:center; justify-content:center; padding:20px; }
 .rfq-overlay.active { display:flex; }
 .rfq-box { background:#fff; border-radius:10px; max-width:460px; width:100%; max-height:90vh; overflow-y:auto; padding:32px; position:relative; }
-.rfq-close { position:absolute; top:16px; right:16px; font-size:1.4rem; cursor:pointer; color:#999; background:none; border:none; }
+.rfq-close { position:absolute; top:16px; right:16px; font-size:1.4rem; cursor:pointer; color:var(--ink-soft); background:none; border:none; }
 .rfq-box h3 { font-size:1.2rem; margin-bottom:4px; }
-.rfq-box .rfq-sub { color:#888; font-size:0.85rem; margin-bottom:20px; }
+.rfq-box .rfq-sub { color:var(--gray-700); font-size:0.85rem; margin-bottom:20px; }
 .rfq-field { margin-bottom:14px; }
 .rfq-field label { display:block; font-size:0.82rem; color:#666; margin-bottom:4px; }
 .rfq-field input, .rfq-field textarea { width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:5px; font-size:0.95rem; font-family:inherit; }
@@ -617,7 +617,7 @@ function renderBrand(brand, products, articles) {
             return `
             <a href="../products/view.html?id=${pSlug}" class="product-card fade-in" style="text-decoration:none;color:inherit;">
                 <div class="product-card-image">
-                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:2rem;"><i class="fas fa-cube"></i></div>'}
+                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-soft);font-size:2rem;"><i class="fas fa-cube"></i></div>'}
                 </div>
                 <div class="product-card-content">
                     <span class="product-card-brand">${brandName}</span>
@@ -693,7 +693,7 @@ function renderBrand(brand, products, articles) {
                 <span class="bp-hero-badge">${categoryLabel}</span>
                 ${logoUrl && heroImage ? `<img loading="lazy" src="${logoUrl}" alt="${brandName}" style="height:48px;object-fit:contain;margin-bottom:12px;">` : ''}
                 <h1>${brandName}</h1>
-                ${tagline ? `<p class="bp-hero-subtitle" style="font-style:italic;color:var(--gray-500);">"${tagline}"</p>` : ''}
+                ${tagline ? `<p class="bp-hero-subtitle" style="font-style:italic;color:var(--ink-soft);">"${tagline}"</p>` : ''}
                 ${description ? `<p class="bp-hero-subtitle">${description.substring(0, 250)}${description.length > 250 ? '...' : ''}</p>` : ''}
                 <div class="bp-hero-meta">
                     ${country ? `<strong>Country:</strong> ${country}<br>` : ''}

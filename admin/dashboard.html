@@ -47,7 +47,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .stat-card { background: var(--white); border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 .stat-card .number { font-size: 2rem; font-weight: 800; color: var(--black); }
 .stat-card .label { font-size: 0.8rem; color: var(--ink-soft); margin-top: 4px; }
-.stat-card .icon { float: right; font-size: 1.5rem; color: var(--gray-300); }
+.stat-card .icon { float: right; font-size: 1.5rem; color: var(--ink-soft); }
 
 /* TABS */
 .tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid var(--gray-300); background: var(--white); border-radius: 10px 10px 0 0; padding: 0 8px; }
@@ -896,7 +896,7 @@ function rejectDoc(collection, docId) {
     const mc = document.getElementById('modalContent');
     mc.innerHTML = `
         <h2 style="margin-bottom:6px;">반려 사유</h2>
-        <p style="color:#7a7164;font-size:0.85rem;margin-bottom:14px;">
+        <p style="color:#5d564c;font-size:0.85rem;margin-bottom:14px;">
             입력한 내용은 <strong>브랜드에게 그대로 보입니다.</strong> 비워두면 사유 없이 반려됩니다.
         </p>
         <textarea id="rejectReason" rows="5"

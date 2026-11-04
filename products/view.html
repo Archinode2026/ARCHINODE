@@ -32,15 +32,15 @@
 
 /* Error */
 .pp-error { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; gap:16px; }
-.pp-error i { font-size:3rem; color:var(--gray-300); }
+.pp-error i { font-size:3rem; color:var(--ink-soft); }
 .pp-error h2 { font-size:1.8rem; font-weight:800; }
-.pp-error p { font-size:0.95rem; color:var(--gray-500); max-width:400px; }
+.pp-error p { font-size:0.95rem; color:var(--ink-soft); max-width:400px; }
 .pp-error a { background:var(--black); color:var(--white); padding:12px 24px; font-size:0.85rem; font-weight:600; text-decoration:none; transition:background 0.2s; }
 .pp-error a:hover { background:var(--gray-800); }
 
 /* Breadcrumb */
-.pp-breadcrumb { padding:16px 0; font-size:0.78rem; color:var(--gray-500); }
-.pp-breadcrumb a { color:var(--gray-500); text-decoration:none; }
+.pp-breadcrumb { padding:16px 0; font-size:0.78rem; color:var(--ink-soft); }
+.pp-breadcrumb a { color:var(--ink-soft); text-decoration:none; }
 .pp-breadcrumb a:hover { color:var(--black); }
 
 /* Product Layout */
@@ -58,31 +58,31 @@
 
 /* Product Info */
 .pp-info {}
-.pp-brand-link { display:inline-block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-500); text-decoration:none; margin-bottom:12px; transition:color 0.2s; }
+.pp-brand-link { display:inline-block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); text-decoration:none; margin-bottom:12px; transition:color 0.2s; }
 .pp-brand-link:hover { color:var(--black); }
 .pp-name { font-size:2.2rem; font-weight:800; letter-spacing:-0.02em; line-height:1.2; margin-bottom:8px; color:var(--black); }
 @media (max-width:768px) { .pp-name { font-size:1.6rem; } }
-.pp-collection { font-size:0.9rem; color:var(--gray-500); margin-bottom:24px; }
-.pp-description { font-size:0.95rem; color:var(--gray-600); line-height:1.8; margin-bottom:32px; }
+.pp-collection { font-size:0.9rem; color:var(--ink-soft); margin-bottom:24px; }
+.pp-description { font-size:0.95rem; color:var(--gray-700); line-height:1.8; margin-bottom:32px; }
 .pp-price-badge { display:inline-block; background:var(--gray-100); color:var(--gray-700); font-size:0.82rem; font-weight:600; padding:8px 16px; border-radius:3px; margin-bottom:24px; }
 
 /* Specs Table */
 .pp-specs { margin-bottom:32px; }
-.pp-specs-title { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-500); margin-bottom:16px; }
+.pp-specs-title { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:16px; }
 .pp-specs-table { width:100%; }
 .pp-specs-table tr { border-bottom:1px solid var(--gray-100); }
 .pp-specs-table td { padding:12px 0; font-size:0.88rem; vertical-align:top; }
 .pp-specs-table td:first-child { font-weight:600; color:var(--gray-700); width:140px; }
-.pp-specs-table td:last-child { color:var(--gray-600); }
+.pp-specs-table td:last-child { color:var(--gray-700); }
 
 /* CTA Buttons */
 .pp-cta { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:32px; }
 .rfq-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9000; align-items:center; justify-content:center; padding:20px; }
 .rfq-overlay.active { display:flex; }
 .rfq-box { background:#fff; border-radius:10px; max-width:460px; width:100%; max-height:90vh; overflow-y:auto; padding:32px; position:relative; }
-.rfq-close { position:absolute; top:16px; right:16px; font-size:1.4rem; cursor:pointer; color:#999; background:none; border:none; }
+.rfq-close { position:absolute; top:16px; right:16px; font-size:1.4rem; cursor:pointer; color:var(--ink-soft); background:none; border:none; }
 .rfq-box h3 { font-size:1.2rem; margin-bottom:4px; }
-.rfq-box .rfq-sub { color:#888; font-size:0.85rem; margin-bottom:20px; }
+.rfq-box .rfq-sub { color:var(--gray-700); font-size:0.85rem; margin-bottom:20px; }
 .rfq-field { margin-bottom:14px; }
 .rfq-field label { display:block; font-size:0.82rem; color:#666; margin-bottom:4px; }
 .rfq-field input, .rfq-field textarea, .rfq-field select { width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:5px; font-size:0.95rem; font-family:inherit; }
@@ -117,7 +117,7 @@
 .pp-rel-card-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.3s; }
 .pp-rel-card:hover .pp-rel-card-img img { transform:scale(1.05); }
 .pp-rel-card-body { padding:16px; }
-.pp-rel-card-brand { font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-500); margin-bottom:4px; }
+.pp-rel-card-brand { font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px; }
 .pp-rel-card-name { font-size:0.88rem; font-weight:600; color:var(--black); }
 
 .btn-like { background:#fff; border:1px solid #ddd; color:#333; display:inline-flex; align-items:center; gap:6px; padding:11px 20px; border-radius:6px; font-size:0.92rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:inherit; }
@@ -291,8 +291,8 @@
             <input type="checkbox" id="bimAgreeData" required style="width:20px;height:20px;margin-top:2px;flex-shrink:0;">
             <span><span data-en="I agree to the " data-ko="">I agree to the </span><a href="javascript:void(0)" onclick="document.getElementById('bimDataTermsDetail').open=true;return false;" data-en="BIM &amp; Technical Data Use Policy" data-ko="BIM 및 기술 데이터 이용 규정에 동의합니다">BIM &amp; Technical Data Use Policy</a><span data-en="." data-ko=""></span></span>
           </label>
-          <details id="bimDataTermsDetail" style="margin-top:6px;font-size:0.76rem;color:#777;line-height:1.6;">
-            <summary data-en="Read the policy" data-ko="규정 전문 보기" style="cursor:pointer;color:#999;"></summary>
+          <details id="bimDataTermsDetail" style="margin-top:6px;font-size:0.76rem;color:#5d564c;line-height:1.6;">
+            <summary data-en="Read the policy" data-ko="규정 전문 보기" style="cursor:pointer;color:#6b6459;"></summary>
             <p data-en="1. This BIM/CAD/3D data and technical specification sheet may only be downloaded and used for project spec-in, design review, and proposal purposes.&#10;2. You may not commercially reproduce, modify, reverse-engineer to manufacture similar products, or redistribute this data to third parties.&#10;3. Copyright and technical rights remain with the overseas manufacturer; unauthorized use or leakage may result in civil and criminal liability under applicable law." data-ko="1. 본 BIM/CAD/3D 데이터 및 기술 사양서는 오직 프로젝트 도면 반영(Spec-in), 설계 검토 및 제안서 작성 목적으로만 다운로드 및 사용이 허가됩니다.&#10;2. 사용자는 본 데이터를 바탕으로 제품의 상업적 복제, 무단 가공, 역설계(Reverse Engineering)를 통한 유사품 제조, 제3자 무단 재배포를 행할 수 없습니다.&#10;3. 데이터의 저작권 및 기술 권리는 해당 해외 제조사에 귀속되며, 허가되지 않은 도용 및 유출이 발생할 경우 관계 법령에 따른 민·형사상 책임을 질 수 있습니다." style="white-space:pre-line;"></p>
           </details>
         </div>
@@ -301,8 +301,8 @@
             <input type="checkbox" id="bimAgreeShare" required style="width:20px;height:20px;margin-top:2px;flex-shrink:0;">
             <span><span data-en="I agree to share this information with the manufacturer (third-party disclosure)." data-ko="제조사(제3자)에게 본 정보가 제공되는 것에 동의합니다.">I agree to share this information with the manufacturer (third-party disclosure).</span></span>
           </label>
-          <details style="margin-top:6px;font-size:0.76rem;color:#777;line-height:1.6;">
-            <summary data-en="Read the disclosure" data-ko="제공 내역 보기" style="cursor:pointer;color:#999;"></summary>
+          <details style="margin-top:6px;font-size:0.76rem;color:#5d564c;line-height:1.6;">
+            <summary data-en="Read the disclosure" data-ko="제공 내역 보기" style="cursor:pointer;color:#6b6459;"></summary>
             <p data-en="Recipient: the product's manufacturer (Vendor). Purpose: BIM approval, technical/quote discussion, sample and technical support. Items: name, company, title, work email, phone, project overview. Retention: until the project discussion concludes (or as required by law)." data-ko="제공받는 자: 해당 제품의 해외 공식 제조사(Vendor). 제공 목적: BIM 데이터 승인, 기술 사양 및 견적 협의, 공식 샘플 및 기술 지원 제공. 제공 항목: 성명, 회사명, 직함, 업무용 이메일, 연락처, 프로젝트 개요. 보유 및 이용 기간: 프로젝트 상담 및 협의 완료 시까지(또는 관계 법령에 따른 보존 기간)." style="white-space:pre-line;"></p>
           </details>
         </div>
@@ -539,7 +539,7 @@ function renderProduct(p, related) {
                         return `
                         <a href="view.html?id=${rSlug}" class="pp-rel-card">
                             <div class="pp-rel-card-img">
-                                ${rImageUrl ? `<img loading="lazy" src="${rImageUrl}" alt="${rName}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);"><i class="fas fa-cube" style="font-size:2rem;"></i></div>'}
+                                ${rImageUrl ? `<img loading="lazy" src="${rImageUrl}" alt="${rName}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-soft);"><i class="fas fa-cube" style="font-size:2rem;"></i></div>'}
                             </div>
                             <div class="pp-rel-card-body">
                                 <div class="pp-rel-card-brand">${rBrandName}</div>
@@ -567,7 +567,7 @@ function renderProduct(p, related) {
             <!-- IMAGE -->
             <div class="pp-gallery">
                 <div class="pp-main-image">
-                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}" id="mainImg">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-300);font-size:3rem;"><i class="fas fa-cube"></i></div>'}
+                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}" id="mainImg">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-soft);font-size:3rem;"><i class="fas fa-cube"></i></div>'}
                 </div>
                 ${pImages.length > 0 ? `
                 <div class="pp-thumbs">

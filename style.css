@@ -85,7 +85,7 @@ input, select, textarea { font-family: inherit; }
   font-size: 0.6rem;
   font-weight: 400;
   letter-spacing: 0.15em;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   margin-left: 10px;
   text-transform: uppercase;
 }
@@ -183,21 +183,21 @@ input, select, textarea { font-family: inherit; }
 }
 .nav-dropdown-menu a small {
   font-size: 0.7rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   font-weight: 400;
 }
 
 .header-actions { display: flex; align-items: center; gap: 16px; }
 .header-actions a, .header-actions button {
   font-size: 0.85rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   transition: color 0.2s;
 }
 .header-actions a:hover, .header-actions button:hover { color: var(--black); }
 .lang-switch {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   border: 1px solid var(--gray-300);
   padding: 4px 10px;
   border-radius: 3px;
@@ -218,7 +218,7 @@ input, select, textarea { font-family: inherit; }
   font-size: 0.75rem;
   font-weight: 500;
   font-family: inherit;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   cursor: pointer;
   transition: all 0.2s;
   line-height: 1.4;
@@ -340,7 +340,7 @@ input, select, textarea { font-family: inherit; }
 .section-link {
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -393,7 +393,7 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   opacity: 0;
   transition: all 0.3s;
 }
@@ -401,7 +401,7 @@ input, select, textarea { font-family: inherit; }
 .product-brand {
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 6px;
@@ -623,11 +623,11 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   gap: 8px;
   font-size: 0.75rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
 }
-.breadcrumb-list a { color: var(--gray-500); }
+.breadcrumb-list a { color: var(--ink-soft); }
 .breadcrumb-list a:hover { color: var(--black); }
-.breadcrumb-list .sep { color: var(--gray-300); }
+.breadcrumb-list .sep { color: var(--ink-soft); }
 .breadcrumb-list .current { color: var(--black); font-weight: 500; }
 
 /* SUBCATEGORIES */
@@ -716,7 +716,7 @@ input, select, textarea { font-family: inherit; }
 }
 .about-text p {
   font-size: 0.95rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.8;
   margin-bottom: 16px;
 }
@@ -726,7 +726,17 @@ input, select, textarea { font-family: inherit; }
   .about-grid { grid-template-columns: 1fr; gap: 40px; }
 }
 
-.stats-section { padding: 80px 0; background: var(--black); color: var(--white); }
+/* A-165: band-* 는 '배경만' 덮는다. 이 섹션은 원래 어두웠고 A-178 에서 band-white 를
+   붙였는데 color 를 그대로 둬서 about.html 의 통계 숫자 4개가 흰 바탕에 흰 글자로
+   안 보였다. 밝은 밴드를 쓰는 지금 기준으로 글자색을 맞춘다. */
+.stats-section {
+  padding: 80px 0;
+  background: var(--black);
+  color: var(--black);
+}
+body .stats-section.band-white,
+body .stats-section.band-beige,
+body .stats-section.band-grey { color: var(--black); }
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -741,7 +751,7 @@ input, select, textarea { font-family: inherit; }
 }
 .stat-item p {
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.5);
+  color: var(--ink-soft);
   font-weight: 400;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -781,7 +791,7 @@ input, select, textarea { font-family: inherit; }
 .timeline-item .timeline-period, .timeline-item h4 {
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 8px;
@@ -793,7 +803,7 @@ input, select, textarea { font-family: inherit; }
 }
 .timeline-item p {
   font-size: 0.88rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.7;
 }
 
@@ -823,7 +833,7 @@ input, select, textarea { font-family: inherit; }
 }
 .service-detail-card p {
   font-size: 0.88rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.7;
 }
 @media (max-width: 768px) { .services-detail-grid { grid-template-columns: 1fr; } }
@@ -872,7 +882,7 @@ input, select, textarea { font-family: inherit; }
 }
 .why-card p {
   font-size: 0.88rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.7;
 }
 @media (max-width: 768px) { .why-grid { grid-template-columns: 1fr; gap: 40px; } }
@@ -923,13 +933,13 @@ input, select, textarea { font-family: inherit; }
 }
 .pricing-card .price-sub {
   font-size: 0.78rem;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   margin-bottom: 32px;
 }
 .pricing-card ul { margin-bottom: 32px; }
 .pricing-card ul li {
   font-size: 0.85rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   padding: 8px 0;
   border-bottom: 1px solid var(--gray-100);
 }
@@ -977,7 +987,7 @@ input, select, textarea { font-family: inherit; }
 }
 .how-step p {
   font-size: 0.82rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.6;
 }
 @media (max-width: 768px) { .how-steps { grid-template-columns: repeat(2, 1fr); gap: 32px; } }
@@ -1063,7 +1073,7 @@ input, select, textarea { font-family: inherit; }
 }
 .form-hint {
   font-size: 0.82rem;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   margin-bottom: 20px;
   line-height: 1.5;
 }
@@ -1101,20 +1111,20 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   transition: all 0.2s;
 }
 .cat-check-label {
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--gray-600);
+  color: var(--gray-700);
   transition: all 0.2s;
 }
 .cat-check-label small {
   display: block;
   font-size: 0.65rem;
   font-weight: 400;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   margin-top: 2px;
 }
 @media (max-width: 1024px) { .category-checkbox-grid { grid-template-columns: repeat(5, 1fr); } }
@@ -1178,7 +1188,7 @@ input, select, textarea { font-family: inherit; }
   background: var(--white);
   max-width: 600px;
 }
-.brand-search-bar i { color: var(--gray-400); font-size: 0.9rem; }
+.brand-search-bar i { color: var(--ink-soft); font-size: 0.9rem; }
 .brand-search-bar input {
   flex: 1;
   border: none;
@@ -1188,7 +1198,7 @@ input, select, textarea { font-family: inherit; }
 }
 .brand-count {
   font-size: 0.75rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   white-space: nowrap;
   font-weight: 500;
 }
@@ -1203,7 +1213,7 @@ input, select, textarea { font-family: inherit; }
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   background: none;
   border: none;
   cursor: pointer;
@@ -1229,7 +1239,7 @@ input, select, textarea { font-family: inherit; }
 }
 .brand-cat-title i {
   font-size: 1rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
 }
 .brand-cat-title h2 {
   font-size: 1.2rem;
@@ -1239,7 +1249,7 @@ input, select, textarea { font-family: inherit; }
 .brand-cat-ko {
   font-size: 0.8rem;
   font-weight: 400;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   margin-left: 8px;
 }
 .brand-dir-list {
@@ -1262,7 +1272,7 @@ input, select, textarea { font-family: inherit; }
   padding: 8px 20px;
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   background: none;
   border: 1px solid var(--gray-200);
   cursor: pointer;
@@ -1316,7 +1326,7 @@ input, select, textarea { font-family: inherit; }
 }
 .mag-hero-content p {
   font-size: 0.92rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.7;
   margin-bottom: 20px;
 }
@@ -1325,10 +1335,10 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   gap: 8px;
   font-size: 0.75rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   margin-bottom: 24px;
 }
-.mag-dot { color: var(--gray-300); }
+.mag-dot { color: var(--ink-soft); }
 .mag-read-btn {
   display: inline-flex;
   align-items: center;
@@ -1340,7 +1350,7 @@ input, select, textarea { font-family: inherit; }
   padding-bottom: 2px;
   transition: all 0.2s;
 }
-.mag-read-btn:hover { color: var(--gray-600); border-color: var(--gray-600); }
+.mag-read-btn:hover { color: var(--gray-700); border-color: var(--gray-600); }
 @media (max-width: 768px) {
   .mag-hero-card { grid-template-columns: 1fr; gap: 24px; }
 }
@@ -1385,7 +1395,7 @@ input, select, textarea { font-family: inherit; }
 }
 .mag-card-body p {
   font-size: 0.82rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.6;
   margin-bottom: 12px;
   display: -webkit-box;
@@ -1414,7 +1424,7 @@ input, select, textarea { font-family: inherit; }
 }
 .mag-newsletter-inner p {
   font-size: 0.92rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.7;
   margin-bottom: 32px;
 }
@@ -1491,7 +1501,7 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   cursor: pointer;
   opacity: 0;
   transition: all 0.3s;
@@ -1559,7 +1569,7 @@ input, select, textarea { font-family: inherit; }
 .pd-brand-name {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: color 0.2s;
@@ -1572,7 +1582,7 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   justify-content: center;
   border: 1px solid var(--gray-200);
-  color: var(--gray-500);
+  color: var(--ink-soft);
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -1589,14 +1599,14 @@ input, select, textarea { font-family: inherit; }
 }
 .pd-subtitle {
   font-size: 0.82rem;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   font-weight: 400;
   margin-bottom: 16px;
 }
 
 .pd-desc {
   font-size: 0.88rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.8;
 }
 
@@ -1617,7 +1627,7 @@ input, select, textarea { font-family: inherit; }
 }
 .pd-por-desc {
   font-size: 0.78rem;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   line-height: 1.6;
 }
 
@@ -1635,7 +1645,7 @@ input, select, textarea { font-family: inherit; }
 }
 .pd-option-selected {
   font-weight: 400;
-  color: var(--gray-500);
+  color: var(--ink-soft);
 }
 
 .pd-option-hint {
@@ -1643,12 +1653,12 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   gap: 8px;
   font-size: 0.75rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   padding: 12px 16px;
   background: var(--gray-50);
   border-left: 3px solid var(--gray-200);
 }
-.pd-option-hint i { font-size: 0.72rem; color: var(--gray-400); }
+.pd-option-hint i { font-size: 0.72rem; color: var(--ink-soft); }
 
 /* Color Swatches */
 .pd-color-swatches {
@@ -1687,7 +1697,7 @@ input, select, textarea { font-family: inherit; }
   padding: 10px 18px;
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--gray-600);
+  color: var(--gray-700);
   background: none;
   border: 1px solid var(--gray-200);
   cursor: pointer;
@@ -1748,7 +1758,7 @@ input, select, textarea { font-family: inherit; }
   gap: 10px;
   padding: 14px 24px;
   background: none;
-  color: var(--gray-600);
+  color: var(--gray-700);
   font-size: 0.82rem;
   font-weight: 500;
   border: 1px solid var(--gray-200);
@@ -1765,9 +1775,9 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   gap: 8px;
   font-size: 0.75rem;
-  color: var(--gray-500);
+  color: var(--ink-soft);
 }
-.pd-lead-note i { font-size: 0.7rem; color: var(--gray-400); }
+.pd-lead-note i { font-size: 0.7rem; color: var(--ink-soft); }
 
 /* Trust Signals */
 .pd-trust {
@@ -1782,9 +1792,9 @@ input, select, textarea { font-family: inherit; }
   align-items: center;
   gap: 6px;
   font-size: 0.72rem;
-  color: var(--gray-500);
+  color: var(--ink-soft);
 }
-.pd-trust-item i { font-size: 0.75rem; color: var(--gray-400); }
+.pd-trust-item i { font-size: 0.75rem; color: var(--ink-soft); }
 
 /* ===== PRODUCT DETAIL — TABS ===== */
 .pd-details {
@@ -1802,7 +1812,7 @@ input, select, textarea { font-family: inherit; }
   padding: 14px 28px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--gray-500);
+  color: var(--ink-soft);
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
@@ -1841,7 +1851,7 @@ input, select, textarea { font-family: inherit; }
   border-bottom: 1px solid var(--gray-100);
   vertical-align: top;
 }
-.pd-spec-table tr td:first-child { color: var(--gray-500); width: 45%; }
+.pd-spec-table tr td:first-child { color: var(--ink-soft); width: 45%; }
 .pd-spec-table tr td:last-child { color: var(--gray-800); font-weight: 500; }
 .pd-spec-table tr td i.fa-check { color: var(--black); font-size: 0.75rem; }
 @media (max-width: 768px) { .pd-specs-grid { grid-template-columns: 1fr; gap: 32px; } }
@@ -1861,7 +1871,7 @@ input, select, textarea { font-family: inherit; }
 }
 .pd-desc-text p {
   font-size: 0.88rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.9;
   margin-bottom: 16px;
 }
@@ -1888,7 +1898,7 @@ input, select, textarea { font-family: inherit; }
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   margin-bottom: 8px;
 }
 .pd-designer-bio h3 {
@@ -1899,12 +1909,12 @@ input, select, textarea { font-family: inherit; }
 }
 .pd-designer-years {
   font-size: 0.78rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   margin-bottom: 20px;
 }
 .pd-designer-bio > p {
   font-size: 0.88rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.8;
   margin-bottom: 24px;
 }
@@ -1919,7 +1929,7 @@ input, select, textarea { font-family: inherit; }
   padding-bottom: 2px;
   transition: all 0.2s;
 }
-.pd-designer-link:hover { color: var(--gray-600); border-color: var(--gray-600); }
+.pd-designer-link:hover { color: var(--gray-700); border-color: var(--gray-600); }
 @media (max-width: 768px) { .pd-designer { grid-template-columns: 160px 1fr; gap: 24px; } }
 @media (max-width: 480px) { .pd-designer { grid-template-columns: 1fr; } }
 
@@ -1948,7 +1958,7 @@ input, select, textarea { font-family: inherit; }
   background: var(--white);
   border: 1px solid var(--gray-200);
   font-size: 1rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   flex-shrink: 0;
 }
 .pd-download-info { flex: 1; }
@@ -1961,12 +1971,12 @@ input, select, textarea { font-family: inherit; }
 }
 .pd-download-info span {
   font-size: 0.72rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   letter-spacing: 0.03em;
 }
 .pd-download-item > i.fa-download {
   font-size: 0.85rem;
-  color: var(--gray-400);
+  color: var(--ink-soft);
   transition: color 0.2s;
 }
 .pd-download-item:hover > i.fa-download { color: var(--black); }
@@ -1999,7 +2009,7 @@ input, select, textarea { font-family: inherit; }
 }
 .pd-brand-text p {
   font-size: 0.85rem;
-  color: var(--gray-600);
+  color: var(--gray-700);
   line-height: 1.7;
   margin-bottom: 12px;
 }
@@ -2012,7 +2022,7 @@ input, select, textarea { font-family: inherit; }
   color: var(--black);
   transition: color 0.2s;
 }
-.pd-brand-link:hover { color: var(--gray-600); }
+.pd-brand-link:hover { color: var(--gray-700); }
 @media (max-width: 768px) {
   .pd-brand-inner { flex-direction: column; align-items: flex-start; gap: 20px; }
 }
@@ -2265,7 +2275,7 @@ select, textarea { border-radius: var(--radius); }
 body .logo-sub {
   font-family: 'Inter','Noto Sans KR',sans-serif;
   font-size: 0.58rem; font-weight: 400; letter-spacing: 0.26em;
-  color: var(--gray-600);   /* A-164: gray-500 은 크림 위 3.01:1 로 AA 미달 */
+  color: var(--gray-700);   /* A-164: gray-500 은 크림 위 3.01:1 로 AA 미달 */
 }
 .main-nav { gap: 26px; }
 .main-nav > a, .nav-dropdown-trigger {
@@ -2732,7 +2742,7 @@ body.home .cta-listing p { color: var(--gray-700); max-width: none; margin: 18px
 @media (max-width: 520px) { .nowrap { white-space: normal; } }
 body.home .cta-btn { background: var(--deep); color: #fdfbf7; padding: 14px 32px; font-size: 0.82rem; }
 body.home .cta-btn:hover { background: var(--accent); color: #fdfbf7; }
-body.home .cta-free-tag { color: var(--gray-600); }
+body.home .cta-free-tag { color: var(--gray-700); }
 
 /* ── 뉴스레터 ── */
 /* 뉴스레터 — 교차 배경의 마지막 단(베이지). 바로 아래 네이비 푸터와 대비를 만든다.
@@ -2751,7 +2761,7 @@ body.home .newsletter .newsletter-form input {
   border: 1px solid var(--gray-300);   /* 알약이라 오른쪽 테두리를 살린다 */
   padding-left: 24px;
 }
-body.home .newsletter .newsletter-form input::placeholder { color: var(--gray-600); }
+body.home .newsletter .newsletter-form input::placeholder { color: var(--gray-700); }
 body.home .newsletter .newsletter-form input:focus { border-color: var(--accent); }
 body.home .newsletter .newsletter-form button {
   background: var(--deep); color: #fdfbf7; border: 1px solid var(--deep);
@@ -2877,7 +2887,7 @@ body.home .korea-network > .container > div:last-child { margin: 0 !important; m
 /* 로고 자리 — 승리가 실제 로고 파일을 넣기 전까지 글자로 둔다 */
 body.home .korea-network > .container > div:last-child > div {
   text-align: left !important; padding: 22px 0 !important;
-  color: var(--gray-600) !important; font-size: 1rem !important; letter-spacing: 0.06em;
+  color: var(--gray-700) !important; font-size: 1rem !important; letter-spacing: 0.06em;
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -2901,7 +2911,7 @@ body.home .korea-network > .container > div:last-child > div {
 .cp-thumb { width: 100%; aspect-ratio: 1; overflow: hidden; background: var(--band-beige); }
 .cp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .9s cubic-bezier(.2,.6,.2,1); }
 .cp-card:hover .cp-thumb img { transform: scale(1.04); }
-.cp-noimg { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--gray-400); font-size: 2rem; }
+.cp-noimg { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--ink-soft); font-size: 2rem; }
 .cp-body { padding: 16px 16px 18px; }
 .cp-brand {
   font-size: 0.66rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
@@ -2914,9 +2924,9 @@ body.home .korea-network > .container > div:last-child > div {
   overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
 html[lang="ko"] .cp-name { word-break: keep-all; }
-.cp-mat { font-size: 0.78rem; color: var(--gray-600); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cp-empty { text-align: center; padding: clamp(44px, 5vw, 70px) 20px; color: var(--gray-600); }
-.cp-empty i { font-size: 2.4rem; margin-bottom: 16px; display: block; color: var(--gray-400); }
+.cp-mat { font-size: 0.78rem; color: var(--gray-700); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-empty { text-align: center; padding: clamp(44px, 5vw, 70px) 20px; color: var(--gray-700); }
+.cp-empty i { font-size: 2.4rem; margin-bottom: 16px; display: block; color: var(--ink-soft); }
 .cp-empty p { font-size: 0.92rem; line-height: 1.7; margin-bottom: 22px; }
 .cp-error { text-align: center; color: var(--gray-700); padding: 40px; font-size: 0.92rem; }
 @media (max-width: 1024px) { .cp-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -3227,4 +3237,14 @@ body.mag .cta-listing p  { max-width: 60ch; word-break: keep-all; }
 }
 @media (max-width: 480px) {
   body.mag .articles-grid { grid-template-columns: 1fr; }
+}
+
+
+/* A-165: 로고 부제가 긴 페이지(brand-guide 는 영문 "Where Global Design meets Korea")에서
+   .logo-sub 의 white-space:nowrap 때문에 390px 에서 문서 폭이 411px 로 넘쳤다.
+   A-014 와 같은 처방 — 각 항목은 한 줄을 유지하되 다 안 들어가면 줄을 나눈다.
+   선택자에 body 를 붙여야 페이지 인라인 블록의 .logo 선언을 넘는다. */
+@media (max-width: 480px) {
+  body .logo { flex-wrap: wrap; }
+  body .logo-sub { white-space: normal; flex-basis: 100%; margin-left: 0; line-height: 1.4; }
 }

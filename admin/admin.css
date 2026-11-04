@@ -34,7 +34,7 @@
 .adm-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }   /* 카드 9장(5단계) → 3열 (3+3+3) */
 .adm-card { display: block; background: var(--white); border-radius: 10px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-decoration: none; color: var(--black); border: 1px solid transparent; transition: border-color 0.2s; }
 .adm-card:hover { border-color: var(--accent); }
-.adm-card-icon { float: right; font-size: 1.4rem; color: var(--gray-300); }
+.adm-card-icon { float: right; font-size: 1.4rem; color: var(--ink-soft); }
 .adm-num { font-size: 2rem; font-weight: 800; color: var(--black); line-height: 1.1; }
 .adm-num-err { color: #b91c1c; }
 .adm-label { font-size: 0.8rem; color: var(--ink-soft); margin-top: 4px; }
@@ -207,10 +207,10 @@
 .adm-kind-page    { background: var(--gray-200); color: var(--gray-700); }
 /* 한/영 토글 (2026-09-12, 검수대장 A-035 — admin-nav.js adm_langHtml). 검색창 아래 오른쪽 KO | EN, 활성 언어는 골드 */
 .adm-lang { display: flex; justify-content: flex-end; align-items: center; gap: 2px; margin: -4px 14px 6px; }
-.adm-lang-btn { background: none; border: none; padding: 2px 4px; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.4px; color: var(--gray-400); cursor: pointer; transition: color 0.2s; }
+.adm-lang-btn { background: none; border: none; padding: 2px 4px; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.4px; color: var(--ink-soft); cursor: pointer; transition: color 0.2s; }
 .adm-lang-btn:hover { color: var(--black); }
 .adm-lang-btn.active { color: var(--navy-gold); cursor: default; }
-.adm-lang-sep { color: var(--gray-400); font-size: 0.7rem; }
+.adm-lang-sep { color: var(--ink-soft); font-size: 0.7rem; }
 /* lang.js 는 페이지에 .lang-switcher 가 없으면 body 끝에 떠 있는 스위처를 붙인다 — 어드민은 사이드바 토글이 대신하므로 숨긴다 */
 .lang-switcher-floating { display: none; }
 @media (max-width: 768px) {
