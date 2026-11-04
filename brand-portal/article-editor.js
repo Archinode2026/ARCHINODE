@@ -212,9 +212,10 @@
       // A-213 — 이 폼의 주인을 기록한다 (dashboard.html 의 bpFormUid)
       try { window.bpFormUid = (auth.currentUser && auth.currentUser.uid) || null; } catch (e) {}
       // status 가드 (입점 승인 후만 작성 가능)
-      const status = window.brandData && window.brandData.status;
-      if (status !== 'approved') {
-        alert('Article writing is available after your brand is approved.\nCurrent status: ' + (status || 'unknown'));
+      // R-061: 판단은 dashboard.html 의 bpCanSubmit() 하나로 모았다 — 제품 쪽과 규칙이
+      // 갈라지지 않게. 안내도 네이티브 alert(영문 한 줄) 대신 단추 옆 자리에 적는다(A-216 과 같은 결).
+      if (window.bpCanSubmit && !window.bpCanSubmit()) {
+        if (window.bpApplyGate) window.bpApplyGate();
         return;
       }
       $('articleForm').style.display = 'block';
