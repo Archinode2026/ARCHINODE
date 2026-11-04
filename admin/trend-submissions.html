@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/vendor/fontawesome-6.5.1/css/all.min.css">
 <link rel="stylesheet" href="../style.css">
-<link rel="stylesheet" href="admin.css?v=20261104b">
+<link rel="stylesheet" href="admin.css?v=20261104c">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -259,8 +259,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 <div class="toast" id="toast"></div>
 
 <script src="../firebase-config.js"></script>
-<script src="js/admin-core.js?v=20261104b"></script>
-<script src="js/admin-nav.js?v=20261104b"></script>
+<script src="js/admin-core.js?v=20261104c"></script>
+<script src="js/admin-nav.js?v=20261104c"></script>
 <script src="../lang.js?v=20260630"></script>
 <script>
 // ADMIN_EMAILS, isAdmin() 는 firebase-config.js 에서 제공
@@ -275,7 +275,7 @@ auth.onAuthStateChanged(function(user) {
     return;
   }
   if (!isAdmin(user.email)) {
-    document.body.innerHTML = '<div style="text-align:center;padding:80px 24px;font-family:Inter,sans-serif;"><h1 style="font-size:1.5rem;margin-bottom:12px;">Access Denied</h1><p style="color:#6b6459;">This page is restricted to ARCHINODE editorial team.</p><p style="margin-top:18px;"><a href="/" style="color:#7a5c32;">Return to homepage</a></p></div>';
+    admAccessDenied(user.email);   // A-202 — 영어 전용·인라인 스타일 안내를 js/admin-core.js 한 곳으로
     return;
   }
   document.getElementById('adminEmail').textContent = user.email;

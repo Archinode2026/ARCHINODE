@@ -284,3 +284,56 @@ if ('serviceWorker' in navigator) {
             .catch(function (e) { console.warn('[ARCHINODE admin] 서비스워커 등록 실패', e); });
     });
 }
+
+
+/* ── 권한 없음 안내 화면 (A-202 / R-068) ─────────────────────────────────
+   로그인은 돼 있지만 관리자가 아닌 계정이 어드민 주소로 들어왔을 때.
+
+   고친 것 두 가지.
+   ① `dashboard.html` 만 `alert('Access denied. Admin only.')` 를 띄우고
+      `auth.signOut()` 까지 했다. 나머지 6개 페이지는 안내만 하고 세션을
+      건드리지 않았다 — 일곱 페이지가 서로 다르게 행동했다.
+      **세션은 그대로 둔다.** 이 계정은 인증은 됐고 권한만 없다. 실제
+      권한은 `firestore.rules` 의 `isAdmin()` 이 막으므로 클라이언트에서
+      로그아웃시켜 얻는 보안은 없고, 전문가 회원은 주소를 잘못 눌렀다는
+      이유로 하던 일을 잃는다. 관리자 자격을 박탈했을 때 세션까지 끊어야
+      한다면 그건 Firebase 토큰 폐기로 할 일이고, 이 분기가 할 일이 아니다.
+   ② 나머지 6개의 안내문은 영어 전용이었다("Access Denied" / "restricted
+      to ARCHINODE editorial team"). 한국어·영어 짝으로 바꾸고, 같은 문구가
+      6곳에 복사돼 있던 것을 여기 한 곳으로 모았다.
+
+   돌아갈 곳을 준다 — 홈과 내 계정. 막다른 화면으로 끝내지 않는다.
+   ──────────────────────────────────────────────────────────────────── */
+function admAccessDenied(email) {
+    /* `document.body.innerHTML = …` 로 갈아끼우지 않는다. 그러면 페이지 아래쪽
+       스크립트가 나중에 찾는 요소(#csvBtn 등)가 사라져 콘솔에 TypeError 가 쌓이고,
+       그 스크립트 블록의 나머지 등록도 거기서 멈춘다. 대신 body 직속 요소를 모두
+       숨기고 안내만 덧붙인다 — DOM 은 남고 화면에는 안내만 보인다.
+       #adminContent 만 숨기면 안 된다: 상단바와 aside#adminSidebar 가 그 밖에 있어
+       어드민 메뉴 구조가 비관리자에게 그대로 노출된다 (6개 페이지 실측). */
+    var kids = document.body.children;
+    for (var i = 0; i < kids.length; i++) {
+        var tag = kids[i].tagName;
+        if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEMPLATE' || tag === 'LINK') continue;
+        kids[i].style.display = 'none';
+    }
+    var box = document.createElement('div');
+    var who = email
+        ? '<p class="adm-denied-who">' + tSpan('Signed in as', '로그인된 계정') + ' <strong>' + escapeHtml(email) + '</strong></p>'
+        : '';
+    box.innerHTML =
+        '<div class="adm-denied">'
+      +   '<i class="fas fa-lock adm-denied-icon" aria-hidden="true"></i>'
+      +   '<h1 ' + tAttr('Admin access only', '관리자 전용 화면입니다') + '>' + escapeHtml(t('Admin access only', '관리자 전용 화면입니다')) + '</h1>'
+      +   '<p ' + tAttr('This page is for the ARCHINODE team. Your account is still signed in — nothing has changed.',
+                        '이 화면은 아키노드 운영팀용입니다. 로그인은 그대로 유지되니 하던 일을 이어서 하실 수 있습니다.') + '>'
+      +     escapeHtml(t('This page is for the ARCHINODE team. Your account is still signed in — nothing has changed.',
+                         '이 화면은 아키노드 운영팀용입니다. 로그인은 그대로 유지되니 하던 일을 이어서 하실 수 있습니다.')) + '</p>'
+      +   who
+      +   '<div class="adm-denied-actions">'
+      +     '<a class="adm-denied-btn adm-denied-btn-main" href="../index.html" ' + tAttr('Go to homepage', '홈으로') + '>' + escapeHtml(t('Go to homepage', '홈으로')) + '</a>'
+      +     '<a class="adm-denied-btn" href="../auth/profile.html" ' + tAttr('My account', '내 계정') + '>' + escapeHtml(t('My account', '내 계정')) + '</a>'
+      +   '</div>'
+      + '</div>';
+    document.body.appendChild(box);
+}

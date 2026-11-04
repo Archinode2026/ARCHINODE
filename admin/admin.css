@@ -296,3 +296,22 @@ h1, h2, .adm-reg-body h1, .adm-reg-body h2, .adm-reg-body h3 {
 
 /* A-199 — 규정집 서브탭 줄의 새로고침 버튼 (탭과 밑줄 높이를 맞춘다) */
 .adm-reg-refresh { align-self: center; margin-bottom: 6px; }
+
+/* ── 권한 없음 안내 (A-202) — 리터럴 대신 토큰. 대비는 아래 주석의 실측값 ── */
+.adm-denied { max-width: 520px; margin: 0 auto; padding: 96px 24px; text-align: center; }
+.adm-denied-icon { font-size: 2rem; color: var(--accent); margin-bottom: 20px; display: block; }
+.adm-denied h1 { font-family: 'Lora', Georgia, serif; font-size: 1.6rem; font-weight: 500; color: var(--black); margin: 0 0 14px; }
+.adm-denied p { font-size: 0.92rem; line-height: 1.7; color: var(--gray-700); margin: 0 0 8px; }   /* 흰 배경 6.55 */
+.adm-denied-who { margin-top: 18px !important; font-size: 0.85rem; color: var(--ink-soft); }       /* 흰 배경 5.66 */
+.adm-denied-who strong { color: var(--gray-700); font-weight: 600; }
+.adm-denied-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+.adm-denied-btn { display: inline-block; padding: 12px 22px; font-size: 0.85rem; font-weight: 600;
+                  border: 1px solid var(--gray-300); border-radius: 4px; color: var(--accent-ink);   /* 흰 배경 5.97 */
+                  text-decoration: none; transition: all 0.3s; }
+.adm-denied-btn:hover { border-color: var(--accent); background: var(--beige); }
+.adm-denied-btn-main { background: var(--navy-gold); border-color: var(--navy-gold); color: var(--black); }   /* 금색 위 어두운 글자 5.72 */
+.adm-denied-btn-main:hover { background: var(--accent); border-color: var(--accent); color: var(--white); }   /* #a07c4a 위 흰 글자 4.74 */
+@media (max-width: 480px) {
+  .adm-denied { padding: 64px 20px; }
+  .adm-denied-actions { flex-direction: column; }
+}
