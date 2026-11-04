@@ -156,18 +156,42 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
 // ── 세션 유지 ──
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
 
+// ── R-069: ?next= — 원래 보려던 페이지로 돌려보낸다 ──
+// 어드민 별도 페이지 5개와 bim-download 는 예전부터 `?next=/admin/...` 를 붙여 보냈는데,
+// 이 화면이 그 값을 읽은 적이 없어 로그인하면 늘 대시보드(또는 내 계정)로 떨어졌다.
+// 바깥 주소로 튕기는 열린 리디렉션이 되지 않게, **같은 사이트의 절대 경로만** 받는다.
+// 스킴 검사가 따로 필요한 이유는 A-218 과 같다 — `javascript:` 에는 이스케이프할 글자가 없다.
+function loginNextUrl() {
+    var raw = '';
+    try { raw = new URLSearchParams(window.location.search).get('next') || ''; } catch (e) { return ''; }
+    if (!raw) return '';
+    var u;
+    try { u = new URL(raw, window.location.origin); } catch (e) { return ''; }
+    // `//evil.com` 은 브라우저가 외부 주소로 읽고, `javascript:`·`data:` 는 origin 이 다르게 나온다.
+    if (u.origin !== window.location.origin) return '';
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+    var path = u.pathname + u.search + u.hash;
+    // 로그인 화면 자신으로 돌아오면 무한 왕복이 된다.
+    if (/\/auth\/(login|signup)\.html$/i.test(u.pathname)) return '';
+    return path;
+}
+
 // ── 이미 로그인 상태면 리디렉션 ──
 auth.onAuthStateChanged(user => {
     if (user) {
+        var next = loginNextUrl();
         if (isAdmin(user.email)) {
-            window.location.href = '../admin/dashboard.html';
+            window.location.href = next || '../admin/dashboard.html';
             return;
         }
+        // 관리자 전용 경로는 관리자가 아닐 때 따라가지 않는다 — 접근 거부 화면에 떨어뜨리는 대신
+        // 그 계정의 제 자리로 보낸다(브랜드는 포털, 그 외는 내 계정).
+        if (next && /^\/admin\//i.test(next)) next = '';
         db.collection('brands').doc(user.uid).get().then(doc => {
             if (doc.exists) {
-                window.location.href = '../brand-portal/dashboard.html';
+                window.location.href = next || '../brand-portal/dashboard.html';
             } else {
-                window.location.href = 'profile.html';
+                window.location.href = next || 'profile.html';
             }
         });
     }

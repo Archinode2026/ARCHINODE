@@ -913,7 +913,8 @@ async function toggleBrandLike() {
             ? 'Log in to save this brand. Go to the sign-in page?'
             : '저장하려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?';
         if (confirm(msg)) {
-            window.location.href = '../auth/login.html';
+            // R-069: 로그인 뒤 이 브랜드 페이지로 돌아온다.
+            window.location.href = '../auth/login.html?next=' + encodeURIComponent(window.location.pathname + window.location.search);
         }
         return;
     }
