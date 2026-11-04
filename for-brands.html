@@ -809,46 +809,69 @@ a { text-decoration: none; color: inherit; }
 </section>
 
 <!-- FOOTER -->
-<footer style="background:#332e27;padding:60px 24px 30px;">
-  <div style="max-width:1200px;margin:0 auto;">
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px;">
-      <div>
-        <div style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:12px;">ARCHINODE</div>
-        <p style="color:#888;font-size:0.88rem;line-height:1.6;" data-en="Connecting global architecture &amp; design brands with the Korean market." data-ko="글로벌 건축·디자인 브랜드를 한국 시장과 연결합니다.">Connecting global architecture &amp; design brands with the Korean market.</p>
-        <div style="margin-top:16px;">
-          <a href="#" style="color:#666;margin-right:14px;font-size:1.1rem;"><i class="fab fa-instagram"></i></a>
-          <a href="#" style="color:#666;margin-right:14px;font-size:1.1rem;"><i class="fab fa-linkedin-in"></i></a>
-          <a href="#" style="color:#666;margin-right:14px;font-size:1.1rem;"><i class="fab fa-youtube"></i></a>
-          <a href="#" style="color:#666;font-size:1.1rem;"><i class="fab fa-pinterest-p"></i></a>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">ARCHINODE <span class="logo-sub">건축을 잇다</span></div>
+        <p data-en="Connecting global architecture &amp; design brands with the Korean market." data-ko="글로벌 건축 및 디자인 브랜드를 한국 시장과 연결합니다."></p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
         </div>
       </div>
-      <div>
-        <h4 style="color:#fff;font-size:0.8rem;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;" data-en="Categories" data-ko="카테고리">Categories</h4>
-        <a href="categories/furniture.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="Furniture" data-ko="가구">Furniture</a>
-        <a href="categories/bathroom.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="Bathroom" data-ko="욕실">Bathroom</a>
-        <a href="categories/kitchen.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="Kitchen" data-ko="주방">Kitchen</a>
-        <a href="categories/lighting.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="Lighting" data-ko="조명">Lighting</a>
-        <a href="categories/outdoor.html" style="display:block;color:#888;font-size:0.85rem;" data-en="Outdoor" data-ko="아웃도어">Outdoor</a>
+      <div class="footer-col">
+        <h4 data-en="Categories" data-ko="카테고리">Categories</h4>
+        <ul>
+          <li><a href="categories/furniture.html" data-en="Furniture" data-ko="가구">Furniture</a></li>
+          <li><a href="categories/bathroom.html" data-en="Bathroom" data-ko="욕실">Bathroom</a></li>
+          <li><a href="categories/outdoor.html" data-en="Outdoor" data-ko="아웃도어">Outdoor</a></li>
+          <li><a href="categories/lighting.html" data-en="Lighting" data-ko="조명">Lighting</a></li>
+          <li><a href="categories/kitchen.html" data-en="Kitchen" data-ko="주방">Kitchen</a></li>
+        </ul>
       </div>
-      <div>
-        <h4 style="color:#fff;font-size:0.8rem;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;" data-en="For Brands" data-ko="브랜드를 위해">For Brands</h4>
-        <a href="for-brands.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="Why ARCHINODE" data-ko="왜 ARCHINODE인가">Why ARCHINODE</a>
-        <a href="list-your-brand.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="Apply Now" data-ko="지금 신청하기">Apply Now</a>
-        <a href="magazine.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="Magazine" data-ko="매거진">Magazine</a>
-        <a href="contact.html" style="display:block;color:#888;font-size:0.85rem;" data-en="Contact" data-ko="문의">Contact</a>
+      <div class="footer-col">
+        <h4 data-en="More Categories" data-ko="더 많은 카테고리">More Categories</h4>
+        <ul>
+          <li><a href="categories/office.html" data-en="Office" data-ko="오피스">Office</a></li>
+          <li><a href="categories/finishes.html" data-en="Finishes" data-ko="마감재">Finishes</a></li>
+          <li><a href="categories/wellness.html" data-en="Wellness" data-ko="웰니스">Wellness</a></li>
+          <li><a href="categories/decor.html" data-en="Decor" data-ko="데코">Decor</a></li>
+          <li><a href="categories/construction.html" data-en="Construction" data-ko="건축자재">Construction</a></li>
+        </ul>
       </div>
-      <div>
-        <h4 style="color:#fff;font-size:0.8rem;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;" data-en="Company" data-ko="회사">Company</h4>
-        <a href="about.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="About" data-ko="소개">About</a>
-        <a href="terms.html" style="display:block;color:#888;font-size:0.85rem;margin-bottom:8px;" data-en="Terms" data-ko="이용약관">Terms</a>
-        <a href="privacy.html" style="display:block;color:#888;font-size:0.85rem;" data-en="Privacy" data-ko="개인정보처리방침" data-en-href="privacy-en.html" data-ko-href="privacy.html">Privacy</a>
+      <div class="footer-col">
+        <h4 data-en="Services" data-ko="서비스">Services</h4>
+        <ul>
+          <li><a href="digital-products.html" data-en="Digital Products" data-ko="디지털 상품">Digital Products</a></li>
+          <li><a href="request-consultation.html" data-en="Consulting" data-ko="컨설팅">Consulting</a></li>
+          <li><a href="list-your-brand.html" data-en="Brand Listing" data-ko="브랜드 입점">Brand Listing</a></li>
+          <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
+          <li><a href="for-brands.html" data-en="For Brands" data-ko="브랜드용 안내">For Brands</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Company" data-ko="회사">Company</h4>
+        <ul>
+          <li><a href="about.html" data-en="About ARCHINODE" data-ko="ARCHINODE 소개">About ARCHINODE</a></li>
+          <li><a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a></li><li><a href="trend-report.html" data-en="Brand Magazine" data-ko="브랜드 매거진">Brand Magazine</a></li>
+          <li><a href="contact.html" data-en="Contact" data-ko="연락처">Contact</a></li>
+        </ul>
       </div>
     </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
-      비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
-      경기도 안양시 동안구 흥안대로 528, 제7층 702-라58호(관양동, 타워 빌딩) &nbsp;|&nbsp; office@archinode.org
+    <div class="footer-business-info" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;margin-top:40px;margin-bottom:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
+      상호: 비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
+      주소: 경기도 안양시 동안구 흥안대로 528, 제7층 702-라58호(관양동, 타워 빌딩) &nbsp;|&nbsp; 이메일: office@archinode.org
     </div>
-    <div style="margin-top:12px;font-size:0.75rem;color:rgba(255,255,255,0.2);">&copy; 2026 ARCHINODE. All rights reserved.</div>
+    <div class="footer-bottom">
+      <p data-en="© 2026 ARCHINODE. All rights reserved." data-ko="© 2026 ARCHINODE. 모든 권리 보유.">&copy; 2026 ARCHINODE. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="terms.html" data-en="Terms" data-ko="약관">Terms</a>
+        <a href="privacy.html" data-en="Privacy Policy" data-ko="개인정보 처리방침" data-en-href="privacy-en.html" data-ko-href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
   </div>
 </footer>
 <script src="search.js"></script>

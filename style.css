@@ -2872,6 +2872,83 @@ body.home .korea-network > .container > div:last-child > div {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
+   브랜드 입점 밴드 (A-178) — 85개 페이지 공통
+   메인에서 쓴 밝은 무드를 전역으로. 어두운 띠가 네이비 푸터 바로 위에
+   또 하나 깔려 있던 것을 없앤다.
+   ────────────────────────────────────────────────────────────────────────── */
+body .cta-listing {
+  background: var(--band-beige); color: var(--black);
+  text-align: left; padding: var(--sec-y) 0;
+}
+body .cta-listing h2 {
+  font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
+  font-size: var(--t-h2); line-height: 1.16; letter-spacing: -0.012em;
+  color: var(--black); margin: 0;
+}
+html[lang="ko"] body .cta-listing h2 { letter-spacing: -0.005em; }
+body .cta-listing p {
+  color: var(--gray-700); font-weight: 400; font-size: 1rem; line-height: 1.8;
+  max-width: 60ch; margin: 18px 0 34px;
+}
+body .cta-btn { background: var(--deep); color: #fdfbf7; padding: 14px 32px; font-size: 0.82rem; }
+body .cta-btn:hover { background: var(--accent); color: #fdfbf7; }
+body .cta-free-tag { color: var(--gray-700); }   /* gray-600 은 베이지 위에서 4.34:1 로 AA 미달 */
+
+/* ──────────────────────────────────────────────────────────────────────────
+   서브 페이지 히어로 (A-178) — 86개 페이지 공통
+   메인 히어로와 같은 문법으로: 좌측 기준선, 세리프 제목, 웜 오버레이.
+   categories.html 처럼 자체 .page-hero 규칙을 가진 페이지가 있어
+   선택자에 body 를 붙여 명시도를 확보한다(link 뒤 인라인 <style> 이 이긴다).
+   ────────────────────────────────────────────────────────────────────────── */
+body .page-hero {
+  position: relative; overflow: hidden;
+  height: auto; min-height: clamp(300px, 42vh, 460px); max-height: none;
+  background: var(--deep);
+  display: flex; align-items: flex-end;
+}
+body .page-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(180deg, rgba(51,46,39,.28) 0%, rgba(51,46,39,.74) 100%);
+}
+body .page-hero-bg {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%; object-fit: cover; opacity: .62;
+}
+body .page-hero-content {
+  position: relative; inset: auto; z-index: 3;
+  display: block; text-align: left;
+  width: 100%; max-width: var(--max-width); margin: 0 auto;
+  padding: 0 40px clamp(38px, 4.6vw, 74px);
+}
+body .page-hero-inner { max-width: 44ch; padding: 0; }
+/* 라벨 — 메인 섹션의 eyebrow 와 같은 어휘(짧은 금색 선 + 대문자 자간) */
+body .page-hero-tag {
+  display: inline-flex; align-items: center; gap: 11px;
+  font-size: 0.68rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+  /* --navy-gold 는 이 오버레이 위에서 4.41:1 로 AA 에 살짝 못 미친다 */
+  color: #d2af78; margin-bottom: 18px;
+}
+body .page-hero-tag::before {
+  content: ''; flex: 0 0 24px; height: 1px; background: #d2af78; opacity: .6;
+}
+body .page-hero h1 {
+  font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
+  font-size: clamp(2.1rem, 4vw, 3.5rem); line-height: 1.12;
+  color: #fdfbf7; letter-spacing: -0.015em; margin: 0;
+}
+html[lang="ko"] body .page-hero h1 { letter-spacing: -0.005em; }
+body .page-hero p {
+  font-size: clamp(0.92rem, 1.1vw, 1.06rem); font-weight: 400; line-height: 1.75;
+  color: rgba(253,251,247,.82); margin: 16px 0 0; max-width: 54ch;
+}
+@media (max-width: 768px) {
+  body .page-hero-content { padding: 0 20px clamp(30px, 6vw, 44px); }   /* .container 와 같은 분기·같은 20px */
+}
+@media (max-width: 640px) {
+  body .page-hero { min-height: clamp(260px, 38vh, 360px); }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
    다른 페이지 확장용 유틸 (A-177) — 2026-11-03
    메인에 적용한 밴드 리듬을 다른 페이지에서도 쓸 수 있게 클래스로 꺼내 둔다.
    아직 어디에도 붙이지 않았다. 섹션에 클래스 하나만 얹으면 된다.
@@ -2883,6 +2960,19 @@ body.home .korea-network > .container > div:last-child > div {
 /* 본문 섹션의 세로 리듬. 띠처럼 얕게 깔 때는 .band-pad-sm */
 .band-pad    { padding: var(--sec-y) 0; }
 .band-pad-sm { padding: clamp(32px, 3.4vw, 54px) 0; }
+/* 밴드 섹션 안의 제목 — 메인 섹션 제목과 같은 서체·굵기 (A-178).
+   band-* 를 붙인 섹션에만 걸리므로 적용 범위가 저절로 한정된다 */
+body .band-white h2, body .band-beige h2, body .band-grey h2 {
+  font-family: 'Lora','Noto Serif KR',Georgia,serif;
+  font-weight: 500; letter-spacing: -0.012em; color: var(--black);
+}
+html[lang="ko"] body .band-white h2,
+html[lang="ko"] body .band-beige h2,
+html[lang="ko"] body .band-grey h2 { letter-spacing: -0.005em; }
+body .band-white h2:not([style*="font-size"]),
+body .band-beige h2:not([style*="font-size"]),
+body .band-grey h2:not([style*="font-size"]) { font-size: clamp(1.5rem, 2.2vw, 2.2rem); }
+
 /* 섹션 제목 — 메인의 .section-title 과 같은 서체·크기 */
 .band-title {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
