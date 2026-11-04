@@ -72,6 +72,14 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
     padding: 10px 14px; border-radius: var(--radius); margin-bottom: 16px; font-size: 0.85rem;
 }
 
+/* R-067: '왜 이 화면으로 왔는지' 한 줄 안내. 경고가 아니므로 중립 색으로 둔다. */
+.next-msg {
+    display: none; background: var(--gray-50); border: 1px solid var(--gray-200); color: var(--gray-700);
+    padding: 10px 14px; border-radius: var(--radius); margin-bottom: 16px; font-size: 0.85rem;
+    word-break: keep-all; line-height: 1.6;
+}
+.next-msg i { color: var(--accent-ink); margin-right: 6px; }
+
 .reset-section { display: none; }
 .back-link { display: inline-block; margin-top: 12px; color: var(--accent-ink); font-size: 0.85rem; cursor: pointer; }
 
@@ -105,6 +113,11 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
         <div id="loginSection">
             <h1 data-en="Welcome Back" data-ko="다시 오신 것을 환영합니다">Welcome Back</h1>
             <p class="subtitle" data-en="Log in to your ARCHINODE account." data-ko="ARCHINODE 계정에 로그인하세요.">Log in to your ARCHINODE account.</p>
+            <!-- R-067: 비로그인으로 어드민·포털 화면에 들어오면 이 자리에 이유를 적는다.
+                 전에는 어드민 대시보드가 브랜드 포털 로그인 창으로 보내서 화면 문구가
+                 온통 "브랜드" 였다(A-067 에서 통합 로그인으로 바꿨다). 지금 문구는
+                 중립이지만, 왜 로그인 창이 떴는지는 여전히 알 수 없었다. -->
+            <p class="next-msg" id="loginNextHint"></p>
 
             <div class="error-msg" id="loginError"></div>
 
@@ -153,9 +166,6 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
 <script src="../firebase-config.js"></script>
 <script src="../lang.js?v=20261104b"></script>
 <script>
-// ── 세션 유지 ──
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
-
 // ── R-069: ?next= — 원래 보려던 페이지로 돌려보낸다 ──
 // 어드민 별도 페이지 5개와 bim-download 는 예전부터 `?next=/admin/...` 를 붙여 보냈는데,
 // 이 화면이 그 값을 읽은 적이 없어 로그인하면 늘 대시보드(또는 내 계정)로 떨어졌다.
@@ -175,6 +185,36 @@ function loginNextUrl() {
     if (/\/auth\/(login|signup)\.html$/i.test(u.pathname)) return '';
     return path;
 }
+
+// ── R-067: 어느 화면 때문에 로그인하게 됐는지 한 줄로 알려 준다 ──
+// 판단 근거는 ?next= 하나뿐이다(R-069 에서 들인 그 값). 값이 없으면 아무것도 띄우지 않는다.
+(function showLoginReason() {
+    var nx = loginNextUrl();
+    if (!nx) return;
+    var el = document.getElementById('loginNextHint');
+    if (!el) return;
+    var en, ko;
+    if (/^\/admin\//i.test(nx)) {
+        en = 'That page is for administrators. Log in with an admin account to continue.';
+        ko = '그 화면은 관리자 전용입니다. 관리자 계정으로 로그인하면 이어서 열립니다.';
+    } else if (/^\/brand-portal\//i.test(nx)) {
+        en = 'Log in to continue to the brand portal.';
+        ko = '브랜드 포털로 이어서 가려면 로그인해 주세요.';
+    } else {
+        en = 'Log in and you will return to the page you were on.';
+        ko = '로그인하면 보던 화면으로 돌아갑니다.';
+    }
+    el.setAttribute('data-en', en);
+    el.setAttribute('data-ko', ko);
+    el.innerHTML = '<i class="fas fa-circle-info" aria-hidden="true"></i>';
+    el.appendChild(document.createTextNode(ko));
+    el.style.display = 'block';
+    // data-en/ko 를 붙인 뒤 현재 언어로 다시 칠한다 (저장된 언어를 건드리지 않는 쪽).
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+})();
+
+// ── 세션 유지 ──
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
 
 // ── 이미 로그인 상태면 리디렉션 ──
 auth.onAuthStateChanged(user => {
