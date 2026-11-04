@@ -363,7 +363,11 @@ function renderCards() {
     } else {
       budgetFlag = '<span class="flag flag-budget-unknown">' + (BUDGET_LABEL[d.budget] || 'Unknown') + '</span>';
     }
-    var triagedFlag = d.triageNote ? '<span class="flag flag-triaged">Triaged</span>' : '';
+    // R-062: 이 딱지는 'Triaged 단계다' 가 아니라 '사전진단 메모가 있다' 는 뜻인데 이름이 단계처럼 보였다.
+    // 메모는 한 번 적으면 지워지지 않으므로 「미팅 완료」로 옮긴 뒤에도 계속 붙어 있어, 담당자가
+    // 아직 사전진단 중인 건으로 착각했다. 단계는 이미 탭이 말해 주니, 딱지는 제 뜻대로 이름을 바꾼다
+    // (옆의 budget 딱지와 같은 줄에 있는 '이 건의 속성' 표시다).
+    var triagedFlag = d.triageNote ? '<span class="flag flag-triaged" title="사전진단 메모가 있습니다 / This request has a triage note">Triage note</span>' : '';
     var preview = escapeHtml((d.description || '').substring(0, 220));
     grid += '<div class="card" onclick="openModal(\'' + d.id + '\')">'
       + '<div class="card-cat">' + (CATEGORY_LABEL[d.category] || d.category || '—') + '</div>'
