@@ -96,6 +96,15 @@
       wrapper.innerHTML = buildSwitcherInner();
       el.parentNode.replaceChild(wrapper, el);
     });
+    /* 스위처 자리가 아예 없는 페이지를 위한 폴백 (A-206) ──────────────────
+       ① 일부러 언어 토글을 뺀 페이지(list-your-brand.html — 외국 고객 전용
+          영어 페이지)가 있다. 그런 페이지에도 폴백이 떠서 **의도를 뒤집었다.**
+          `<body data-no-lang-switcher>` 로 빼 달라고 말할 수 있게 했다.
+       ② 폴백 위치가 우상단(top:14px)이라 **그게 뜨는 모든 페이지의 헤더를
+          덮었다** — 실측: 안내 띠·'회원가입' 링크·'로그아웃' 버튼을 375px 과
+          1440px 양쪽에서 가렸고, z-index:9999 라 클릭까지 가로챘다.
+          위치는 style.css 에서 우하단으로 내렸다. */
+    if (document.body.hasAttribute('data-no-lang-switcher')) return;
     if (!document.querySelector('.lang-switcher')) {
       var floater = document.createElement('div');
       floater.className = 'lang-switcher lang-switcher-floating';

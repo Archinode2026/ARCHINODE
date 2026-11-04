@@ -225,6 +225,25 @@ input, select, textarea { font-family: inherit; }
 }
 .lang-switch-btn:hover { border-color: var(--black); color: var(--black); }
 .lang-switch-btn i { font-size: 0.6rem; opacity: 0.7; }
+
+/* ── 어두운 헤더 위의 언어 스위처 (A-206) ──────────────────────────────────
+   `.lang-switch-btn` 기본색은 밝은 배경용 `--ink-soft`(#6b6459) 다. 이걸 그대로
+   어두운 헤더(#332e27)에 올리면 **2.3:1** 이 된다 — A-193 과 똑같은 함정이다
+   (밝은 배경용 토큰을 어두운 컨테이너에 넣는 것). 실측으로 잡았다.
+   `--gray-400`(#b5ab9b)은 #332e27 위에서 5.93:1.
+   이 세 헤더는 각 페이지 인라인 <style> 에 정의돼 있어 body 접두사가 필요하다. */
+body .auth-header .lang-switch-btn,
+body .reset-header .lang-switch-btn,
+body .topbar .lang-switch-btn {
+  color: var(--gray-400);
+  border-color: var(--gray-700);
+}
+body .auth-header .lang-switch-btn:hover,
+body .reset-header .lang-switch-btn:hover,
+body .topbar .lang-switch-btn:hover {
+  color: var(--navy-gold);            /* #c9a36a on #332e27 = 5.72 */
+  border-color: var(--accent);
+}
 .lang-menu {
   position: absolute;
   top: calc(100% + 6px);
@@ -252,7 +271,11 @@ input, select, textarea { font-family: inherit; }
 .lang-menu a.active { background: var(--band-beige); color: var(--accent-ink); }
 .lang-menu a small { font-size: 0.68rem; color: var(--ink-soft); font-weight: 400; letter-spacing: 0.5px; }
 .lang-menu a.active small { color: var(--accent-ink); }
-.lang-switcher-floating { position: fixed; top: 14px; right: 16px; z-index: 9999; }
+/* A-206: top:14px 이었다. 그러면 폴백이 뜨는 **모든** 페이지의 헤더를 덮는다 —
+   실측으로 안내 띠·'회원가입' 링크·'로그아웃' 버튼을 375px·1440px 양쪽에서
+   가렸고, z-index 9999 라 클릭까지 가로챘다. 우하단은 머리글이 없는 자리다.
+   (쿠키 동의 띠가 떠 있는 동안에는 가려질 수 있지만 그건 한 번 닫으면 끝난다.) */
+.lang-switcher-floating { position: fixed; bottom: 16px; right: 16px; z-index: 9999; }
 .lang-switcher-floating .lang-switch-btn { background: var(--white); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 
 .mobile-toggle { display: none; font-size: 1.2rem; color: var(--black); }

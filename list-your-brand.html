@@ -150,7 +150,7 @@
 }
 </style>
 </head>
-<body data-langs="en,ko">
+<body data-langs="en,ko" data-no-lang-switcher>
 
 <!-- ANNOUNCEMENT BAR -->
 <div class="announcement-bar">
@@ -173,7 +173,7 @@
     </nav>
     <div class="header-actions">
       <a href="auth/login.html" style="font-size:0.82rem;color:var(--accent-ink);font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
-      <!-- 영어 전용 페이지 — 외국 고객 전용. 언어 토글 숨김 -->
+      <!-- 영어 전용 페이지 — 외국 고객 전용. 언어 토글 숨김 (A-206: <body data-no-lang-switcher> 로 lang.js 폴백도 끈다) -->
     </div>
   </div>
 </header>
@@ -568,7 +568,7 @@
 </footer>
 
 <!-- Lang Script -->
-<script src="lang.js?v=20261104a"></script>
+<script src="lang.js?v=20261104b"></script>
 
 <!-- Firebase -->
 <script src="firebase-config.js"></script>

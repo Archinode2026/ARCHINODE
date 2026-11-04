@@ -29,6 +29,9 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .auth-header .logo span { font-size: 0.6rem; font-weight: 400; color: var(--gray-400); margin-left: 4px; }
 .auth-header .nav-link { color: var(--gray-400); font-size: 0.82rem; text-decoration: none; }
 .auth-header .nav-link:hover { color: var(--navy-gold); }
+/* A-206 — 언어 스위처 자리. 없으면 lang.js 가 화면 우상단에 고정 버튼을 띄우고
+   그게 이 헤더의 '회원가입'/'로그인' 링크를 덮어 클릭까지 가로챘다. */
+.auth-header-right { display: flex; align-items: center; gap: 14px; }
 
 .auth-container {
     flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px;
@@ -92,7 +95,8 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
 
 <div class="auth-header">
     <a href="../index.html" class="logo">ARCHINODE <span>건축을 잇다</span></a>
-    <a href="signup.html" class="nav-link" data-en="Don't have an account? Sign up" data-ko="계정이 없으신가요? 회원가입">Don't have an account? Sign up</a>
+    <div class="auth-header-right"><a href="signup.html" class="nav-link" data-en="Don't have an account? Sign up" data-ko="계정이 없으신가요? 회원가입">Don't have an account? Sign up</a>
+    <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a></div>
 </div>
 
 <div class="auth-container">
@@ -147,7 +151,7 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
 </div>
 
 <script src="../firebase-config.js"></script>
-<script src="../lang.js?v=20261104a"></script>
+<script src="../lang.js?v=20261104b"></script>
 <script>
 // ── 세션 유지 ──
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
