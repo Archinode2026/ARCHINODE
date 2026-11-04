@@ -38,6 +38,18 @@ R-036 당시 상태를 index.html 에 다시 심어 시험했더니(`min-width:0
 
 `.fade-in`(스크롤 전 `opacity:0`)은 레이아웃은 그대로라 측정에 영향이 없다 —
 `opacity` 로 건너뛰지 않는 이유다. `visibility:hidden`·`display:none` 만 건너뛴다.
+
+**가장 큰 한계: 데이터가 없는 화면은 넘치지 않는다.** 이 컨테이너에서는
+파이어베이스가 막혀 있어 `brands/view.html`·`products/view.html`·`magazine/view.html`
+같은 상세 화면과 어드민 표가 **빈 상태로 측정된다.** 빈 표는 안 넘친다 —
+R-075(어드민 표가 휴대폰에서 넘침)를 기본 하네스가 끝까지 못 본 이유가 바로 이것이다.
+목록·상세 화면을 제대로 재려면 가짜 Firestore 로 실제 길이의 데이터를 채워야 한다.
+이 검사만 통과했다고 그 화면들이 안전하다고 읽으면 안 된다.
+
+이 검사는 **넘침만** 본다. 넘치지 않으면서 못 읽게 되는 경우는 안 잡는다 —
+예: `brands/view.html` 의 한국 딜러 칸은 인라인 `grid-template-columns:1fr 1fr` 인데,
+한 칸에 긴 URL 이 들어가면 322px 에서 열이 `43px / 219px` 로 쪼개진다(실측).
+화면을 넘지는 않으므로 이 검사는 통과로 보고한다.
 """
 import argparse, sys
 
