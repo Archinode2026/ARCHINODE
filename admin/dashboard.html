@@ -173,7 +173,8 @@ tr:hover { background: var(--gray-50); }
         <a href="articles.html" style="display:none;font-size:0.82rem;color:#6b6459;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#c9a36a'" onmouseout="this.style.color='#b5ab9b'"><i class="fas fa-newspaper"></i> Articles</a>
         <span class="admin-email" id="adminEmail"></span>
         <a href="../auth/login.html" style="font-size:0.82rem;color:#c9a36a;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
-        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+        <!-- R-043: 다른 어드민 7개 화면과 포털·내 계정은 모두 span 짝이 있는데 여기만 맨 글자였다 -->
+        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-en="Log Out" data-ko="로그아웃">Log Out</span></button>
     </div>
 </div>
 
@@ -674,8 +675,9 @@ async function viewBrand(docId) {
     }
     if (b.statusChangedAt) {
         try {
-            const dt = b.statusChangedAt.toDate ? b.statusChangedAt.toDate() : new Date(b.statusChangedAt);
-            statusHistoryHtml += `<div class="detail-row"><div class="detail-label">Changed At</div><div class="detail-value">${dt.toLocaleString()}</div></div>`;
+            // R-052: 여기도 같은 함수로. 라벨("Changed At")이 영문 전용인 것은 이 모달 전체가
+            // 그러해서 따로 적어 뒀다(장부 A-226 「이력」 참고) — 이번 건은 날짜 쪽이다.
+            statusHistoryHtml += `<div class="detail-row"><div class="detail-label">Changed At</div><div class="detail-value">${rvDateTimeSpan(b.statusChangedAt)}</div></div>`;
         } catch (e) {}
     }
 
@@ -986,13 +988,22 @@ function rvDate(ts) {
         return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
     } catch (e) { return '-'; }
 }
-function rvDateTime(iso) {
+// R-052: 날짜·시각도 화면 언어를 따라야 한다.
+// `toLocaleString()` 을 인자 없이 부르면 **브라우저 시스템 언어**를 따라가서, 화면을 영어로
+// 바꿔도 "2026. 9. 12. 오후 8:37:00" 처럼 시각만 한국어로 남았다. 게다가 그려 넣은 맨 글자라
+// KO|EN 을 다시 눌러도 바뀌지 않는다 — 그래서 두 벌을 만들어 data-en/data-ko 로 단다.
+function rvDateTimePair(value) {
     try {
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return String(iso || '');
-        return d.toLocaleString();
-    } catch (e) { return String(iso || ''); }
+        const d = (value && value.toDate) ? value.toDate() : new Date(value);
+        if (isNaN(d.getTime())) return { en: String(value || ''), ko: String(value || '') };
+        return { en: d.toLocaleString('en-US'), ko: d.toLocaleString('ko-KR') };
+    } catch (e) { return { en: String(value || ''), ko: String(value || '') }; }
 }
+function rvDateTimeSpan(value) {
+    const p = rvDateTimePair(value);
+    return `<span ${rvAttr(p.en, p.ko)}>${escapeHtml(rvT(p.en, p.ko))}</span>`;
+}
+function rvDateTime(iso) { const p = rvDateTimePair(iso); return rvT(p.en, p.ko); }
 // 2026-11-03: "R-" 신규 + 과거 "A-"(아직 이전 안 된 문서) 둘 다 정렬 가능하게 접두사 양쪽 허용
 function rvNoNum(no) { const m = /^[AR]-(\d+)$/.exec(String(no || '')); return m ? parseInt(m[1], 10) : 0; }
 
@@ -1254,7 +1265,7 @@ function viewReview(id) {
             <details><summary>${rvSpan('Dev note (technical)', '개발 메모 (기술 근거)')}</summary><pre>${escapeHtml(d.techNote || '-')}</pre></details>
             <div style="font-size:0.75rem;font-weight:700;color:#6b6459;text-transform:uppercase;letter-spacing:0.5px;">${rvSpan('History', '이력')}</div>
             <ul class="rv-history">
-                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)}${h.priTo ? ` ${rvPriorityBadge(h.priFrom)} → ${rvPriorityBadge(h.priTo)}` : ''} <small>${escapeHtml(rvDateTime(h.at))} · ${escapeHtml(h.by || '-')}</small>${Array.isArray(h.edited) && h.edited.length ? `<div style="margin-top:3px;color:#6b6459;">${rvSpan('Content edited', '내용 수정')}: ${escapeHtml(h.edited.map(k => rvFieldLabel(k)).join(', '))}</div>` : ''}${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#6b6459;">-</li>'}
+                ${hist.length ? hist.map(h => `<li>${rvStatusBadge(h.status)}${h.priTo ? ` ${rvPriorityBadge(h.priFrom)} → ${rvPriorityBadge(h.priTo)}` : ''} <small>${rvDateTimeSpan(h.at)} · ${escapeHtml(h.by || '-')}</small>${Array.isArray(h.edited) && h.edited.length ? `<div style="margin-top:3px;color:#6b6459;">${rvSpan('Content edited', '내용 수정')}: ${escapeHtml(h.edited.map(k => rvFieldLabel(k)).join(', '))}</div>` : ''}${h.note ? `<div style="margin-top:3px;">${escapeHtml(h.note)}</div>` : ''}</li>`).join('') : '<li style="color:#6b6459;">-</li>'}
             </ul>
             <div class="rv-statusbar">
                 <select id="rvNewStatus" ${rvAttr('Status', '상태')} title="${escapeHtml(rvT('Status', '상태'))}">
