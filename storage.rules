@@ -16,6 +16,9 @@ rules_version = '2';
      · 읽기는 공개. 브랜드 로고·제품 사진·기사 이미지는 비로그인 방문자에게 보여야 한다.
        (주소를 아는 사람만 볼 수 있다 — 다운로드 URL 에 토큰이 붙는다.)
      · 용량·형식은 규칙에서도 한 번 더 막는다. 화면 쪽 검사는 우회할 수 있다.
+     · **지우기는 따로 적는다.** Storage 규칙에서 delete 는 `write` 에 포함되는데,
+       지울 때는 `request.resource` 가 **null** 이라 contentType·size 검사가 통과할 수 없다.
+       create/update 와 한 줄로 묶으면 **본인도 자기 파일을 못 지운다**(실측으로 잡음).
      · 어드민은 모두 쓸 수 있다 — 대신 자료 정리·교체를 할 수 있어야 한다.
    ══════════════════════════════════════════════════════════════════════════ */
 
@@ -50,26 +53,30 @@ service firebase.storage {
     // ── 기사 이미지 (brand-portal/article-editor.js) ──
     match /articles/{uid}/{allPaths=**} {
       allow read: if true;
-      allow write: if (isOwner(uid) && isImage() && underImageLimit()) || isAdmin();
+      allow create, update: if (isOwner(uid) && isImage() && underImageLimit()) || isAdmin();
+      allow delete: if isOwner(uid) || isAdmin();
     }
 
     // ── 제품 사진 (brand-portal/dashboard.html) ──
     match /products/{uid}/{allPaths=**} {
       allow read: if true;
-      allow write: if (isOwner(uid) && isImage() && underImageLimit()) || isAdmin();
+      allow create, update: if (isOwner(uid) && isImage() && underImageLimit()) || isAdmin();
+      allow delete: if isOwner(uid) || isAdmin();
     }
 
     // ── 제품 자료: 카탈로그 PDF · BIM · 3D 모델 ──
     match /products-specs/{uid}/{allPaths=**} {
       allow read: if true;
-      allow write: if (isOwner(uid) && underFileLimit()) || isAdmin();
+      allow create, update: if (isOwner(uid) && underFileLimit()) || isAdmin();
+      allow delete: if isOwner(uid) || isAdmin();
     }
 
     // ── 인증서 (brand-portal/dashboard.html) ──
     //    KC·KS 같은 서류다. 공개 페이지에 걸지 않으므로 읽기도 본인과 어드민만.
     match /certifications/{uid}/{allPaths=**} {
       allow read: if isOwner(uid) || isAdmin();
-      allow write: if (isOwner(uid) && underFileLimit()) || isAdmin();
+      allow create, update: if (isOwner(uid) && underFileLimit()) || isAdmin();
+      allow delete: if isOwner(uid) || isAdmin();
     }
 
     // ── 그 밖의 모든 경로 ──
