@@ -294,7 +294,14 @@ body .topbar .lang-switch-btn:hover {
    ─────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .main-nav { display: none; }
-  .mobile-toggle { display: block; }
+  /* A-286(2026-11-05): 이 구간에서 .main-nav 는 display:none 이라 이 버튼이
+     메뉴에 닿는 유일한 길이다. 그런데 44px 최소 타깃 규칙(A-113)은
+     @media (max-width: 768px) 블록에만 있어서, 769~1100px 에서 버튼이
+     12x17px 였다(브론즈 라이브 실측). 보일 때는 항상 44px 을 보장한다. */
+  .mobile-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; min-height: 44px;
+  }
   /* 햄버거를 '열었을 때' 의 모양도 같이 올라와야 한다. 이게 768px 에 남아 있으면
      769~1100px 에서 메뉴를 열었을 때 패널이 아니라 맨 플렉스 줄로 튀어나온다. */
   .main-nav.active {
