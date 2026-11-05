@@ -83,49 +83,15 @@
   };
 
   /* ──────────────────────────────────────────────────────────────────────
-     A-299: 브랜드 포털의 「ARCHINODE 에 문의」(1:1 문의)도 같은 구멍이었다.
+     A-299 는 되돌렸다 (2026-11-05, 승리님 결정).
 
-     `brand-portal/dashboard.html` 은 `inquiries` 에 쓰기만 하고 아무에게도
-     알리지 않았다. 어드민이 로그인해서 인박스를 열어봐야만 보인다. 그런데
-     제출 직후 화면은 「보냈습니다. 답변은 여기와 이메일로 드립니다」라고
-     말한다 — 받는 쪽에 아무 신호도 안 가는데 말이다.
+     브랜드 포털의 1:1 문의가 들어올 때 office@ 로 알림을 넣는 함수를 여기
+     달았다가 같은 날 뺐다. 승리님 판단: 「문의가 어드민 메일까지 올 필요는
+     없다 — 어드민 화면에서 확인되면 된다.」
 
-     답변 쪽은 이미 메일을 만든다(`view-inquiries.js` 의 `inq_sendAnswerMail`).
-     즉 나가는 길은 있고 **들어오는 길만 비어 있었다.** 리드(A-263)와 똑같은
-     모양이라 같은 파일·같은 규율로 붙인다: 기다리지 않고, 실패하면 삼키고,
-     제목은 180 에서 자른다.
+     그러니 다음에 「문의가 들어와도 아무도 모른다」가 결함처럼 보이면,
+     그건 결함이 아니라 **결정**이다. 어드민 사이드바의 1:1 문의 배지와
+     대시보드의 「열린 문의」 카드가 그 자리를 대신한다.
+     (답변 쪽 메일은 그대로 나간다 — view-inquiries.js 의 inq_sendAnswerMail.)
      ────────────────────────────────────────────────────────────────────── */
-  window.notifyNewInquiry = function (inq) {
-    try {
-      if (typeof db === 'undefined' || !db) return;
-      inq = inq || {};
-      var who = String(inq.fromName || '').trim();
-      var subject = ('[ARCHINODE] 새 문의 — ' + cut(String(inq.subject || '제목 없음'), 90)
-                     + (who ? ' / ' + who : '')).substring(0, 180);
-
-      var lines = [
-        '브랜드 포털에서 1:1 문의가 들어왔습니다.',
-        '',
-        '제목: ' + String(inq.subject || '-'),
-        '보낸 사람: ' + (who || '-') + ' (' + String(inq.fromEmail || '-') + ')',
-        '역할: ' + String(inq.fromRole || '-'),
-        '',
-        '내용:',
-        cut(inq.body, 600),
-        '',
-        '어드민에서 답변하세요 (답변하면 문의자에게 메일이 갑니다):',
-        'https://archinodekr.com/admin/dashboard.html#inquiries'
-      ];
-
-      db.collection('mail').add({
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        to: ADMIN_TO,
-        message: { subject: subject, text: lines.join('\n') }
-      }).catch(function (err) {
-        console.warn('[inquiry] admin notification skipped:', err);
-      });
-    } catch (err) {
-      console.warn('[inquiry] admin notification skipped:', err);
-    }
-  };
 })();

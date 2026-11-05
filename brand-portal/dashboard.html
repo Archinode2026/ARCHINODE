@@ -793,7 +793,6 @@ h1, h2, .section-card h2 {
 <script src="../firebase-config.js"></script>
 <script src="../search.js"></script>
 <script src="../lang.js?v=20261104b"></script>
-<script src="../lead-notify.js?v=20261105c"></script>
 <script>
 let currentUser = null;
 let brandDataUid = null;   // brandData 를 '어느 계정으로' 불러왔는지 (R-031 = A-213)
@@ -1907,8 +1906,6 @@ function sup_send(e) {
     sup_state.sending = true; btn.disabled = true;
     sup_msg(inbox_t('Sending…', '보내는 중…'), false);
     db.collection('inquiries').add(doc).then(function (ref) {
-        /* A-299: 접수는 이미 끝났다. 알림은 띄우기만 하고 기다리지 않는다 — 실패해도 접수는 유효하다. */
-        if (typeof window.notifyNewInquiry === 'function') window.notifyNewInquiry(doc);
         sup_state.sending = false; btn.disabled = false;
         subjEl.value = ''; bodyEl.value = '';
         sup_msg(inbox_t('Sent. We will answer here and by email.', '보냈습니다. 답변은 여기와 이메일로 드립니다.'), false);
