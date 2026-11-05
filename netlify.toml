@@ -25,7 +25,14 @@
 # 같은 후처리가 href 의 .html 확장자도 떼어낸다(signup.html → /auth/signup) —
 # 이 저장소는 .html 링크를 쓰므로 그것도 원하지 않는 변형이다.
 #
-# skip_processing 은 대시보드 설정을 덮어쓴다. 이 줄을 지우면 증상이 돌아온다.
+# ★ 2026-11-05 실측 정정: **이 설정만으로는 멈추지 않았다.**
+#   배포가 반영된 뒤에도 라이브 HTML 이 그대로 깨져 있었다(admin/dashboard.html 20건).
+#   실제로 멈춘 것은 Netlify 대시보드의
+#     Project configuration → Developer settings → Post processing → **Pretty URLs** 끄기
+#   (예전 "Asset optimization" 은 없어졌고 Pretty URLs 가 그 역할을 한다.)
+#   끈 뒤 Trigger deploy 를 해야 적용된다 — 후처리는 배포 시점에 걸린다.
+#   아래 줄은 남겨 둔다(해롭지 않고 의도를 기록한다). 다만 **이 줄을 믿지 마라** —
+#   증상이 돌아오면 먼저 대시보드의 Pretty URLs 를 확인해라.
 [build.processing]
   skip_processing = true
 
