@@ -127,6 +127,10 @@
 
 /* Error */
 .form-error { display: none; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.88rem; }
+/* R-031: 이미 브랜드를 가진 계정이 이 페이지에 오면, 제출해 보고 나서야 알게 되는 대신 미리 알려 준다.
+   경고(빨강)가 아니라 안내(호박)다 — 막는 것이 아니고 '다른 이메일로 하라' 는 길안내이기 때문이다. */
+.lyb-own-notice { display: none; background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 14px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.86rem; line-height: 1.75; }
+.lyb-own-notice a { color: #7a5c32; font-weight: 600; text-decoration: underline; white-space: nowrap; }
 
 @media (max-width: 768px) {
     .lyb-hero h1 { font-size: 2rem; }
@@ -250,6 +254,12 @@
     <p data-en="Fill in the details below. Your Brand Portal account will be created automatically." data-ko="아래 세부정보를 입력하세요. Brand Portal 계정이 자동으로 생성됩니다."></p>
 
     <div class="lyb-form" id="formContainer">
+        <!-- R-031: 이미 브랜드를 운영하는 계정에게 띄우는 안내 (lybOwnBrandNotice 가 채운다).
+             문장은 브랜드 이름이 들어가야 해서 JS 가 넣고, 링크는 고정 문구라 lang.js 가 직접 칠한다. -->
+        <div class="lyb-own-notice" id="lybOwnNotice">
+            <span id="lybOwnNoticeText"></span>
+            <a href="brand-portal/dashboard.html" data-en="Go to your Brand Portal" data-ko="브랜드 포털로 가기">Go to your Brand Portal</a>
+        </div>
         <div class="form-error" id="formError"></div>
 
         <form id="brandForm">
@@ -864,6 +874,80 @@ function copyCred(elId, btn) {
             btn.classList.remove('copied');
         }, 2000);
     });
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+   R-031 — 이미 브랜드를 가진 계정이 '브랜드 입점' 으로 들어왔을 때
+
+   brands 문서의 ID 가 계정 uid 라서 **계정 하나 = 브랜드 하나** 다. 그런데 이 양식은
+   createUserWithEmailAndPassword 로 **새 계정을 만들고 거기에 로그인까지** 한다. 그래서
+   브랜드 운영자가 그대로 제출하면 (1) 같은 이메일이면 email-already-in-use 로 실패하고,
+   (2) 다른 이메일이면 성공하지만 **현재 계정에서 조용히 로그아웃**된다. 둘 다 눌러 본
+   뒤에야 알게 되는 일이라, 양식 맨 위에 미리 적어 둔다. (입력을 막지는 않는다 —
+   다른 이메일로 브랜드를 하나 더 내는 것은 막을 일이 아니라 안내할 일이다.)
+
+   ★ 문구는 반드시 data-en/data-ko 로 단다 (brand-portal 의 bpApplyGate 와 같은 이유):
+     이 함수는 onAuthStateChanged 가 돌 때 실행되는데 그 시점이 lang.js 가
+     documentElement.lang 을 세우기 전일 수 있다. textContent 만 넣으면 그때의 언어가
+     그대로 굳어서, 한국어로 보는 사람에게 영문이 박힌다(A-222 에서 실측으로 잡은 함정).
+   ──────────────────────────────────────────────────────────────────────── */
+
+// brandName 은 저장할 때 escapeHtml 을 거친 값이다. innerHTML 로 되돌리면 옛 문서에 남은
+// 생마크업까지 파싱되므로, escapeHtml 이 만드는 세 글자만 문자열로 되돌린 뒤 textContent 에 넣는다.
+// (&amp; 를 마지막에 풀어야 "&amp;lt;" 가 "<" 로 두 번 풀리지 않는다.)
+function lybUnescape(t) {
+    return String(t == null ? '' : t)
+        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+}
+
+function lybOwnNoticeText(name) {
+    var ko = (name ? '\u300c' + name + '\u300d 브랜드를 이미 운영하는 계정으로 로그인해 있습니다. '
+                   : '이미 브랜드를 운영하는 계정으로 로그인해 있습니다. ')
+        + '계정 하나에 브랜드 하나만 둘 수 있어서, 브랜드를 더 내시려면 다른 이메일로 신청해 주세요. '
+        + '이 양식을 제출하면 새 계정이 만들어지고 지금 계정에서는 로그아웃됩니다.';
+    var en = 'You are signed in to an account that already manages '
+        + (name ? '\u201c' + name + '\u201d' : 'a brand') + '. '
+        + 'Each account holds one brand, so please apply with a different email address to add another. '
+        + 'Submitting this form creates a new account and signs you out of the current one.';
+    return { ko: ko, en: en };
+}
+
+async function lybOwnBrandNotice(user) {
+    var box = document.getElementById('lybOwnNotice');
+    var txt = document.getElementById('lybOwnNoticeText');
+    if (!box || !txt) return;
+    function hide() {
+        box.style.display = 'none';
+        txt.removeAttribute('data-en');
+        txt.removeAttribute('data-ko');
+        txt.textContent = '';
+    }
+    // firebase-config.js 는 db / auth 를 **const** 로 선언한다 — 즉 전역 어휘 바인딩이고
+    // window.db / window.auth 는 영원히 undefined 다. window 로 보면 이 안내는 아예 뜨지 않는다
+    // (실측으로 잡음: 브랜드 보유 계정에서도 상자가 끝까지 숨어 있었다). bare 이름으로 본다.
+    if (!user || typeof db === 'undefined' || !db) { hide(); return; }
+    var doc;
+    try {
+        doc = await db.collection('brands').doc(user.uid).get();
+    } catch (e) {
+        // A-194 와 같은 원칙: 못 봤으면 단정하지 않는다. 조회가 막히면 아무 말도 하지 않는다.
+        console.warn('list-your-brand: brand lookup failed', e);
+        hide();
+        return;
+    }
+    if (!doc.exists) { hide(); return; }
+    var t = lybOwnNoticeText(lybUnescape((doc.data() || {}).brandName || ''));
+    txt.setAttribute('data-en', t.en);
+    txt.setAttribute('data-ko', t.ko);
+    txt.textContent = (document.documentElement.lang !== 'en' ? t.ko : t.en);
+    box.style.display = 'block';
+    // 저장된 언어로 다시 칠한다 (setLang 은 '사용자 선택' 이라 저장해 버리므로 쓰지 않는다 — A-204).
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+}
+
+// 같은 이유로 window.auth 가 아니라 bare auth 를 본다 (A-056 의 null 가드는 그대로 지킨다).
+if (typeof auth !== 'undefined' && auth && auth.onAuthStateChanged) {
+    auth.onAuthStateChanged(function(user) { lybOwnBrandNotice(user); });
 }
 </script>
 <script src="cookie-consent.js?v=20260630" defer></script>
