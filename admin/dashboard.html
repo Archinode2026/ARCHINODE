@@ -778,7 +778,7 @@ async function loadProducts() {
                 <td>
                     <button class="act-btn act-view" onclick="viewProduct('${doc.id}')">View</button>
                     ${p.status === 'pending' ? `
-                        <button class="act-btn act-approve" onclick="updateDoc('products','${doc.id}','approved')">Approve</button>
+                        <button class="act-btn act-approve" onclick="approveDoc('products','${doc.id}')">Approve</button>
                         <button class="act-btn act-reject" onclick="rejectDoc('products','${doc.id}')">Reject</button>
                     ` : `<span style="font-size:0.78rem;color:#6b6459;">${p.status}</span>`}
                 </td>
@@ -824,7 +824,7 @@ async function viewProduct(docId) {
     }).join('');
 
     const actionsHtml = p.status === 'pending' ? `
-        <button class="act-btn act-approve" onclick="updateDoc('products','${docId}','approved');closeModal();">Approve</button>
+        <button class="act-btn act-approve" onclick="approveDoc('products','${docId}')">Approve</button>
         <button class="act-btn act-reject" onclick="rejectDoc('products','${docId}')">Reject</button>
     ` : '';
 
@@ -865,7 +865,7 @@ async function loadArticles() {
                 <td>
                     ${a.status === 'pending' ? `
                         <button class="act-btn act-view" onclick="viewArticle('${doc.id}')">Review</button>
-                        <button class="act-btn act-approve" onclick="updateDoc('articles','${doc.id}','approved')">Approve</button>
+                        <button class="act-btn act-approve" onclick="approveDoc('articles','${doc.id}')">Approve</button>
                         <button class="act-btn act-reject" onclick="rejectDoc('articles','${doc.id}')">Reject</button>
                     ` : `<span style="font-size:0.78rem;color:#6b6459;">${a.status}</span>`}
                 </td>
@@ -896,7 +896,7 @@ async function viewArticle(docId) {
         ${admArticleHero(a) ? `<img loading="lazy" src="${escapeHtml(admArticleHero(a))}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
         ${admArticleBody(a)}
         <div style="margin-top:24px;">
-            <button class="act-btn act-approve" onclick="updateDoc('articles','${docId}','approved');closeModal();">Approve</button>
+            <button class="act-btn act-approve" onclick="approveDoc('articles','${docId}')">Approve</button>
             <button class="act-btn act-reject" onclick="rejectDoc('articles','${docId}')">Reject</button>
         </div>`;
     document.getElementById('modal').classList.add('show');
@@ -951,8 +951,15 @@ function admArticleBody(a) {
 // ── 범용 상태 업데이트 ──
 // A-154: 반려는 rejectDoc() 이 사유를 받아 reviewerNote 에 저장한다.
 // 브랜드 포털은 status === 'rejected' 일 때만 이 값을 보여준다(승인 건의 내부 메모는 노출되지 않는다).
+/* A-302(2026-11-05): 전에는 여기서 브라우저 confirm() 을 썼다. 그런데 Chrome 은 한 탭에서
+   대화상자가 반복되면 「추가 대화상자 차단」 체크박스를 띄우고, 한 번 체크되면 그 뒤로
+   confirm() 이 **항상 false** 를 돌려준다. 그러면 이 줄이 아무 말 없이 return 해서
+   「눌렀는데 그대로 pending」 이 된다 — 실측(2026-11-05): R26 승인은 활동 로그에 흔적조차
+   남지 않았고, 같은 시각 R27 거절은 남았다. 거절만 모달을 쓰고 있었기 때문이다.
+   이 화면의 규칙은 원래 「prompt()/alert() 를 쓰지 않는다 — 이미 있는 모달을 재사용한다」
+   (rejectDoc 주석)인데 승인만 그 규칙 밖에 있었다. 이제 확인은 approveDoc/rejectDoc 가
+   모달로 받고, 이 함수는 쓰기만 한다. skipConfirm 인자는 호환을 위해 남기되 쓰지 않는다. */
 async function updateDoc(collection, docId, status, reason, skipConfirm) {
-    if (!skipConfirm && !confirm(`${status === 'approved' ? 'Approve' : 'Reject'} this item?`)) return;
     let prev = null;   // 2단계: 활동 로그 from·label 용 — 이 흐름은 get() 이 없어 한 번 읽는다
     try { prev = (await db.collection(collection).doc(docId).get()).data() || null; } catch (e) {}
     const updates = { status: status };
@@ -968,6 +975,46 @@ async function updateDoc(collection, docId, status, reason, skipConfirm) {
     await db.collection(collection).doc(docId).update(updates);
     logAdmin({ action: collection === 'products' ? 'product.status' : 'article.status', target: { col: collection, id: docId, label: (prev && (prev.name || prev.title)) || '' }, from: (prev && prev.status) || '', to: status, note: (reason || '').trim() });   // 2단계: 활동 로그
     await loadAll();
+}
+
+// ── 승인 확인 (A-302) ──
+// 거절(rejectDoc)과 같은 규칙 — 브라우저 대화상자를 쓰지 않고 이미 있는 모달을 재사용한다.
+async function approveDoc(collection, docId) {
+    const mc = document.getElementById('modalContent');
+    const what = collection === 'products' ? '제품' : '매거진 글';
+    /* 이름은 인자로 받지 않고 여기서 읽는다 — 인라인 onclick 에 이름을 넣으면
+       escapeHtml 이 만든 &#39; 가 속성 파싱 때 ' 로 되돌아와 핸들러가 깨진다.
+       (같은 함정을 뉴스레터 화면에서 이미 겪었다 — 거기선 data 속성 + 이벤트 위임으로 풀었다.) */
+    let label = docId;
+    try {
+        const d = (await db.collection(collection).doc(docId).get()).data();
+        if (d) label = d.name || d.title || docId;
+    } catch (e) { /* 이름을 못 읽어도 승인은 막지 않는다 — docId 로 보여준다 */ }
+    mc.innerHTML = `
+        <h2 style="margin-bottom:6px;">${what} 승인</h2>
+        <p style="color:#5d564c;font-size:0.85rem;margin-bottom:6px;">
+            승인하면 <strong>공개 화면에 바로 노출됩니다.</strong>
+        </p>
+        <p style="color:#403a30;font-size:0.92rem;margin-bottom:18px;word-break:break-all;">${escapeHtml(label || docId)}</p>
+        <div style="display:flex;gap:8px;">
+            <button class="act-btn act-approve" id="approveConfirm">승인</button>
+            <button class="act-btn" id="approveCancel" style="background:#ede7dc;color:#403a30;">취소</button>
+        </div>`;
+    document.getElementById('modal').classList.add('show');
+    document.getElementById('approveCancel').onclick = closeModal;
+    document.getElementById('approveConfirm').onclick = async function () {
+        this.disabled = true;
+        this.textContent = '처리 중…';
+        try {
+            await updateDoc(collection, docId, 'approved', null, true);
+            closeModal();
+        } catch (err) {
+            console.error(err);
+            this.disabled = false;
+            this.textContent = '승인';
+            showToast(typeof t === 'function' ? t('Could not approve', '승인하지 못했습니다') : '승인하지 못했습니다', 'error');
+        }
+    };
 }
 
 // ── 반려 사유 입력 (A-154) ──
