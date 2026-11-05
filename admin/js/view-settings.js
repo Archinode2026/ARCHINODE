@@ -20,7 +20,7 @@
 var SET_DEFAULTS = {
     listing: {
         freeUntilText_en: 'Free until Dec 2026, then EUR 10 / month',
-        freeUntilText_ko: '2026년 12월까지 무료, 이후 월 EUR 10',
+        freeUntilText_ko: '처음 3개월 무료, 이후 월 EUR 10 또는 연 EUR 100',
         founderText_en:   'Same EUR 10 / month, no upsell',
         founderText_ko:   '동일 월 EUR 10, 추가 요금 없음',
         freeUntil:        '2026-12-31',

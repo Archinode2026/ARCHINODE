@@ -63,6 +63,7 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#332e27; backgroun
     </nav>
     <div class="header-actions">
       <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
+      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
     </div>
   </div>
 </header>
@@ -228,6 +229,10 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#332e27; backgroun
 </script>
 <script src="../cookie-consent.js?v=20260630" defer></script>
 <script src="../analytics-loader.js?v=20260630" defer></script>
-<script src="../sentry-loader.js?v=20260630" defer></script>
+<script src="../sentry-loader.js?v=20260630" defer>
+</script>
+<script>
+function toggleMobile() { var n = document.getElementById('mainNav'); if (n) n.classList.toggle('active'); }
+</script>
 </body>
 </html>
