@@ -649,7 +649,7 @@ function renderBrand(brand, products, articles) {
             const aTag = a.tag ? `<span class="article-card-tag">${escapeHtml(a.tag)}</span>` : '';
             const aDate = (a.publishedAt && a.publishedAt.toDate) ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : '';
             return `
-            <a href="../trend-report/view.html?id=${escapeHtml(a.id)}" class="article-card fade-in">
+            <a href="../magazine/view.html?id=${escapeHtml(a.id)}" class="article-card fade-in">
                 <div class="article-card-img"><img loading="lazy" src="${aImg}" alt="${aTitle}">${aTag}</div>
                 <div class="article-card-body">
                     <h3>${aTitle}</h3>

@@ -329,7 +329,7 @@ fadeEls.forEach(el => fadeObserver.observe(el));
     var img = safeUrl(a.coverImage) || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80';   // A-218
     var date = a.publishedAt && a.publishedAt.toDate ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : '';
     var tagHtml = a.tag ? '<span class="article-card-tag">' + esc(a.tag) + '</span>' : '';
-    return '<a href="trend-report/view.html?id=' + esc(id) + '" class="article-card">' +
+    return '<a href="magazine/view.html?id=' + esc(id) + '" class="article-card">' +
       '<div class="article-card-img"><img src="' + esc(img) + '" alt="' + esc(a.title) + '" loading="lazy">' + tagHtml + '</div>' +
       '<div class="article-card-body"><h3>' + esc(a.title) + '</h3>' +
       '<p>' + esc((a.excerpt||'').substring(0,140)) + '</p>' +

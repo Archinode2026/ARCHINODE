@@ -37,3 +37,8 @@
 
 # ★ search-index.json 은 막지 않는다 — search.js 가 실제로 받아 쓴다.
 #   막으면 사이트 검색이 죽는다. (A-284)
+
+# A-291(2026-11-05): 브랜드 매거진 기사 화면을 magazine/view.html 로 통합.
+# 이미 공유된 /trend-report/view.html?id=... 주소를 질의문자열 그대로 넘긴다
+# (Netlify 는 쿼리를 자동으로 보존한다). ! 가 없으면 실재하는 파일이 이긴다 — A-285.
+/trend-report/view.html   /magazine/view.html   301!
