@@ -15,14 +15,19 @@
    ★ 문서 값은 전부 사용자 값 — 출력은 예외 없이 escapeHtml/escapeAttr. 확인창(confirm/alert) 없음.
    ───────────────────────────────────────────────────────────────────────── */
 
-// 기본값 — 계약서 4-2. 문구는 for-brands.html 752줄(freeUntilText)·757줄(founderText)·501줄("Free through December 2026" → freeUntil) 그대로.
+// 기본값 — 계약서 4-2. 문구는 for-brands.html 의 요금 표(`pt-highlight`) 칸과 글자 그대로 맞춘다.
+// ★ 줄번호로 가리키지 마라 — 이전 주석은 752·757·501줄을 가리켰는데 편집으로 밀려 엉뚱한 자리를 가리키고 있었다 (A-281).
+//   찾는 방법: for-brands.html 에서 `pt-highlight` 또는 `no upsell` 로 검색.
 // ★ 정책 숫자를 여기서 새로 정하지 않는다 — 코드에 이미 박힌 문구를 옮긴 것. 통화·금액은 규정집 2부 안건 1 미결.
 var SET_DEFAULTS = {
     listing: {
-        freeUntilText_en: 'Free until Dec 2026, then EUR 10 / month',
+        freeUntilText_en: 'First 3 months free, then EUR 10 / month or EUR 100 / year',
         freeUntilText_ko: '처음 3개월 무료, 이후 월 EUR 10 또는 연 EUR 100',
-        founderText_en:   'Same EUR 10 / month, no upsell',
-        founderText_ko:   '동일 월 EUR 10, 추가 요금 없음',
+        founderText_en:   'Included — one plan, no upsell',
+        founderText_ko:   '기본 제공 — 요금제 하나, 추가 요금 없음',
+        // 이 필드는 폐기된 정책(「Free through December 2026」)에서 왔다.
+        //   현행 정책은 「브랜드별 입점 후 3개월 무료」라 전역 날짜 하나로 표현할 수 없다.
+        //   모델을 바꾸는 것은 사업 결정이므로 값은 그대로 둔다 — 승리님 확정 후 정리. (A-281)
         freeUntil:        '2026-12-31',
         pendingIssue:     '안건 1'
     },
