@@ -61,6 +61,7 @@
           currentLang = autoLang;
           applyLanguage(autoLang);
           updateLangButton(autoLang);
+          broadcastLang(autoLang);       // A-259
         }
       })
       .catch(function(){});
@@ -72,6 +73,7 @@
     initSwitcher();
     applyLanguage(currentLang);
     updateLangButton(currentLang);
+    broadcastLang(currentLang);          // A-259
     detectCountryAndApply();
   });
 
@@ -181,6 +183,25 @@
     updateLangButton(currentLang);
   };
 
+  /* ── A-259: 언어가 바뀌었음을 알리는 신호 ──────────────────────────────────
+     data-en/data-ko 는 **이미 화면에 있는 글자**만 바꾼다. 기사 본문처럼 자바스크립트가
+     Firestore 에서 읽어 innerHTML 로 그려 넣는 것은 그 손길이 닿지 않는다 — 언어를
+     바꿔도 처음 그릴 때의 언어가 그대로 굳는다(A-222 와 같은 함정).
+     그런 화면이 스스로 다시 그릴 수 있도록, 언어를 적용할 때마다 신호를 하나 쏜다.
+     듣는 쪽: document.addEventListener('archinode:lang', fn) — e.detail.lang 에 'en'|'ko'.
+     applyLanguage() 안이 아니라 여기서 쏘는 이유: applyLanguage 는 '다시 칠하기'로도
+     불리는데(applyLang/applyLangAgain), 그때마다 기사를 다시 그리면 헛일이 된다.
+     언어가 **정말 바뀐 때**만 쏜다. */
+  var _lastBroadcast = null;
+  function broadcastLang(lang) {
+    if (_lastBroadcast === lang) return;
+    _lastBroadcast = lang;
+    try {
+      document.dispatchEvent(new CustomEvent('archinode:lang', { detail: { lang: lang } }));
+    } catch (err) { /* CustomEvent 를 못 만드는 아주 옛 브라우저 — 조용히 넘어감 */ }
+  }
+  window.archinodeLang = function() { return currentLang; };
+
   window.setLang = function(lang, e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     if (availableLangs.indexOf(lang) === -1) return;
@@ -188,6 +209,7 @@
     try { localStorage.setItem('archinode-lang', lang); } catch(err){}
     applyLanguage(lang);
     updateLangButton(lang);
+    broadcastLang(lang);                 // A-259
     document.querySelectorAll('.lang-menu').forEach(function(m) {
       m.style.display = 'none';
     });

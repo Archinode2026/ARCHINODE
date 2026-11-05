@@ -56,6 +56,13 @@
 .ma-brand-box-text h4 { font-size:0.95rem; font-weight:700; margin-bottom:4px; }
 .ma-brand-box-text p { font-size:0.82rem; color:var(--ink-soft); margin:0; }
 .ma-brand-box a { margin-left:auto; background:var(--black); color:var(--white); padding:10px 20px; font-size:0.82rem; font-weight:600; text-decoration:none; white-space:nowrap; }
+
+/* A-259: 번역판이 없어 원문을 내줄 때의 한 줄. 본문보다 한 걸음 물러나 보이게. */
+.ma-origin-note {
+  font-size: 0.82rem; color: var(--ink-soft, #6b6257);
+  background: #f7f3ec; border-left: 3px solid #d8cdb8;
+  padding: 10px 14px; border-radius: 0 4px 4px 0; margin: 0 0 24px;
+}
 </style>
 </head>
 <body>
@@ -170,6 +177,7 @@
 <script src="../firebase-config.js"></script>
 <script src="../search.js?v=20260630"></script>
 <script src="../lang.js?v=20261104b"></script>
+<script src="../articles-lang.js?v=20261105a"></script>
 <script src="../auth-ui.js?v=20260630"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
@@ -190,11 +198,18 @@ async function loadArticle() {
         if (snap.empty) { showError('기사를 찾을 수 없습니다', '요청하신 기사가 존재하지 않거나 아직 검토 중입니다.'); return; }
 
         const article = snap.docs[0].data();
-        document.getElementById('pageTitle').textContent = article.title + ' | ARCHINODE Magazine';
-        document.getElementById('metaDesc').content = (article.excerpt || article.content || '').substring(0, 160);
-        // A-093: og:title/og:description도 함께 갱신 — 카카오톡/슬랙 등 메신저 미리보기용
-        document.getElementById('ogTitle').setAttribute('content', article.title + ' | ARCHINODE Magazine');
-        document.getElementById('ogDesc').setAttribute('content', (article.excerpt || article.content || '').substring(0, 160));
+        window.__article = article;   // A-259: 언어가 바뀌면 이걸로 다시 그린다
+        // A-259: 창 제목과 공유 미리보기도 보는 언어를 따른다.
+        window.__applyArticleMeta = function() {
+            var side = (typeof window.artSide === 'function') ? window.artSide(article) : article;
+            document.getElementById('pageTitle').textContent = (side.title || '') + ' | ARCHINODE Magazine';
+            var desc = (side.excerpt || side.content || '').substring(0, 160);
+            document.getElementById('metaDesc').content = desc;
+            // A-093: og:title/og:description도 함께 갱신 — 카카오톡/슬랙 등 메신저 미리보기용
+            document.getElementById('ogTitle').setAttribute('content', (side.title || '') + ' | ARCHINODE Magazine');
+            document.getElementById('ogDesc').setAttribute('content', desc);
+        };
+        window.__applyArticleMeta();
 
         // A-096: 매거진 기사 상세 화면(동적 템플릿)에 구조화 데이터(JSON-LD)가 아예 없던 문제 — Article 스키마 주입
         (function injectArticleJsonLd() {
@@ -215,6 +230,13 @@ async function loadArticle() {
             document.head.appendChild(script);
         })();
         renderArticle(article);
+        // A-259: 기사 본문은 innerHTML 로 그려 넣은 것이라 data-en/data-ko 가 닿지 않는다.
+        // 언어가 바뀌면 신호를 받아 통째로 다시 그린다.
+        document.addEventListener('archinode:lang', function() {
+            if (!window.__article) return;
+            renderArticle(window.__article);
+            if (window.__applyArticleMeta) window.__applyArticleMeta();
+        });
     } catch (err) {
         console.error('Error loading article:', err);
         showError('오류가 발생했습니다', '기사를 불러오는 중 문제가 발생했습니다.');
@@ -242,13 +264,30 @@ function renderBlocks(blocks) {
 }
 
 function renderArticle(a) {
-    const dateStr = a.publishedAt ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : (a.createdAt ? a.createdAt.toDate().toLocaleDateString('ko-KR') : '');
+    // A-259: 보는 사람 언어에 맞는 판을 고른다. 번역판이 없으면 원문을 주되 side.fellBack 이 선다.
+    const side = (typeof window.artSide === 'function') ? window.artSide(a) : {
+        title: a.title, excerpt: a.excerpt, blocks: a.blocks, content: a.content,
+        lang: (a.lang === 'ko' ? 'ko' : 'en'), fellBack: false
+    };
+    const viewLang = (typeof window.artViewLang === 'function') ? window.artViewLang()
+                   : (document.documentElement.lang === 'ko' ? 'ko' : 'en');
+    // 날짜도 보는 언어를 따른다. 전에는 늘 ko-KR 이라 영어로 봐도 한국식이었다(A-252 와 같은 결).
+    const dateLocale = viewLang === 'ko' ? 'ko-KR' : 'en-US';
+    const dateStr = a.publishedAt ? a.publishedAt.toDate().toLocaleDateString(dateLocale)
+                  : (a.createdAt ? a.createdAt.toDate().toLocaleDateString(dateLocale) : '');
     // blocks 스키마 우선. 없으면 옛 content/imageUrl 폴백.
     let bodyHtml = '';
-    if (Array.isArray(a.blocks) && a.blocks.length > 0) {
-        bodyHtml = renderBlocks(a.blocks);
-    } else if (a.content) {
-        bodyHtml = a.content.split('\n').filter(p => p.trim()).map(p => '<p>' + escapeHtml(p) + '</p>').join('');
+    if (Array.isArray(side.blocks) && side.blocks.length > 0) {
+        bodyHtml = renderBlocks(side.blocks);
+    } else if (side.content) {
+        bodyHtml = side.content.split('\n').filter(p => p.trim()).map(p => '<p>' + escapeHtml(p) + '</p>').join('');
+    }
+    // 원문만 있을 때의 한 줄. 말없이 다른 언어를 내밀면 번역이 깨진 줄 안다.
+    let fallbackNote = '';
+    if (side.fellBack && typeof window.artFallbackNote === 'function') {
+        const n = window.artFallbackNote(side.lang);
+        fallbackNote = '<p class="ma-origin-note" data-en="' + escapeHtml(n.en) + '" data-ko="' + escapeHtml(n.ko) + '">'
+                     + escapeHtml(viewLang === 'ko' ? n.ko : n.en) + '</p>';
     }
     // 히어로 이미지: coverImage(신) 우선, imageUrl(구) 폴백
     const heroImg = a.coverImage || a.imageUrl || '';
@@ -259,10 +298,10 @@ function renderArticle(a) {
     contentDiv.innerHTML = `
     <!-- HERO -->
     <div class="ma-hero">
-        ${heroImg ? `<img loading="lazy" src="${escapeHtml(heroImg)}" alt="${escapeHtml(a.title || '')}">` : ''}
+        ${heroImg ? `<img loading="lazy" src="${escapeHtml(heroImg)}" alt="${escapeHtml(side.title || '')}">` : ''}
         <div class="ma-hero-overlay">
             <span class="ma-hero-tag">${escapeHtml(a.tag || 'Article')}</span>
-            <h1>${escapeHtml(a.title || '')}</h1>
+            <h1>${escapeHtml(side.title || '')}</h1>
         </div>
     </div>
 
@@ -270,7 +309,7 @@ function renderArticle(a) {
         <div class="ma-breadcrumb">
             <a href="../index.html" data-en="Home" data-ko="홈">Home</a> &nbsp;/&nbsp;
             <a href="../magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a> &nbsp;/&nbsp;
-            <span>${escapeHtml(a.title || '')}</span>
+            <span>${escapeHtml(side.title || '')}</span>
         </div>
 
         <div class="ma-meta">
@@ -281,6 +320,7 @@ function renderArticle(a) {
         </div>
 
         <div class="ma-content">
+            ${fallbackNote}
             ${bodyHtml}
 
             <div class="ma-brand-box">
