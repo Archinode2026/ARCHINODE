@@ -218,11 +218,40 @@
     if (blocks.some(b => b.type === 'image' && b.uploading)) return 'Wait for images to finish uploading';
     return null;
   }
+  /* A-305: 고른 언어와 실제 본문이 어긋나면 본문을 믿는다.
+     자동으로 바꾸되 **조용히 바꾸지는 않는다** — 바뀌면 폼 안내에 적어 준다.
+     판정은 한글 음절 비율 하나뿐이다(제목 + 본문 텍스트). 영문 브랜드명이나
+     제품명이 섞인 한국어 글도 보통 20%% 를 넘기므로 경계는 넉넉히 잡았다. */
+  function pickLang(title, blocks) {
+    var chosen = $('artLang') ? $('artLang').value : 'en';
+    var text = String(title || '');
+    (blocks || []).forEach(function (b) { if (b && b.type === 'text') text += ' ' + String(b.content || ''); });
+    var letters = (text.match(/[A-Za-z\uac00-\ud7a3]/g) || []).length;
+    if (letters < 20) return chosen;                     // 표본이 적으면 고른 값을 믿는다
+    var han = (text.match(/[\uac00-\ud7a3]/g) || []).length;
+    var ratio = han / letters;
+    var actual = ratio >= 0.2 ? 'ko' : 'en';
+    if (actual !== chosen && $('artFormMsg')) {
+      $('artFormMsg').textContent = (actual === 'ko')
+        ? '원문 언어를 한국어로 맞췄습니다(본문이 한국어입니다).'
+        : 'Original language set to English (the body is in English).';
+      $('artFormMsg').style.color = '#7a5c32';
+      if ($('artLang')) $('artLang').value = actual;
+    }
+    return actual;
+  }
+
   function resetForm() {
     blocks = [];
     if ($('artTitle')) $('artTitle').value = '';
     if ($('artTag')) $('artTag').value = 'Brand Spotlight';
-    if ($('artLang')) $('artLang').value = 'en';
+    /* A-305(2026-11-06): 전에는 여기서 매번 'en' 으로 되돌렸다. 자동 판별도 없고
+       기본값이 영어라, 한국 브랜드가 한국어로 쓰면서 이 칸을 건드리지 않으면
+       lang:'en' 이 박혔다. 그러면 공개 화면의 artSide() 가 원문을 영어로 판정해
+       **한국어 글인데 한국어 독자에게 「이 글은 영어 원문만 있습니다」** 가 붙고,
+       어드민 카드에는 'EN missing' 이 뜬다(실제로 라이브 더미 2건이 그 상태였다).
+       이제 건드리지 않는다 — 마크업의 첫 option 이 기본이고, 쓴 사람이 고른 값은
+       다음 글을 쓸 때까지 남는다. 틀리면 아래 제출 직전 교차검증이 잡는다. */
     if ($('artFormMsg')) { $('artFormMsg').textContent = ''; $('artFormMsg').style.color = ''; }
     render();
   }
@@ -308,7 +337,7 @@
           blocks: cleanBlocks,
           coverImage: getCoverImage(),
           excerpt: getExcerpt(),
-          lang: $('artLang') ? $('artLang').value : 'en',
+          lang: pickLang(title, cleanBlocks),
           status: 'pending',
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }), 15000);

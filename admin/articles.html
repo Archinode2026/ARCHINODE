@@ -512,13 +512,70 @@ function updateActionButtons(status) {
 }
 
 // ─────────────── 액션 ───────────────
-document.getElementById('btnReview').addEventListener('click', function() {
+
+/* ══════════════════════════════════════════════════════════════════════════
+   A-309(2026-11-06): 브라우저 confirm() 을 쓰지 않는다.
+
+   A-302 에서 대시보드의 승인이 **조용히 실패**하던 것을 고쳤다. 원인은 Chrome 이
+   한 탭에서 대화상자가 반복되면 「추가 대화상자 차단」을 띄우고, 한 번 체크되면
+   confirm() 이 **항상 false** 를 돌려준다는 것이었다. 그러면 `if (!confirm(...)) return;`
+   이 아무 말 없이 반환한다. 브론즈가 라이브 콘솔에서 물증을 찾았다 —
+   「Page dialog suppressed (confirm): "Approve this item?" ... confirm() returned false」 8건.
+
+   이 파일에는 같은 폭탄이 네 개 남아 있었다(검토 시작·대기로 되돌리기·거절·번역 빈칸).
+   특히 **거절**은 눌러도 아무 일이 없으면 심사자가 「저장이 안 되네」 하고 다시 누른다.
+
+   그래서 자체 오버레이로 바꾼다. 이 화면의 기존 모달(modalOverlay)은 기사 편집기
+   자체라 재사용할 수 없어 별도 요소를 그때그때 만든다. Esc·배경 클릭 = 취소.
+   ══════════════════════════════════════════════════════════════════════════ */
+function admConfirm(title, message, okLabel) {
+  return new Promise(function (resolve) {
+    var wrap = document.createElement('div');
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-modal', 'true');
+    wrap.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(32,28,24,.45);'
+                       + 'display:flex;align-items:center;justify-content:center;padding:20px;';
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#fdfbf7;border-radius:10px;max-width:460px;width:100%;'
+                      + 'padding:26px 26px 22px;box-shadow:0 18px 50px rgba(0,0,0,.22);font-family:inherit;';
+    var h = document.createElement('h3');
+    h.textContent = title;
+    h.style.cssText = 'margin:0 0 10px;font-size:1.05rem;color:#332e27;';
+    var p = document.createElement('p');
+    p.textContent = message;
+    p.style.cssText = 'margin:0 0 20px;font-size:0.9rem;line-height:1.65;color:#5d564c;white-space:pre-line;';
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;';
+    var ok = document.createElement('button');
+    ok.type = 'button'; ok.className = 'act-btn act-approve'; ok.textContent = okLabel || '계속';
+    var no = document.createElement('button');
+    no.type = 'button'; no.className = 'act-btn'; no.textContent = '취소';
+    no.style.cssText = 'background:#ede7dc;color:#403a30;';
+    row.appendChild(ok); row.appendChild(no);
+    box.appendChild(h); box.appendChild(p); box.appendChild(row);
+    wrap.appendChild(box);
+    document.body.appendChild(wrap);
+    ok.focus();
+
+    function done(v) {
+      document.removeEventListener('keydown', onKey, true);
+      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+      resolve(v);
+    }
+    function onKey(e) { if (e.key === 'Escape') { e.stopPropagation(); done(false); } }
+    document.addEventListener('keydown', onKey, true);
+    ok.onclick = function () { done(true); };
+    no.onclick = function () { done(false); };
+    wrap.onclick = function (e) { if (e.target === wrap) done(false); };
+  });
+}
+document.getElementById('btnReview').addEventListener('click', async function() {
   // A-204: 확인창이 없어 누르는 순간 바로 저장됐다. 이 상태는 브랜드 화면에도 '검토 중' 으로 보인다.
-  if (!confirm("상태를 '검토 중'으로 바꿉니다. 브랜드 포털에도 '검토 중'으로 보입니다. 계속할까요?")) return;
+  if (!await admConfirm('검토 시작', "상태를 '검토 중'으로 바꿉니다.\n브랜드 포털에도 '검토 중'으로 보입니다.", '검토 시작')) return;
   doAction('reviewing', '검토 시작');
 });
-document.getElementById('btnBackToPending').addEventListener('click', function() {
-  if (!confirm("상태를 '대기'로 되돌리고 Reviewer Note 를 지웁니다. 계속할까요?")) return;
+document.getElementById('btnBackToPending').addEventListener('click', async function() {
+  if (!await admConfirm('대기로 되돌리기', "상태를 '대기'로 되돌리고 Reviewer Note 를 지웁니다.", '되돌리기')) return;
   doAction('pending', '대기로 되돌리기', { clearNote: true });
 });
 document.getElementById('btnRevise').addEventListener('click', function() {
@@ -526,18 +583,18 @@ document.getElementById('btnRevise').addEventListener('click', function() {
   if (!note) { showToast('수정 요청 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
   doAction('revision-requested', '수정 요청');
 });
-document.getElementById('btnReject').addEventListener('click', function() {
+document.getElementById('btnReject').addEventListener('click', async function() {
   var note = document.getElementById('inNote').value.trim();
   if (!note) { showToast('거절 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
-  if (!confirm('정말 거절하시겠습니까? 브랜드에게 거절 메일을 보내야 합니다.')) return;
+  if (!await admConfirm('거절', '정말 거절하시겠습니까?\n브랜드에게 거절 메일을 보내야 합니다.', '거절')) return;
   doAction('rejected', '거절');
 });
-document.getElementById('btnApprove').addEventListener('click', function() {
+document.getElementById('btnApprove').addEventListener('click', async function() {
   var tr = trCollect();
   if (!tr.blocks) {
     var langName = tr.prefix === 'ko' ? '한국어' : '영어';
-    if (!confirm(langName + ' 번역이 비어 있습니다. 그대로 승인하면 매거진에서 원문이 나가고 '
-               + '「이 글은 원문만 있습니다」 안내가 붙습니다. 계속할까요?')) return;
+    if (!await admConfirm('번역 없이 승인', langName + ' 번역이 비어 있습니다.\n그대로 승인하면 매거진에서 원문이 나가고 '
+               + '「이 글은 원문만 있습니다」 안내가 붙습니다.', '그대로 승인')) return;
   }
   doAction('approved', '게시 승인');
 });
