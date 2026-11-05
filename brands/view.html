@@ -423,6 +423,7 @@
 </footer>
 
 <script src="../firebase-config.js"></script>
+<script src="../lead-notify.js?v=20261105a"></script>
 <script src="../search.js"></script>
 <script src="../lang.js?v=20261104b"></script>
 <script src="../auth-ui.js"></script>
@@ -842,7 +843,8 @@ async function submitRfq(e) {
     const message = document.getElementById('rfqMessage').value.trim();
 
     try {
-        await db.collection('leads').add({
+        // A-263: 접수 알림. leads 에 넣은 것과 같은 모양을 그대로 넘긴다.
+        const leadDoc = {
             type: 'brand-inquiry',
             status: 'new',
             brandId: currentBrandDocId || '',
@@ -863,7 +865,10 @@ async function submitRfq(e) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             assignedAt: null
-        });
+        };
+        await db.collection('leads').add(leadDoc);
+        // 기다리지 않는다 — 메일이 늦거나 실패해도 접수는 이미 끝난 일이다(A-263).
+        if (window.notifyNewLead) window.notifyNewLead(leadDoc);
         document.getElementById('rfqFormWrap').style.display = 'none';
         document.getElementById('rfqSuccessWrap').style.display = 'block';
     } catch (err) {

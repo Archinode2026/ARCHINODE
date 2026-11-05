@@ -151,6 +151,8 @@
 .adm-type-quote { background: #fef3c7; color: #92400e; }
 .adm-type-brand { background: #e0e7ff; color: #3730a3; }
 .adm-type-dealer { background: #d1fae5; color: #065f46; }
+.adm-type-sample { background: #fae8ff; color: #6b21a8; }   /* A-263 */
+.adm-type-sourcing { background: #e0f2fe; color: #075985; }  /* A-263 */
 .adm-lead-h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 /* 폼(수동 등록) — dashboard.html .rv-form 과 같은 모양이지만 검수관리 탭이 걷힐 때를 대비해 따로 둔다 */
 .adm-form label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--gray-700); margin: 12px 0 6px; }

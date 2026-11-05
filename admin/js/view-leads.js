@@ -20,10 +20,14 @@ var LEAD_PAGE_SIZE = 200;
 var LEAD_PORTAL_URL = 'https://archinodekr.com/brand-portal/dashboard.html';   // 메일 본문 링크 — list-your-brand.html 과 같은 절대 주소 형식
 
 // 유형 3종 (계약서 4-3)
+// A-263: 사이트가 실제로 쓰는 키를 다 적는다. 전에는 'sourcing' 과 'sample-request' 가 빠져 있어
+// 그 리드들이 유형 칸에 영문 키 그대로 나왔고, 유형 거르개에서도 고를 수 없었다(폴백이 가려 준 탓에 안 보였다).
 var LEAD_TYPES = [
-    { key: 'quote',         en: 'Quote request',    ko: '견적 요청',   cls: 'adm-type-quote' },
-    { key: 'brand-inquiry', en: 'Brand inquiry',    ko: '브랜드 문의', cls: 'adm-type-brand' },
-    { key: 'dealer',        en: 'Dealer connection', ko: '딜러 연결',  cls: 'adm-type-dealer' }
+    { key: 'quote',          en: 'Quote request',     ko: '견적 요청',   cls: 'adm-type-quote' },
+    { key: 'sample-request', en: 'Sample request',    ko: '샘플 요청',   cls: 'adm-type-sample' },
+    { key: 'brand-inquiry',  en: 'Brand inquiry',     ko: '브랜드 문의', cls: 'adm-type-brand' },
+    { key: 'sourcing',       en: 'Sourcing inquiry',  ko: '소싱 문의',   cls: 'adm-type-sourcing' },
+    { key: 'dealer',         en: 'Dealer connection', ko: '딜러 연결',   cls: 'adm-type-dealer' }
 ];
 // 상태 5종. 브랜드 포털은 assigned→contacted→closed 만 바꿀 수 있다(규칙 update 조건)
 var LEAD_STATUSES = [
