@@ -308,7 +308,8 @@ function inq_saveAnswer(it) {
 
 // ── 답변 메일 1통 — list-your-brand.html 의 mail.add 패턴 그대로 (to + message.subject/text, 평문).
 //    제목 "Re: <subject> — ARCHINODE" 는 규칙(message.subject.size() < 200)에 맞춰 190자에서 자른다.
-//    ★ 문서 저장 성공 ≠ 발송 — Trigger Email Extension 설치 여부는 미확인(CLAUDE.md 5절). 실패는 토스트(조용한 실패 방지).
+//    ★ 문서 저장 성공 ≠ 발송 — 다만 Trigger Email Extension 은 설치돼 있고 실제로 나간다(2026-11-05 라이브 확인: mail 문서의 delivery.state 가 SUCCESS).
+//    보내는 것은 Resend 이고 **FROM 은 archinodekr.com** 이다 — archinode.org 는 도메인 검증이 안 돼 550 으로 거절됐다(2026-11-02 실제 실패 기록). 그래도 발송 실패는 조용히 일어나므로 저장 실패는 토스트로 알린다.
 function inq_mailSubject(subject) {
     var prefix = 'Re: ', suffix = ' — ARCHINODE';
     var s = String(subject || '').replace(/\s+/g, ' ').trim();

@@ -509,7 +509,8 @@ function lead_assignTo(item, brandId, onDone) {
 
 // ── 배정 알림 메일 1통 — list-your-brand.html 의 mail.add 패턴 그대로 (to + message.subject/text, 평문).
 //    본문에 리드 유형·이름·회사·메시지 요약 + 포털 링크. 연락처는 넣지 않는다(포털에서 본다). 실패는 토스트(조용한 실패 방지).
-//    ★ 문서 저장 성공 ≠ 발송 — Trigger Email Extension 설치 여부는 미확인(CLAUDE.md 5절).
+//    ★ 문서 저장 성공 ≠ 발송 — 다만 Trigger Email Extension 은 설치돼 있고 실제로 나간다(2026-11-05 라이브 확인: mail 문서의 delivery.state 가 SUCCESS).
+//    보내는 것은 Resend 이고 **FROM 은 archinodekr.com** 이다 — archinode.org 는 도메인 검증이 안 돼 550 으로 거절됐다(2026-11-02 실제 실패 기록). 그래도 발송 실패는 조용히 일어나므로 저장 실패는 토스트로 알린다.
 function lead_sendAssignMail(item, brand) {
     if (!brand.email) {
         showToast(t('Assigned — but the brand has no email on file, so no notification was queued', '배정됨 — 브랜드 이메일이 없어 알림 메일을 넣지 못했습니다'), 'warn');
