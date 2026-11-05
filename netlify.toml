@@ -12,6 +12,23 @@
 
 # A-004(2026-11-03): reCAPTCHA v3 서버 검증용 Netlify Function.
 # 비밀 키(RECAPTCHA_SECRET_KEY)는 Netlify 대시보드 환경변수로만 설정 — 이 파일/레포에는 절대 없음.
+# A-290(2026-11-05): Netlify 후처리(Asset Optimization)를 저장소에서 명시적으로 끈다.
+#
+# 증상 — 기기 파일은 멀쩡한데 **라이브만** HTML 속성이 깨졌다(브론즈 라이브 실측):
+#   기기:   onmouseover="this.style.background='#d9b883'"
+#   라이브: onmouseover='this.style.background=\'#d9b883\''   ← 유효하지 않은 HTML
+# 후처리가 쌍따옴표 속성을 홑따옴표로 재직렬화하면서 내부 아포스트로피를
+# 백슬래시로 이스케이프한다. HTML 속성은 백슬래시를 모르므로 파서가 그 지점에서
+# 속성을 끊고, 뒤따르는 속성들이 유령 속성이 된다.
+# 실제 피해: for-brands.html 「Request Consultation」 호버 사망 + JS SyntaxError,
+#            auth/login.html 영어 헤더가 「Don\」 로 표시, admin/dashboard.html 호버 20건 사망.
+# 같은 후처리가 href 의 .html 확장자도 떼어낸다(signup.html → /auth/signup) —
+# 이 저장소는 .html 링크를 쓰므로 그것도 원하지 않는 변형이다.
+#
+# skip_processing 은 대시보드 설정을 덮어쓴다. 이 줄을 지우면 증상이 돌아온다.
+[build.processing]
+  skip_processing = true
+
 [functions]
   directory = "netlify/functions"
 
