@@ -8,3 +8,11 @@
 /scripts/*            /404.html   404
 /archi-diary/*         /404.html   404
 /.claude/*            /404.html   404
+
+# A-284(2026-11-05): netlify.toml 의 publish = "." 때문에 저장소 루트가 통째로 서빙된다.
+# 아래는 웹에 뜰 이유가 없는 파일들. search-index.json 은 search.js 가 실제로 받아 쓰므로 막지 않는다.
+# /netlify/* 는 함수 "원본 파일"을 막는 것이고, 실제 호출 경로는 /.netlify/functions/* (점이 붙는다)라 영향 없다.
+/storage.rules        /404.html   404
+/netlify.toml         /404.html   404
+/README.md            /404.html   404
+/netlify/*            /404.html   404

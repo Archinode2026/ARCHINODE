@@ -37,7 +37,7 @@ var SET_DEFAULTS = {
         bizNo:      '640-03-02879',
         email:      'office@archinode.org',
         euDirector: 'Silvia Vandone',
-        euEmail:    'silviavandone@hotmail.com',
+        euEmail:    'office@archinode.org',
         domain:     'archinodekr.com'
     },
     adminNotice: ''

@@ -99,7 +99,7 @@ brands(입점, status pending/approved/suspended/rejected + 사유) · products 
 
 ## 9. 실비아 (EU Director)
 
-Silvia Vandone · silviavandone@hotmail.com(스팸함 위험, 응답률<5%면 도메인 메일로) · 1차 20개 브랜드 자료 `sales/silvia-batch-1-*`, 브로슈어 `downloads/`. 1차 발송 여부·응답률은 **확인 못 함**(규정집 안건 7).
+Silvia Vandone · 공개 연락처는 **office@archinode.org** (2026-11-05 승리님 결정 — 개인 hotmail 공개 노출 제거, 담당자 이름만 표기. 개인 메일은 SPF/DKIM 이 없어 스팸함 위험이 있었다. 실비아가 직접 발신할 주소가 필요하면 `silvia@archinodekr.com` — 도메인은 Resend 인증 완료) · 1차 20개 브랜드 자료 `sales/silvia-batch-1-*`, 브로슈어 `downloads/`. 1차 발송 여부·응답률은 **확인 못 함**(규정집 안건 7).
 
 ---
 

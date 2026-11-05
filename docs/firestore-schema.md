@@ -326,7 +326,7 @@ articles: status ASC, createdAt DESC
     pendingIssue:     '안건 1'                                        // 비어 있지 않으면 설정 화면이 각 칸 옆에 빨간 「안건 1 결정 대기」 표시. 결정 뒤 비운다
   },
   site: { operator: '비비들리바이브', ceo: '박승리', bizNo: '640-03-02879', email: 'office@archinode.org',
-          euDirector: 'Silvia Vandone', euEmail: 'silviavandone@hotmail.com', domain: 'archinodekr.com' },
+          euDirector: 'Silvia Vandone', euEmail: 'office@archinode.org', domain: 'archinodekr.com' },
   adminNotice: '',          // 어드민끼리 보는 메모 한 칸 — 대시보드 상단 회색 박스(escapeHtml)
   updatedAt: Timestamp,     // serverTimestamp
   updatedBy: 'office@archinode.org'
