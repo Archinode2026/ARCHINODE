@@ -199,7 +199,7 @@
     <button class="rfq-close" onclick="closeRfqModal()">&times;</button>
     <div id="rfqFormWrap">
       <h3 id="rfqTitle" data-en="Request a Quote" data-ko="견적 요청">Request a Quote</h3>
-      <p class="rfq-sub" id="rfqSub" data-en="Tell the brand what you need — they'll follow up directly." data-ko="필요한 내용을 알려주시면 브랜드가 직접 연락드려요.">Tell the brand what you need — they'll follow up directly.</p>
+      <p class="rfq-sub" id="rfqSub" data-en="Tell us what you need — ARCHINODE routes it to the brand and follows up." data-ko="필요한 내용을 알려주세요 — 아키노드가 브랜드에 연결하고 진행을 챙깁니다.">Tell us what you need — ARCHINODE routes it to the brand and follows up.</p>
       <form id="rfqForm" onsubmit="return submitRfq(event)">
         <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
           <label for="rfq_hp">Leave this field empty</label>
@@ -232,7 +232,7 @@
     <div id="rfqSuccessWrap" style="display:none;" class="rfq-success">
       <i class="fas fa-check-circle"></i>
       <h3 data-en="Request Sent" data-ko="요청이 전달됐습니다">Request Sent</h3>
-      <p data-en="The brand will contact you directly by email." data-ko="브랜드가 이메일로 직접 연락드릴 거예요.">The brand will contact you directly by email.</p>
+      <p data-en="ARCHINODE has received your inquiry and will pass it to the brand." data-ko="아키노드가 문의를 접수했습니다. 브랜드에 전달해 드립니다.">ARCHINODE has received your inquiry and will pass it to the brand.</p>
     </div>
   </div>
 </div>
@@ -637,13 +637,13 @@ let rfqType = 'quote';
 const RFQ_COPY = {
     'quote': {
         titleEn: 'Request a Quote', titleKo: '견적 요청',
-        subEn: "Tell the brand what you need — they'll follow up directly.", subKo: '필요한 내용을 알려주시면 브랜드가 직접 연락드려요.',
+        subEn: "Tell us what you need — ARCHINODE routes it to the brand and follows up.", subKo: '필요한 내용을 알려주세요 — 아키노드가 브랜드에 연결하고 진행을 챙깁니다.',
         msgLabelEn: 'Project / quantity / desired timeline', msgLabelKo: '프로젝트 · 수량 · 희망 납기',
         showShipping: false
     },
     'sample-request': {
         titleEn: 'Request a Sample', titleKo: '샘플 요청',
-        subEn: 'Request a physical sample — the brand will arrange shipping.', subKo: '실물 샘플을 요청하시면 브랜드가 배송을 준비해요.',
+        subEn: 'Request a physical sample — ARCHINODE arranges it with the brand.', subKo: '실물 샘플을 요청하시면 아키노드가 브랜드와 조율해 드립니다.',
         msgLabelEn: 'Notes (optional)', msgLabelKo: '참고 사항 (선택)',
         showShipping: true
     }
