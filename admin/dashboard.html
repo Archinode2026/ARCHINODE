@@ -885,13 +885,59 @@ async function viewArticle(docId) {
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(a.title)}</h2>
         <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(a.tag || '')} · ${escapeHtml(a.brandName)}</p>
-        ${a.imageUrl ? `<img loading="lazy" src="${escapeHtml(a.imageUrl)}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
-        <div style="white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:#5d564c;">${escapeHtml(a.content || '')}</div>
+        ${admArticleHero(a) ? `<img loading="lazy" src="${escapeHtml(admArticleHero(a))}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
+        ${admArticleBody(a)}
         <div style="margin-top:24px;">
             <button class="act-btn act-approve" onclick="updateDoc('articles','${docId}','approved');closeModal();">Approve</button>
             <button class="act-btn act-reject" onclick="rejectDoc('articles','${docId}')">Reject</button>
         </div>`;
     document.getElementById('modal').classList.add('show');
+}
+
+/* A-267: 이 화면의 [Review] 는 옛 스키마(`content` 한 덩어리)만 그렸다. 지금 브랜드가 쓰는
+   블록 에디터는 본문을 `blocks[]` 에 담으므로 `a.content` 가 없고, 그래서 **본문이 빈 칸으로**
+   떴다. magazine/view.html·admin/articles.html 은 이미 블록을 그리는데 여기만 빠져 있었다.
+   번역판(koBlocks/enBlocks)이 있으면 그것도 아래에 같이 보여 준다. */
+function admArticleHero(a) { return a.coverImage || a.imageUrl || ''; }
+
+function admRenderBlocks(blocks) {
+    if (!Array.isArray(blocks) || blocks.length === 0) return '';
+    return blocks.map(function (b) {
+        if (!b) return '';
+        if (b.type === 'text') {
+            return '<p style="white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:#5d564c;margin:0 0 14px;">'
+                 + escapeHtml(b.content || '') + '</p>';
+        }
+        if (b.type === 'image' && b.url) {
+            var cap = b.caption
+                ? '<figcaption style="font-size:0.8rem;color:#7a7268;margin-top:6px;text-align:center;">' + escapeHtml(b.caption) + '</figcaption>'
+                : '';
+            return '<figure style="margin:0 0 18px;"><img loading="lazy" src="' + escapeHtml(b.url) + '" alt="'
+                 + escapeHtml(b.alt || '') + '" style="width:100%;border-radius:6px;">' + cap + '</figure>';
+        }
+        return '';
+    }).join('');
+}
+
+function admArticleBody(a) {
+    a = a || {};
+    var html = admRenderBlocks(a.blocks);
+    if (!html && a.content) {
+        html = '<div style="white-space:pre-wrap;font-size:0.9rem;line-height:1.8;color:#5d564c;">'
+             + escapeHtml(a.content) + '</div>';
+    }
+    if (!html) html = '<p style="color:#9a9288;font-size:0.88rem;">(본문이 비어 있습니다)</p>';
+
+    // 번역판이 있으면 함께. 접두사는 원문의 반대쪽(A-259 의 약속과 같다).
+    var p = (a.lang === 'ko') ? 'en' : 'ko';
+    var tr = admRenderBlocks(a[p + 'Blocks']);
+    if (tr) {
+        html += '<div style="margin-top:22px;padding-top:18px;border-top:1px dashed #ddd5c7;">'
+             +  '<p style="font-size:0.78rem;font-weight:700;color:#8a7030;letter-spacing:.04em;margin:0 0 10px;">'
+             +  (p === 'ko' ? '한국어 판' : 'English version')
+             +  (a[p + 'Title'] ? ' · ' + escapeHtml(a[p + 'Title']) : '') + '</p>' + tr + '</div>';
+    }
+    return html;
 }
 
 // ── 범용 상태 업데이트 ──
@@ -903,6 +949,14 @@ async function updateDoc(collection, docId, status, reason, skipConfirm) {
     try { prev = (await db.collection(collection).doc(docId).get()).data() || null; } catch (e) {}
     const updates = { status: status };
     if (status === 'rejected') updates.reviewerNote = (reason || '').trim() || null;
+    /* A-267: 매거진 목록은 orderBy('publishedAt') 으로 읽는데, **그 필드가 없는 문서는
+       Firestore 가 결과에서 통째로 뺀다**(실측: 한 컬렉션에서 33건 중 28건이 빠졌다).
+       브랜드가 올린 글에는 publishedAt 이 아예 없어서, 여기서 승인하면 상태만 approved 가
+       되고 매거진에는 **영영 안 뜬다** — 화면상 성공이라 조용히 실패한다.
+       articles.html 의 승인 경로는 이미 찍고 있다. 여기도 맞춘다. */
+    if (collection === 'articles' && status === 'approved' && !(prev && prev.publishedAt)) {
+        updates.publishedAt = firebase.firestore.FieldValue.serverTimestamp();
+    }
     await db.collection(collection).doc(docId).update(updates);
     logAdmin({ action: collection === 'products' ? 'product.status' : 'article.status', target: { col: collection, id: docId, label: (prev && (prev.name || prev.title)) || '' }, from: (prev && prev.status) || '', to: status, note: (reason || '').trim() });   // 2단계: 활동 로그
     await loadAll();
