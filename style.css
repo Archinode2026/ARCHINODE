@@ -110,8 +110,10 @@ input, select, textarea { font-family: inherit; }
   background: var(--black) !important;
   color: var(--white) !important;
   font-weight: 600 !important;
-  padding: 8px 20px !important;
-  font-size: 0.8rem !important;
+  /* 헤더 CTA 가 다른 메뉴에 비해 너무 컸다 — 승리 요청으로 줄인다(2026-11-05).
+     글자 크기와 좌우 여백을 함께 줄여 폭이 줄게 한다. nowrap·flex-shrink 는 A-069 그대로. */
+  padding: 6px 13px !important;
+  font-size: 0.68rem !important;
   letter-spacing: 0.02em;
   transition: background 0.2s !important;
   white-space: nowrap;
@@ -2340,8 +2342,21 @@ body .logo-sub {
   font-family: 'Inter','Noto Sans KR',sans-serif;
   font-size: 0.58rem; font-weight: 400; letter-spacing: 0.26em;
   color: var(--gray-700);   /* A-164: gray-500 은 크림 위 3.01:1 로 AA 미달 */
+  /* 로고 부제가 한 글자씩 세로로 쌓이던 문제: 헤더가 빡빡해지면 flex 가 .logo 를 눌러
+     부제 폭이 11px 까지 줄었고(실측 1512px 에서 11x74px), white-space 가 normal 이라
+     글자마다 줄이 바뀌었다. 부제는 한 줄로 두고, 로고는 눌리지 않게 한다. */
+  white-space: nowrap;
 }
-.main-nav { gap: 26px; }
+/* 자리가 모자라면 글자를 쪼개지 말고 **부제를 통째로 아랫줄로** 내린다.
+   (flex-shrink:0 으로 로고를 안 줄이는 쪽은 1280px 이하에서 페이지 가로 스크롤을 만들었다 — 실측) */
+body .header .logo { flex-wrap: wrap; }
+/* 헤더 오른쪽 항목도 같은 이유로 글자가 쪼개졌다("Log In" 이 두 줄). 각 항목은 한 줄을
+   유지하고, 자리가 모자라면 항목 단위로 줄을 바꾼다 — A-014 가 좁은 폭에만 걸어 둔 규칙을
+   모든 폭으로 올린다(영문 부제가 한국어보다 길어 데스크톱에서도 같은 일이 난다). */
+body .header-actions { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+body .header-actions a, body .header-actions button { white-space: nowrap; }
+/* 영문 부제가 한국어보다 길어 헤더가 빡빡해졌다 — 메뉴 사이 간격을 조금 좁혀 자리를 돌려준다 */
+.main-nav { gap: 20px; }
 .main-nav > a, .nav-dropdown-trigger {
   font-size: 0.83rem; font-weight: 500; color: var(--gray-700);
   position: relative; transition: color .2s;
