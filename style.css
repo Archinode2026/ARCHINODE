@@ -281,15 +281,22 @@ body .topbar .lang-switch-btn:hover {
 .lang-switcher-floating .lang-switch-btn { background: var(--white); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 
 .mobile-toggle { display: none; font-size: 1.2rem; color: var(--black); }
-@media (max-width: 768px) {
+/* ── A-275: 메뉴를 햄버거로 넘기는 분기 (2026-11-05) ─────────────────────────
+   전에는 이 분기가 768px 이라, 769~1300px 구간에서 데스크톱 메뉴가 그대로 떠 있었다.
+   영어 메뉴 일곱 개가 857~963px 를 먹는데 거기에 로고(285)·오른쪽 버튼·좌우 여백(80)을
+   더하면 1024px 화면에는 애초에 안 들어간다(각 항목이 nowrap 이라 줄어들 데도 없다).
+   그래서 영어로 보면 가로 스크롤이 생겼다 — 900px 381 / 1024px 257 / 1100px 181 초과(실측).
+   한국어는 674~789px 라 대개 들어가서 눈에 덜 띄었다.
+
+   index.html 은 이미 자기 <style> 에 똑같은 1100px 분기를 갖고 있었고 그래서 혼자
+   멀쩡했다. 그 처방을 공용으로 올린다 — 이제 전 페이지가 같게 동작한다.
+   ★ 바뀌는 것: 769~1100px 에서 상단 메뉴 대신 햄버거가 뜬다. 노트북 폭이 여기 걸린다.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
   .main-nav { display: none; }
   .mobile-toggle { display: block; }
-  /* A-014: 좁은 화면에서 로고 부제·헤더 액션 글자가 세로로 쪼개지는 문제 —
-     각 항목은 한 줄을 유지하고(nowrap), 다 안 들어가면 통째로 다음 줄로 넘긴다(wrap). */
-  .header .container { flex-wrap: wrap; height: auto; min-height: var(--header-height); padding-top: 10px; padding-bottom: 10px; row-gap: 8px; }
-  .logo-sub { white-space: nowrap; }
-  .header-actions { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
-  .header-actions a, .header-actions button { white-space: nowrap; }
+  /* 햄버거를 '열었을 때' 의 모양도 같이 올라와야 한다. 이게 768px 에 남아 있으면
+     769~1100px 에서 메뉴를 열었을 때 패널이 아니라 맨 플렉스 줄로 튀어나온다. */
   .main-nav.active {
     display: flex;
     flex-direction: column;
@@ -312,6 +319,15 @@ body .topbar .lang-switch-btn:hover {
     margin-bottom: 8px;
   }
   .nav-cta { text-align: center; }
+}
+
+@media (max-width: 768px) {
+  /* A-014: 좁은 화면에서 로고 부제·헤더 액션 글자가 세로로 쪼개지는 문제 —
+     각 항목은 한 줄을 유지하고(nowrap), 다 안 들어가면 통째로 다음 줄로 넘긴다(wrap). */
+  .header .container { flex-wrap: wrap; height: auto; min-height: var(--header-height); padding-top: 10px; padding-bottom: 10px; row-gap: 8px; }
+  .logo-sub { white-space: nowrap; }
+  .header-actions { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+  .header-actions a, .header-actions button { white-space: nowrap; }
   /* A-113: 모바일 터치 타깃 44px 최소 — 푸터 링크·헤더 아이콘 버튼 */
   .footer-col ul li { margin-bottom: 4px; }
   .footer-col ul li a { display: inline-block; padding: 10px 4px; min-height: 44px; line-height: 1.2; }

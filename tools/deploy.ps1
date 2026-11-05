@@ -68,7 +68,7 @@ if (-not $NoPush -and $ahead -eq 0) {
 if ($ahead -gt 0) { $range = "origin/main..main" } else { $range = "HEAD~1..HEAD" }
 $changed = git diff --name-only --diff-filter=AM $range |
     Where-Object { $_ -match '\.(html|js|css|json|xml|txt)$' -and $_ -notmatch '^(docs|archi-diary|tools|scripts|sales|silvia|\.claude)/' }
-$rulesChanged = (git diff --name-only $range | Where-Object { $_ -eq 'firestore.rules' })
+$rulesChanged = (git diff --name-only $range | Where-Object { $_ -eq 'firestore.rules' -or $_ -eq 'storage.rules' })   # A-276: storage.rules 도 본다
 
 Write-Host "[확인] 브랜치 main · 미커밋 0 · 올릴 커밋 $ahead 개 · 대조할 정적 파일 $($changed.Count) 개" -ForegroundColor Cyan
 if ($ahead -gt 0) { git log --oneline $range | ForEach-Object { Write-Host "       $_" } }
@@ -102,7 +102,12 @@ if ($adminAssetsChanged) {
 if ($Rules) {
     Write-Host '[규칙] firestore.rules 를 Firebase 에 게시합니다 (프로젝트 archinode-8ab04). 넓히기/좁히기를 컬렉션마다 나눠 판단했습니까?' -ForegroundColor Yellow
     $log = Join-Path $env:TEMP 'archinode-deploy-rules.log'
-    npx firebase-tools deploy --only firestore:rules --project archinode-8ab04 | Tee-Object -FilePath $log | Out-Host
+    # A-276(2026-11-05): storage.rules 도 함께 게시한다. 전에는 firestore 만 올려서,
+    # Storage 규칙을 고쳐 놓고 따로 올리는 걸 잊어 "고쳤는데 그대로" 가 났다.
+    $targets = 'firestore:rules'
+    if (Test-Path (Join-Path $PSScriptRoot '..\storage.rules')) { $targets = 'firestore:rules,storage' }
+    Write-Host "[규칙] 대상: $targets" -ForegroundColor Yellow
+    npx firebase-tools deploy --only $targets --project archinode-8ab04 | Tee-Object -FilePath $log | Out-Host
     $rtext = ''
     if (Test-Path $log) { $rtext = Get-Content $log -Raw }
     if ($null -eq $rtext) { $rtext = '' }
@@ -116,7 +121,7 @@ if ($Rules) {
 if ($rulesChanged) {
     Write-Host ''
     Write-Host '#################################################################' -ForegroundColor Red
-    Write-Host '#  firestore.rules 가 바뀐 커밋입니다.                            #' -ForegroundColor Red
+    Write-Host '#  firestore.rules / storage.rules 가 바뀐 커밋입니다.           #' -ForegroundColor Red
     Write-Host '#  push 로는 절대 반영되지 않습니다.                              #' -ForegroundColor Red
     Write-Host '#  → 한울님이 Firebase 콘솔 > Firestore > Rules 에 전체 복사·게시  #' -ForegroundColor Red
     Write-Host '#  → 이 사실을 보고 맨 위에 적을 것                               #' -ForegroundColor Red

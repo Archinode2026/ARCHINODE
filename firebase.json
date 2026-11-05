@@ -20,11 +20,15 @@
       "**/*.xlsx",
       "**/*.docx",
       "firestore.rules",
+      "storage.rules",
       "옛사본-2026-04/**"
     ]
   },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }
