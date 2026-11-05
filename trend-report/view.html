@@ -41,6 +41,10 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#332e27; backgroun
   .article-hero h1 { font-size: 1.7rem; }
   .article-hero { padding: 40px 20px 20px; }
 }
+
+/* A-270: 번역판이 없어 원문을 내줄 때의 한 줄 */
+.ma-origin-note { font-size: 0.82rem; color: #6b6257; background: #f7f3ec;
+  border-left: 3px solid #d8cdb8; padding: 10px 14px; border-radius: 0 4px 4px 0; margin: 0 0 24px; }
 </style>
 </head>
 <body>
@@ -118,6 +122,7 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#332e27; backgroun
 <script src="../firebase-config.js"></script>
 <script src="../auth-ui.js"></script>
 <script src="../lang.js?v=20261104b"></script>
+<script src="../articles-lang.js?v=20261105a"></script>
 <script>
 (function(){
   function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -177,18 +182,43 @@ body { font-family: 'Inter','Noto Sans KR', sans-serif; color:#332e27; backgroun
         script.textContent = JSON.stringify(ld);
         document.head.appendChild(script);
     })();
-    document.getElementById('bcTitle').textContent = a.title || '—';
-    document.getElementById('aTag').textContent = a.tag || '';
-    document.getElementById('aTitle').textContent = a.title || '—';
-    var date = a.publishedAt && a.publishedAt.toDate ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : '';
-    document.getElementById('aMeta').textContent = (a.brandName||'') + (date ? ' · ' + date : '');
+    /* A-270: 이 화면은 A-259 때 빠져 있었다. 매거진 글 화면(magazine/view.html)만 고치고
+       브랜드 매거진 글 화면인 여기를 빠뜨려서, 한국어로 토글해도 영문 원문만 나왔다. */
+    function paintArticle() {
+      var side = (typeof window.artSide === 'function') ? window.artSide(a) : {
+        title: a.title, excerpt: a.excerpt, blocks: a.blocks,
+        lang: (a.lang === 'ko' ? 'ko' : 'en'), fellBack: false
+      };
+      var viewLang = (typeof window.artViewLang === 'function') ? window.artViewLang()
+                   : (document.documentElement.lang === 'ko' ? 'ko' : 'en');
+      document.getElementById('bcTitle').textContent = side.title || '—';
+      document.getElementById('aTag').textContent = a.tag || '';
+      document.getElementById('aTitle').textContent = side.title || '—';
+      // 날짜도 보는 언어를 따른다 (전에는 늘 ko-KR 이었다).
+      var date = a.publishedAt && a.publishedAt.toDate
+        ? a.publishedAt.toDate().toLocaleDateString(viewLang === 'ko' ? 'ko-KR' : 'en-US') : '';
+      document.getElementById('aMeta').textContent = (a.brandName||'') + (date ? ' · ' + date : '');
 
-    if (a.coverImage) {
-      document.getElementById('aCoverImg').src = a.coverImage;
-      document.getElementById('aCoverImg').alt = a.title || '';
-      document.getElementById('aCover').style.display = 'block';
+      if (a.coverImage) {
+        document.getElementById('aCoverImg').src = a.coverImage;
+        document.getElementById('aCoverImg').alt = side.title || '';
+        document.getElementById('aCover').style.display = 'block';
+      }
+
+      // 번역판이 없으면 원문을 주되 말없이 내밀지 않는다 — 번역이 깨진 줄 알기 때문이다.
+      var note = '';
+      if (side.fellBack && typeof window.artFallbackNote === 'function') {
+        var n = window.artFallbackNote(side.lang);
+        note = '<p class="ma-origin-note" data-en="' + n.en.replace(/"/g,'&quot;') + '" data-ko="' + n.ko.replace(/"/g,'&quot;') + '">'
+             + (viewLang === 'ko' ? n.ko : n.en) + '</p>';
+      }
+      document.getElementById('aBody').innerHTML = note + renderBlocks(side.blocks);
+
+      document.getElementById('metaTitle').textContent = (side.title || 'Article') + ' | ARCHINODE Brand Magazine';
+      document.getElementById('ogTitle').setAttribute('content', (side.title || 'Article') + ' | ARCHINODE Brand Magazine');
     }
-    document.getElementById('aBody').innerHTML = renderBlocks(a.blocks);
+    paintArticle();
+    document.addEventListener('archinode:lang', paintArticle);
     showArticle();
   }).catch(function(err){
     console.warn('article load failed', err);

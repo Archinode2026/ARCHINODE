@@ -36,6 +36,16 @@ function adm_installApp() {
     });
 }
 
+/* A-269(2026-11-05): 글 다루는 메뉴를 하나로 모았다.
+   뺀 것 — 「브랜드 › 아티클」(dashboard 탭): 같은 articles 컬렉션을 표로 보여 주는 두 번째
+     화면이었는데, 번역 편집기도 검토 단계(pending→reviewing→approved)도 없어서 기능이
+     모자란 쪽이었다. 실제로 본문이 안 보이고(A-267) 승인해도 매거진에 안 뜨는(A-268)
+     문제가 여기서 나왔다. 탭 자체는 dashboard.html 에 남아 있으니 필요하면 되살리면 된다.
+   뺀 것 — 「접수 › 트렌드 투고」: trend-submissions 컬렉션에 **쓰는 코드가 사이트에 없다.**
+     옛 방문자 투고 폼이 사라지고 브랜드 포털 블록 에디터(→ articles)로 옮겨 간 뒤로
+     마지막 기록이 2026-05-12 1건이다. 컬렉션과 어드민 페이지는 그대로 두되 메뉴에서만
+     내린다 — 옛 1건을 옮길지 지울지는 따로 정한다.
+   남긴 것 — 「접수 › 매거진 아티클」(articles.html): 카드 + 번역 편집기 + 검토 단계. */
 var ADMIN_MENUS = [
     { key: 'top', en: '', ko: '', items: [
         { id: 'dashboard', en: 'Dashboard', ko: '대시보드', icon: 'fa-th-large', kind: 'view', target: 'dashboard', ready: true }
@@ -48,15 +58,13 @@ var ADMIN_MENUS = [
     { key: 'brand', en: 'Brands', ko: '브랜드', items: [
         { id: 'brands',    en: 'Brands',          ko: '브랜드',      icon: 'fa-building',     kind: 'tab',  target: 'brands',    ready: true },
         { id: 'products',  en: 'Products',        ko: '제품',        icon: 'fa-box-open',     kind: 'tab',  target: 'products',  ready: true },
-        { id: 'articles',  en: 'Articles',        ko: '아티클',      icon: 'fa-newspaper',    kind: 'tab',  target: 'articles',  ready: true },
         { id: 'prospects', en: 'Brand Prospects', ko: '브랜드 후보', icon: 'fa-search',       kind: 'view', target: 'prospects', ready: false }    // 7단계
     ] },
     { key: 'inbox', en: 'Submissions', ko: '접수', items: [
         { id: 'consultations', en: 'Consultations',      ko: '자문 요청',     icon: 'fa-comments',           kind: 'page', target: 'consultations.html',          ready: true },
-        { id: 'trend',         en: 'Trend Submissions',  ko: '트렌드 투고',   icon: 'fa-lightbulb',          kind: 'page', target: 'trend-submissions.html',      ready: true },
         { id: 'newsletter',    en: 'Newsletter',         ko: '뉴스레터',      icon: 'fa-envelope-open-text', kind: 'page', target: 'newsletter-subscribers.html', ready: true },
         { id: 'notify',        en: 'Digital Notify',     ko: '디지털 알림',   icon: 'fa-bell',               kind: 'page', target: 'notify-subscribers.html',     ready: true },
-        { id: 'articlesCards', en: 'Articles (Cards)',   ko: '아티클 카드형', icon: 'fa-th',                 kind: 'page', target: 'articles.html',               ready: true }
+        { id: 'articlesCards', en: 'Magazine Articles',  ko: '매거진 아티클', icon: 'fa-newspaper',          kind: 'page', target: 'articles.html',               ready: true }
     ] },
     { key: 'ops', en: 'Operations', ko: '운영', items: [
         { id: 'notices',     en: 'Notices',      ko: '공지사항',  icon: 'fa-bullhorn',        kind: 'view', target: 'notices',     ready: true },    // 5단계 ✓ view-notices.js

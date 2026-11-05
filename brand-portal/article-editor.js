@@ -102,6 +102,29 @@
         el.appendChild(capIn);
       }
       cont.appendChild(el);
+
+      /* A-271: 전에는 새 블록이 늘 **맨 끝**에 붙었다. 글 사이에 사진을 넣으려면 끝에 만든 뒤
+         ↑ 를 여러 번 눌러 올려야 했고, 글이 한 덩어리면 자리가 위/아래 둘뿐이라
+         "사이에 못 넣는다" 로 느껴진다. 블록마다 '여기 아래' 추가 단추를 둔다. */
+      const ins = document.createElement('div');
+      ins.style.cssText = 'display:flex;gap:6px;justify-content:center;margin:6px 0 10px;';
+      [['text', '＋ 글', '이 블록 아래에 글 블록 넣기'],
+       ['image', '＋ 사진', '이 블록 아래에 사진 블록 넣기']].forEach(pair => {
+        const ib = document.createElement('button');
+        ib.type = 'button';
+        ib.textContent = pair[1];
+        ib.title = pair[2];
+        ib.style.cssText = 'background:#fff;border:1px dashed #cfc6b6;color:#7a6f5d;border-radius:4px;'
+          + 'padding:3px 14px;font-size:0.74rem;cursor:pointer;';
+        ib.addEventListener('click', () => {
+          blocks.splice(i + 1, 0, pair[0] === 'text'
+            ? { type: 'text', content: '' }
+            : { type: 'image', url: '', alt: '', caption: '' });
+          render();
+        });
+        ins.appendChild(ib);
+      });
+      cont.appendChild(ins);
     });
   }
 
