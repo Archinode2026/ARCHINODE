@@ -172,8 +172,16 @@ tr:hover { background: var(--gray-50); }
         <a href="newsletter-subscribers.html" style="display:none;font-size:0.82rem;color:#6b6459;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#c9a36a'" onmouseout="this.style.color='#b5ab9b'"><i class="fas fa-envelope-open-text"></i> Newsletter</a>
         <a href="articles.html" style="display:none;font-size:0.82rem;color:#6b6459;font-weight:500;text-decoration:none;padding:6px 10px;border-radius:3px;" onmouseover="this.style.color='#c9a36a'" onmouseout="this.style.color='#b5ab9b'"><i class="fas fa-newspaper"></i> Articles</a>
         <span class="admin-email" id="adminEmail"></span>
-        <a href="../auth/login.html" style="font-size:0.82rem;color:#c9a36a;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
-        <!-- R-043: 다른 어드민 7개 화면과 포털·내 계정은 모두 span 짝이 있는데 여기만 맨 글자였다 -->
+        <!-- A-295(2026-11-05): 「Log In」 앵커를 들어냈다.
+             ① 이 화면은 비로그인이면 auth/login.html 로 리다이렉트된다 — 로그인 링크를
+                볼 수 있는 사람이 없다. 죽은 UI 였다.
+             ② 그런데도 로그인 상태에서 「Log Out」 바로 왼쪽에 떠 있었다(실측 39x21px).
+             ③ 원인은 auth-ui.js 가 아니다. auth-ui.js:52 는 `.header-actions` 를 못 찾으면
+                바로 반환하는데, 이 페이지의 헤더 컨테이너는 `<div class="right">` 다.
+                즉 **이 화면에서는 auth-ui.js 가 통째로 아무 일도 하지 않는다** —
+                A-152 의 정적 로그인 링크 숨김도 당연히 안 걸렸다.
+                대신 이 화면은 #adminEmail 과 #logoutBtn 으로 자기 헤더를 직접 관리한다.
+             (R-043: 다른 어드민 7개 화면과 포털·내 계정은 모두 span 짝이 있는데 여기만 맨 글자였다) -->
         <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-en="Log Out" data-ko="로그아웃">Log Out</span></button>
     </div>
 </div>

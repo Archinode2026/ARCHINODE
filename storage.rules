@@ -1,13 +1,21 @@
+// ★ 2026-11-05 실측으로 갱신 (A-296). 아래 두 가지는 이제 사실이 아니다 —
+//   (옛 주석) 「Storage 버킷이 아직 없어서 업로드가 404 로 멈춘다」
+//   (옛 주석) 「deploy.ps1 -Rules 는 firestore:rules 만 올린다」
+//   실제: 버킷 archinode-8ab04.firebasestorage.app 은 **존재**하고, 비인가 접근은
+//   404 가 아니라 **403 Permission denied** 다. deploy.ps1 은 A-276 이후
+//   firestore:rules,storage 를 함께 올린다.
+//   그리고 이 파일의 규칙이 **실제로 배포돼 있다** — 어드민 세션 listAll() 실측:
+//   articles/<uid>·products/<uid>·certifications/<uid> 는 성공, 루트와 임의 경로는
+//   storage/unauthorized. Firebase 기본 잠금 규칙이면 세 경로도 거부된다.
+//   ※ 404 와 403 을 가르는 것이 A-272 의 핵심이었다. 옛 주석이 그 함정을 되살려 놨었다.
 rules_version = '2';
 
 /* ══════════════════════════════════════════════════════════════════════════
    ARCHINODE — Cloud Storage 보안 규칙 (2026-11-05 신설, A-272)
 
    이 파일은 **버킷을 만든 뒤에** 쓸 수 있다. 2026-11-05 기준 프로젝트에
-   Storage 버킷이 아직 없어서 업로드가 404 로 멈춘다 — 콘솔에서 먼저 켜야 한다.
 
    게시: npx firebase-tools deploy --only storage --project archinode-8ab04
-        (tools/deploy.ps1 -Rules 는 firestore:rules 만 올린다. 아직 이 파일은 포함 안 됨.)
 
    설계
      · 쓰기는 **자기 uid 아래에만**. 경로의 {uid} 와 로그인한 사람이 같아야 한다.

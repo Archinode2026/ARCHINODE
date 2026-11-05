@@ -168,8 +168,12 @@ function set_load() {
         set_state.exists = snap.exists;
         set_state.doc = snap.exists ? (snap.data() || {}) : {};
         set_fillForm(set_state.doc);
+        /* A-293(2026-11-05): 전에는 문서가 없을 때만 이 버튼을 보였다. 그래서 2026-09-17 에
+           저장된 옛 요금제가 그대로 남았는데도 되돌릴 길이 화면에 없었다 — 코드 기본값만
+           두 번(A-278·A-281) 고치고 저장본은 그대로였다. 저장본이 코드 기본값을 **이긴다**.
+           이제 항상 보인다. 이 버튼은 입력 칸만 채우고, 저장은 「저장」 버튼이 한다. */
         var btn = document.getElementById('setDefaultsBtn');
-        if (btn) btn.style.display = snap.exists ? 'none' : '';
+        if (btn) btn.style.display = '';
         // A-215: 조건부여서 t() 로 미리 고르면 lang.js 가 못 바꾼다 — 짝으로 넘긴다
         if (snap.exists) set_msg('', '', false);
         else set_msg('No settings document yet — press "Fill defaults" to create it from the current site text.',
@@ -250,7 +254,12 @@ function set_drawUpdated() {
 // ── 「기본값 채우기」 — 문서가 없을 때만. 입력 칸만 채우고 저장은 「저장」 버튼으로(set) ──
 function set_fillDefaults() {
     set_fillForm(SET_DEFAULTS);
-    set_msg('Defaults filled from for-brands.html text — press Save to create the document.', 'for-brands.html 문구로 채웠습니다 — 「저장」을 누르면 문서가 만들어집니다.', false);
+    set_msg(set_state.exists
+        ? 'Inputs replaced with the current site text (for-brands.html). Nothing is saved until you press Save.'
+        : 'Defaults filled from for-brands.html text — press Save to create the document.',
+        set_state.exists
+        ? '현재 사이트 문구(for-brands.html)로 입력 칸을 바꿨습니다. 「저장」을 눌러야 반영됩니다.'
+        : 'for-brands.html 문구로 채웠습니다 — 「저장」을 누르면 문서가 만들어집니다.', false);
 }
 
 // ── 입력 칸 → 문서 객체 (listing·site·adminNotice 만 — 카테고리·어드민 이메일은 넣지 않는다, 계약서 2-3) ──
