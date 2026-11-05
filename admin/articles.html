@@ -246,6 +246,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
            만들어야 이미지가 제자리에 남는다. 평평한 한 칸(koreanBody)으로는 그게 안 됐다. -->
       <div class="modal-section">
         <h3><span id="trHeading">번역</span></h3>
+        <div class="editor-hint" id="trWhy" style="margin-bottom:6px;"></div>
+        <div class="editor-hint" id="trStrand" style="display:none;margin-bottom:6px;color:#8a7030;"></div>
         <div class="editor-hint" style="margin-bottom:12px;">
           여기 채운 내용이 <strong>매거진 화면에 그대로 나갑니다</strong> — 보는 사람 언어에 맞춰 자동으로 바뀝니다(A-259).
           비워 두면 원문이 나가고 「이 글은 원문만 있습니다」 안내가 붙습니다.
@@ -583,7 +585,24 @@ function trBuild(d) {
   trDoc = d;
   var p = trPrefix(d);
   var langName = p === 'ko' ? '한국어' : '영어';
+  var origName = p === 'ko' ? '영어' : '한국어';
   document.getElementById('trHeading').textContent = '번역 (' + langName + ')';
+  // A-265: 왜 이 언어를 묻는지 적어 둔다. 원문이 한국어인 글에서 「번역 (영어)」 만 보이면
+  //        한국어를 넣는 자리인 줄 알고 엉뚱한 칸에 쓰게 된다(실제로 그런 일이 있었다).
+  var why = document.getElementById('trWhy');
+  if (why) {
+    why.textContent = '이 글은 원문이 ' + origName + '라서 ' + langName + ' 판을 넣는 자리입니다. '
+                    + '원문은 위 Body 의 「Original (' + String(d.lang || '').toUpperCase() + ')」 탭에 있습니다.';
+  }
+  // 원문이 한국어인데 옛 한국어 칸에 글이 남아 있으면 알려 준다 — 여기서는 쓰이지 않는 글이다.
+  var strand = document.getElementById('trStrand');
+  if (strand) {
+    var show = (p === 'en' && d.koreanBody);
+    strand.style.display = show ? 'block' : 'none';
+    strand.textContent = show
+      ? '참고 · 옛 한국어 칸(koreanBody)에 글이 남아 있습니다. 이 글은 원문이 한국어라 그 글은 화면에 쓰이지 않습니다.'
+      : '';
+  }
   document.getElementById('trOrigTitle').textContent = d.title || '(없음)';
   document.getElementById('trOrigExcerpt').textContent = d.excerpt || '(없음)';
   document.getElementById('trTitle').value = d[p + 'Title'] || '';
