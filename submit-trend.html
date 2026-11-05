@@ -116,7 +116,7 @@
     <p style="color:#666; line-height:1.7; margin-bottom:32px;" data-en="If your brand is not yet listed, register first. If you are already approved, log in to the Brand Portal." data-ko="아직 입점 전이라면 먼저 신청하세요. 이미 승인된 브랜드라면 포털에 로그인하세요.">If your brand is not yet listed, register first. If you are already approved, log in to the Brand Portal.</p>
     <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
       <a href="list-your-brand.html" style="display:inline-block; padding:14px 32px; background:#332e27; color:#fff; font-size:0.9rem; font-weight:600; text-decoration:none; border-radius:6px;" data-en="List Your Brand →" data-ko="브랜드 입점 신청 →">List Your Brand →</a>
-      <a href="auth/login.html" style="display:inline-block; padding:14px 32px; background:#7a5c32; color:#fff; font-size:0.9rem; font-weight:600; text-decoration:none; border-radius:6px;" data-en="Brand Portal Login" data-ko="브랜드 포털 로그인">Brand Portal Login</a>
+      <a href="auth/login.html" id="stPortalCta" style="display:inline-block; padding:14px 32px; background:#7a5c32; color:#fff; font-size:0.9rem; font-weight:600; text-decoration:none; border-radius:6px;" data-en="Brand Portal Login" data-ko="브랜드 포털 로그인">Brand Portal Login</a>
     </div>
     <p style="margin-top:32px; font-size:0.84rem; color:#6b6459;"><a href="magazine.html" style="color:#666; text-decoration:underline;" data-en="Browse existing articles at the Brand Magazine." data-ko="브랜드 매거진에서 기존 글 둘러보기">Browse existing articles at the Brand Magazine.</a></p>
   </div>
@@ -172,8 +172,49 @@ document.addEventListener('click', function(e) {
   }
 });
 function toggleMobile() { document.getElementById('mainNav').classList.toggle('active'); }
+
 </script>
+<!-- A-266: 이 페이지만 Firebase 를 안 싣고 있어서 로그인 여부를 알 방법이 없었다.
+     그래서 로그인한 채로 들어와도 헤더에 늘 「로그인」 이 떠 로그아웃된 것처럼 보였다.
+     다른 공개 페이지와 같은 순서로 싣는다(SDK → config → auth-ui). -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script src="lang.js?v=20261104b"></script>
+<script src="auth-ui.js"></script>
+<script>
+/* A-266: 이 페이지는 「입점 → 승인 → 로그인 → 글쓰기」 를 설명한다. 이미 로그인한 브랜드에게
+   「브랜드 포털 로그인」 이라고 말하면 한 단계 뒤로 보내는 셈이라, 바로 포털로 보낸다.
+   ★ 문구는 data-en/data-ko 로 단다 — 이 함수는 lang.js 가 언어를 세우기 전에 돌 수 있다(A-222). */
+if (typeof auth !== 'undefined' && auth && auth.onAuthStateChanged) {
+  auth.onAuthStateChanged(async function(user) {
+    var cta = document.getElementById('stPortalCta');
+    if (!cta) return;
+
+    function setCta(href, en, ko) {
+      cta.href = href;
+      cta.setAttribute('data-en', en);
+      cta.setAttribute('data-ko', ko);
+      cta.textContent = (document.documentElement.lang !== 'en') ? ko : en;
+      if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+    }
+
+    if (!user) { setCta('auth/login.html', 'Brand Portal Login', '브랜드 포털 로그인'); return; }
+
+    // A-194 와 같은 원칙: 브랜드인지 **확인한** 때만 단정한다. 못 보면 기본값을 둔다 —
+    // 브랜드가 아닌 회원을 포털로 보내면 들어가자마자 튕긴다.
+    if (typeof db === 'undefined' || !db) return;
+    try {
+      var doc = await db.collection('brands').doc(user.uid).get();
+      if (doc.exists) setCta('brand-portal/dashboard.html', 'Open your Brand Portal', '브랜드 포털 열기');
+      else            setCta('auth/profile.html',           'Go to my account',       '내 계정으로');
+    } catch (e) {
+      console.warn('submit-trend: brand lookup failed', e);   // 기본값(로그인) 그대로 둔다
+    }
+  });
+}
+</script>
 <script src="cookie-consent.js?v=20260630" defer></script>
 <script src="analytics-loader.js?v=20260630" defer></script>
 <script src="sentry-loader.js?v=20260630" defer></script>
