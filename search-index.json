@@ -28,7 +28,7 @@
     "name_en": "ARCHINODE Digital Products",
     "name_ko": "ARCHINODE 디지털 상품",
     "desc_en": "Generic CAD libraries don",
-    "desc_ko": "일반 CAD 라이브러리는 한국 시장을 모릅니다. 일반 브랜드 매거진은 건축·디자인 실무를 모릅니다. ARCHINODE는 그 중간에 있습니다 — 12년의 밀라노–서울 파트너십을 도면·블록·리포트로 정리해 실제 작업을 돕습니다.",
+    "desc_ko": "일반 CAD 라이브러리는 한국 시장을 모릅니다. 일반 브랜드 아티클은 건축·디자인 실무를 모릅니다. ARCHINODE는 그 중간에 있습니다 — 12년의 밀라노–서울 파트너십을 도면·블록·리포트로 정리해 실제 작업을 돕습니다.",
     "url": "digital-products.html"
   },
   {
@@ -73,10 +73,10 @@
   },
   {
     "type": "page",
-    "name_en": "Brand Magazine",
-    "name_ko": "브랜드 매거진",
-    "desc_en": "ARCHINODE Brand Magazine — 유럽 디자인 브랜드가 직접 발행하는 브랜드 매거진. 박람회 인사이트, 신제품, 브랜드 스피릿을 한국 건축가·디자이너에게 전합니다.",
-    "desc_ko": "ARCHINODE Brand Magazine — 유럽 디자인 브랜드가 직접 발행하는 브랜드 매거진. 박람회 인사이트, 신제품, 브랜드 스피릿을 한국 건축가·디자이너에게 전합니다.",
+    "name_en": "Brand Articles",
+    "name_ko": "브랜드 아티클",
+    "desc_en": "ARCHINODE Brand Articles — 유럽 디자인 브랜드가 직접 발행하는 브랜드 아티클. 박람회 인사이트, 신제품, 브랜드 스피릿을 한국 건축가·디자이너에게 전합니다.",
+    "desc_ko": "ARCHINODE Brand Articles — 유럽 디자인 브랜드가 직접 발행하는 브랜드 아티클. 박람회 인사이트, 신제품, 브랜드 스피릿을 한국 건축가·디자이너에게 전합니다.",
     "url": "trend-report.html"
   },
   {

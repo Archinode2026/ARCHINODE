@@ -177,7 +177,7 @@
       brand: { en: 'Brand', ko: '브랜드' },
       magazine: { en: 'Magazine', ko: '매거진' },
       article: { en: 'Magazine', ko: '매거진' },               // A-073: 인덱스는 article로 저장, 표시는 Magazine
-      'trend-report': { en: 'Brand Magazine', ko: '브랜드 매거진' },
+      'trend-report': { en: 'Brand Articles', ko: '브랜드 아티클' },
       page: { en: 'Page', ko: '페이지' }
     };
     var l = labels[type] || { en: type, ko: type };

@@ -3357,3 +3357,12 @@ body.mag .cta-listing p  { max-width: 60ch; word-break: keep-all; }
   body .logo { flex-wrap: wrap; }
   body .logo-sub { white-space: normal; flex-basis: 100%; margin-left: 0; line-height: 1.4; }
 }
+
+/* A-316(2026-11-06): 푸터의 죽은 소셜 아이콘 4개를 문의 한 줄로 바꿨다.
+   계정이 생기면 .footer-social 을 되살리면 된다 — 그 규칙은 남겨 두었다. */
+.footer-contact a {
+  font-size: 0.8rem; color: var(--gray-500); text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.18); padding-bottom: 2px;
+  transition: color 0.3s, border-color 0.3s;
+}
+.footer-contact a:hover { color: var(--white); border-color: var(--white); }

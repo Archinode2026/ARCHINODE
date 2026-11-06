@@ -191,7 +191,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 @media (max-width: 768px) {
     .field-row { grid-template-columns: 1fr; }
     .product-grid { grid-template-columns: 1fr; }
-    /* A-039: 좁은 화면에서 탭("제품"·"브랜드 매거진" 등) 글자가 세로로 쪼개지는 문제 —
+    /* A-039: 좁은 화면에서 탭("제품"·"브랜드 아티클" 등) 글자가 세로로 쪼개지는 문제 —
        탭 폭을 고정 flex로 욱여넣지 않고 한 줄을 유지한 채(nowrap) 가로 스크롤을 허용한다. */
     .tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .tab { white-space: nowrap; flex: 0 0 auto; }
@@ -289,7 +289,7 @@ h1, h2, .section-card h2 {
     <div class="tabs">
         <div class="tab active" data-tab="brand" data-en="Brand Info" data-ko="브랜드 정보">Brand Info</div>
         <div class="tab" data-tab="products" data-en="Products" data-ko="제품">Products</div>
-        <div class="tab" data-tab="magazine" data-en="Brand Magazine" data-ko="브랜드 매거진">Magazine</div>
+        <div class="tab" data-tab="magazine" data-en="Brand Articles" data-ko="브랜드 아티클">Magazine</div>
         <div class="tab" data-tab="inbox" data-en="Inbox" data-ko="인박스">Inbox <span class="tab-badge" id="inboxBadge" style="display:none;"></span></div>
         <div class="tab" data-tab="support" data-en="Support" data-ko="문의">Support <span class="tab-badge" id="supportBadge" style="display:none;"></span></div>
         <div class="tab" data-tab="settings" data-en="Settings" data-ko="설정">Settings</div>
