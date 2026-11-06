@@ -317,6 +317,10 @@ fadeEls.forEach(el => fadeObserver.observe(el));
 </script>
 <script src="search.js"></script>
 <script src="lang.js?v=20261104b"></script>
+<!-- A-347(2026-11-06): 목록 카드도 보는 사람 언어로. A-259 는 기사 **본문**만 갈랐고
+     이 화면의 카드 제목·요약은 늘 원문 그대로였다 — 한국어로 보다가 영어 제목을 누르면
+     본문만 한국어로 나왔다. artSide() 는 articles-lang.js 에 있다. -->
+<script src="articles-lang.js?v=20261105a"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -335,17 +339,25 @@ fadeEls.forEach(el => fadeObserver.observe(el));
      그대로 통과해 src 에 들어갔다(실측). URL 은 스킴을 따로 봐야 한다. */
   function safeUrl(u){ return (u && /^https?:\/\//i.test(String(u))) ? String(u) : ''; }
   function cardHtml(id, a) {
+    // A-347: 보는 사람 언어의 판을 고른다. 번역판이 없으면 artSide 가 원문을 돌려준다.
+    var side = (typeof window.artSide === 'function') ? window.artSide(a) : a;
+    var viewLang = (typeof window.artViewLang === 'function') ? window.artViewLang()
+                 : (document.documentElement.lang === 'ko' ? 'ko' : 'en');
     var img = safeUrl(a.coverImage) || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80';   // A-218
-    var date = a.publishedAt && a.publishedAt.toDate ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : '';
+    // A-347: 날짜도 보는 언어를 따른다 — 전에는 늘 ko-KR 이라 영어로 봐도 한국식이었다(A-252 와 같은 결).
+    var date = a.publishedAt && a.publishedAt.toDate
+             ? a.publishedAt.toDate().toLocaleDateString(viewLang === 'ko' ? 'ko-KR' : 'en-US') : '';
     var tagHtml = a.tag ? '<span class="article-card-tag">' + esc(a.tag) + '</span>' : '';
     return '<a href="magazine/view.html?id=' + esc(id) + '" class="article-card">' +
-      '<div class="article-card-img"><img src="' + esc(img) + '" alt="' + esc(a.title) + '" loading="lazy">' + tagHtml + '</div>' +
-      '<div class="article-card-body"><h3>' + esc(a.title) + '</h3>' +
-      '<p>' + esc((a.excerpt||'').substring(0,140)) + '</p>' +
+      '<div class="article-card-img"><img src="' + esc(img) + '" alt="' + esc(side.title) + '" loading="lazy">' + tagHtml + '</div>' +
+      '<div class="article-card-body"><h3>' + esc(side.title) + '</h3>' +
+      '<p>' + esc((side.excerpt||'').substring(0,140)) + '</p>' +
       '<div class="article-card-date">' + esc(a.brandName||'') + (date ? ' · ' + date : '') + '</div>' +
       '</div></a>';
   }
+  var _lastRows = null;   // A-347: 언어가 바뀌면 이걸로 다시 그린다
   function render(rows) {
+    _lastRows = rows;
     if (errBox) errBox.style.display='none';
     if (!rows.length) { grid.style.display='none'; if (empty) empty.style.display='block'; return; }
     if (empty) empty.style.display='none';
@@ -384,6 +396,12 @@ fadeEls.forEach(el => fadeObserver.observe(el));
   }, function(err){
     if (err && err.code === 'failed-precondition') { fallbackLoad(err); return; }
     showError(err);
+  });
+
+  /* A-347: 카드는 innerHTML 로 그려 넣은 것이라 data-en/data-ko 가 닿지 않는다.
+     언어가 바뀌면 신호를 받아 목록을 통째로 다시 그린다(A-259 가 본문에 쓴 방식과 같다). */
+  document.addEventListener('archinode:lang', function() {
+    if (_lastRows) render(_lastRows);
   });
 })();
 </script>

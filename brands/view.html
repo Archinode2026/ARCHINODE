@@ -459,6 +459,8 @@
 <script src="../lead-notify.js?v=20261105d"></script>
 <script src="../search.js"></script>
 <script src="../lang.js?v=20261104b"></script>
+<!-- A-347(2026-11-06): 브랜드 아티클 카드도 보는 사람 언어로. artSide() 는 articles-lang.js. -->
+<script src="../articles-lang.js?v=20261105a"></script>
 <script src="../auth-ui.js"></script>
 <script>
 // XSS 방어: 사용자(브랜드)가 입력한 텍스트를 화면에 넣기 전 이스케이프 (A-003)
@@ -563,6 +565,18 @@ async function loadBrand() {
 
         // 페이지 렌더링
         renderBrand(brand, products, articles);
+
+        /* A-347: 이 화면은 innerHTML 로 통째로 그려 넣어서 data-en/data-ko 가 닿지 않는다.
+           언어가 바뀌면 같은 자료로 다시 그리고, 새로 박힌 data-en/ko 를 applyLangAgain() 으로
+           한 번 칠한다. renderBrand 는 contentDiv.innerHTML 만 쓰는 순수 렌더라 다시 불러도
+           듣는 쪽이 겹치지 않는다(단추는 전부 인라인 onclick). */
+        window.__brandView = { brand: brand, products: products, articles: articles };
+        document.addEventListener('archinode:lang', function() {
+            var v = window.__brandView;
+            if (!v) return;
+            renderBrand(v.brand, v.products, v.articles);
+            if (typeof window.applyLangAgain === 'function') window.applyLangAgain();
+        });
 
     } catch (error) {
         console.error('Error loading brand:', error);
@@ -676,11 +690,17 @@ function renderBrand(brand, products, articles) {
     let articlesHtml = '';
     if (articles.length > 0) {
         const articleCards = articles.map(a => {
-            const aTitle = escapeHtml(a.title || 'Untitled');
-            const aExcerpt = escapeHtml((a.excerpt || '').substring(0, 140));
+            // A-347: 보는 사람 언어의 판. 번역판이 없으면 artSide 가 원문을 돌려준다.
+            const aSide = (typeof window.artSide === 'function') ? window.artSide(a) : a;
+            const aViewLang = (typeof window.artViewLang === 'function') ? window.artViewLang()
+                            : (document.documentElement.lang === 'ko' ? 'ko' : 'en');
+            const aTitle = escapeHtml(aSide.title || 'Untitled');
+            const aExcerpt = escapeHtml((aSide.excerpt || '').substring(0, 140));
             const aImg = escapeHtml(a.coverImage || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80');
             const aTag = a.tag ? `<span class="article-card-tag">${escapeHtml(a.tag)}</span>` : '';
-            const aDate = (a.publishedAt && a.publishedAt.toDate) ? a.publishedAt.toDate().toLocaleDateString('ko-KR') : '';
+            // A-347: 날짜도 보는 언어를 따른다 (A-252 와 같은 결).
+            const aDate = (a.publishedAt && a.publishedAt.toDate)
+                        ? a.publishedAt.toDate().toLocaleDateString(aViewLang === 'ko' ? 'ko-KR' : 'en-US') : '';
             return `
             <a href="../magazine/view.html?id=${escapeHtml(a.id)}" class="article-card fade-in">
                 <div class="article-card-img"><img loading="lazy" src="${aImg}" alt="${aTitle}">${aTag}</div>
