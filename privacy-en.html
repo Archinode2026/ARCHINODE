@@ -459,6 +459,50 @@
             }
         }
 
+        /* ───────────────────────────────────────────────────────────────────
+           A-327(2026-11-06): 이 페이지는 style.css 를 싣지 않는다. 자체 <style>
+           만으로 서는 페이지라서, 공용으로 올린 처방이 **전부 비껴갔다**:
+             A-275 — 메뉴 분기를 768px → 1100px 로 올린 것
+                     (영어 메뉴 7개가 857~963px 를 먹어 1024px 에 안 들어간다)
+             A-286 — 그 구간에서 햄버거 최소 타깃 44x44
+           그래서 769~1100px 에서 이 페이지만 데스크톱 메뉴를 띄우고 가로
+           스크롤이 났고(1000px 에서 226px 초과, 브론즈 라이브 실측),
+           ≤768px 햄버거가 14x19px 였다. 같은 문서의 한국어판(privacy.html)은
+           style.css 를 실어 둘 다 정상이다 — 대조군이 바로 옆에 있었다.
+
+           아래 1100px 블록은 **위 768px 블록 뒤에** 둔다. 폭이 겹치는 구간에서
+           같은 특이성이면 나중 선언이 이기므로, ≤768px 에서도 햄버거가
+           44x44 로 보장된다. 로고·제목 크기 같은 768px 전용 규칙은 그대로
+           둔다(1100px 에서 로고가 줄면 노트북에서 어색해진다).
+           ─────────────────────────────────────────────────────────────────── */
+        @media (max-width: 1100px) {
+            .main-nav {
+                display: none;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background-color: #fff;
+                border-top: 1px solid #e0e0e0;
+                padding: 20px;
+                gap: 20px;
+                z-index: 999;
+            }
+
+            .main-nav.active {
+                display: flex;
+            }
+
+            .mobile-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 44px;
+                min-height: 44px;
+            }
+        }
+
         .scroll-to-top {
             position: fixed;
             bottom: 30px;

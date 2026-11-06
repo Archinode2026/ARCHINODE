@@ -275,5 +275,36 @@ async function bdLoad() {
 
 bdLoad();
 </script>
+
+<!-- ───────────────────────────────────────────────────────────────────────────
+     A-328(2026-11-06): 이 페이지는 헤더에 **카테고리 드롭다운 단추와 모바일
+     햄버거 단추를 둘 다 갖고 있는데, 두 함수가 어디에도 없었다.**
+     공용 JS 가 아니라 **페이지마다 인라인으로 정의**하는 함수들이라(230개
+     페이지가 각자 갖고 있다) 이 페이지만 빠진 것이다.
+
+     결과: 드롭다운은 눌러도 안 열리고, **휴대폰에서는 메뉴가 아예 안 열렸다**
+     — 그 폭에서 .main-nav 는 display:none 이고 햄버거가 메뉴에 닿는 유일한
+     길이다(A-275/A-286). 즉 모바일에서 이 페이지는 내비게이션이 없었다.
+
+     내가 전에 toggleMobile() 을 src 스크립트 안에 넣어 똑같이 죽인 적이 있다.
+     그때는 「넣은 자리가 틀렸다」였고 이번은 「아예 없었다」지만, 증상과 원인
+     계열은 같다 — 단추는 보이는데 손이 없다. brands.html 의 구현을 그대로
+     옮긴다. (브론즈 9차가 헤더를 전수로 훑다 드러난 자리)
+     ─────────────────────────────────────────────────────────────────────── -->
+<script>
+function toggleCatMenu() {
+  const menu = document.getElementById('catMenu');
+  if (menu) menu.classList.toggle('active');
+}
+document.addEventListener('click', function(e) {
+  const dropdown = document.querySelector('.nav-dropdown');
+  const menu = document.getElementById('catMenu');
+  if (dropdown && menu && !dropdown.contains(e.target)) menu.classList.remove('active');
+});
+function toggleMobile() {
+  const nav = document.getElementById('mainNav');
+  if (nav) nav.classList.toggle('active');
+}
+</script>
 </body>
 </html>
