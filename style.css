@@ -2845,8 +2845,10 @@ body.home .editorial-card-side h3 {
 html[lang="ko"] .photo-band h2 { letter-spacing: -0.005em; }
 
 /* ── 서비스 — 칸막이가 아니라 리듬으로 ── */
+/* A-342: 카드 2개가 한국어 화면에서 빠지므로 4열 고정이면 오른쪽 절반이 빈다.
+   auto-fit 으로 바꿔 남은 카드 수에 맞춰 접히게 한다 — 영어(4개)는 전과 같이 4열. */
 body.home .services-grid, body.home .services .services-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0;
   border-top: 1px solid var(--rule);
 }
 body.home .service-item {

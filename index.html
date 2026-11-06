@@ -1127,12 +1127,16 @@ input, select, textarea { font-family: inherit; }
 <section class="services">
   <div class="container">
     <div class="services-grid">
-      <div class="service-item fade-in">
+      <!-- A-342(2026-11-06): 승리님 결정 — 딜러 신뢰성·감시 이야기는 한국 스펙라이터에게
+           노출하지 않는다. 돈을 내는 쪽은 브랜드이고, 이건 돈을 내면 받는 서비스의
+           설명이기 때문이다. 한국 딜러가 자기 모국어로 「당신이 계약을 지키는지
+           지속적으로 모니터링합니다」를 읽는 구조이기도 했다. -->
+      <div class="service-item fade-in" data-lang-only="en">
         <i class="fas fa-handshake"></i>
         <h4 data-en="Dealership Screening" data-ko="딜러십 검증">Dealership Screening</h4>
         <p data-en="We verify and evaluate potential Korean dealers on behalf of global brands." data-ko="글로벌 브랜드를 대신하여 한국 딜러 후보를 검증하고 평가합니다.">We verify and evaluate potential Korean dealers on behalf of global brands.</p>
       </div>
-      <div class="service-item fade-in">
+      <div class="service-item fade-in" data-lang-only="en">
         <i class="fas fa-eye"></i>
         <h4 data-en="Dealer Monitoring" data-ko="딜러 모니터링">Dealer Monitoring</h4>
         <p data-en="Ongoing compliance monitoring for dealership agreements in Korea." data-ko="한국 내 딜러십 계약 이행을 지속적으로 모니터링합니다.">Ongoing compliance monitoring for dealership agreements in Korea.</p>
