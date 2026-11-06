@@ -181,9 +181,16 @@ service cloud.firestore {
       // 생성: 인증된 사용자가 본인 brandId로만, status는 'pending'
       // (어드민이 직접 발행 시에는 별도로 approved 가능 — 어드민은 update로 status 변경)
       // 2026-11-02: isApprovedBrand() 추가 — 정지·거절·대기 브랜드는 신규 매거진 글 제출 불가
-      allow create: if isApprovedBrand(request.resource.data.brandId)
-                    && isNewStatusPending()
-                    && request.resource.data.title is string;
+      // A-315(2026-11-06): isAdmin() 이 빠져 있었다. 바로 위 주석은 「어드민이 직접 발행 시에는
+      //   별도로 approved 가능」이라고 적고 있는데 **규칙이 그걸 허용하지 않았다** — 주석과 규칙이
+      //   어긋나 있었고, 실무적으로 **편집부가 기사를 직접 올릴 경로가 없었다**(정적 파일로만 가능).
+      //   브론즈가 어드민 세션으로 두 가지 brandId 를 시도해 둘 다 permission-denied 로 실측했다:
+      //     brandId = 브랜드 uid → isApprovedBrand() 가 request.auth.uid == uid 를 요구해 실패
+      //     brandId = 어드민 uid → brands/{adminUid} 문서가 없어 get() 실패
+      allow create: if isAdmin()
+                    || (isApprovedBrand(request.resource.data.brandId)
+                        && isNewStatusPending()
+                        && request.resource.data.title is string);
 
       // 수정: 소유 브랜드 또는 어드민. status·brandId·createdAt 보호
       // 2026-11-02: isApprovedBrand() 추가 — 정지된 브랜드는 자기 매거진 글도 더 이상 수정할 수 없다

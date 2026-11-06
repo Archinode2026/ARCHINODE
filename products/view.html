@@ -404,23 +404,40 @@ function escapeHtml(str) {
 }
 
 const params = new URLSearchParams(window.location.search);
-const productSlug = params.get('id');
+const productKey = params.get('id');   // A-314: docId 우선, 옛 slug 주소도 받는다
 const contentDiv = document.getElementById('productContent');
 const loadingDiv = document.getElementById('loadingState');
 
 async function loadProduct() {
-    if (!productSlug) { showError('제품을 찾을 수 없습니다', 'URL에 제품 ID가 없습니다.'); return; }
+    if (!productKey) { showError('제품을 찾을 수 없습니다', 'URL에 제품 ID가 없습니다.'); return; }
 
     try {
-        const snap = await db.collection('products')
-            .where('slug', '==', productSlug)
-            .where('status', '==', 'approved')
-            .limit(1)
-            .get();
+        /* A-314(2026-11-06): A-291 에서 기사 화면을 docId 우선 + slug 폴백으로 바꿨는데
+           **제품 화면에는 같은 처방을 하지 않았다.** 그래서 어드민에서 docId 를 복사해
+           열면 「제품을 찾을 수 없습니다」가 떴다(브론즈 실측). 같은 유형의 두 상세
+           화면이 또 어긋난 것이다. 사이트 내부 링크는 slug 로 일관돼 있어 사용자
+           경로는 멀쩡했지만, 체계가 반만 적용된 상태였다.
+           ★ doc().get() 은 status 필터를 거치지 않으므로 직접 확인한다.
+           ★ 없는 문서 읽기는 규칙이 permission-denied 로 던지므로(resource 가 null)
+             docId 시도만 따로 try/catch 로 감싼다 — 안 그러면 slug 폴백이 영영 안 돈다. */
+        let docSnap = null;
+        try {
+            const byId = await db.collection('products').doc(productKey).get();
+            if (byId.exists) docSnap = byId;
+        } catch (e) { /* 키가 slug 면 여기로 떨어진다 — 삼키고 slug 조회로 */ }
+        if (!docSnap) {
+            const snap = await db.collection('products')
+                .where('slug', '==', productKey)
+                .where('status', '==', 'approved')
+                .limit(1)
+                .get();
+            if (!snap.empty) docSnap = snap.docs[0];
+        }
 
-        if (snap.empty) { showError('제품을 찾을 수 없습니다', '요청하신 제품이 존재하지 않거나 아직 검토 중입니다.'); return; }
+        if (!docSnap) { showError('제품을 찾을 수 없습니다', '요청하신 제품이 존재하지 않거나 아직 검토 중입니다.'); return; }
+        if ((docSnap.data() || {}).status !== 'approved') { showError('제품을 찾을 수 없습니다', '요청하신 제품이 존재하지 않거나 아직 검토 중입니다.'); return; }
 
-        const doc = snap.docs[0];
+        const doc = docSnap;
         const product = doc.data();
         currentProductDocId = doc.id;
 

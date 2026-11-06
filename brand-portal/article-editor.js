@@ -246,14 +246,32 @@
     var bodyText = '';
     (blocks || []).forEach(function (b) { if (b && b.type === 'text') bodyText += ' ' + String(b.content || ''); });
 
+    /* A-310 2차(2026-11-06): 처음엔 본문이 20자 미만이면 제목으로 폴백했는데,
+       브론즈가 반례를 냈다 — 본문 「Photos below.」(12자) + 한국어 제목이면
+       **영어 본문 글인데 제목 때문에 ko** 가 된다. 제목은 한국 시장용으로
+       지역화되는 자리라 본문보다 약한 단서다. 그래서 **본문에 글자가 거의 없을
+       때만**(사진만 올린 기사) 제목을 본다. */
     var m = langRatio(bodyText);
-    if (!m || m.letters < 20) m = langRatio(title);   // 본문이 짧으면 제목이 유일한 단서다
-    if (!m || m.letters < 8) return chosen;           // 둘 다 짧으면 판단하지 않는다
+    if (!m || m.letters < 8) m = langRatio(title);   // 본문에 글자가 거의 없을 때만
+    if (!m || m.letters < 8) return chosen;          // 둘 다 짧으면 판단하지 않는다
 
     var actual;
     if (m.ratio >= 0.35) actual = 'ko';
     else if (m.ratio <= 0.10) actual = 'en';
-    else return chosen;                                // 애매한 구간 — 고른 값을 존중한다
+    else {
+      /* A-310 2차: 혼용 구간(10~35%)은 값을 바꾸지 않는다. 다만 **침묵하지도 않는다** —
+         건축·디자인 글은 브랜드명·제품명·인명이 전부 영문이라 한국어 글도 이 비율대에
+         자주 들어온다(브론즈 예: 「Vitra 의 Eames Lounge Chair 는 …」 ratio 0.27).
+         고른 값이 기본값 `en` 인 채로 조용히 저장되면 A-305 가 고치려던 증상이 그대로다.
+         그래서 중립 안내만 띄우고 선택은 쓴 사람에게 맡긴다. */
+      if ($('artFormMsg')) {
+        $('artFormMsg').textContent = (chosen === 'ko')
+          ? '두 언어가 섞여 있습니다. 원문 언어가 「한국어」가 맞는지 확인해 주세요.'
+          : 'This article mixes both languages. Please check that the original language is correct.';
+        $('artFormMsg').style.color = '#7a5c32';
+      }
+      return chosen;
+    }
 
     if (actual !== chosen) {
       if ($('artLang')) $('artLang').value = actual;
