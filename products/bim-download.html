@@ -51,9 +51,27 @@
 <header class="header" id="header">
   <div class="container">
     <a href="../index.html" class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">건축을 잇다</span></a>
-    <nav class="main-nav" id="mainNav">
+    <nav <!-- A-318(2026-11-06): 이 페이지만 Categories 드롭다운과 Brand Articles 가 통째로 빠져
+     5항목이었다. 같은 깊이의 products/view.html 정본을 그대로 옮긴다. -->
+class="main-nav" id="mainNav">
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger" onclick="toggleCatMenu()" data-en="Categories" data-ko="카테고리">Categories <i class="fas fa-chevron-down"></i></button>
+        <div class="nav-dropdown-menu" id="catMenu">
+            <a href="../categories/furniture.html"><span>Furniture</span><small>가구</small></a>
+            <a href="../categories/bathroom.html"><span>Bathroom</span><small>욕실</small></a>
+            <a href="../categories/outdoor.html"><span>Outdoor</span><small>아웃도어</small></a>
+            <a href="../categories/lighting.html"><span>Lighting</span><small>조명</small></a>
+            <a href="../categories/kitchen.html"><span>Kitchen</span><small>주방</small></a>
+            <a href="../categories/office.html"><span>Office</span><small>오피스</small></a>
+            <a href="../categories/finishes.html"><span>Finishes</span><small>마감재</small></a>
+            <a href="../categories/wellness.html"><span>Wellness</span><small>웰니스</small></a>
+            <a href="../categories/decor.html"><span>Decor</span><small>데코</small></a>
+            <a href="../categories/construction.html"><span>Construction</span><small>건축자재</small></a>
+        </div>
+      </div>
       <a href="../brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
       <a href="../magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
+      <a href="../trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a>
       <a href="../about.html" data-en="About" data-ko="소개">About</a>
       <a href="../request-consultation.html" data-en="Consulting" data-ko="컨설팅">Consulting</a>
       <a href="../list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
