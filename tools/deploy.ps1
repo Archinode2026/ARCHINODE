@@ -22,6 +22,8 @@ param(
     [int]$MaxFiles = 8        # 해시 대조할 파일 최대 수
 )
 
+# A-351: 콘솔이 UTF-8 이 아니면 한글 커밋 메시지가 깨져 나온다(2026-11-06 실측).
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 $ErrorActionPreference = 'Stop'
 $LiveUrl = 'https://archinodekr.com'
 
@@ -104,18 +106,53 @@ if ($Rules) {
     $log = Join-Path $env:TEMP 'archinode-deploy-rules.log'
     # A-276(2026-11-05): storage.rules 도 함께 게시한다. 전에는 firestore 만 올려서,
     # Storage 규칙을 고쳐 놓고 따로 올리는 걸 잊어 "고쳤는데 그대로" 가 났다.
-    $targets = 'firestore:rules'
-    if (Test-Path (Join-Path $PSScriptRoot '..\storage.rules')) { $targets = 'firestore:rules,storage' }
-    Write-Host "[규칙] 대상: $targets" -ForegroundColor Yellow
-    npx firebase-tools deploy --only $targets --project archinode-8ab04 | Tee-Object -FilePath $log | Out-Host
+    # A-351(2026-11-06): 전에는 'firestore:rules,storage' 를 **한 번에** 올렸다. A-276 이
+    # 「Storage 규칙을 따로 올리는 걸 잊는 사고」를 막으려고 묶은 것인데, 묶는 순간
+    # **storage 쪽 실패가 firestore 까지 끌고 내려가는 단일 실패점**이 됐다.
+    # 실제로 2026-11-06 에 그 일이 났다 — CLI 가 storage 배포 전에 Storage API 사용 권한을
+    # 확인하다 403(serviceusage.serviceUsageConsumer 없음)을 받고 멈추는 바람에,
+    # 아무 문제 없던 firestore.rules 가 사흘째 미발행으로 남아 있었다(A-315·A-350).
+    # 그래서 **따로 올리고 따로 보고한다.** 중요한 쪽(firestore)을 먼저 올린다.
+    $okFs = $false; $okSt = $null
+
+    Write-Host '[규칙] (1/2) firestore:rules 게시' -ForegroundColor Yellow
+    npx firebase-tools deploy --only firestore:rules --project archinode-8ab04 | Tee-Object -FilePath $log | Out-Host
     $rtext = ''
     if (Test-Path $log) { $rtext = Get-Content $log -Raw }
     if ($null -eq $rtext) { $rtext = '' }
-    if ($LASTEXITCODE -ne 0 -or ($rtext -notmatch 'Deploy complete')) {
-        Write-Host '[실패] 규칙 게시가 끝까지 가지 못했습니다. 위 로그를 확인하고 다시 실행하세요. (push는 아직 안 했습니다)' -ForegroundColor Red
+    $okFs = ($LASTEXITCODE -eq 0 -and $rtext -match 'Deploy complete')
+    if ($okFs) { Write-Host '[규칙] firestore.rules 게시 완료.' -ForegroundColor Green }
+    else       { Write-Host '[실패] firestore.rules 게시가 끝까지 가지 못했습니다. 위 로그를 보세요.' -ForegroundColor Red }
+
+    if (Test-Path (Join-Path $PSScriptRoot '..\storage.rules')) {
+        Write-Host '[규칙] (2/2) storage 게시' -ForegroundColor Yellow
+        $logSt = Join-Path $env:TEMP 'archinode-deploy-storage.log'
+        npx firebase-tools deploy --only storage --project archinode-8ab04 | Tee-Object -FilePath $logSt | Out-Host
+        $stext = ''
+        if (Test-Path $logSt) { $stext = Get-Content $logSt -Raw }
+        if ($null -eq $stext) { $stext = '' }
+        $okSt = ($LASTEXITCODE -eq 0 -and $stext -match 'Deploy complete')
+        if ($okSt) { Write-Host '[규칙] storage.rules 게시 완료.' -ForegroundColor Green }
+        else {
+            Write-Host '' 
+            Write-Host '#################################################################' -ForegroundColor Yellow
+            Write-Host '#  storage 게시 실패 — firestore 는 위 결과대로입니다.            #' -ForegroundColor Yellow
+            Write-Host '#  403(serviceusage) 이면 GCP IAM 권한 문제입니다:                #' -ForegroundColor Yellow
+            Write-Host '#  console.developers.google.com/iam-admin/iam?project=           #' -ForegroundColor Yellow
+            Write-Host '#  archinode-8ab04 에서 roles/serviceusage.serviceUsageConsumer    #' -ForegroundColor Yellow
+            Write-Host '#  를 부여하거나, Storage 규칙은 콘솔에서 손으로 게시하세요.       #' -ForegroundColor Yellow
+            Write-Host '#################################################################' -ForegroundColor Yellow
+            Write-Host ''
+        }
+    }
+
+    if (-not $okFs) {
+        Write-Host '[중단] firestore.rules 가 안 올라갔으므로 push 하지 않습니다.' -ForegroundColor Red
         exit 1
     }
-    Write-Host '[규칙] 게시 완료.' -ForegroundColor Green
+    if ($okSt -eq $false) {
+        Write-Host '[주의] firestore 는 올라갔지만 storage 는 못 올렸습니다. 위 안내대로 따로 처리하세요.' -ForegroundColor Yellow
+    }
     $rulesChanged = $null
 }
 if ($rulesChanged) {
