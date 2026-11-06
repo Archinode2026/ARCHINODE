@@ -381,6 +381,10 @@ auth.onAuthStateChanged(async (user) => {
     if (!user) { window.location.href = '../auth/login.html?next=/admin/dashboard.html'; return; }
     if (!isAdmin(user.email)) {
         // A-202 / R-068: 네이티브 alert() 와 강제 로그아웃을 걷어냈다.
+// A-313(2026-11-06): 그때 살아남은 alert() 5곳도 showToast 로 바꿨다. 브라우저가
+//   대화상자를 억제하면 alert() 는 **아무것도 보여주지 않고 코드는 그냥 지나간다** —
+//   특히 647(사유 미입력)은 입력 검증이라 「왜 반려가 안 되지」가 된다(A-302 와 같은 계열).
+//   showToast 는 admin-core.js:97 에 이미 있고 .adm-toast 스타일도 이 화면용으로 준비돼 있다.
         // 이 계정은 인증은 됐고 권한만 없다. 실제 권한은 firestore.rules 가
         // 막으므로 여기서 로그아웃시켜 얻는 보안은 없고, 주소를 잘못 누른
         // 전문가 회원이 하던 일을 잃는다. 나머지 6개 어드민 페이지도 세션을
@@ -589,7 +593,7 @@ async function updateBrand(docId, newStatus) {
         
         await loadBrands();
     } catch (e) {
-        alert('Failed to update brand status: ' + e.message);
+        showToast((typeof t === 'function' ? t('Could not update brand status: ', '브랜드 상태를 바꾸지 못했습니다: ') : '브랜드 상태를 바꾸지 못했습니다: ') + e.message, 'error');
     }
 }
 
@@ -644,7 +648,7 @@ function openReasonModal(opts) {
         document.getElementById('reasonConfirmBtn').onclick = () => {
             const v = ta.value.trim();
             if (opts.required && v.length === 0) {
-                alert('A reason is required for this action.');
+                showToast(typeof t === 'function' ? t('A reason is required for this action.', '이 동작에는 사유를 입력해야 합니다.') : '이 동작에는 사유를 입력해야 합니다.', 'error');
                 ta.focus();
                 return;
             }
@@ -661,7 +665,7 @@ async function viewBrand(docId) {
     // 담당자가 지금 보는 것으로 착각할 위험이 있었다. 존재 확인 후 안내하고 모달을 닫는다.
     if (!doc.exists) {
         closeModal();
-        alert('This brand no longer exists — the list may be out of date. Reloading the list now.');
+        showToast(typeof t === 'function' ? t('This brand no longer exists — reloading the list.', '이 브랜드가 더 이상 없습니다 — 목록을 다시 불러옵니다.') : '이 브랜드가 더 이상 없습니다 — 목록을 다시 불러옵니다.', 'warn');
         await loadAll();
         return;
     }
@@ -796,7 +800,7 @@ async function viewProduct(docId) {
     const doc = await db.collection('products').doc(docId).get();
     if (!doc.exists) {
         closeModal();
-        alert('This product no longer exists — the list may be out of date. Reloading the list now.');
+        showToast(typeof t === 'function' ? t('This product no longer exists — reloading the list.', '이 제품이 더 이상 없습니다 — 목록을 다시 불러옵니다.') : '이 제품이 더 이상 없습니다 — 목록을 다시 불러옵니다.', 'warn');
         await loadProducts();
         return;
     }
@@ -885,7 +889,7 @@ async function viewArticle(docId) {
     // 직전에 보던 다른 글 내용이 그대로 남아 지금 것으로 착각할 위험이 있었다.
     if (!doc.exists) {
         closeModal();
-        alert('This article no longer exists — the list may be out of date. Reloading the list now.');
+        showToast(typeof t === 'function' ? t('This article no longer exists — reloading the list.', '이 기사가 더 이상 없습니다 — 목록을 다시 불러옵니다.') : '이 기사가 더 이상 없습니다 — 목록을 다시 불러옵니다.', 'warn');
         await loadAll();
         return;
     }

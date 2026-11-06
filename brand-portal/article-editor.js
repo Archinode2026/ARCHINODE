@@ -218,25 +218,51 @@
     if (blocks.some(b => b.type === 'image' && b.uploading)) return 'Wait for images to finish uploading';
     return null;
   }
-  /* A-305: 고른 언어와 실제 본문이 어긋나면 본문을 믿는다.
-     자동으로 바꾸되 **조용히 바꾸지는 않는다** — 바뀌면 폼 안내에 적어 준다.
-     판정은 한글 음절 비율 하나뿐이다(제목 + 본문 텍스트). 영문 브랜드명이나
-     제품명이 섞인 한국어 글도 보통 20%% 를 넘기므로 경계는 넉넉히 잡았다. */
+  /* A-305 → A-310(2026-11-06) 로 다시 짰다. 브론즈가 손계산으로 반례 둘을 찾았다.
+
+     첫 판은 **제목 + 본문**을 합쳐 한글 비율을 쟀다. 그래서
+     「2026 밀라노 가구 박람회 현장 리뷰」(한글 16) + 짧은 영어 본문(60자) 이
+     ratio 0.21 로 `ko` 가 됐다. 그런데 **유럽 브랜드가 영어로 쓰고 한국 시장용
+     제목만 한국어로 다는 것은 이 사업에서 자연스러운 일이다.** 제목이 본문을
+     이기면 안 된다.
+
+     그리고 첫 판은 어긋나면 **무조건** 덮어썼다. 두 언어를 일부러 섞은 글에서
+     사용자 의도를 지운다.
+
+     그래서 둘 다 바꿨다:
+       1. **본문으로 판정한다.** 본문이 짧으면 그때만 제목을 본다
+          (사진 기사처럼 본문 텍스트가 거의 없는 글은 제목이 유일한 단서다).
+       2. **분명할 때만 덮어쓴다.** 한글 35%% 이상이면 ko, 10%% 이하면 en,
+          그 사이는 **애매하므로 고른 값을 존중한다.**
+     판정을 바꿀 때는 조용히 하지 않고 폼 안내에 적는다. */
+  function langRatio(text) {
+    var letters = (String(text || '').match(/[A-Za-z\uac00-\ud7a3]/g) || []).length;
+    if (!letters) return null;
+    var han = (String(text).match(/[\uac00-\ud7a3]/g) || []).length;
+    return { letters: letters, ratio: han / letters };
+  }
   function pickLang(title, blocks) {
     var chosen = $('artLang') ? $('artLang').value : 'en';
-    var text = String(title || '');
-    (blocks || []).forEach(function (b) { if (b && b.type === 'text') text += ' ' + String(b.content || ''); });
-    var letters = (text.match(/[A-Za-z\uac00-\ud7a3]/g) || []).length;
-    if (letters < 20) return chosen;                     // 표본이 적으면 고른 값을 믿는다
-    var han = (text.match(/[\uac00-\ud7a3]/g) || []).length;
-    var ratio = han / letters;
-    var actual = ratio >= 0.2 ? 'ko' : 'en';
-    if (actual !== chosen && $('artFormMsg')) {
-      $('artFormMsg').textContent = (actual === 'ko')
-        ? '원문 언어를 한국어로 맞췄습니다(본문이 한국어입니다).'
-        : 'Original language set to English (the body is in English).';
-      $('artFormMsg').style.color = '#7a5c32';
+    var bodyText = '';
+    (blocks || []).forEach(function (b) { if (b && b.type === 'text') bodyText += ' ' + String(b.content || ''); });
+
+    var m = langRatio(bodyText);
+    if (!m || m.letters < 20) m = langRatio(title);   // 본문이 짧으면 제목이 유일한 단서다
+    if (!m || m.letters < 8) return chosen;           // 둘 다 짧으면 판단하지 않는다
+
+    var actual;
+    if (m.ratio >= 0.35) actual = 'ko';
+    else if (m.ratio <= 0.10) actual = 'en';
+    else return chosen;                                // 애매한 구간 — 고른 값을 존중한다
+
+    if (actual !== chosen) {
       if ($('artLang')) $('artLang').value = actual;
+      if ($('artFormMsg')) {
+        $('artFormMsg').textContent = (actual === 'ko')
+          ? '원문 언어를 한국어로 맞췄습니다(본문이 한국어입니다). 다르면 위에서 바꿔 주세요.'
+          : 'Original language set to English (the body is in English). Change it above if that is wrong.';
+        $('artFormMsg').style.color = '#7a5c32';
+      }
     }
     return actual;
   }
