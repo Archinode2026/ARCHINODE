@@ -542,7 +542,7 @@
         <div class="container">
             <a href="index.html" class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">Bridging Architecture<!-- A-282: 이 페이지는 lang.js 를 싣지 않는다(자체 toggleLang 으로 privacy.html 과 왕복). 그래서 data-en 이 적용될 길이 없어 마크업을 영어로 굽는다 — 사이트 관례는 한국어를 굽는 것이지만 여기만 예외다. --></span></a>
             <nav class="main-nav" id="mainNav">
-                <div class="nav-dropdown">
+      <div class="nav-dropdown">
                     <button class="nav-dropdown-trigger" onclick="toggleCatMenu()">Categories <i class="fas fa-chevron-down"></i></button>
                     <div class="nav-dropdown-menu" id="catMenu">
                         <a href="categories/furniture.html"><span>Furniture</span><small>가구</small></a>
@@ -557,16 +557,13 @@
                         <a href="categories/construction.html"><span>Construction</span><small>건축자재</small></a>
                     </div>
                 </div>
-                <a href="brands.html">Brands</a>
-                <a href="magazine.html">Magazine</a>
-                <!-- A-318: 「Brand Articles」가 빠져 있었다. 같은 문서의 한국어판 privacy.html 에는
-                     있어 두 언어판이 어긋나 있었다. 이 페이지는 영어 전용(자체 toggleLang 으로
-                     privacy.html 과 왕복)이라 하드코딩이 맞다 — A-282 참조. -->
-                <a href="trend-report.html">Brand Articles</a>
-                <a href="about.html">About</a>
-                <a href="request-consultation.html" data-en="Consulting" data-ko="컨설팅">Consulting</a>
-                <a href="list-your-brand.html" class="nav-cta">List Your Brand</a>
-            </nav>
+      <a href="brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a>
+      <a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
+      <a href="about.html" data-en="About" data-ko="소개">About</a>
+      <a href="for-brands.html" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
+      <a href="list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+    </nav>
             <div class="header-actions">
                 <button class="search-toggle" onclick="toggleSearch()" aria-label="Search"><i class="fas fa-search"></i></button>
                 <a href="auth/profile.html" aria-label="Saved"><i class="far fa-bookmark"></i></a>

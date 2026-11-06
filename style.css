@@ -513,6 +513,20 @@ body .topbar .lang-switch-btn:hover {
   margin-top: 20px;
 }
 
+/* ── A-338(2026-11-06): 화면 하나를 청중 둘이 본다 ──────────────────────────
+   한국 고객(스펙라이터·딜러)과 유럽 브랜드가 같은 메뉴를 봤다. 사이트의
+   96%(213개 페이지)가 한국 고객 콘텐츠인데 헤더 7칸 중 3칸이 브랜드향이었다.
+   승리님 결정: 이미 있는 언어 분기를 메뉴까지 확장한다.
+   `data-lang-only` 는 lang.js applyLanguage() 가 전부터 지원하던 속성인데
+   아무도 안 쓰고 있었다 — 장치는 이미 있었고 쓰지 않았을 뿐이다.
+
+   아래 규칙이 하는 일: **JS 가 뜨기 전에도** 맞는 쪽만 보이게 한다.
+   lang.js 는 applyLanguage() 끝에서 documentElement.lang 을 바꾸므로 JS 가
+   돈 뒤에도 같은 규칙이 이어진다. JS 가 아예 안 뜨면 정적 lang 에 맞는
+   쪽이 보인다 — 한쪽만 보이는 것이 둘 다 보이는 것보다 낫다. */
+html[lang="en"] [data-lang-only="ko"],
+html[lang="ko"] [data-lang-only="en"] { display: none !important; }
+
 /* FOOTER */
 .footer { background: var(--gray-900); color: var(--white); padding: 80px 0 0; }
 .footer-grid {

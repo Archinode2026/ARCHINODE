@@ -169,14 +169,7 @@
   <div class="container">
     <a href="index.html" class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">건축을 잇다</span></a>
       <nav class="main-nav" id="mainNav">
-      <!-- A-318: 「Categories」가 허브(categories.html)가 아니라 「가구」 하위로 직행했다.
-     모든 카테고리를 볼 길이 없고 목적지도 엉뚱했다(브론즈 지적). -->
-<!-- A-330(2026-11-06): 230개 페이지는 Categories 가 10개 드롭다운인데 이 페이지만
-         `categories.html` 허브로 가는 맨 링크였다(A-318 이 남긴 1건). 정본 블록을
-         brands.html 에서 그대로 옮긴다. ★ toggleCatMenu 는 공용 JS 가 아니라
-         페이지마다 인라인 정의라서 함수도 같이 넣는다 — 마크업만 옮기면
-         단추가 보이는데 안 열린다(A-328 이 바로 그 상태였다). -->
-        <div class="nav-dropdown">
+      <div class="nav-dropdown">
         <button class="nav-dropdown-trigger" onclick="toggleCatMenu()" data-en="Categories" data-ko="카테고리">Categories <i class="fas fa-chevron-down"></i></button>
         <div class="nav-dropdown-menu" id="catMenu">
             <a href="categories/furniture.html"><span>Furniture</span><small>가구</small></a>
@@ -192,12 +185,12 @@
         </div>
       </div>
       <a href="brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
-      <a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
       <a href="trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a>
+      <a href="magazine.html" data-en="Magazine" data-ko="매거진">Magazine</a>
       <a href="about.html" data-en="About" data-ko="소개">About</a>
-      <a href="for-brands.html" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
-      <a href="request-consultation.html" data-en="Consulting" data-ko="컨설팅">Consulting</a>
-      <a href="list-your-brand.html" class="nav-cta active-nav" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+      <a href="for-brands.html" data-lang-only="en" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
+      <a href="sourcing-inquiry.html" class="nav-cta" data-lang-only="ko" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a>
+      <a href="list-your-brand.html" class="nav-cta active-nav" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
     </nav>
     <div class="header-actions">
       <a href="auth/login.html" style="font-size:0.82rem;color:var(--accent-ink);font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
