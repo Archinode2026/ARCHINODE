@@ -154,7 +154,9 @@
         if (item.type === 'brand') score += 5;
         else if (item.type === 'category') score += 4;
         else if (item.type === 'subcategory') score += 3;
-        else if (item.type === 'magazine') score += 2;
+        // A-349: 여기도 색인에 없는 'magazine' 을 보고 있었다 — 그래서 기사 130편이
+        //        타입 가점을 **하나도 못 받고** 브랜드·카테고리 아래로 밀렸다.
+        else if (item.type === 'article') score += 2;
 
         results.push({
           item: item,
@@ -175,8 +177,10 @@
       category: { en: 'Category', ko: '카테고리' },
       subcategory: { en: 'Subcategory', ko: '서브카테고리' },
       brand: { en: 'Brand', ko: '브랜드' },
-      magazine: { en: 'Magazine', ko: '매거진' },
-      article: { en: 'Magazine', ko: '매거진' },               // A-073: 인덱스는 article로 저장, 표시는 Magazine
+      // A-349(2026-11-06): A-348 이 *.html 만 쓸어서 이 파일이 통째로 비껴갔다.
+      // 헤더·푸터는 「Korean Articles」인데 검색 결과 라벨만 「Magazine」이면 한 화면에서 이름이 갈린다.
+      magazine: { en: 'Korean Articles', ko: '매거진' },
+      article: { en: 'Korean Articles', ko: '매거진' },      // A-073: 인덱스는 article로 저장, 표시는 섹션 이름
       'trend-report': { en: 'Brand Articles', ko: '브랜드 아티클' },
       page: { en: 'Page', ko: '페이지' }
     };
@@ -221,7 +225,7 @@
           '</div>';
       } else {
         resultsContainer.innerHTML = '<div class="search-hint">' +
-          (lang === 'ko' ? '브랜드, 카테고리, 매거진을 검색하세요' : 'Search brands, categories, magazine') +
+          (lang === 'ko' ? '브랜드, 카테고리, 매거진을 검색하세요' : 'Search brands, categories, Korean articles') +
           '</div>';
       }
       return;
@@ -240,10 +244,15 @@
         sub = (item.country || '') + (item.category ? ' · ' + item.category : '');
       } else if (item.type === 'category') {
         sub = lang === 'ko' ? (item.desc_ko || '') : (item.desc_en || '');
-      } else if (item.type === 'magazine') {
-        sub = lang === 'ko' ? (item.name_ko || '').substring(0, 60) : '';
-        if (!sub) sub = item.name_en.substring(0, 60);
-        name = item.name_en; // Magazine titles stay in English
+      } else if (item.type === 'article') {
+        /* A-349: 색인의 기사 타입은 'article' 이다. 전에는 'magazine' 을 보고 있었는데
+           색인에 그런 타입이 **아예 없어서**(article 130 · subcategory 69 · page 10 ·
+           category 10 · trend-report 1) 이 분기는 한 번도 안 돌았다. 그 안의
+           `name = item.name_en` 이 살아났다면 한국어 화면에서 기사 제목이 영어로 굳었을
+           것이다 — 목록이 보는 사람 언어를 안 따르는 그 결함(A-347)과 같은 종류다.
+           제목(name)은 위의 기본값이 이미 언어를 따르므로 건드리지 않고,
+           부제에 반대쪽 언어 제목을 보여 준다. */
+        sub = (lang === 'ko' ? (item.name_en || '') : (item.name_ko || '')).substring(0, 60);
       }
 
       html += '<a href="' + esc(r.url) + '" class="search-result-item">' +
