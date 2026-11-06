@@ -60,11 +60,13 @@ class Walker(HTMLParser):
     def handle_starttag(self, tag, attrs):
         d = dict(attrs)
         anc = (self.stack[-1]['anc'] if self.stack else '') + ' ' + d.get('class', '')
+        # 조상이 건 청중 가리개를 물려받는다 — 그 블록은 한 언어에서만 보인다
+        gate = d.get('data-lang-only') or (self.stack[-1]['gate'] if self.stack else None)
         if tag in VOID:
-            self._keep(tag, d, self.getpos()[0], [], anc)
+            self._keep(tag, d, self.getpos()[0], [], anc, gate)
             return
         self.stack.append({'tag': tag, 'd': d, 'txt': [],
-                           'line': self.getpos()[0], 'anc': anc})
+                           'line': self.getpos()[0], 'anc': anc, 'gate': gate})
 
     def handle_endtag(self, tag):
         for i in range(len(self.stack) - 1, -1, -1):
@@ -72,18 +74,18 @@ class Walker(HTMLParser):
                 e = self.stack.pop(i)
                 for _ in range(len(self.stack) - i):
                     self.stack.pop()
-                self._keep(e['tag'], e['d'], e['line'], e['txt'], e['anc'])
+                self._keep(e['tag'], e['d'], e['line'], e['txt'], e['anc'], e['gate'])
                 return
 
     def handle_data(self, data):
         if self.stack:
             self.stack[-1]['txt'].append(data)
 
-    def _keep(self, tag, d, line, txt, anc):
+    def _keep(self, tag, d, line, txt, anc, gate):
         if not any(k.startswith('data-en') or k.startswith('data-ko') for k in d):
             return
         self.hits.append({'tag': tag, 'line': line, 'inner': ''.join(txt).strip(),
-                          'd': d, 'anc': anc})
+                          'd': d, 'anc': anc, 'gate': gate})
 
 
 def html_files(root='.'):
@@ -197,6 +199,11 @@ def check_elements(problems, supported):
                     continue
                 if bilingual and langs == {'en'}:
                     continue    # 의도된 두 언어 병기
+                # A-365: data-lang-only 가 걸린 블록은 **그 언어에서만 보인다.**
+                # 반대 언어의 속성은 쓰이지 않으므로 없는 것이 맞다 — 오히려 남아 있으면
+                # 한국 고객이 받는 HTML 소스에 영어 전용 문구의 번역문이 실린다(A-358).
+                if h['gate'] in ('en', 'ko') and langs == {h['gate']}:
+                    continue
                 missing = 'data-ko%s' % sfx if langs == {'en'} else 'data-en%s' % sfx
                 problems.append(('[3] 외짝속성', p, h['line'],
                                  '<%s> %s 가 없다 — 그 언어에서 안 바뀐다'
