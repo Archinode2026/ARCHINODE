@@ -1127,6 +1127,35 @@ input, select, textarea { font-family: inherit; }
 <section class="services">
   <div class="container">
     <div class="services-grid">
+      <!-- A-344(2026-11-06): 승리님 결정 — 이 섹션은 「돈 내면 받는 서비스」 설명이라
+           통째로 브랜드향이었다(4장 모두). 한국어 화면에는 한국 고객이 실제로 할 수 있는
+           것으로 바꿔 끼운다. 넷 다 코드가 있는 기능만 넣었다:
+             자재 소싱   sourcing-inquiry.html  → leads(type: sourcing)
+             견적·샘플    products/view.html     → leads(type: quote | sample-request)
+             BIM·CAD    products/view.html     → bim-requests
+             브랜드 문의  brands/view.html       → leads(type: brand-inquiry)
+           없는 기능을 적으면 눌렀을 때 아무 일도 안 일어난다. -->
+      <div class="service-item fade-in" data-lang-only="ko">
+        <i class="fas fa-magnifying-glass-location"></i>
+        <h4 data-en="Material Sourcing" data-ko="자재 소싱">Material Sourcing</h4>
+        <p data-en="Can&#39;t find a product in Korea? We look for it at the source in Europe." data-ko="찾는 제품이 한국에 없으신가요? 유럽 현지에서 직접 찾아 연결해 드립니다.">Can&#39;t find a product in Korea? We look for it at the source in Europe.</p>
+      </div>
+      <div class="service-item fade-in" data-lang-only="ko">
+        <i class="fas fa-file-invoice"></i>
+        <h4 data-en="Quotes &amp; Samples" data-ko="견적 · 샘플 요청">Quotes &amp; Samples</h4>
+        <p data-en="Request a quote or a sample straight from the product page. We pass it to the brand." data-ko="제품 페이지에서 바로 견적과 샘플을 요청하세요. 아키노드가 접수해 브랜드에 전달합니다.">Request a quote or a sample straight from the product page. We pass it to the brand.</p>
+      </div>
+      <div class="service-item fade-in" data-lang-only="ko">
+        <i class="fas fa-cube"></i>
+        <h4 data-en="BIM &amp; CAD Files" data-ko="BIM · CAD 자료">BIM &amp; CAD Files</h4>
+        <p data-en="Request BIM objects, CAD drawings and catalogues you can drop straight into a drawing." data-ko="도면에 바로 얹는 BIM 객체·CAD 도면·카탈로그를 요청하실 수 있습니다.">Request BIM objects, CAD drawings and catalogues you can drop straight into a drawing.</p>
+      </div>
+      <div class="service-item fade-in" data-lang-only="ko">
+        <i class="fas fa-comments"></i>
+        <h4 data-en="Talk to the Brand" data-ko="브랜드 직접 문의">Talk to the Brand</h4>
+        <p data-en="Ask on any brand page. ARCHINODE takes it in and passes it to the brand." data-ko="브랜드 페이지에서 바로 문의하세요. 아키노드가 접수해 브랜드에 전달합니다.">Ask on any brand page. ARCHINODE takes it in and passes it to the brand.</p>
+      </div>
+
       <!-- A-342(2026-11-06): 승리님 결정 — 딜러 신뢰성·감시 이야기는 한국 스펙라이터에게
            노출하지 않는다. 돈을 내는 쪽은 브랜드이고, 이건 돈을 내면 받는 서비스의
            설명이기 때문이다. 한국 딜러가 자기 모국어로 「당신이 계약을 지키는지
@@ -1141,12 +1170,12 @@ input, select, textarea { font-family: inherit; }
         <h4 data-en="Dealer Monitoring" data-ko="딜러 모니터링">Dealer Monitoring</h4>
         <p data-en="Ongoing compliance monitoring for dealership agreements in Korea." data-ko="한국 내 딜러십 계약 이행을 지속적으로 모니터링합니다.">Ongoing compliance monitoring for dealership agreements in Korea.</p>
       </div>
-      <div class="service-item fade-in">
+      <div class="service-item fade-in" data-lang-only="en">
         <i class="fas fa-calendar-check"></i>
         <h4 data-en="Korean Certification Support" data-ko="한국 인증 지원">Korean Certification Support</h4>
         <p data-en="Guidance on Korean product certifications — KC mark, KS standards, eco-labels. We help you identify required certifications, connect with accredited testing labs, and prepare documentation." data-ko="한국 시장 진출에 필요한 인증을 지원합니다 — KC인증, KS규격, 환경표지. 필요한 인증 안내, 공인 인증기관 연결, 서류 준비 지원.">Guidance on Korean product certifications — KC mark, KS standards, eco-labels. We help you identify required certifications, connect with accredited testing labs, and prepare documentation.</p>
       </div>
-      <div class="service-item fade-in">
+      <div class="service-item fade-in" data-lang-only="en">
         <i class="fas fa-trophy"></i>
         <h4 data-en="ARCHINODE Awards" data-ko="ARCHINODE 어워드">ARCHINODE Awards</h4>
         <p data-en="Annual awards celebrating the best products across every category." data-ko="매년 각 카테고리 최고의 제품을 선정하는 어워드 프로그램입니다.">Annual awards celebrating the best products across every category.</p>
@@ -1156,7 +1185,11 @@ input, select, textarea { font-family: inherit; }
 </section>
 
 <!-- CTA - BRAND LISTING -->
-<section class="cta-listing" id="cta">
+<!-- A-343(2026-11-06): 승리님 결정 — 한국어 화면에서는 뺀다. 이 띠는 「ARCHINODE에
+     브랜드를 등록하세요」라고 말하는데, 한국어로 보는 사람은 브랜드가 아니라 자재를
+     찾으러 온 스펙라이터다. 기존 한국 딜러에게는 오히려 꺼릴 이유를 주는 말이기도 하다
+     (A-342 참고). 영어 화면에는 그대로 나간다. -->
+<section class="cta-listing" id="cta" data-lang-only="en">
   <div class="container cta-inner">
     <div class="cta-text">
     <h2 class="fade-in" data-en="List Your Brand in Korea" data-ko="한국에 브랜드를 등록하세요">List Your Brand in Korea</h2>
