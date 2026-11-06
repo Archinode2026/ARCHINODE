@@ -379,6 +379,18 @@
             color: #fff;
         }
 
+        /* A-340: 공용 style.css 를 안 싣는 페이지라 접기 스타일을 여기 둔다. */
+        .footer-column details.footer-more > summary {
+            list-style: none; cursor: pointer; color: #b5ab9b;
+            font-size: 13px; margin-bottom: 10px;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .footer-column details.footer-more > summary::-webkit-details-marker { display: none; }
+        .footer-column details.footer-more > summary::after { content: '\203A'; transition: transform 0.2s; font-size: 1.1em; }
+        .footer-column details.footer-more[open] > summary::after { transform: rotate(90deg); }
+        .footer-column details.footer-more > summary:hover { color: #fff; }
+        .footer-column details.footer-more > a { padding-left: 12px; border-left: 1px solid rgba(255,255,255,0.12); }
+
         .footer-bottom {
             border-top: 1px solid #333;
             padding-top: 30px;
@@ -747,11 +759,16 @@
                 </div>
                 <div class="footer-column">
                     <h3>Services</h3>
-                    <a href="digital-products.html">Digital Products</a>
-                    <a href="request-consultation.html">Consulting</a>
-                    <a href="list-your-brand.html">Brand Listing</a>
                     <a href="sourcing-inquiry.html">Sourcing Inquiry</a>
-                    <a href="for-brands.html">Enter Korea</a>
+                    <!-- A-340: 공용 푸터와 같은 접기. 이 페이지는 style.css 를 안 실으므로
+                         details 스타일은 이 파일의 <style> 안에 따로 있다. -->
+                    <details class="footer-more">
+                        <summary>For European brands</summary>
+                        <a href="for-brands.html">Enter Korea</a>
+                        <a href="list-your-brand.html">Brand Listing</a>
+                        <a href="request-consultation.html">Consulting</a>
+                        <a href="digital-products.html">Digital Products</a>
+                    </details>
                 </div>
                 <div class="footer-column">
                     <h3>Company</h3>

@@ -527,6 +527,33 @@ body .topbar .lang-switch-btn:hover {
 html[lang="en"] [data-lang-only="ko"],
 html[lang="ko"] [data-lang-only="en"] { display: none !important; }
 
+/* ── A-340(2026-11-06): 푸터 브랜드향 4줄을 한 칸으로 접는다 ─────────────
+   푸터는 사이트맵이라 전부 보여 주는 게 맞다는 승리님 판단. 다만 서비스
+   열 5칸 중 4칸이 유럽 브랜드향(디지털 상품·컨설팅·브랜드 입점·한국 진출
+   안내)이라 한국 고객에게는 남의 메뉴가 네 줄 깔려 있었다.
+   헤더처럼 숨기지 않고 `<details>` 로 접는다 — 사이트맵은 그대로이고,
+   이름표가 「누구를 위한 것인지」를 먼저 말해 준다.
+
+   `<select>` 를 쓰지 않은 이유: 값이 바뀔 때 이동하는 콤보박스는 키보드
+   사용자가 화살표로 값을 넘길 때마다 페이지가 튄다(점프 메뉴 문제).
+   `<details>` 는 JS 없이 동작하고 크롤러가 안쪽 링크를 그대로 읽는다. */
+.footer-col details.footer-more { margin-top: 2px; }
+.footer-col details.footer-more > summary {
+  list-style: none; cursor: pointer;
+  font-size: 0.82rem; color: rgba(237,242,247,.78);
+  transition: color 0.2s; display: inline-flex; align-items: center; gap: 6px;
+}
+.footer-col details.footer-more > summary::-webkit-details-marker { display: none; }
+.footer-col details.footer-more > summary::after {
+  content: '\203A'; display: inline-block; transition: transform 0.2s; font-size: 1.1em; line-height: 1;
+}
+.footer-col details.footer-more[open] > summary::after { transform: rotate(90deg); }
+.footer-col details.footer-more > summary:hover { color: var(--white); }
+.footer-col details.footer-more ul { margin-top: 10px; padding-left: 12px; border-left: 1px solid rgba(237,242,247,.12); }
+@media (max-width: 768px) {
+  .footer-col details.footer-more > summary { min-height: 44px; padding: 10px 4px; }
+}
+
 /* FOOTER */
 .footer { background: var(--gray-900); color: var(--white); padding: 80px 0 0; }
 .footer-grid {
