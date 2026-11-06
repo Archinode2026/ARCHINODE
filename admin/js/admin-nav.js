@@ -64,7 +64,7 @@ var ADMIN_MENUS = [
         { id: 'consultations', en: 'Consultations',      ko: '자문 요청',     icon: 'fa-comments',           kind: 'page', target: 'consultations.html',          ready: true },
         { id: 'newsletter',    en: 'Newsletter',         ko: '뉴스레터',      icon: 'fa-envelope-open-text', kind: 'page', target: 'newsletter-subscribers.html', ready: true },
         { id: 'notify',        en: 'Digital Notify',     ko: '디지털 알림',   icon: 'fa-bell',               kind: 'page', target: 'notify-subscribers.html',     ready: true },
-        { id: 'articlesCards', en: 'Magazine Articles',  ko: '매거진 아티클', icon: 'fa-newspaper',          kind: 'page', target: 'articles.html',               ready: true }
+        { id: 'articlesCards', en: 'Brand Articles',     ko: '브랜드 아티클', icon: 'fa-newspaper',          kind: 'page', target: 'articles.html',               ready: true }
     ] },
     { key: 'ops', en: 'Operations', ko: '운영', items: [
         { id: 'notices',     en: 'Notices',      ko: '공지사항',  icon: 'fa-bullhorn',        kind: 'view', target: 'notices',     ready: true },    // 5단계 ✓ view-notices.js
