@@ -37,9 +37,27 @@
     var autoLang = null;
     try { autoLang = localStorage.getItem('archinode-lang-auto'); } catch(e){}
     if (autoLang && availableLangs.indexOf(autoLang) !== -1) return autoLang;
-    // 3. 디폴트 — 한국 사이트라 ko 우선 (IP 조회 결과 받기 전 임시)
-    if (availableLangs.indexOf('ko') !== -1) return 'ko';
+    // 3. A-359(2026-11-06): 브라우저 언어 — **네트워크를 기다리지 않는 신호**
+    //    여기는 전에 「한국 사이트라 ko 우선」이라고 무조건 ko 를 돌려줬다. 그래서 처음 오는
+    //    유럽 브랜드는 api.country.is 왕복이 끝날 때까지 **페이지 전체를 한국어로** 보고,
+    //    자기들을 위한 내용(data-lang-only="en")은 가려진 채였다. 그 API 가 막히거나(사내
+    //    방화벽·광고 차단기가 서드파티 호출을 자주 막는다) 응답이 없으면 **한국어에 갇혔다.**
+    //    브라우저 언어는 동기로 읽히고 사용자가 직접 고른 값이라, 위치(IP)보다 언어 선택에
+    //    더 맞는 신호다. IP 조회는 그대로 두고 **보정**으로만 쓴다.
+    //    한국어 브라우저면 지금과 똑같이 ko 로 간다 — 한국 사용자 대다수는 달라지는 게 없다.
+    var navLangs = [];
+    try {
+      navLangs = (navigator.languages && navigator.languages.length)
+        ? navigator.languages.slice()
+        : (navigator.language ? [navigator.language] : []);
+    } catch(e){ navLangs = []; }
+    for (var i = 0; i < navLangs.length; i++) {
+      var base = String(navLangs[i] || '').toLowerCase().split('-')[0];
+      if (base && availableLangs.indexOf(base) !== -1) return base;
+    }
+    // 4. 브라우저 언어가 이 사이트에 없는 언어일 때 — 영어가 더 넓게 읽힌다
     if (availableLangs.indexOf('en') !== -1) return 'en';
+    if (availableLangs.indexOf('ko') !== -1) return 'ko';
     return availableLangs[0] || 'ko';
   }
 
@@ -64,7 +82,12 @@
           broadcastLang(autoLang);       // A-259
         }
       })
-      .catch(function(){});
+      .catch(function(e){
+        /* A-359: 조용히 삼키면 「왜 언어가 안 바뀌나」를 알 수 없다.
+           이제는 브라우저 언어로 이미 정해져 있으니 치명적이진 않지만,
+           막혔다는 사실은 남겨 둔다. */
+        console.warn('[lang] 국가 감지에 실패했습니다 — 브라우저 언어로 진행합니다:', e && e.message);
+      });
   }
 
   document.addEventListener('DOMContentLoaded', function() {
