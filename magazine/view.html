@@ -285,12 +285,21 @@ async function loadArticle() {
             document.head.appendChild(script);
         })();
         renderArticle(article);
-        // A-259: 기사 본문은 innerHTML 로 그려 넣은 것이라 data-en/data-ko 가 닿지 않는다.
-        // 언어가 바뀌면 신호를 받아 통째로 다시 그린다.
+        /* A-352(2026-11-06): 다시 그린 뒤 한 번 칠한다.
+           A-259 는 「본문을 다시 그린다」까지만 했는데, renderArticle 이 innerHTML 로
+           박아 넣는 것 중에는 **data-en/data-ko 짝을 가진 조각이 넷** 있다
+           (원문 안내 · 「브랜드 아티클」 · 「ARCHINODE에서 브랜드 페이지 보기」 · 「브랜드 보기」).
+           applyLanguage() 는 **이미 화면에 있던 글자**만 칠하므로, 나중에 박힌 그것들은
+           한국어로 보고 있어도 영어로 남는다 — 테스트 기사로 끝까지 보다가 실제로
+           「View brand page on ARCHINODE」가 한국어 화면에 영어로 뜨는 것을 봤다.
+           A-347 에서 brands/view.html 에 넣은 손과 같은 것이고, 그때 이 화면을
+           같이 보지 않은 것이 빠뜨린 이유다. */
+        if (typeof window.applyLangAgain === 'function') window.applyLangAgain();
         document.addEventListener('archinode:lang', function() {
             if (!window.__article) return;
             renderArticle(window.__article);
             if (window.__applyArticleMeta) window.__applyArticleMeta();
+            if (typeof window.applyLangAgain === 'function') window.applyLangAgain();
         });
     } catch (err) {
         console.error('Error loading article:', err);
