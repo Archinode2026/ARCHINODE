@@ -757,10 +757,10 @@ function renderBrand(brand, products, articles) {
                 ${tagline ? `<p class="bp-hero-subtitle" style="font-style:italic;color:var(--ink-soft);">"${tagline}"</p>` : ''}
                 ${description ? `<p class="bp-hero-subtitle">${description.substring(0, 250)}${description.length > 250 ? '...' : ''}</p>` : ''}
                 <div class="bp-hero-meta">
-                    ${country ? `<strong>Country:</strong> ${country}<br>` : ''}
+                    ${country ? `<strong data-en="Country:" data-ko="국가:">Country:</strong> ${country}<br>` : ''}
                     ${founded ? `<strong>Founded:</strong> ${founded}<br>` : ''}
                     ${headquarters ? `<strong>HQ:</strong> ${headquarters}<br>` : ''}
-                    ${website ? `<strong>Website:</strong> <a href="${wsUrl}" target="_blank" style="color:var(--gray-700);" rel="noopener noreferrer">${website}</a>` : ''}
+                    ${website ? `<strong data-en="Website:" data-ko="웹사이트:">Website:</strong> <a href="${wsUrl}" target="_blank" style="color:var(--gray-700);" rel="noopener noreferrer">${website}</a>` : ''}
                 </div>
                 ${certifications.length > 0 ? `
                 <div class="bp-cert-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
@@ -788,20 +788,20 @@ function renderBrand(brand, products, articles) {
         <!-- INFO BAR -->
         <section class="bp-info-bar">
             <div class="bp-info-item">
-                <span class="bp-info-label">Brand</span>
+                <span class="bp-info-label" data-en="Brand" data-ko="브랜드">Brand</span>
                 <span class="bp-info-value">${brandName}</span>
             </div>
             <div class="bp-info-item">
-                <span class="bp-info-label">Country</span>
+                <span class="bp-info-label" data-en="Country" data-ko="국가">Country</span>
                 <span class="bp-info-value">${country || 'N/A'}</span>
             </div>
             <div class="bp-info-item">
-                <span class="bp-info-label">Category</span>
+                <span class="bp-info-label" data-en="Category" data-ko="카테고리">Category</span>
                 <span class="bp-info-value">${categoryLabel}</span>
             </div>
             <div class="bp-info-item">
-                <span class="bp-info-label">${founded ? 'Since' : 'Products'}</span>
-                <span class="bp-info-value">${founded || products.length + ' items'}</span>
+                <span class="bp-info-label" data-en="${founded ? 'Since' : 'Products'}" data-ko="${founded ? '설립' : '제품'}">${founded ? 'Since' : 'Products'}</span>
+                <span class="bp-info-value" data-en="${founded || products.length + ' items'}" data-ko="${founded || products.length + '개'}">${founded || products.length + ' items'}</span>
             </div>
         </section>
 
@@ -850,9 +850,9 @@ function renderBrand(brand, products, articles) {
 
         <!-- CTA -->
         <section class="bp-cta-section">
-            <h2>Interested in ${brandName}?</h2>
-            <p>${brandName} 제품에 대한 문의나 한국 시장 유통에 관심이 있으시면 ARCHINODE 팀에게 연락해주세요.</p>
-            <a href="../contact.html" class="bp-cta-button"><i class="fas fa-envelope"></i> &nbsp;Contact ARCHINODE</a>
+            <h2 data-en="Interested in ${brandName}?" data-ko="${brandName}에 관심이 있으십니까?">Interested in ${brandName}?</h2>
+            <p data-en="For enquiries about ${brandName} products or distribution in Korea, contact the ARCHINODE team." data-ko="${brandName} 제품에 대한 문의나 한국 시장 유통에 관심이 있으시면 ARCHINODE 팀에게 연락해주세요.">For enquiries about ${brandName} products or distribution in Korea, contact the ARCHINODE team.</p>
+            <a href="../contact.html" class="bp-cta-button"><i class="fas fa-envelope"></i> &nbsp;<span data-en="Contact ARCHINODE" data-ko="ARCHINODE에 문의하기">Contact ARCHINODE</span></a>
         </section>
     </div>`;
 }

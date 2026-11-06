@@ -27,3 +27,6 @@ silvia/
 _b*.html
 _b*.css
 _b*.js
+
+# ── 검사기 실행 부산물 (2026-11-06, A-368) ──
+tools/__pycache__/

@@ -387,13 +387,20 @@ function renderArticle(a) {
             ${fallbackNote}
             ${bodyHtml}
 
+            ${a.brandSlug ? `
+            <!-- A-369(2026-11-06): 전에는 이 상자를 **항상** 그리고 단추만 조건부로 그렸다.
+                 그래서 brandSlug 가 없는 기사에서는 「ARCHINODE에서 브랜드 페이지 보기」라는
+                 안내만 남고 **갈 곳이 없었다**(브론즈 13차: 시험 기사 2건 모두 그 꼴,
+                 href 없는 div, cursor:auto). 갈 곳이 없으면 상자째로 그리지 않는다.
+                 화살표는 data-en·data-ko **양쪽에** 넣는다 — 전에는 보이는 글에만 있어서
+                 칠한 뒤 사라졌다(A-357 과 같은 부류인데 스크립트 안이라 검사기가 못 본다). -->
             <div class="ma-brand-box">
                 <div class="ma-brand-box-text">
                     <h4>${escapeHtml(a.brandName || '')}</h4>
                     <p data-en="View brand page on ARCHINODE" data-ko="ARCHINODE에서 브랜드 페이지 보기">View brand page on ARCHINODE</p>
                 </div>
-                ${a.brandSlug ? `<a href="../brands/view.html?id=${escapeHtml(a.brandSlug)}" data-en="View Brand" data-ko="브랜드 보기">View Brand →</a>` : ''}
-            </div>
+                <a href="../brands/view.html?id=${escapeHtml(a.brandSlug)}" data-en="View Brand →" data-ko="브랜드 보기 →">View Brand →</a>
+            </div>` : ''}
         </div>
     </div>`;
 

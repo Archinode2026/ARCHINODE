@@ -49,6 +49,10 @@ REPAINT_SCREENS = ['brands/view.html', 'magazine/view.html', 'trend-report.html'
 STAMPED_ASSETS = ['lang.js', 'search.js', 'articles-lang.js', 'style.css']
 # [3] 두 언어를 늘 함께 보여 주는 의도된 자리
 BILINGUAL_CONTAINERS = ('nav-dropdown-menu',)
+# [2b] 가리개 안의 글이 어긋났을 때, **승리님 규칙에 걸리는 내용이면 실패**로 본다.
+# A-365 에서 「가격 노출은 영어에만」·「딜러 얘기는 한국 고객에 노출 금지」로 지운
+# 171곳을 가려낸 것과 **같은 패턴**이다 — 기준을 두 벌 만들지 않는다.
+SENSITIVE = re.compile(r'[$€₩]\s?[\d,]|\d+\s*(?:만원|원|USD|EUR)|무료|딜러|검증|모니터링|수수료|커미션|스크리닝')
 
 
 class Walker(HTMLParser):
@@ -169,7 +173,7 @@ def check_repaint(problems):
                              '첫 렌더 뒤에 applyLangAgain() 을 부르는 자리가 없다 — 수신기 안에만 있다'))
 
 
-def check_elements(problems, supported):
+def check_elements(problems, supported, deferred):
     for p in html_files():
         try:
             w = Walker()
@@ -177,7 +181,6 @@ def check_elements(problems, supported):
         except Exception as e:
             problems.append(('[0] 파싱', p, 0, '파싱 실패: %s' % e))
             continue
-        ko_first = is_ko_primary(p)
         for h in w.hits:
             d = h['d']
             # [3] 접미사마다 짝
@@ -208,19 +211,46 @@ def check_elements(problems, supported):
                 problems.append(('[3] 외짝속성', p, h['line'],
                                  '<%s> %s 가 없다 — 그 언어에서 안 바뀐다'
                                  % (h['tag'], missing)))
-            # [2] 안에 든 글
             en, ko, inner = d.get('data-en'), d.get('data-ko'), h['inner']
+
+            # [6] A-365: 한 언어에서만 보이는 블록에 **반대 언어의 민감한 글**이 남아 있으면,
+            # 화면에는 안 보여도 상대 청중이 받는 HTML 소스에 실려 나간다.
+            if h['gate'] in ('en', 'ko'):
+                other = ko if h['gate'] == 'en' else en
+                if other and SENSITIVE.search(other):
+                    problems.append(('[6] 소스에 남은 반대언어', p, h['line'],
+                                     '<%s> data-lang-only="%s" 인데 data-%s 에 가격·딜러 얘기가 남아 있다 — %r'
+                                     % (h['tag'], h['gate'],
+                                        'ko' if h['gate'] == 'en' else 'en', other[:60])))
+
+            # [2b] A-358: 한 언어에서만 보이는 블록은 **보이는 글도 그 언어**여야 한다.
+            # 짝이 없어도(A-365 로 반대 언어를 지운 자리) 이 검사는 돌아야 한다 —
+            # 처음엔 짝이 있을 때만 봐서 A-358 을 되살려도 안 잡혔다(음성 테스트로 확인).
+            if h['gate'] in ('en', 'ko') and inner and not is_generated(inner):
+                want = (en if h['gate'] == 'en' else ko)
+                if want and want.strip() and inner != want.strip():
+                    msg = ('<%s> data-lang-only="%s" 블록인데 보이는 글이 data-%s 가 아니다 — %r'
+                           % (h['tag'], h['gate'], h['gate'], inner[:60]))
+                    if SENSITIVE.search(inner) or SENSITIVE.search(want):
+                        problems.append(('[2] 안에든글', p, h['line'], msg))
+                    else:
+                        # 칠하기 전 한순간의 깜빡임이고 내용이 민감하지 않다.
+                        # 「자재 소싱 문의」 링크처럼 사이트 전체에 퍼진 묵은 자리라
+                        # 세어서 알리기만 한다 — A-368 참고.
+                        deferred.append((p, h['line'], msg))
+
+            # [2] 안에 든 글 — 짝이 둘 다 있을 때만 의미가 있다
             if en is None or ko is None or not inner:
                 continue
             if not en.strip() or not ko.strip():
                 continue
             if is_generated(inner):
                 continue
-            if inner == en.strip() or inner == ko.strip():
+            if inner != en.strip() and inner != ko.strip():
+                problems.append(('[2] 안에든글', p, h['line'],
+                                 '<%s> 안에 든 글이 data-en 도 data-ko 도 아니다 — %r'
+                                 % (h['tag'], inner[:60])))
                 continue
-            problems.append(('[2] 안에든글', p, h['line'],
-                             '<%s> 안에 든 글이 data-en 도 data-ko 도 아니다 (이 파일의 기준은 %s) — %r'
-                             % (h['tag'], 'data-ko' if ko_first else 'data-en', inner[:60])))
 
 
 def check_stamps(problems):
@@ -230,11 +260,19 @@ def check_stamps(problems):
         for a in STAMPED_ASSETS:
             for q in re.findall(r'(?<=["/])' + re.escape(a) + r'(\?v=[0-9a-z]+)?(?=")', s):
                 seen[a][q or '(도장없음)'] += 1
+    notes = []
     for a in STAMPED_ASSETS:
         if len(seen[a]) > 1:
             problems.append(('[4] 버전도장', a, 0,
                              '참조가 여러 도장으로 갈라져 있다 — %s. 도장을 올려도 일부만 올라간다'
                              % dict(seen[a])))
+        elif seen[a] and list(seen[a]) == ['(도장없음)']:
+            # 브론즈 13차: 갈라짐만 보면 **전부 빠진 것**은 통과한다.
+            # style.css 가 그 꼴이다. 승리님이 캐시 전략을 「지금은 넘어간다」로
+            # 정하셨으므로(A-360) 실패로 세지 않고 보류로 알린다.
+            notes.append('%s — 참조 %d곳 전부 도장이 없다(ETag 재검증에 의존). 캐시 전략 결정 보류 중, A-360 참고'
+                         % (a, sum(seen[a].values())))
+    return notes
 
 
 def main():
@@ -247,13 +285,21 @@ def main():
         return 2
     problems = []
     check_repaint(problems)
-    check_elements(problems, supported)
-    check_stamps(problems)
+    deferred = []
+    check_elements(problems, supported, deferred)
+    notes = check_stamps(problems) or []
 
     print('lang.js 가 훑는 접미사: %s'
           % ', '.join(sorted(x or '(없음)' for x in supported)))
+    for n in notes:
+        print('보류  %s' % n)
+    if deferred:
+        print('보류  가리개 안에서 보이는 글이 그 언어가 아닌 자리 %d곳 / %d파일 — '
+              '칠하기 전 한순간만 보이고 내용은 민감하지 않다(대부분 「자재 소싱 문의」 링크). '
+              '쓸지 말지는 결정 대기, A-368 참고'
+              % (len(deferred), len(set(x[0] for x in deferred))))
     if not problems:
-        print('언어 규약 검사 — 어긋난 것 없음 (검사 5종)')
+        print('언어 규약 검사 — 어긋난 것 없음 (검사 6종)')
         return 0
     by = collections.Counter(x[0] for x in problems)
     print('언어 규약 검사 — 어긋난 것 %d건' % len(problems))
