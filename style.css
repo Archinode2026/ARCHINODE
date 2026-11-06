@@ -570,7 +570,14 @@ body .topbar .lang-switch-btn:hover {
 .footer-bottom-links { display: flex; gap: 20px; }
 .footer-bottom-links a { font-size: 0.72rem; color: var(--gray-600); transition: color 0.2s; }
 .footer-bottom-links a:hover { color: var(--white); }
-@media (max-width: 1024px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+/* A-324(2026-11-06): 1025~601px 2열 구간에서 .footer-grid 직계 자식이 5개(브랜드+열 4)라
+   3행이 되고 마지막 행 한 칸이 빈다. A-321 전 매거진 기사 130편은 자식이 4개여서 2+2 로
+   맞았으니, 이 구간이 새로 어색해지는 쪽은 그 130편이다. 브랜드 블록이 첫 행을 통째로
+   쓰게 하면 링크 4열이 정확히 2+2 로 채워진다. (브론즈 8차 발견) */
+@media (max-width: 1024px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid > .footer-brand { grid-column: 1 / -1; }
+}
 @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } }
 
 /* ANIMATIONS */
