@@ -35,18 +35,33 @@
     var basePath = getBasePath();
     var xhr = new XMLHttpRequest();
     xhr.open('GET', basePath + 'search-index.json', true);
+    /* A-353(2026-11-06): 전에는 **세 갈래가 모두 콜백을 버렸다** — 파싱 실패 · 200 이 아닌 응답 ·
+       네트워크 오류. 그러면 loadAllIndexes 가 다음 단계(loadBrandIndex)에 못 가고
+       renderResults 가 **영영 안 불린다.** 사용자는 타이핑해도 아무 반응이 없다 —
+       「결과가 없습니다」조차 안 뜬다. 조용한 실패 그 자체다.
+       같은 파일의 loadBrandIndex 는 실패해도 `brandIndex = []; callback();` 으로
+       **제대로 넘긴다** — 한 파일 안에서 두 함수가 같은 상황을 다르게 다루고 있었다.
+       여기도 같은 약속으로 맞춘다: 색인이 없으면 빈 배열로 두고 콜백은 반드시 부른다.
+       그러면 검색은 브랜드(Firestore)만으로라도 돌고, 안 되면 「결과가 없습니다」가 뜬다.
+       (브론즈 11차 발견. 재현 조건은 search-index.json 이 404/500 이거나 끊길 때 —
+        A-285 에서 _redirects 가 이 파일을 막았다면 정확히 이 증상이었다.) */
+    function giveUp(why) {
+      console.warn('[search] 색인을 못 읽었습니다 — 브랜드 검색만으로 진행합니다:', why);
+      if (!searchData) { searchData = []; isLoaded = true; }
+      callback();
+    }
     xhr.onload = function() {
-      if (xhr.status === 200) {
-        try {
-          searchData = JSON.parse(xhr.responseText);
-          isLoaded = true;
-          callback();
-        } catch(e) {
-          console.warn('Search index parse error:', e);
-        }
+      if (xhr.status !== 200) { giveUp('HTTP ' + xhr.status); return; }
+      try {
+        searchData = JSON.parse(xhr.responseText);
+        isLoaded = true;
+        callback();
+      } catch(e) {
+        giveUp('파싱 실패: ' + e.message);
       }
     };
-    xhr.onerror = function() { console.warn('Failed to load search index'); };
+    xhr.onerror = function() { giveUp('네트워크 오류'); };
+    xhr.ontimeout = function() { giveUp('시간 초과'); };
     xhr.send();
   }
 

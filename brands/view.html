@@ -565,6 +565,13 @@ async function loadBrand() {
 
         // 페이지 렌더링
         renderBrand(brand, products, articles);
+        /* A-353: 다시 그린 뒤 반드시 한 번 칠한다. lang.js 는 **모든 경로가**
+           applyLanguage() → broadcastLang() 순서라(62·74·210행), 신호를 받아
+           innerHTML 로 다시 박은 조각은 **그 칠하기를 이미 지나쳤다.**
+           세 화면(magazine/view · brands/view · trend-report)이 같은 구조이므로
+           **세 곳 모두 같은 약속으로** 부른다. 지금 증상이 없는 곳도 넣어 둔다 —
+           카드에 data-en/ko 를 하나 넣는 순간 같은 결함이 나기 때문이다. */
+        if (typeof window.applyLangAgain === 'function') window.applyLangAgain();
 
         /* A-347: 이 화면은 innerHTML 로 통째로 그려 넣어서 data-en/data-ko 가 닿지 않는다.
            언어가 바뀌면 같은 자료로 다시 그리고, 새로 박힌 data-en/ko 를 applyLangAgain() 으로
@@ -644,8 +651,8 @@ function renderBrand(brand, products, articles) {
         galleryHtml = `
         <section class="bp-gallery-section">
             <div class="bp-section-header fade-in">
-                <h2 class="bp-section-title">Gallery</h2>
-                <p class="bp-section-desc">${brandName}의 브랜드 이미지</p>
+                <h2 class="bp-section-title" data-en="Gallery" data-ko="갤러리">Gallery</h2>
+                <p class="bp-section-desc" data-en="${brandName} brand imagery" data-ko="${brandName}의 브랜드 이미지">${brandName} brand imagery</p>
             </div>
             <div class="bp-gallery-grid">
                 ${galleryImages.map(img => `<div class="bp-gallery-item fade-in"><img loading="lazy" src="${img}" alt="${brandName}"></div>`).join('')}
@@ -679,8 +686,8 @@ function renderBrand(brand, products, articles) {
         productsHtml = `
         <section class="bp-products-section">
             <div class="bp-section-header fade-in">
-                <h2 class="bp-section-title">Products</h2>
-                <p class="bp-section-desc">${brandName}의 제품 라인업</p>
+                <h2 class="bp-section-title" data-en="Products" data-ko="제품">Products</h2>
+                <p class="bp-section-desc" data-en="The ${brandName} product line" data-ko="${brandName}의 제품 라인업">The ${brandName} product line</p>
             </div>
             <div class="products-grid">${productCards}</div>
         </section>`;
@@ -715,8 +722,8 @@ function renderBrand(brand, products, articles) {
         articlesHtml = `
         <section class="bp-articles-section">
             <div class="bp-section-header fade-in">
-                <h2 class="bp-section-title">Brand Articles</h2>
-                <p class="bp-section-desc">${brandName}이(가) 전하는 브랜드 스토리</p>
+                <h2 class="bp-section-title" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</h2>
+                <p class="bp-section-desc" data-en="Stories told by ${brandName}" data-ko="${brandName}의 브랜드 스토리">Stories told by ${brandName}</p>
             </div>
             <div class="articles-grid">${articleCards}</div>
         </section>`;
@@ -728,7 +735,7 @@ function renderBrand(brand, products, articles) {
         storyHtml = `
         <section class="bp-story-section">
             <div class="bp-section-header fade-in">
-                <h2 class="bp-section-title">Brand Story</h2>
+                <h2 class="bp-section-title" data-en="Brand Story" data-ko="브랜드 스토리">Brand Story</h2>
             </div>
             <div class="bp-story-content fade-in">
                 ${brandStory.split('\n').filter(p => p.trim()).map(p => `<p>${escapeHtml(p)}</p>`).join('')}
@@ -825,7 +832,7 @@ function renderBrand(brand, products, articles) {
                     <i class="fas fa-handshake" style="color:#7a5c32;"></i>
                     <span data-en="Korean Official Dealer" data-ko="한국 공식 딜러">Korean Official Dealer</span>
                 </h2>
-                <p class="bp-section-desc" data-en="Official dealer & distributor in Korea" data-ko="한국 내 공식 딜러 및 유통사">${brandName}의 한국 공식 딜러를 통해 제품을 문의하실 수 있습니다.</p>
+                <p class="bp-section-desc" data-en="Official dealer &amp; distributor in Korea" data-ko="한국 내 공식 딜러 및 유통사">Official dealer &amp; distributor in Korea</p>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
                 <div style="display:flex;flex-direction:column;gap:12px;">

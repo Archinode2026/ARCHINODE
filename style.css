@@ -302,6 +302,13 @@ body .topbar .lang-switch-btn:hover {
     display: inline-flex; align-items: center; justify-content: center;
     min-width: 44px; min-height: 44px;
   }
+  /* A-353(2026-11-06): A-286 은 햄버거만 44px 로 올렸고 **검색 돋보기는 빼놓았다**.
+     1133px 에서 14x17px 로 실측됐다(브론즈 11차). 같은 줄에 나란히 있는 단추인데
+     하나만 손가락 기준(Apple HIG 44px)을 지키고 있었다. */
+  .search-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; min-height: 44px;
+  }
   /* 햄버거를 '열었을 때' 의 모양도 같이 올라와야 한다. 이게 768px 에 남아 있으면
      769~1100px 에서 메뉴를 열었을 때 패널이 아니라 맨 플렉스 줄로 튀어나온다. */
   .main-nav.active {

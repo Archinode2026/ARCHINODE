@@ -402,6 +402,9 @@ fadeEls.forEach(el => fadeObserver.observe(el));
      언어가 바뀌면 신호를 받아 목록을 통째로 다시 그린다(A-259 가 본문에 쓴 방식과 같다). */
   document.addEventListener('archinode:lang', function() {
     if (_lastRows) render(_lastRows);
+    /* A-353: 지금은 cardHtml() 에 data-en/ko 가 없어 증상이 없지만, 세 화면을 같은
+       약속으로 맞춰 둔다 — 카드에 하나라도 넣는 순간 A-352 와 같은 결함이 난다. */
+    if (typeof window.applyLangAgain === 'function') window.applyLangAgain();
   });
 })();
 </script>
