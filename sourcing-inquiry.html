@@ -23,6 +23,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<!-- A-333(2026-11-06): reCAPTCHA v3 — R-086. 사이트 키는 공개돼도 안전하다(설계상 그렇게 쓰도록
+     되어 있다). 비밀 키는 netlify/functions/recaptcha-verify.js 가 읽는 Netlify 환경변수
+     RECAPTCHA_SECRET_KEY 에만 있고 파일에는 쓰지 않는다. A-004 가 폼 3곳에 넣은 것과 같은 패턴. -->
+<script src="https://www.google.com/recaptcha/api.js?render=6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po"></script>
 </head>
 <body>
 <!-- ANNOUNCEMENT BAR -->
@@ -292,6 +296,14 @@ const fadeObs = new IntersectionObserver(entries => {
 fadeEls.forEach(el => fadeObs.observe(el));
 
 // ── 소싱 문의 제출 ──
+// A-333: A-010 의 타임아웃 가드. 다른 폼 4곳과 같은 구현.
+function archinodeWithTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise(function(_, reject) { setTimeout(function () { reject(new Error('ARCHINODE_TIMEOUT')); }, ms); })
+  ]);
+}
+
 async function submitSourcing(e) {
   e.preventDefault();
   if (document.getElementById('src_hp').value.trim() !== '') return false;
@@ -308,6 +320,24 @@ async function submitSourcing(e) {
   const message = document.getElementById('srcMessage').value.trim();
 
   try {
+    // A-333(2026-11-06): reCAPTCHA v3 — 토큰 발급 + 서버(Netlify Function) 검증, 낮은 점수면 중단.
+    // R-086: 이 폼만 보호가 없었다. leads 에 바로 쓰는 폼이라 봇이 돌면 무료 한도를 먹고
+    //        리드 인박스에 쓰레기가 쌓인다.
+    const captchaToken = await archinodeWithTimeout(
+      grecaptcha.execute('6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po', { action: 'sourcing_inquiry' }),
+      15000
+    );
+    const captchaResp = await archinodeWithTimeout(
+      fetch('/.netlify/functions/recaptcha-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: captchaToken, action: 'sourcing_inquiry' })
+      }),
+      15000
+    );
+    const captchaData = await captchaResp.json();
+    if (!captchaData.ok) { throw new Error('ARCHINODE_CAPTCHA_FAILED'); }
+
     // A-263: 접수 알림. leads 에 넣은 것과 같은 모양을 그대로 넘긴다.
     const leadDoc = {
       type: 'sourcing',
@@ -339,7 +369,12 @@ async function submitSourcing(e) {
     document.getElementById('sourcingSuccessWrap').style.display = 'block';
   } catch (err) {
     console.error('Sourcing inquiry error:', err);
-    errorMsg.textContent = 'Something went wrong. Please try again.';
+    // A-333: 구체적 사유는 밝히지 않는다(봇 회피 방지) — A-004 가 폼 3곳에 쓴 문장 그대로.
+    errorMsg.textContent = (err.message === 'ARCHINODE_CAPTCHA_FAILED')
+      ? 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.'
+      : (err.message === 'ARCHINODE_TIMEOUT')
+      ? 'Your connection seems slow or offline. Please check your network and try again.'
+      : 'Something went wrong. Please try again.';
     errorMsg.style.display = 'block';
   }
   btn.disabled = false;
