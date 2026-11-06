@@ -297,6 +297,15 @@
       if (al !== null) el.setAttribute('aria-label', al);
     });
 
+    /* A-363(2026-11-06): `-title` 이 빠져 있었다. `data-en-title`/`data-ko-title`
+       을 단 자리가 2곳 있는데(brands/view.html · products/view.html 의 「내 리스트에
+       저장」 단추) lang.js 가 그 접미사를 훑지 않아서 **마우스를 올렸을 때 나오는
+       말풍선은 언제나 영어**였다. 달아 놓고 안 듣던 죽은 속성이다. */
+    document.querySelectorAll('[data-' + lang + '-title]').forEach(function(el) {
+      var tt = el.getAttribute('data-' + lang + '-title');
+      if (tt !== null) el.setAttribute('title', tt);
+    });
+
     document.querySelectorAll('[data-lang-only]').forEach(function(el) {
       var only = el.getAttribute('data-lang-only').split(',').map(function(s){ return s.trim().toLowerCase(); });
       el.style.display = (only.indexOf(lang) !== -1) ? '' : 'none';

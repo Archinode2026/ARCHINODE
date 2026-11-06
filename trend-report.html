@@ -393,6 +393,11 @@ fadeEls.forEach(el => fadeObserver.observe(el));
     var rows = [];
     snap.forEach(function(d){ rows.push({ id: d.id, data: d.data() }); });
     render(rows);
+    /* A-364(2026-11-06): 첫 렌더 뒤에도 한 번 칠한다. A-353 때 수신기 안에만 넣고
+       **이 자리를 빼먹었다** — 세 화면을 같은 약속으로 맞췄다고 대장에 적었는데
+       실제로는 두 화면만 두 자리였다. 지금은 cardHtml() 에 data-en/ko 가 없어
+       증상이 없지만, 하나라도 넣는 순간 A-352 와 같은 결함이 난다. */
+    if (typeof window.applyLangAgain === 'function') window.applyLangAgain();
   }, function(err){
     if (err && err.code === 'failed-precondition') { fallbackLoad(err); return; }
     showError(err);

@@ -1392,11 +1392,45 @@ input, select, textarea { font-family: inherit; }
 /* ===== HERO SLIDER ===== */
 const slides = document.querySelectorAll('.hero-slide');
 const dots = document.querySelectorAll('.hero-dot');
+/* A-361(2026-11-06): 히어로 글자가 한국어 화면에서 5초 뒤부터 영어로 바뀌었다.
+   heroData 가 **영어만** 담고 있었고 goSlide(n) 이 #heroTag·#heroTitle·#heroDesc 를
+   그 영어로 덮어썼다. 첫 페인트만 한국어고 그 뒤로는 계속 영어였다 — 사이트에서
+   가장 먼저 보이는 자리이고, 청중을 언어로 가른다는 설계(A-338)가 첫 화면에서
+   깨져 있었다. 게다가 정적 마크업의 문안(data-ko-html 「유럽의 감도를…」)은
+   heroData[0] 과도 다른 **제4의 문안**이었다.
+
+   한국어 문안이 없는 상태에서 글자를 돌리면 반드시 한쪽 언어가 깨진다. 그래서
+   **글자 회전을 끄고**(HERO_ROTATE_TEXT = false) 마크업에 있는 양쪽 문안을
+   그대로 세워 둔다. 배경 사진과 점은 그대로 돈다.
+   한국어 문안을 ko 에 채우고 HERO_ROTATE_TEXT 를 true 로 바꾸면 글자 회전이
+   되살아난다 — 그때는 언어에 따라 골라 쓰고, 언어가 바뀌면 다시 그린다. */
+const HERO_ROTATE_TEXT = false;
 const heroData = [
-  { tag: 'Europe meets Korea', title: 'Connecting Global<br>Architecture & Design', desc: 'Seamlessly connecting European design brands with the Korean market. Founding brands joining now.' },
-  { tag: 'Brand Directory', title: 'Every Brand,<br>One Platform', desc: 'From furniture to finishes, explore the world\'s leading design brands all in one place.' },
-  { tag: 'For Professionals', title: 'Designed for<br>Architects & Designers', desc: 'Find products, connect with brands, and source materials for your next project.' }
+  { en: { tag: 'Europe meets Korea', title: 'Connecting Global<br>Architecture & Design', desc: 'Seamlessly connecting European design brands with the Korean market. Founding brands joining now.' },
+    ko: null },
+  { en: { tag: 'Brand Directory', title: 'Every Brand,<br>One Platform', desc: 'From furniture to finishes, explore the world\'s leading design brands all in one place.' },
+    ko: null },
+  { en: { tag: 'For Professionals', title: 'Designed for<br>Architects & Designers', desc: 'Find products, connect with brands, and source materials for your next project.' },
+    ko: null }
 ];
+
+function heroLang() {
+  var l = document.documentElement.lang;
+  return (l === 'ko' || l === 'en') ? l : 'en';
+}
+function heroSideFor(n) {
+  var d = heroData[n]; if (!d) return null;
+  var side = d[heroLang()];
+  return side || null;        // 그 언어 문안이 없으면 글자를 건드리지 않는다
+}
+function paintHeroText(n) {
+  if (!HERO_ROTATE_TEXT) return;
+  var side = heroSideFor(n);
+  if (!side) return;
+  document.getElementById('heroTag').textContent = side.tag;
+  document.getElementById('heroTitle').innerHTML = side.title;
+  document.getElementById('heroDesc').textContent = side.desc;
+}
 let currentSlide = 0;
 let slideInterval;
 
@@ -1406,10 +1440,13 @@ function goSlide(n) {
   currentSlide = n;
   slides[currentSlide].classList.add('active');
   dots[currentSlide].classList.add('active');
-  document.getElementById('heroTag').textContent = heroData[n].tag;
-  document.getElementById('heroTitle').innerHTML = heroData[n].title;
-  document.getElementById('heroDesc').textContent = heroData[n].desc;
+  paintHeroText(n);
 }
+
+/* 언어가 바뀌면 지금 슬라이드의 글자를 그 언어로 다시 그린다.
+   글자 회전이 꺼져 있으면 아무것도 안 하고, lang.js 의 칠하기가 마크업의
+   data-en/data-ko 를 그대로 살린다. */
+document.addEventListener('archinode:lang', function() { paintHeroText(currentSlide); });
 
 function nextSlide() { goSlide((currentSlide + 1) % slides.length); }
 function startSlider() { slideInterval = setInterval(nextSlide, 5000); }
