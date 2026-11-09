@@ -2468,6 +2468,12 @@ body .header .container {
    단추가 왼쪽에 고아로 서는 것보다 낫다고 판단했다 — 로그인하는 사람은
    승리님과 브랜드다. */
 body .header .container > .header-actions { margin-left: auto; }
+/* A-383: A-377 로 단추를 오른쪽에 밀어 붙이자 남는 자리가 **메뉴와 단추 사이로**
+   몰리면서, 로고와 메뉴가 **틈 0px 로 붙어** 버렸다(브론즈 16차 실측: 한 줄인 모든
+   경우에서 `로고끝 == 메뉴시작`, 빈 띠는 EN 1440 에서 145px · KO 1600 에서 533px).
+   오른쪽 정렬은 유지한 채 최소 간격만 준다. */
+body .header .container > .main-nav { margin-left: 32px; }
+@media (max-width: 1200px) { body .header .container > .main-nav { margin-left: 20px; } }
 /* 영문 부제가 한국어보다 길어 헤더가 빡빡해졌다 — 메뉴 사이 간격을 조금 좁혀 자리를 돌려준다 */
 .main-nav { gap: 20px; }
 .main-nav > a, .nav-dropdown-trigger {
@@ -2687,13 +2693,21 @@ body.home .header.over-hero {
   /* 어떤 사진 위에서도 글자가 읽히도록 옅은 그늘 */
   box-shadow: inset 0 60px 60px -60px rgba(26,22,18,.55);
 }
+/* A-383(2026-11-09): `.nav-dropdown-trigger` 가 **이 목록에만 빠져 있었다.**
+   `style.css:2473` 은 `.main-nav > a, .nav-dropdown-trigger` 를 늘 짝지어 적는데
+   여기서만 짝이 깨져서, 홈 첫 화면의 어두운 사진 위에서 「Categories / 카테고리」만
+   어두운 색(rgb(93,86,76))으로 남아 **사실상 안 보였다**(브론즈 16차 실측).
+   메뉴의 첫 항목이고 사이트의 첫 화면이다. 밑줄·전환도 같이 빠져 있어 네 자리를 함께 고친다. */
 body.home .header.over-hero .logo,
 body.home .header.over-hero .main-nav > a,
+body.home .header.over-hero .nav-dropdown-trigger,
 body.home .header.over-hero .header-actions a,
 body.home .header.over-hero .header-actions button { color: #fdfbf7 !important; }
 body.home .header.over-hero .logo-sub { color: rgba(253,251,247,.74); }
-body.home .header.over-hero .main-nav > a:hover { color: #fdfbf7; }
-body.home .header.over-hero .main-nav > a::after { background: #fdfbf7; }
+body.home .header.over-hero .main-nav > a:hover,
+body.home .header.over-hero .nav-dropdown-trigger:hover { color: #fdfbf7; }
+body.home .header.over-hero .main-nav > a::after,
+body.home .header.over-hero .nav-dropdown-trigger::after { background: #fdfbf7; }
 /* .nav-cta 가 !important 로 박혀 있어 같은 무기가 아니면 진다 */
 body.home .header.over-hero .main-nav a.nav-cta { background: #fdfbf7 !important; color: var(--black) !important; }
 body.home .header.over-hero .main-nav a.nav-cta:hover { background: var(--accent-ink) !important; color: #fdfbf7 !important; }
@@ -2702,6 +2716,7 @@ body.home .header.over-hero .lang-switcher button { border-color: rgba(253,251,2
 @media (prefers-reduced-motion: no-preference) {
   body.home .header { transition: background .35s, box-shadow .35s, border-color .35s; }
   body.home .header .logo, body.home .header .main-nav > a,
+  body.home .header .nav-dropdown-trigger,
   body.home .header .header-actions a, body.home .header .header-actions button { transition: color .35s; }
 }
 

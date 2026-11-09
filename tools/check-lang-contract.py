@@ -52,7 +52,17 @@ BILINGUAL_CONTAINERS = ('nav-dropdown-menu',)
 # [2b] 가리개 안의 글이 어긋났을 때, **승리님 규칙에 걸리는 내용이면 실패**로 본다.
 # A-365 에서 「가격 노출은 영어에만」·「딜러 얘기는 한국 고객에 노출 금지」로 지운
 # 171곳을 가려낸 것과 **같은 패턴**이다 — 기준을 두 벌 만들지 않는다.
-SENSITIVE = re.compile(r'[$€₩]\s?[\d,]|\d+\s*(?:만원|원|USD|EUR)|무료|딜러|검증|모니터링|수수료|커미션|스크리닝')
+# A-382: 「검증」·「모니터링」은 **딜러 문맥일 때만** 민감이다. 전에는 낱말만 보고
+# 「한국에서의 성공은 아시아 전역에서 브랜드를 검증합니다」까지 걸어서, 지우면 안 되는
+# 글을 지우라고 상시로 요구했다 — 오탐이 늘 뜨는 검사기는 사람이 결국 무시하게 된다.
+SENSITIVE = re.compile(
+    r'[$€₩]\s?[\d,]'                      # 통화 기호 + 숫자
+    r'|\d+\s*(?:만원|원|USD|EUR)'          # 숫자 + 화폐 단위
+    r'|무료|수수료|커미션'                    # 값에 관한 말
+    r'|딜러'                                # 딜러는 낱말만으로도 민감
+    r'|스크리닝'
+    r'|(?:검증|모니터링)[^。.\n]{0,14}(?:딜러|유통|파트너)'
+    r'|(?:딜러|유통|파트너)[^。.\n]{0,14}(?:검증|모니터링)')
 
 
 class Walker(HTMLParser):
@@ -122,6 +132,17 @@ def suffix_of(key):
     return None
 
 
+def page_locked_lang(src):
+    """A-382: `<body data-langs="en">` 처럼 **페이지 자체가 한 언어로 잠긴** 경우.
+    그 페이지에서는 반대 언어의 속성이 쓰이지 않으므로 없는 것이 맞다 —
+    `data-lang-only` 가리개와 같은 이치인데, 범위가 블록이 아니라 페이지다."""
+    m = re.search(r'<(?:body|html)[^>]*\sdata-langs="([^"]*)"', src)
+    if not m:
+        return None
+    langs = [x.strip().lower() for x in m.group(1).split(',') if x.strip()]
+    return langs[0] if len(langs) == 1 else None
+
+
 def is_ko_primary(path):
     return path == 'magazine.html' or path.startswith('magazine/')
 
@@ -176,11 +197,13 @@ def check_repaint(problems):
 def check_elements(problems, supported, deferred):
     for p in html_files():
         try:
+            src = io.open(p, encoding='utf-8', errors='replace').read()
             w = Walker()
-            w.feed(io.open(p, encoding='utf-8', errors='replace').read())
+            w.feed(src)
         except Exception as e:
             problems.append(('[0] 파싱', p, 0, '파싱 실패: %s' % e))
             continue
+        locked = page_locked_lang(src)
         for h in w.hits:
             d = h['d']
             # [3] 접미사마다 짝
@@ -207,6 +230,9 @@ def check_elements(problems, supported, deferred):
                 # 한국 고객이 받는 HTML 소스에 영어 전용 문구의 번역문이 실린다(A-358).
                 if h['gate'] in ('en', 'ko') and langs == {h['gate']}:
                     continue
+                # A-382: 페이지 자체가 한 언어로 잠긴 경우도 같다
+                if locked in ('en', 'ko') and langs == {locked}:
+                    continue
                 missing = 'data-ko%s' % sfx if langs == {'en'} else 'data-en%s' % sfx
                 problems.append(('[3] 외짝속성', p, h['line'],
                                  '<%s> %s 가 없다 — 그 언어에서 안 바뀐다'
@@ -215,22 +241,24 @@ def check_elements(problems, supported, deferred):
 
             # [6] A-365: 한 언어에서만 보이는 블록에 **반대 언어의 민감한 글**이 남아 있으면,
             # 화면에는 안 보여도 상대 청중이 받는 HTML 소스에 실려 나간다.
-            if h['gate'] in ('en', 'ko'):
-                other = ko if h['gate'] == 'en' else en
+            effective = h['gate'] if h['gate'] in ('en', 'ko') else locked
+            if effective in ('en', 'ko'):
+                other = ko if effective == 'en' else en
                 if other and SENSITIVE.search(other):
                     problems.append(('[6] 소스에 남은 반대언어', p, h['line'],
                                      '<%s> data-lang-only="%s" 인데 data-%s 에 가격·딜러 얘기가 남아 있다 — %r'
-                                     % (h['tag'], h['gate'],
-                                        'ko' if h['gate'] == 'en' else 'en', other[:60])))
+                                     % (h['tag'], effective,
+                                        'ko' if effective == 'en' else 'en', other[:60])))
 
             # [2b] A-358: 한 언어에서만 보이는 블록은 **보이는 글도 그 언어**여야 한다.
             # 짝이 없어도(A-365 로 반대 언어를 지운 자리) 이 검사는 돌아야 한다 —
             # 처음엔 짝이 있을 때만 봐서 A-358 을 되살려도 안 잡혔다(음성 테스트로 확인).
-            if h['gate'] in ('en', 'ko') and inner and not is_generated(inner):
-                want = (en if h['gate'] == 'en' else ko)
+            if effective in ('en', 'ko') and inner and not is_generated(inner):
+                want = (en if effective == 'en' else ko)
                 if want and want.strip() and inner != want.strip():
-                    msg = ('<%s> data-lang-only="%s" 블록인데 보이는 글이 data-%s 가 아니다 — %r'
-                           % (h['tag'], h['gate'], h['gate'], inner[:60]))
+                    msg = ('<%s> %s 가 %s 전용인데 보이는 글이 data-%s 가 아니다 — %r'
+                           % (h['tag'], '블록' if h['gate'] else '페이지',
+                              effective, effective, inner[:60]))
                     if SENSITIVE.search(inner) or SENSITIVE.search(want):
                         problems.append(('[2] 안에든글', p, h['line'], msg))
                     else:

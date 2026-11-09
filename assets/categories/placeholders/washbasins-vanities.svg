@@ -6,7 +6,7 @@
     </linearGradient>
   </defs>
   <rect width="600" height="400" fill="url(#bg)"/>
-  <text x="300" y="180" font-family="Georgia, serif" font-size="34" font-weight="800" fill="#C8A96E" text-anchor="middle" letter-spacing="-0.5">Washbasins & Vanities</text>
+  <text x="300" y="180" font-family="Georgia, serif" font-size="34" font-weight="800" fill="#C8A96E" text-anchor="middle" letter-spacing="-0.5">Washbasins &amp; Vanities</text>
   <line x1="270" y1="210" x2="330" y2="210" stroke="#C8A96E" stroke-width="2"/>
   <text x="300" y="245" font-family="Inter, sans-serif" font-size="12" fill="#888" text-anchor="middle" letter-spacing="3">ARCHINODE</text>
 </svg>

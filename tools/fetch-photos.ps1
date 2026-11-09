@@ -8,7 +8,7 @@
 # 쓰는 법: 리포 뿌리에서 PowerShell 로 한 번만.
 #     .\tools\fetch-photos.ps1
 #
-# 사진 112장을 assets/photos/ 에 1800px 로 받는다. 작은 크기(600·240)는
+# 사진 125장을 assets/photos/ 에 1800px 로 받는다. 작은 크기(600·240)는
 # 노드가 이 원본에서 만들어 넣는다 — 그래서 받을 양이 반으로 줄었다.
 # 이미 있는 파일은 건너뛴다. 중간에 끊겨도 다시 돌리면 이어진다.
 
@@ -17,6 +17,20 @@ $dir = Join-Path $PSScriptRoot "..\assets\photos"
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
 
 $ids = @(
+  # ── A-384(2026-11-09) 자리표시 SVG 대체 11 + 주제 틀린 것 3 ──
+  'photo-1542855368-ca6ea825bca2'
+  'photo-1635108195612-1ba1c88aaf0c'
+  'photo-1528217580778-96e570819666'
+  'photo-1623114112815-74a4b9fe505d'
+  'photo-1599083549933-838ea352c1cc'
+  'photo-1502005097973-6a7082348e28'
+  'photo-1558658862-77693bcc4e97'
+  'photo-1572168400468-62e1b3209d7d'
+  'photo-1633512424746-0cb5240e064d'
+  'photo-1557415750-61d89e10368b'
+  'photo-1551807306-4bcd16b92a41'
+  'photo-1596683705523-eb49540c3934'
+  'photo-1607400201889-565b1ee75f8e'
   # ── A-379(2026-11-09) 카테고리 카드용 20장 추가 ──
   'photo-1577412647305-991150c7d163'
   'photo-1543751416-705d3e34d02a'
