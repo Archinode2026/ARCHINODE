@@ -247,7 +247,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const errorDiv = document.getElementById('loginError');
     errorDiv.style.display = 'none';
     btn.disabled = true;
-    btn.textContent = 'Logging in...';
+    window.setLangText && window.setLangText(btn, "Logging in...", "로그인 중...");
 
     try {
         const email = document.getElementById('loginEmail').value.trim();
@@ -256,7 +256,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         // onAuthStateChanged가 리디렉션 처리
     } catch (error) {
         btn.disabled = false;
-        btn.textContent = 'Log In';
+        window.setLangText && window.setLangText(btn, "Log In", "로그인");
         errorDiv.style.display = 'block';
         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
             errorDiv.textContent = '이메일 또는 비밀번호가 올바르지 않습니다. / Invalid email or password.';

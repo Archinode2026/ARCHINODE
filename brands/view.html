@@ -516,7 +516,17 @@ async function loadBrand() {
         document.getElementById('ogTitle').setAttribute('content', brand.brandName + ' | ARCHINODE');
         document.getElementById('ogDesc').setAttribute('content', brandOgDesc);
         document.getElementById('metaDesc').setAttribute('content', brandOgDesc);
-        document.getElementById('breadcrumbName').textContent = brand.brandName;
+        /* A-423(2026-11-09): 이름을 넣기만 하면 **아래 574행의 applyLangAgain() 이
+           도로 「불러오는 중...」으로 칠한다.** 이 칸에는 자리표시용 data-en/data-ko 가
+           달려 있고 lang.js 는 그 속성을 보고 글자를 되돌리기 때문이다. 즉 브랜드 상세
+           빵부스러기는 **라이브에서 늘 「불러오는 중...」이었다.**
+           products/view.html:803-811 이 쓰는 꼴 그대로 — 글자와 함께 두 속성도 바꾼다.
+           브랜드 이름은 두 언어가 같으므로 양쪽에 같은 값을 넣는다.
+           (lang.js 는 data-{lang} 를 textContent 로 넣으므로 HTML 이 새지 않는다.) */
+        var bcName = document.getElementById('breadcrumbName');
+        bcName.textContent = brand.brandName;
+        bcName.setAttribute('data-en', brand.brandName);
+        bcName.setAttribute('data-ko', brand.brandName);
 
         // A-096: 브랜드 상세 화면에 구조화 데이터(JSON-LD)가 아예 없던 문제 — Brand/Organization 스키마 주입
         (function injectBrandJsonLd() {
@@ -980,14 +990,16 @@ function updateBrandLikeUI() {
     if (!btn) return;
     const label = document.getElementById('brandLikeLabel');
     const ko = document.documentElement.lang !== 'en';
-    if (isBrandLiked) {
-        btn.classList.add('liked');
-        icon.className = 'fas fa-bookmark';
-        if (label) label.textContent = ko ? '저장됨' : 'Saved';
-    } else {
-        btn.classList.remove('liked');
-        icon.className = 'far fa-bookmark';
-        if (label) label.textContent = ko ? '저장' : 'Save';
+        /* A-423: 글자만 바꾸면 다음 칠하기가 마크업의 data-ko="저장" 으로 **되돌린다** —
+           저장된 항목인데 단추가 「저장」이라고 말하게 된다. 두 속성도 같이 바꾼다. */
+    const en = isBrandLiked ? 'Saved' : 'Save';
+    const kr = isBrandLiked ? '저장됨' : '저장';
+    btn.classList.toggle('liked', isBrandLiked);
+    icon.className = (isBrandLiked ? 'fas' : 'far') + ' fa-bookmark';
+    if (label) {
+        label.textContent = ko ? kr : en;
+        label.setAttribute('data-en', en);
+        label.setAttribute('data-ko', kr);
     }
 }
 

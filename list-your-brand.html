@@ -720,14 +720,14 @@ form.addEventListener('submit', async function(e) {
     }
     errorDiv.style.display = 'none';
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating your account...';
+    window.setLangText && window.setLangText(submitBtn, "Creating your account...", "계정 만드는 중...");
 
     const selectedCats = document.querySelectorAll('input[name="category"]:checked');
     if (selectedCats.length === 0) {
         errorDiv.style.display = 'block';
         errorDiv.textContent = 'Please select at least one category.';
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Application';
+        window.setLangText && window.setLangText(submitBtn, "Submit Application", "신청서 제출");
         return;
     }
 
@@ -738,7 +738,7 @@ form.addEventListener('submit', async function(e) {
         vendorTermsErrorEl.style.display = 'block';
         vendorTermsEl.focus();
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Application';
+        window.setLangText && window.setLangText(submitBtn, "Submit Application", "신청서 제출");
         return;
     }
     vendorTermsErrorEl.style.display = 'none';
@@ -870,7 +870,7 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Application';
+        window.setLangText && window.setLangText(submitBtn, "Submit Application", "신청서 제출");
         errorDiv.style.display = 'block';
 
         if (error.message === 'ARCHINODE_CAPTCHA_FAILED') {

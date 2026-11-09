@@ -166,6 +166,23 @@
   // DOMContentLoaded 때 한 번 도는 applyLanguage()의 손길이 닿지 않는다. 그런 코드가
   // innerHTML을 채운 직후 이 함수를 불러서 현재 언어를 다시 적용할 수 있게 공개한다.
   // (일부 페이지에 이미 "if (window.applyLang) window.applyLang();" 방어 호출이 있었음)
+  /* A-425(2026-11-09): 단추가 제출 중에 보여 주는 임시 글자(「Uploading...」 등)가
+     **영어 전용**이었다. 한국어 화면에서 누르면 거기서만 영어가 튀어나온다. 그리고
+     글자만 바꾸면 그 사이 언어를 바꿨을 때 마크업의 data-ko 가 도로 칠한다(A-423).
+     이 함수는 둘을 한 번에 지킨다 — 두 언어를 속성에 심고 현재 언어로 글자를 넣는다.
+
+     ★ 현재 언어는 **document.documentElement.lang** 으로 본다. localStorage 는
+       사람이 손으로 토글할 때만 쓰이므로(232행), 나라 감지로 한국어가 된 손님에게는
+       비어 있다 — A-402 에서 search.js 가 빠졌던 바로 그 함정이다. */
+  window.setLangText = function(el, en, ko) {
+    if (!el) return;
+    if (typeof el === 'string') el = document.getElementById(el);
+    if (!el) return;
+    el.setAttribute('data-en', en);
+    el.setAttribute('data-ko', ko);
+    el.textContent = (document.documentElement.lang === 'ko') ? ko : en;
+  };
+
   window.applyLang = function() {
     applyLanguage(currentLang);
   };

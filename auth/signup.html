@@ -409,7 +409,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     }
 
     btn.disabled = true;
-    btn.textContent = 'Creating account...';
+    window.setLangText && window.setLangText(btn, "Creating account...", "계정 만드는 중...");
 
     try {
         // Firebase Auth 계정 생성
@@ -444,7 +444,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
 
     } catch (error) {
         btn.disabled = false;
-        btn.textContent = 'Create Account';
+        window.setLangText && window.setLangText(btn, "Create Account", "계정 만들기");
         errorDiv.style.display = 'block';
         if (error.code === 'auth/email-already-in-use') {
             errorDiv.textContent = '이미 등록된 이메일입니다. 로그인해주세요. / Email already in use. Please log in.';

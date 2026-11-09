@@ -497,6 +497,105 @@ def check_inbound_links(problems, notes):
                                        for (t, lb), n in d.most_common())))
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# [9] A-423 — JS 가 글자를 넣는 칸에 자리표시 data-en/data-ko 가 남아 있나
+#
+#     `brands/view.html` 의 빵부스러기가 **라이브에서 늘 「불러오는 중...」이었다.**
+#     519행이 브랜드 이름을 넣고, 574행의 applyLangAgain() 이 마크업에 남은
+#     `data-ko="불러오는 중..."` 을 보고 **도로 칠했다.**
+#
+#     계약: 어떤 칸의 글자를 JS 가 넣는다면, 그 칸의 data-en/data-ko 도 함께
+#     바꿔야 한다(products/view.html:803-811 이 그렇게 한다). 그러지 않으면
+#     다음 칠하기가 자리표시로 되돌린다.
+#
+#     면제는 한 가지뿐 — 같은 파일이 그 id 에 setAttribute('data-en'/'data-ko')
+#     를 한다. `archinode:lang` 을 듣는다는 것만으로는 면제가 아니다:
+#     brands/view.html 도 그 이벤트를 듣지만 빵부스러기는 되돌아갔다.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# 언어를 스스로 보고 다시 그리므로 data-* 는 **폴백**인 자리. 이유를 적어 둔다.
+# 제출 중 임시 글자라 **끝나면 스스로 쉬는 글자로 돌아온다**. 중간에 언어를 바꿔도
+# 되돌아오는 값이 바로 그 쉬는 글자라 결과가 같다. 이유를 적어 두고 통과시킨다.
+TRANSIENT_OK = {
+    ('magazine.html', 'loadMoreBtn'):
+        "누르기 직전 글자를 origText 로 저장했다가 finally 에서 그대로 되돌린다. "
+        "임시 글자는 '...' 이라 언어가 없다",
+    ('request-consultation.html', 'submitBtn'):
+        '임시·쉬는 글자를 이미 두 언어로 고른다. localStorage 를 읽지만 '
+        "'archinode-lang-auto' 까지 보고, 그 값은 lang.js:81 의 나라 감지가 쓴다 — "
+        'A-402 의 함정에 빠지지 않는다 (확인함)',
+}
+
+PLACEHOLDER_OK = {
+    ('index.html', 'heroTag'):   'heroSideFor() 가 documentElement.lang 을 보고 고르고, '
+                                 "archinode:lang 때 paintHeroText() 로 다시 그린다. "
+                                 '글자 회전이 꺼지면 data-* 가 그대로 쓰인다 — 폴백이 맞다',
+    ('index.html', 'heroTitle'): '위와 같다 (innerHTML, data-en-html 폴백)',
+    ('index.html', 'heroDesc'):  '위와 같다',
+}
+
+
+def check_js_placeholder(problems, notes):
+    """[9] JS 가 채우는 칸에 자리표시 data-en/data-ko 가 남아 있나.
+
+    ★ 이 함수는 처음에 `getElementById('x').textContent =` **이어 붙인 꼴만** 봤다.
+      그런데 고치면서 `var bc = getElementById('x'); bc.textContent = ...` 로 바꿨더니
+      **검사기가 제가 잡으려던 바로 그 결함을 못 보게 됐다**(음성 시험이 통과해 버렸다).
+      그래서 변수를 거쳐 가는 꼴도 따라간다. 검사기도 「보고 있는 모양만 센다」.
+    """
+    get_id = r"(?:getElementById\(\s*['\"]([\w-]+)['\"]\s*\)|querySelector\(\s*['\"]#([\w-]+)['\"]\s*\))"
+    var_of = re.compile(r"(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*=\s*[^;\n]*?" + get_id)
+    chained_set = re.compile(get_id + r"\s*\.\s*(?:textContent|innerText|innerHTML)\s*=")
+    chained_attr = re.compile(get_id + r"\s*\.\s*setAttribute\(\s*['\"]data-(?:en|ko)['\"]")
+    # lang.js 의 setLangText(el, en, ko) 는 글자와 두 속성을 함께 바꾼다 — 면제다
+    via_helper = re.compile(r"setLangText\s*\(\s*(?:['\"]#?([\w-]+)['\"]|([A-Za-z_$][\w$]*))")
+
+    for f in html_files():
+        src = io.open(f, encoding='utf-8', errors='replace').read()
+
+        # 변수 → id
+        v2i = {}
+        for m in var_of.finditer(src):
+            v2i[m.group(1)] = m.group(2) or m.group(3)
+
+        filled = set()        # 글자를 JS 가 넣는 id
+        fixed = set()         # data-en/ko 도 JS 가 같이 바꾸는 id
+        for m in chained_set.finditer(src):
+            filled.add(m.group(1) or m.group(2))
+        for m in chained_attr.finditer(src):
+            fixed.add(m.group(1) or m.group(2))
+        helper_vars = set()
+        for m in via_helper.finditer(src):
+            if m.group(1):
+                fixed.add(m.group(1))
+            elif m.group(2):
+                helper_vars.add(m.group(2))
+        for v, i in v2i.items():
+            if re.search(r"\b%s\s*\.\s*(?:textContent|innerText|innerHTML)\s*=" % re.escape(v), src):
+                filled.add(i)
+            if re.search(r"\b%s\s*\.\s*setAttribute\(\s*['\"]data-(?:en|ko)['\"]" % re.escape(v), src):
+                fixed.add(i)
+            if v in helper_vars:
+                fixed.add(i)
+
+        for i in sorted(filled - fixed):
+            for m in re.finditer(r'<[^>]*\bid="%s"[^>]*>' % re.escape(i), src):
+                tag = m.group(0)
+                if not re.search(r'\bdata-(en|ko)(-html)?=', tag):
+                    continue
+                line = src[:m.start()].count('\n') + 1
+                key = (f.replace('\\', '/'), i)
+                why = PLACEHOLDER_OK.get(key) or TRANSIENT_OK.get(key)
+                if why:
+                    notes.append('[9] %s:%d #%s — %s' % (f, line, i, why))
+                    continue
+                problems.append((
+                    '[9] 자리표시가 되돌린다', f, line,
+                    'JS 가 #%s 의 글자를 넣는데 마크업에 data-en/data-ko 가 남아 있다. '
+                    '다음 칠하기(applyLanguage / applyLangAgain)가 **자리표시로 되돌린다.** '
+                    'products/view.html:803-811 처럼 글자와 두 속성을 함께 바꿔라.' % i))
+
+
 def main():
     if not os.path.exists('lang.js'):
         print('리포 뿌리에서 실행해라 (lang.js 가 보이는 곳).', file=sys.stderr)
@@ -512,6 +611,7 @@ def main():
     notes = check_stamps(problems) or []
     check_public_sensitive(problems, notes)
     check_inbound_links(problems, notes)
+    check_js_placeholder(problems, notes)
 
     print('lang.js 가 훑는 접미사: %s'
           % ', '.join(sorted(x or '(없음)' for x in supported)))
@@ -523,7 +623,7 @@ def main():
               '쓸지 말지는 결정 대기, A-368 참고'
               % (len(deferred), len(set(x[0] for x in deferred))))
     if not problems:
-        print('언어 규약 검사 — 어긋난 것 없음 (검사 8종)')
+        print('언어 규약 검사 — 어긋난 것 없음 (검사 9종)')
         return 0
     by = collections.Counter(x[0] for x in problems)
     print('언어 규약 검사 — 어긋난 것 %d건' % len(problems))

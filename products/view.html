@@ -1016,15 +1016,15 @@ function updateLikeUI() {
     const label = document.getElementById('likeLabel');
     if (!btn) return;
     const ko = document.documentElement.lang !== 'en';
-    if (isLiked) {
-        btn.classList.add('liked');
-        icon.className = 'fas fa-bookmark';
-        label.textContent = ko ? '저장됨' : 'Saved';
-    } else {
-        btn.classList.remove('liked');
-        icon.className = 'far fa-bookmark';
-        label.textContent = ko ? '저장' : 'Save';
-    }
+        /* A-423: 글자만 바꾸면 다음 칠하기가 마크업의 data-ko="저장" 으로 **되돌린다** —
+           저장된 항목인데 단추가 「저장」이라고 말하게 된다. 두 속성도 같이 바꾼다. */
+    const en = isLiked ? 'Saved' : 'Save';
+    const kr = isLiked ? '저장됨' : '저장';
+    btn.classList.toggle('liked', isLiked);
+    icon.className = (isLiked ? 'fas' : 'far') + ' fa-bookmark';
+    label.textContent = ko ? kr : en;
+    label.setAttribute('data-en', en);
+    label.setAttribute('data-ko', kr);
 }
 
 async function toggleLike() {

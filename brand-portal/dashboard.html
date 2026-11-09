@@ -72,23 +72,30 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 /* FORM FIELDS */
 .field { margin-bottom: 18px; }
 .field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--gray-700); margin-bottom: 4px; }
+/* A-426(2026-11-09): 이 한 줄과 아래 `.btn` 한 줄이 **56곳**을 손가락 기준 아래로
+   내려보내고 있었다 — 입력칸 52개 중 44개(38.7px), 단추 14개 중 12개(38.7~40px).
+   padding 만 있고 min-height 가 없어서, 글자 크기가 곧 칸 높이가 됐다.
+   낱낱이 class 를 다는 대신 **규칙 두 줄을 고친다** — 낱개로 세면 또 빠뜨린다(A-414 ④).
+   textarea 는 바로 아래 줄의 min-height: 80px 이 이긴다(순서가 뒤다). */
 .field input, .field select, .field textarea {
     width: 100%; padding: 10px 14px; border: 1px solid var(--gray-300); border-radius: 6px;
-    font-size: 0.9rem; font-family: inherit; background: var(--gray-50);
+    font-size: 0.9rem; font-family: inherit; background: var(--gray-50); min-height: 44px;
 }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); background: var(--white); }
 .field textarea { resize: vertical; min-height: 80px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 /* A-415: 브랜드 카테고리는 여러 개를 고를 수 있다(쓰는 쪽이 배열이다). 칸 높이 44px 는
    손가락 기준 최소 타깃 — A-393 에서 쓴 기준과 같다. */
-.bp-cat-grid { display: flex; flex-wrap: wrap; gap: 2px 16px; padding: 4px 0 2px; }
+/* 줄 사이 10px: 44px 칸이 세 줄로 접히는데 2px 만 띄우면 세로로 살짝 빗나간 탭이
+   이웃 줄로 간다(브론즈 23차). 가로 16px 은 그대로. */
+.bp-cat-grid { display: flex; flex-wrap: wrap; gap: 10px 16px; padding: 4px 0 2px; }
 .bp-cat-check { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; font-size: 0.85rem; color: var(--gray-700); cursor: pointer; }
 .bp-cat-check input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin: 0; }
 .bp-cat-check input:checked + span { font-weight: 700; color: var(--black); }
 .readonly { background: var(--gray-200) !important; color: var(--ink-soft); }
 
 /* BUTTONS */
-.btn { padding: 10px 24px; border: none; border-radius: 999px; font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.3s; }
+.btn { padding: 10px 24px; border: none; border-radius: 999px; font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.3s; min-height: 44px; }   /* A-426 */
 .btn-primary { background: var(--black); color: var(--white); }
 .btn-primary:hover { background: var(--accent-ink); }
 .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
@@ -311,11 +318,11 @@ h1, h2, .section-card h2 {
             <form id="brandInfoForm">
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Brand Name" data-ko="브랜드 명">Brand Name</label>
+                        <label for="editBrandName" data-en="Brand Name" data-ko="브랜드 명">Brand Name</label>
                         <input type="text" id="editBrandName" readonly class="readonly">
                     </div>
                     <div class="field">
-                        <label data-en="Country" data-ko="국가">Country</label>
+                        <label for="editCountry" data-en="Country" data-ko="국가">Country</label>
                         <!-- A-311(2026-11-06): 자유 입력이었다. 검증이 어디에도 없어(규칙에도 없다)
                              브랜드가 입점 후 국가를 아무 문자열로 덮어쓸 수 있었다 — 라이브에
                              country="seoul"(도시)이 그렇게 들어와 있었다. 신청서(list-your-brand.html)
@@ -434,7 +441,7 @@ h1, h2, .section-card h2 {
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Category" data-ko="카테고리">Category</label>
+                        <label id="editCategoryLabel" data-en="Category" data-ko="카테고리">Category</label>
                         <!-- A-415(2026-11-09): 이 자리는 단일 <select> 였다. 그런데 brands.category 는
                              list-your-brand.html:783 이 **배열**로 쓴다. 카테고리를 2개 이상 고른 브랜드가
                              이 화면에서 무엇이든(설명 한 줄이라도) 저장하면 select.value 가 "Furniture,Lighting"
@@ -442,7 +449,7 @@ h1, h2, .section-card h2 {
                              **빈 문자열이 Firestore 에 덮어써졌다** — 브랜드가 모르는 사이에 제 카테고리가
                              통째로 지워진 것이다. A-311 이 바로 윗줄 editCountry 에서 똑같은 모양을 이미
                              고쳤는데 그 아래 한 줄은 그대로였다. 쓰는 쪽과 같은 모양으로 맞춘다. -->
-                        <div class="bp-cat-grid" id="editCategoryGroup">
+                        <div class="bp-cat-grid" id="editCategoryGroup" role="group" aria-labelledby="editCategoryLabel">
                           <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Bathroom"><span data-en="Bathroom" data-ko="욕실">Bathroom</span></label>
                           <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Construction"><span data-en="Construction" data-ko="건축자재">Construction</span></label>
                           <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Decor"><span data-en="Decor" data-ko="데코">Decor</span></label>
@@ -456,25 +463,25 @@ h1, h2, .section-card h2 {
                         </div>
                     </div>
                     <div class="field">
-                        <label data-en="Website" data-ko="웹사이트">Website</label>
+                        <label for="editWebsite" data-en="Website" data-ko="웹사이트">Website</label>
                         <input type="url" id="editWebsite">
                     </div>
                 </div>
                 <div class="field">
-                    <label data-en="Brand Description / Philosophy" data-ko="브랜드 설명 / 철학">Brand Description / Philosophy</label>
+                    <label for="editDescription" data-en="Brand Description / Philosophy" data-ko="브랜드 설명 / 철학">Brand Description / Philosophy</label>
                     <textarea id="editDescription" rows="4" placeholder="Share your brand's story, philosophy, and heritage..." data-en-placeholder="Share your brand's story, philosophy, and heritage..." data-ko-placeholder="브랜드의 이야기, 철학, 전통을 들려주세요..."></textarea>
                 </div>
                 <div class="field">
-                    <label data-en="Tagline / Slogan" data-ko="태그라인 / 슬로건">Tagline / Slogan</label>
+                    <label for="editTagline" data-en="Tagline / Slogan" data-ko="태그라인 / 슬로건">Tagline / Slogan</label>
                     <input type="text" id="editTagline" placeholder="e.g. 'Designed for life'" data-en-placeholder="e.g. 'Designed for life'" data-ko-placeholder="예: '삶을 위한 디자인'">
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Founded Year" data-ko="설립 연도">Founded Year</label>
+                        <label for="editFounded" data-en="Founded Year" data-ko="설립 연도">Founded Year</label>
                         <input type="text" id="editFounded" placeholder="e.g. 1962" data-en-placeholder="e.g. 1962" data-ko-placeholder="예: 1962">
                     </div>
                     <div class="field">
-                        <label data-en="Headquarters" data-ko="본사">Headquarters</label>
+                        <label for="editHeadquarters" data-en="Headquarters" data-ko="본사">Headquarters</label>
                         <input type="text" id="editHeadquarters" placeholder="e.g. Milan, Italy" data-en-placeholder="e.g. Milan, Italy" data-ko-placeholder="예: 이탈리아 밀라노">
                     </div>
                 </div>
@@ -484,23 +491,23 @@ h1, h2, .section-card h2 {
                 <p style="font-size:0.8rem;color:#6b6459;margin-bottom:16px;" data-en="Add image URLs to make your brand page stand out. You can use links from your website or image hosting services." data-ko="이미지 URL을 추가하여 브랜드 페이지를 돋보이게 하세요. 웹사이트 링크 또는 이미지 호스팅 서비스를 사용할 수 있습니다.">Add image URLs to make your brand page stand out. You can use links from your website or image hosting services.</p>
 
                 <div class="field">
-                    <label data-en="Logo Image URL" data-ko="로고 이미지 URL">Logo Image URL</label>
+                    <label for="editLogoUrl" data-en="Logo Image URL" data-ko="로고 이미지 URL">Logo Image URL</label>
                     <input type="url" id="editLogoUrl" placeholder="https://yourbrand.com/logo.png">
                 </div>
                 <div class="field">
-                    <label data-en="Hero / Banner Image URL" data-ko="히어로 · 배너 이미지 URL">Hero / Banner Image URL</label>
+                    <label for="editHeroImage" data-en="Hero / Banner Image URL" data-ko="히어로 · 배너 이미지 URL">Hero / Banner Image URL</label>
                     <input type="url" id="editHeroImage" placeholder="https://yourbrand.com/hero-banner.jpg">
                 </div>
                 <div class="field">
-                    <label data-en="Gallery Image 1 URL" data-ko="갤러리 이미지 1 URL">Gallery Image 1 URL</label>
+                    <label for="editGallery1" data-en="Gallery Image 1 URL" data-ko="갤러리 이미지 1 URL">Gallery Image 1 URL</label>
                     <input type="url" id="editGallery1" placeholder="https://yourbrand.com/gallery1.jpg">
                 </div>
                 <div class="field">
-                    <label data-en="Gallery Image 2 URL" data-ko="갤러리 이미지 2 URL">Gallery Image 2 URL</label>
+                    <label for="editGallery2" data-en="Gallery Image 2 URL" data-ko="갤러리 이미지 2 URL">Gallery Image 2 URL</label>
                     <input type="url" id="editGallery2" placeholder="https://yourbrand.com/gallery2.jpg">
                 </div>
                 <div class="field">
-                    <label data-en="Gallery Image 3 URL" data-ko="갤러리 이미지 3 URL">Gallery Image 3 URL</label>
+                    <label for="editGallery3" data-en="Gallery Image 3 URL" data-ko="갤러리 이미지 3 URL">Gallery Image 3 URL</label>
                     <input type="url" id="editGallery3" placeholder="https://yourbrand.com/gallery3.jpg">
                 </div>
 
@@ -508,7 +515,7 @@ h1, h2, .section-card h2 {
                 <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#332e27;"><i class="fas fa-pen-fancy" style="margin-right:8px;color:#7a5c32;"></i>Brand Story</h3>
 
                 <div class="field">
-                    <label data-en="Brand Story (detailed)" data-ko="브랜드 이야기 (자세히)">Brand Story (detailed)</label>
+                    <label for="editBrandStory" data-en="Brand Story (detailed)" data-ko="브랜드 이야기 (자세히)">Brand Story (detailed)</label>
                     <textarea id="editBrandStory" rows="8" placeholder="Tell the full story of your brand — history, philosophy, craftsmanship, vision for the future..." data-en-placeholder="Tell the full story of your brand — history, philosophy, craftsmanship, vision for the future..." data-ko-placeholder="브랜드의 전체 이야기를 들려주세요 — 역사, 철학, 장인정신, 미래에 대한 비전..."></textarea>
                 </div>
 
@@ -517,21 +524,21 @@ h1, h2, .section-card h2 {
 
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Instagram URL" data-ko="인스타그램 URL">Instagram URL</label>
+                        <label for="editInstagram" data-en="Instagram URL" data-ko="인스타그램 URL">Instagram URL</label>
                         <input type="url" id="editInstagram" placeholder="https://instagram.com/yourbrand">
                     </div>
                     <div class="field">
-                        <label data-en="LinkedIn URL" data-ko="링크드인 URL">LinkedIn URL</label>
+                        <label for="editLinkedin" data-en="LinkedIn URL" data-ko="링크드인 URL">LinkedIn URL</label>
                         <input type="url" id="editLinkedin" placeholder="https://linkedin.com/company/yourbrand">
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Pinterest URL" data-ko="핀터레스트 URL">Pinterest URL</label>
+                        <label for="editPinterest" data-en="Pinterest URL" data-ko="핀터레스트 URL">Pinterest URL</label>
                         <input type="url" id="editPinterest" placeholder="https://pinterest.com/yourbrand">
                     </div>
                     <div class="field">
-                        <label data-en="YouTube URL" data-ko="유튜브 URL">YouTube URL</label>
+                        <label for="editYoutube" data-en="YouTube URL" data-ko="유튜브 URL">YouTube URL</label>
                         <input type="url" id="editYoutube" placeholder="https://youtube.com/@yourbrand">
                     </div>
                 </div>
@@ -542,31 +549,31 @@ h1, h2, .section-card h2 {
 
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Dealer / Distributor Name" data-ko="딜러 / 유통사명">Dealer / Distributor Name</label>
+                        <label for="editDealerName" data-en="Dealer / Distributor Name" data-ko="딜러 / 유통사명">Dealer / Distributor Name</label>
                         <input type="text" id="editDealerName" placeholder="e.g. Nexus Design" data-en-placeholder="e.g. Nexus Design" data-ko-placeholder="예: 넥서스 디자인">
                     </div>
                     <div class="field">
-                        <label data-en="Dealer Phone" data-ko="딜러 연락처">Dealer Phone</label>
+                        <label for="editDealerContact" data-en="Dealer Phone" data-ko="딜러 연락처">Dealer Phone</label>
                         <input type="text" id="editDealerContact" placeholder="e.g. 02-1234-5678" data-en-placeholder="e.g. 02-1234-5678" data-ko-placeholder="예: 02-1234-5678">
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Dealer Email" data-ko="딜러 이메일">Dealer Email</label>
+                        <label for="editDealerEmail" data-en="Dealer Email" data-ko="딜러 이메일">Dealer Email</label>
                         <input type="email" id="editDealerEmail" placeholder="e.g. info@dealer.kr" data-en-placeholder="e.g. info@dealer.kr" data-ko-placeholder="예: info@dealer.kr">
                     </div>
                     <div class="field">
-                        <label data-en="Dealer Website" data-ko="딜러 웹사이트">Dealer Website</label>
+                        <label for="editDealerWebsite" data-en="Dealer Website" data-ko="딜러 웹사이트">Dealer Website</label>
                         <input type="url" id="editDealerWebsite" placeholder="https://dealer.kr">
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Dealer Address" data-ko="딜러 주소">Dealer Address</label>
+                        <label for="editDealerAddress" data-en="Dealer Address" data-ko="딜러 주소">Dealer Address</label>
                         <input type="text" id="editDealerAddress" placeholder="e.g. 123 Nonhyeon-ro, Gangnam-gu, Seoul" data-en-placeholder="e.g. 123 Nonhyeon-ro, Gangnam-gu, Seoul" data-ko-placeholder="e.g. 서울특별시 강남구 논현로 123">
                     </div>
                     <div class="field">
-                        <label data-en="Showroom Location" data-ko="쇼룸 위치">Showroom Location</label>
+                        <label for="editDealerShowroom" data-en="Showroom Location" data-ko="쇼룸 위치">Showroom Location</label>
                         <input type="text" id="editDealerShowroom" placeholder="e.g. Gangnam Showroom, Seoul" data-en-placeholder="e.g. Gangnam Showroom, Seoul" data-ko-placeholder="e.g. 서울 강남 쇼룸">
                     </div>
                 </div>
@@ -584,16 +591,16 @@ h1, h2, .section-card h2 {
 
             <div class="field-row">
                 <div class="field">
-                    <label data-en="Certification Name" data-ko="인증명">Certification Name</label>
+                    <label for="certName" data-en="Certification Name" data-ko="인증명">Certification Name</label>
                     <input type="text" id="certName" placeholder="e.g. CE Marking" data-en-placeholder="e.g. CE Marking" data-ko-placeholder="예: CE 마킹">
                 </div>
                 <div class="field">
-                    <label data-en="Issuer (optional)" data-ko="발급기관 (선택)">Issuer (optional)</label>
+                    <label for="certIssuer" data-en="Issuer (optional)" data-ko="발급기관 (선택)">Issuer (optional)</label>
                     <input type="text" id="certIssuer" placeholder="e.g. TUV Rheinland" data-en-placeholder="e.g. TUV Rheinland" data-ko-placeholder="예: TÜV 라인란드">
                 </div>
             </div>
             <div class="field">
-                <label data-en="Certificate File (PDF or image)" data-ko="인증서 파일 (PDF 또는 이미지)">Certificate File (PDF or image)</label>
+                <label for="certFile" data-en="Certificate File (PDF or image)" data-ko="인증서 파일 (PDF 또는 이미지)">Certificate File (PDF or image)</label>
                 <input type="file" id="certFile" accept="application/pdf,image/*">
             </div>
             <button type="button" class="btn btn-secondary" id="addCertBtn"><i class="fas fa-plus"></i> <span data-en="Add Certification" data-ko="인증서 추가">Add Certification</span></button>
@@ -615,21 +622,21 @@ h1, h2, .section-card h2 {
                 <h3 style="font-size:1rem;margin-bottom:16px;" data-en="New Product" data-ko="제품 등록">New Product</h3>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Product Name *" data-ko="제품명 *">Product Name *</label>
+                        <label for="prodName" data-en="Product Name *" data-ko="제품명 *">Product Name *</label>
                         <input type="text" id="prodName" required placeholder="e.g. IC Lights T1" data-en-placeholder="e.g. IC Lights T1" data-ko-placeholder="예: IC Lights T1">
                     </div>
                     <div class="field">
-                        <label data-en="Collection / Series" data-ko="컬렉션 · 시리즈">Collection / Series</label>
+                        <label for="prodCollection" data-en="Collection / Series" data-ko="컬렉션 · 시리즈">Collection / Series</label>
                         <input type="text" id="prodCollection" placeholder="e.g. IC Lights" data-en-placeholder="e.g. IC Lights" data-ko-placeholder="예: IC Lights">
                     </div>
                 </div>
                 <div class="field">
-                    <label data-en="Description" data-ko="설명">Description</label>
+                    <label for="prodDesc" data-en="Description" data-ko="설명">Description</label>
                     <textarea id="prodDesc" placeholder="Product description, features, and design story..." data-en-placeholder="Product description, features, and design story..." data-ko-placeholder="제품 설명, 특징, 디자인 이야기..."></textarea>
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Category *" data-ko="카테고리 *">Category *</label>
+                        <label for="prodCategory" data-en="Category *" data-ko="카테고리 *">Category *</label>
                         <select id="prodCategory" required onchange="updateSubcategories()">
                             <option value="" data-en="Select category" data-ko="카테고리 선택">Select category</option>
                             <option value="Furniture">Furniture / 가구</option>
@@ -645,7 +652,7 @@ h1, h2, .section-card h2 {
                         </select>
                     </div>
                     <div class="field">
-                        <label data-en="Subcategory *" data-ko="서브카테고리 *">Subcategory *</label>
+                        <label for="prodSubcategory" data-en="Subcategory *" data-ko="서브카테고리 *">Subcategory *</label>
                         <select id="prodSubcategory" required>
                             <option value="" data-en="Select subcategory" data-ko="서브카테고리 선택">Select subcategory</option>
                         </select>
@@ -653,21 +660,21 @@ h1, h2, .section-card h2 {
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Materials" data-ko="소재">Materials</label>
+                        <label for="prodMaterials" data-en="Materials" data-ko="소재">Materials</label>
                         <input type="text" id="prodMaterials" placeholder="e.g. Brass, Opal glass" data-en-placeholder="e.g. Brass, Opal glass" data-ko-placeholder="예: 황동, 오팔 글라스">
                     </div>
                     <div class="field">
-                        <label data-en="Dimensions" data-ko="치수">Dimensions</label>
+                        <label for="prodDimensions" data-en="Dimensions" data-ko="치수">Dimensions</label>
                         <input type="text" id="prodDimensions" placeholder="e.g. W20 × D20 × H53 cm" data-en-placeholder="e.g. W20 × D20 × H53 cm" data-ko-placeholder="예: W20 × D20 × H53 cm">
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Designer" data-ko="디자이너">Designer</label>
+                        <label for="prodDesigner" data-en="Designer" data-ko="디자이너">Designer</label>
                         <input type="text" id="prodDesigner" placeholder="e.g. Michael Anastassiades" data-en-placeholder="e.g. Michael Anastassiades" data-ko-placeholder="예: 미카엘 아나스타시아데스">
                     </div>
                     <div class="field">
-                        <label data-en="Price Range" data-ko="가격대">Price Range</label>
+                        <label for="prodPrice" data-en="Price Range" data-ko="가격대">Price Range</label>
                         <select id="prodPrice">
                             <option value="" data-en="Select" data-ko="선택">Select</option>
                             <option value="$" data-en="$ (Under $500)" data-ko="$ (500달러 미만)">$ (Under $500)</option>
@@ -679,7 +686,7 @@ h1, h2, .section-card h2 {
                     </div>
                 </div>
                 <div class="field">
-                    <label data-en="Product Image" data-ko="제품 이미지">Product Image</label>
+                    <label for="prodImage" data-en="Product Image" data-ko="제품 이미지">Product Image</label>
                     <div class="upload-area" id="prodUploadArea">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p data-en="Click or drag to upload image (JPG, PNG, max 5MB)" data-ko="눌러서 고르거나 끌어다 놓으세요 (JPG · PNG, 최대 5MB)">Click or drag to upload image (JPG, PNG, max 5MB)</p>
@@ -695,16 +702,16 @@ h1, h2, .section-card h2 {
                 <p style="font-size:0.78rem;color:#6b6459;margin-bottom:12px;" data-en="Architects can drop these straight into their drawings." data-ko="건축가가 도면에 바로 반영할 수 있는 파일이에요.">Architects can drop these straight into their drawings.</p>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Catalog PDF" data-ko="카탈로그 PDF">Catalog PDF</label>
+                        <label for="prodCatalogFile" data-en="Catalog PDF" data-ko="카탈로그 PDF">Catalog PDF</label>
                         <input type="file" id="prodCatalogFile" accept="application/pdf">
                     </div>
                     <div class="field">
-                        <label data-en="BIM / Revit File" data-ko="BIM / Revit 파일">BIM / Revit File</label>
+                        <label for="prodBimFile" data-en="BIM / Revit File" data-ko="BIM / Revit 파일">BIM / Revit File</label>
                         <input type="file" id="prodBimFile">
                     </div>
                 </div>
                 <div class="field">
-                    <label data-en="3D Model File" data-ko="3D 모델 파일">3D Model File</label>
+                    <label for="prodModel3dFile" data-en="3D Model File" data-ko="3D 모델 파일">3D Model File</label>
                     <input type="file" id="prodModel3dFile">
                 </div>
 
@@ -712,16 +719,16 @@ h1, h2, .section-card h2 {
                 <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;color:#332e27;" data-en="Trade Conditions" data-ko="거래조건"><i class="fas fa-handshake" style="margin-right:6px;color:#7a5c32;"></i>Trade Conditions</h4>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="MOQ (Minimum Order Quantity)" data-ko="최소 발주 수량(MOQ)">MOQ (Minimum Order Quantity)</label>
+                        <label for="prodMoq" data-en="MOQ (Minimum Order Quantity)" data-ko="최소 발주 수량(MOQ)">MOQ (Minimum Order Quantity)</label>
                         <input type="text" id="prodMoq" placeholder="e.g. 100 units" data-en-placeholder="e.g. 100 units" data-ko-placeholder="예: 100개">
                     </div>
                     <div class="field">
-                        <label data-en="Lead Time" data-ko="리드타임">Lead Time</label>
+                        <label for="prodLeadTime" data-en="Lead Time" data-ko="리드타임">Lead Time</label>
                         <input type="text" id="prodLeadTime" placeholder="e.g. 8-10 weeks" data-en-placeholder="e.g. 8-10 weeks" data-ko-placeholder="예: 8~10주">
                     </div>
                 </div>
                 <div class="field">
-                    <label data-en="Supply Method" data-ko="공급 방식">Supply Method</label>
+                    <label for="prodSupplyType" data-en="Supply Method" data-ko="공급 방식">Supply Method</label>
                     <select id="prodSupplyType">
                         <option value="" data-en="Select" data-ko="선택">Select</option>
                         <option value="direct" data-en="Direct shipment from HQ" data-ko="본사 직접 납품">Direct shipment from HQ</option>
@@ -762,12 +769,12 @@ h1, h2, .section-card h2 {
             <div id="articleForm" style="display:none;margin-top:24px;padding:24px;background:#f7f3ec;border-radius:8px;">
                 <h3 style="font-size:1rem;margin-bottom:16px;" data-en="New Article" data-ko="글 작성">New Article</h3>
                 <div class="field">
-                    <label data-en="Article Title *" data-ko="글 제목 *">Article Title *</label>
+                    <label for="artTitle" data-en="Article Title *" data-ko="글 제목 *">Article Title *</label>
                     <input type="text" id="artTitle" required placeholder="e.g. How Italian Design Shapes Modern Korean Interiors" data-en-placeholder="e.g. How Italian Design Shapes Modern Korean Interiors" data-ko-placeholder="예: 이탈리아 디자인이 한국 인테리어를 바꾸는 방식">
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Tag" data-ko="태그">Tag</label>
+                        <label for="artTag" data-en="Tag" data-ko="태그">Tag</label>
                         <select id="artTag">
                             <option value="Brand Spotlight" data-en="Brand Spotlight" data-ko="브랜드 스포트라이트">Brand Spotlight</option>
                             <option value="Trend" data-en="Trend" data-ko="트렌드">Trend</option>
@@ -777,7 +784,7 @@ h1, h2, .section-card h2 {
                         </select>
                     </div>
                     <div class="field">
-                        <label data-en="Original Language" data-ko="원문 언어">Original Language</label>
+                        <label for="artLang" data-en="Original Language" data-ko="원문 언어">Original Language</label>
                         <select id="artLang">
                             <option value="en" data-en="English" data-ko="영어">English</option>
                             <option value="ko" data-en="Korean" data-ko="한국어">Korean</option>
@@ -785,9 +792,9 @@ h1, h2, .section-card h2 {
                     </div>
                 </div>
                 <div class="field">
-                    <label data-en="Article Body *" data-ko="본문 *">Article Body *</label>
+                    <label id="artBodyLabel" data-en="Article Body *" data-ko="본문 *">Article Body *</label>
                     <p style="font-size:0.78rem;color:#5d564c;margin:4px 0 12px;" data-en="Build your article by adding text and image blocks in any order. Drag an image into an image block to upload it." data-ko="글 상자와 이미지 상자를 원하는 순서로 더해 본문을 만드세요. 이미지 상자에 그림을 끌어다 놓으면 됩니다.">Build your article by adding text and image blocks in any order. Drag an image into an image block to upload it.</p>
-                    <div id="artBlocks" style="display:flex;flex-direction:column;gap:12px;"></div>
+                    <div id="artBlocks" role="group" aria-labelledby="artBodyLabel" style="display:flex;flex-direction:column;gap:12px;"></div>
                     <div style="display:flex;gap:8px;margin-top:12px;">
                         <button type="button" class="btn btn-secondary" id="addTextBlockBtn"><i class="fas fa-paragraph"></i> Add Text</button>
                         <button type="button" class="btn btn-secondary" id="addImageBlockBtn"><i class="fas fa-image"></i> Add Image</button>
@@ -878,11 +885,11 @@ h1, h2, .section-card h2 {
             <h2><i class="fas fa-cog"></i> Account Settings</h2>
             <form id="passwordForm">
                 <div class="field">
-                    <label data-en="New Password" data-ko="새 비밀번호">New Password</label>
+                    <label for="newPassword" data-en="New Password" data-ko="새 비밀번호">New Password</label>
                     <input type="password" id="newPassword" required placeholder="Enter new password (min 6 characters)" data-en-placeholder="Enter new password (min 6 characters)" data-ko-placeholder="새 비밀번호 입력 (6자 이상)">
                 </div>
                 <div class="field">
-                    <label data-en="Confirm New Password" data-ko="새 비밀번호 확인">Confirm New Password</label>
+                    <label for="confirmPassword" data-en="Confirm New Password" data-ko="새 비밀번호 확인">Confirm New Password</label>
                     <input type="password" id="confirmPassword" required placeholder="Confirm new password" data-en-placeholder="Confirm new password" data-ko-placeholder="새 비밀번호 확인">
                 </div>
                 <button type="submit" class="btn btn-primary" data-en="Change Password" data-ko="비밀번호 변경">Change Password</button>
@@ -894,21 +901,21 @@ h1, h2, .section-card h2 {
             <form id="contactForm">
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Contact Person" data-ko="담당자">Contact Person</label>
+                        <label for="editContactName" data-en="Contact Person" data-ko="담당자">Contact Person</label>
                         <input type="text" id="editContactName">
                     </div>
                     <div class="field">
-                        <label data-en="Position" data-ko="직함">Position</label>
+                        <label for="editPosition" data-en="Position" data-ko="직함">Position</label>
                         <input type="text" id="editPosition">
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Email" data-ko="이메일">Email</label>
+                        <label for="editEmail" data-en="Email" data-ko="이메일">Email</label>
                         <input type="email" id="editEmail" readonly class="readonly">
                     </div>
                     <div class="field">
-                        <label data-en="Phone" data-ko="전화">Phone</label>
+                        <label for="editPhone" data-en="Phone" data-ko="전화">Phone</label>
                         <input type="tel" id="editPhone">
                     </div>
                 </div>
@@ -1300,7 +1307,7 @@ document.getElementById('addCertBtn').addEventListener('click', async () => {
 
     const btn = document.getElementById('addCertBtn');
     btn.disabled = true;
-    btn.textContent = 'Uploading...';
+    window.setLangText && window.setLangText(btn, "Uploading...", "올리는 중...");
 
     try {
         const ref = storage.ref(`certifications/${currentUser.uid}/${Date.now()}_${file.name}`);
@@ -1564,7 +1571,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
 
     const btn = document.getElementById('submitProduct');
     btn.disabled = true;
-    btn.textContent = 'Uploading...';
+    window.setLangText && window.setLangText(btn, "Uploading...", "올리는 중...");
 
     async function uploadIfPresent(inputId, folder) {
         const file = document.getElementById(inputId).files[0];
@@ -1584,11 +1591,11 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
 
     const category = document.getElementById('prodCategory').value;
     const subcategory = document.getElementById('prodSubcategory').value;
-    if (!category || !subcategory) { prodMsg(document.documentElement.lang !== 'en' ? '카테고리와 서브카테고리를 모두 골라 주세요.' : 'Category and subcategory are required', true); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+    if (!category || !subcategory) { prodMsg(document.documentElement.lang !== 'en' ? '카테고리와 서브카테고리를 모두 골라 주세요.' : 'Category and subcategory are required', true); btn.disabled = false; window.setLangText && window.setLangText(btn, "Submit for Review", "검수 요청"); return; }
 
     // A-213: 업로드 전에 한 번 — 파일을 올리고 나서 멈추면 쓰레기 파일이 남는다
     let bpId = bpIdentity(bpFormUid);
-    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); btn.disabled = false; window.setLangText && window.setLangText(btn, "Submit for Review", "검수 요청"); return; }
 
     const catalogPdf = await uploadIfPresent('prodCatalogFile', 'products-specs');
     const bimFile = await uploadIfPresent('prodBimFile', 'products-specs');
@@ -1596,7 +1603,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
 
     // A-213: 업로드는 await 를 여러 번 거친다. 그 사이에 계정이 바뀌었을 수 있으므로 다시 확인한다.
     bpId = bpIdentity(bpFormUid);
-    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); btn.disabled = false; btn.textContent = 'Submit for Review'; return; }
+    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); btn.disabled = false; window.setLangText && window.setLangText(btn, "Submit for Review", "검수 요청"); return; }
 
     await db.collection('products').add({
         brandId: bpId.uid,            // A-213 — brandId·brandName·brandSlug 를 한 객체에서 함께
@@ -1625,7 +1632,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     });
 
     btn.disabled = false;
-    btn.textContent = 'Submit for Review';
+    window.setLangText && window.setLangText(btn, "Submit for Review", "검수 요청");
     document.getElementById('productForm').style.display = 'none';
     document.getElementById('addProductBtn').style.display = 'inline-block';
 
@@ -1925,7 +1932,7 @@ function inbox_open(id) {
     document.getElementById('inboxModalContent').innerHTML = '<h2>' + inbox_esc(it.name || '-') + ' ' + inbox_typeBadge(it.type) + ' ' + inbox_statusBadge(it.status) + '</h2>'
         + '<dl class="inbox-dl">' + dd('Company', '회사', it.company) + dd('Email', '이메일', it.email) + dd('Phone', '전화', it.phone) + dd('Industry', '업종', it.industry)
         + dd('Product', '제품', it.productName) + dd('Received', '접수', inbox_fmtDate(it.createdAt)) + dd('Assigned', '배정', inbox_fmtDate(it.assignedAt)) + dd('Message', '본문', it.message) + '</dl>'
-        + '<div class="inbox-bar"><label ' + inbox_attr('Status', '상태') + '>' + inbox_esc(inbox_t('Status', '상태')) + '</label><select id="inboxStatus">' + opts + '</select>'
+        + '<div class="inbox-bar"><label for="inboxStatus" ' + inbox_attr('Status', '상태') + '>' + inbox_esc(inbox_t('Status', '상태')) + '</label><select id="inboxStatus">' + opts + '</select>'
         + '<input type="text" id="inboxNote" maxlength="200" value="' + inbox_attrEsc(it.brandNote || '') + '" placeholder="' + inbox_attrEsc(inbox_t('Your note (one line, optional)', '메모 한 줄 (선택)')) + '" data-en-placeholder="Your note (one line, optional)" data-ko-placeholder="메모 한 줄 (선택)"></div>'
         + '<div class="inbox-err" id="inboxErr"></div>'
         + '<div class="inbox-actions"><button type="button" class="btn btn-secondary" id="inboxCancelBtn" ' + inbox_attr('Close', '닫기') + '>' + inbox_esc(inbox_t('Close', '닫기')) + '</button>'
