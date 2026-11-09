@@ -595,7 +595,19 @@ async function loadBrand() {
 function renderBrand(brand, products, articles) {
     articles = articles || [];
     const brandName = escapeHtml(brand.brandName || '');
-    const categoryLabel = escapeHtml(brand.category || 'Brand');
+    /* A-373: 카테고리 **값**이 영어로 굳어 있었다 — 라벨(「카테고리」)은 A-367 로
+       번역됐는데 값은 `Outdoor` 그대로였다(브론즈 14차). 머리띠 드롭다운이 이미
+       갖고 있는 열 쌍을 그대로 쓴다 — 번역을 새로 짓지 않는다. */
+    const CAT_KO = {
+        'Furniture': '가구', 'Bathroom': '욕실', 'Outdoor': '아웃도어',
+        'Lighting': '조명', 'Kitchen': '주방', 'Office': '오피스',
+        'Finishes': '마감재', 'Wellness': '웰니스', 'Decor': '데코',
+        'Construction': '건축자재'
+    };
+    const categoryRaw = brand.category || 'Brand';
+    const categoryLabel = escapeHtml(categoryRaw);
+    /* 모르는 값이면 양쪽을 같게 둔다 — 영어로 보여 주는 게 빈칸보다 낫다 */
+    const categoryKo = escapeHtml(CAT_KO[categoryRaw] || categoryRaw);
     const description = escapeHtml(brand.description || '');
     const tagline = escapeHtml(brand.tagline || '');
     const country = escapeHtml(brand.country || '');
@@ -751,7 +763,7 @@ function renderBrand(brand, products, articles) {
                 ${heroHtml}
             </div>
             <div class="bp-hero-content fade-in">
-                <span class="bp-hero-badge">${categoryLabel}</span>
+                <span class="bp-hero-badge" data-en="${categoryLabel}" data-ko="${categoryKo}">${categoryLabel}</span>
                 ${logoUrl && heroImage ? `<img loading="lazy" src="${logoUrl}" alt="${brandName}" style="height:48px;object-fit:contain;margin-bottom:12px;">` : ''}
                 <h1>${brandName}</h1>
                 ${tagline ? `<p class="bp-hero-subtitle" style="font-style:italic;color:var(--ink-soft);">"${tagline}"</p>` : ''}
@@ -775,9 +787,9 @@ function renderBrand(brand, products, articles) {
                         <i class="far fa-bookmark" id="brandLikeIcon"></i>
                         <span id="brandLikeLabel" data-en="Save" data-ko="저장">Save</span>
                     </button>
-                    <button type="button" class="btn btn-primary" onclick="openRfqModal()"><i class="fas fa-file-invoice"></i> Inquire</button>
-                    ${website ? `<a href="${wsUrl}" target="_blank" class="btn btn-secondary" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> Visit Website</a>` : ''}
-                    <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> Contact</a>
+                    <button type="button" class="btn btn-primary" onclick="openRfqModal()"><i class="fas fa-file-invoice"></i> <span data-en="Inquire" data-ko="문의하기">Inquire</span></button>
+                    ${website ? `<a href="${wsUrl}" target="_blank" class="btn btn-secondary" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> <span data-en="Visit Website" data-ko="웹사이트 방문">Visit Website</span></a>` : ''}
+                    <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> <span data-en="Contact" data-ko="연락처">Contact</span></a>
                 </div>
                 ${snsLinks ? `<div class="bp-social-links">${snsLinks}</div>` : ''}
             </div>
@@ -797,7 +809,7 @@ function renderBrand(brand, products, articles) {
             </div>
             <div class="bp-info-item">
                 <span class="bp-info-label" data-en="Category" data-ko="카테고리">Category</span>
-                <span class="bp-info-value">${categoryLabel}</span>
+                <span class="bp-info-value" data-en="${categoryLabel}" data-ko="${categoryKo}">${categoryLabel}</span>
             </div>
             <div class="bp-info-item">
                 <span class="bp-info-label" data-en="${founded ? 'Since' : 'Products'}" data-ko="${founded ? '설립' : '제품'}">${founded ? 'Since' : 'Products'}</span>

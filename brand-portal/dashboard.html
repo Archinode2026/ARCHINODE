@@ -1607,20 +1607,28 @@ async function loadProducts() {
         const pCollection = escapeHtml(p.collection || '');
         const pMaterials = escapeHtml(p.materials || '');
         const pSt = (p.status === 'approved' || p.status === 'rejected') ? p.status : 'pending';
-        const pStatus = pSt === 'approved' ? (ko ? '승인됨' : 'Approved')
-                      : pSt === 'rejected' ? (ko ? '반려됨' : 'Rejected')
-                      : (ko ? '심사 대기중' : 'Pending');
+        /* A-373(2026-11-09): 여기 `ko` 는 `document.documentElement.lang` 을 보는데
+           html 은 `lang="en"` 으로 시작한다. 제품 목록이 lang.js 보다 먼저 그려지면
+           `ko=false` 가 되어 **한국어 브랜드에게 영어 배지**가 뜨고, 짝 속성이 없어
+           나중에 칠해도 안 고쳐졌다(브론즈 14차). 기사 목록은 A-204 에서 같은 함정을
+           고쳤는데 제품 목록만 남아 있었다. 양쪽을 속성으로 달고, 목록을 다 그린 뒤
+           한 번 칠한다 — A-354 의 「다시 그린 뒤 반드시 한 번 칠한다」와 같은 약속이다. */
+        const pStatusEn = pSt === 'approved' ? 'Approved' : pSt === 'rejected' ? 'Rejected' : 'Pending';
+        const pStatusKo = pSt === 'approved' ? '승인됨'   : pSt === 'rejected' ? '반려됨'   : '심사 대기중';
+        const pStatus = ko ? pStatusKo : pStatusEn;
         grid.innerHTML += `
             <div class="product-card">
                 <div class="img-area">${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : 'No image'}</div>
                 <div class="info">
                     <h4>${pName}</h4>
                     <p>${pCollection} ${p.materials ? '· ' + pMaterials : ''}</p>
-                    <span class="status-badge ${statusClass}" style="margin-top:8px;">${pStatus}</span>
+                    <span class="status-badge ${statusClass}" style="margin-top:8px;" data-en="${pStatusEn}" data-ko="${pStatusKo}">${pStatus}</span>
                     ${rejectReasonHtml(pSt, p.reviewerNote)}
                 </div>
             </div>`;
     });
+    /* A-373: 다 그린 뒤 반드시 한 번 칠한다 */
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
 }
 
 // ── 매거진 아티클 — 블록 에디터 + 이미지 업로드 + 저장은 brand-portal/article-editor.js에서 처리 ──

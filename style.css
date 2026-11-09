@@ -2450,6 +2450,20 @@ body .header .container {
   min-height: var(--header-height);
   row-gap: 8px;
 }
+
+/* A-373(2026-11-09): A-366 이 줄바꿈을 켰더니 **1175~1300px 영어**에서
+   `.header-actions` 가 둘째 줄에 **혼자** 남고, 컨테이너가 `space-between` 이라
+   그 줄의 맨 **왼쪽**에 붙었다 — 돋보기·저장·언어 단추가 로고 밑 왼쪽에 떠 있다.
+   기능은 멀쩡하지만(전부 화면 안) 1280px 은 가장 흔한 노트북 폭이라 생김새가 중요하다.
+   브론즈 14차 실측: 1280 비로그인 영어 로고 326 + 메뉴 764 + 단추 110 = 1200 >
+   안쪽 1185 — 15px 모자라 넘어간다.
+   이 구간에서만 `margin-left:auto` 로 단추 줄을 오른쪽에 붙인다. 두 항목이 한 줄을
+   나눠 쓰는 1101~1174 에서는 `space-between` 과 결과가 같아 변화가 없고,
+   1301px 이상(한 줄)과 1100px 이하(햄버거)는 아예 건드리지 않는다 —
+   **A-366 에서 「1280px 이상은 변화 없다」고 적었다가 틀린 자리라, 이번엔 구간을 좁게 잡는다.** */
+@media (min-width: 1101px) and (max-width: 1300px) {
+  body .header .container > .header-actions { margin-left: auto; }
+}
 /* 영문 부제가 한국어보다 길어 헤더가 빡빡해졌다 — 메뉴 사이 간격을 조금 좁혀 자리를 돌려준다 */
 .main-nav { gap: 20px; }
 .main-nav > a, .nav-dropdown-trigger {
