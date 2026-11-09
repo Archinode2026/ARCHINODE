@@ -382,32 +382,39 @@ body .topbar .lang-switch-btn:hover {
      표본 한 파일에서 선택자를 고르고 **마크업 변종을 세지 않은** 결과다.
      이제 **감싸개**(`.breadcrumb`)를 기준으로 잡아 안쪽 구조와 무관하게 닿는다.
      빠진 둘이 하필 상세 화면이었다(브론즈 20차). */
-  .breadcrumb a,
-  .pp-breadcrumb a,
-  .ma-breadcrumb a,
-  .pp-brand-link,
-  .pp-category-tag,
-  .section-link,
-  .footer-bottom-links a,
-  .footer-contact a,
-  .announcement-bar a,
+  /* A-411: `body ` 접두는 멋이 아니라 **순서 방어**다. 이 블록(455행쯤)은
+     `.section-link`(555) · `.footer-bottom-links a`(779) · `.footer-contact a`(3630)
+     같은 **기본 규칙보다 앞**에 있다. 지금은 그 기본 규칙들이 `position` 을
+     건드리지 않아 우연히 이기고 있을 뿐이다 — 누가 거기에 `position` 을 한 줄
+     더하면 이 블록이 조용히 죽는다. 특정도로 못 박아 둔다. */
+  body .breadcrumb a,
+  body .pp-breadcrumb a,
+  body .ma-breadcrumb a,
+  body .pp-brand-link,
+  body .pp-category-tag,
+  body .section-link,
+  body .footer-bottom-links a,
+  body .footer-contact a,
+  body .announcement-bar a,
+  body .contact-direct,
   body.home .promo-foot a,
-  .hero-dot,
-  .hero-pause-btn,
-  .cat-rail-btn { position: relative; }
+  body .hero-dot,
+  body .hero-pause-btn,
+  body .cat-rail-btn { position: relative; }
 
   /* 세로만 — 한 줄에 나란히 있어 가로로 넓히면 이웃과 겹치는 것들 */
-  .breadcrumb a::after,
-  .pp-breadcrumb a::after,
-  .ma-breadcrumb a::after,
-  .pp-brand-link::after,
-  .pp-category-tag::after,
-  .section-link::after,
-  .footer-bottom-links a::after,
-  .footer-contact a::after,
-  .announcement-bar a::after,
+  body .breadcrumb a::after,
+  body .pp-breadcrumb a::after,
+  body .ma-breadcrumb a::after,
+  body .pp-brand-link::after,
+  body .pp-category-tag::after,
+  body .section-link::after,
+  body .footer-bottom-links a::after,
+  body .footer-contact a::after,
+  body .announcement-bar a::after,
+  body .contact-direct::after,
   body.home .promo-foot a::after,
-  .hero-dot::after {
+  body .hero-dot::after {
     content: '';
     position: absolute;
     left: 0;
@@ -425,8 +432,8 @@ body .topbar .lang-switch-btn:hover {
      안 돈다). 그러니 지금 피해는 **없다.** 그래도 `body.home` 을 떼는 쪽이
      맞다 — 선택자가 페이지가 아니라 **마크업을 따라가게** 두면, 다음에
      어느 페이지에 점을 넣어도 2px 짜리 타깃이 되지 않는다. */
-  .hero-pause-btn::after,
-  .cat-rail-btn::after {
+  body .hero-pause-btn::after,
+  body .cat-rail-btn::after {
     content: '';
     position: absolute;
     left: 50%;
@@ -461,7 +468,20 @@ body .topbar .lang-switch-btn:hover {
    승리님 결정 사항으로 대장 A-394 에 적었다.
    ─────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
-  .scroll-top { bottom: 84px; }
+  /* A-411(2026-11-09): `.scroll-top { bottom: 84px }` 로 적었더니 **죽어 있었다.**
+     이 블록은 464행이고 기본 규칙 `.scroll-top { bottom: 30px }` 는 **812행**이다
+     — 특정도가 같으면 **뒤에 오는 선언이 이긴다.** 브론즈 21차가 라이브에서
+     computed `bottom` = 30px 를 재서 잡았다(겹침 44×34, 2/7 — A-394 의 「고치기
+     전」 숫자 그대로).
+
+     ★ **내 검증 방법이 이것을 가렸다.** A-394 를 확인할 때 규칙을 `<style>` 로
+     **주입**했는데, 주입한 스타일은 캐스케이드 **맨 뒤**에 붙으므로 늘 이긴다.
+     즉 나는 **선언이 맞는지**만 확인하고 **그 선언이 파일에서 이기는지**는
+     확인하지 않았다. 주입으로 재는 것은 이 꼴의 결함을 구조적으로 못 본다.
+
+     이 파일의 관례대로 `body ` 접두로 특정도를 올려 순서와 무관하게 이기게 한다
+     (A-366·A-377 이 `body .header .container` 로 같은 일을 했다). */
+  body .scroll-top { bottom: 84px; }
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -482,9 +502,24 @@ body .topbar .lang-switch-btn:hover {
    `getClientRects()` 를 써야 한다 — 대장 A-408 에 적어 뒀다.
    ─────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
-  .announcement-bar a {
+  body .announcement-bar a {
     display: inline-block;
     white-space: nowrap;
+  }
+
+  /* A-414(2026-11-09): 언어 단추가 **auth 계열에서만** 손가락 기준에 못 미쳤다 —
+     공개면은 47.1x44 인데 `signup` 53x26.1 · `reset-password` 53.6x22.8
+     (브론즈 21차 실측, 3/7). 공개면이 44px 인 이유는 그 단추가
+     `.header-actions` 안이라 A-113 의 `min-height: 44px` 를 받기 때문이고,
+     이 세 헤더는 그 묶음 밖에 있어 안 받았다. 같은 기준으로 맞춘다.
+     `body ` 접두는 A-411 의 순서 방어 — 이 세 헤더는 각 페이지 인라인
+     `<style>` 에 정의돼 있어 특정도를 올려야 이긴다(237행 주석 참고). */
+  body .auth-header .lang-switch-btn,
+  body .reset-header .lang-switch-btn,
+  body .topbar .lang-switch-btn {
+    min-height: 44px;
+    min-width: 44px;
+    justify-content: center;
   }
 }
 
@@ -2426,7 +2461,13 @@ body .stats-section.band-grey { color: var(--black); }
   button[onclick*="copy"], .copy-btn, .product-wish, .btn-like {
     display: none !important;
   }
-  body { background: #fdfbf7; color: #332e27; }
+  /* A-412(2026-11-09): 전에는 `body { ... }` 였는데 **2523행의 기본
+     `body` 규칙에 덮여 죽어 있었다**(특정도 같고 뒤가 이긴다). 즉 인쇄할 때
+     배경·글자색이 의도한 크림/먹색이 아니라 기본값으로 나갔다.
+     `html body` 로 특정도를 올려(0,0,2 > 0,0,1) 순서와 무관하게 이기게 한다.
+     ※ 화면으로는 확인할 수 없는 자리다 — 여기서 인쇄를 할 수 없어
+     **특정도 규칙으로만 보장**했고 눈으로는 못 봤다. */
+  html body { background: #fdfbf7; color: #332e27; }
   .page-hero, .hero { min-height: auto; padding: 0; background: none !important; }
   .page-hero-bg, .hero-slide-bg { display: none; }
   .container, .page-hero-content, .page-hero-inner { max-width: 100%; padding: 0; }
@@ -3502,6 +3543,20 @@ html[lang="ko"] body.mag .section-title { letter-spacing: -0.005em; }
 
 /* ── 머리기사 ── */
 body.mag .featured-card {
+  /* A-413(2026-11-09): `display: block` 이 빠져 있었다. 마크업이
+     `<a class="featured-card">` 라 **인라인**이고, 그래서 `height` 와
+     `overflow: hidden` 이 뜻대로 걸리지 않는다. 그 상태에서
+     `.featured-overlay`(`position:absolute; inset:auto 0 0 0`)가 카드 위로
+     솟아 **바로 위의 빵부스러기를 덮었다.**
+
+     브론즈 21차 실측(390px 한국어): `trend-report.html` 에서 덮개가
+     (20,417,350,358) 로 깔려 「홈」이 **0/7** — 즉 **「홈」을 누르면 머리기사로
+     간다.** `magazine.html` 은 1~3/7. 1280px 은 멀쩡해서 데스크톱 눈으로는
+     안 보였다. 덮개를 걷으면 둘 다 7/7 이 되는 것으로 원인을 확정했다.
+
+     형제인 `body.mag .article-card`(3562행)에는 이 한 줄이 **있다** —
+     머리기사 카드만 빠졌다. */
+  display: block;
   position: relative; overflow: hidden; cursor: pointer;
   height: clamp(360px, 42vw, 560px); border-radius: var(--radius);
 }

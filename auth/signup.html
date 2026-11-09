@@ -99,8 +99,15 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .benefits li { font-size: 0.82rem; color: var(--gray-700); padding: 4px 0; }
 .benefits li i { color: var(--accent); margin-right: 8px; width: 14px; }
 
-.terms-check { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0 8px; font-size: 0.8rem; color: var(--gray-700); }
-.terms-check input { margin-top: 2px; accent-color: var(--accent); }
+/* A-414(2026-11-09): 체크박스가 **13x13**(브라우저 기본)이고 라벨도 20.5px 라
+   손가락으로 누르기 어려웠다(브론즈 21차 실측, 체크박스 2/7 · 라벨 3/7).
+   이 저장소의 다른 동의 체크박스는 16~22px 다 — `list-your-brand.html:484` 16px ·
+   `products/view.html` 20px · `request-consultation.html` 22px. 20px 로 맞추고
+   줄 자체에 `min-height: 44px` 을 줘 **라벨을 눌러도 토글되는 44px 짜리 줄**로
+   만든다(`<label for>` 이라 라벨 클릭이 체크박스를 켠다).
+   `list-your-brand.html` 의 격자 라벨은 **이미 44px**(간격 60px)이라 손대지 않았다. */
+.terms-check { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0 8px; font-size: 0.8rem; color: var(--gray-700); min-height: 44px; }
+.terms-check input { margin-top: 2px; accent-color: var(--accent); width: 20px; height: 20px; flex-shrink: 0; }
 .terms-check a { color: var(--accent-ink); }
 
 @media (max-width: 560px) {

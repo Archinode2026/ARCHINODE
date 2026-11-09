@@ -47,6 +47,8 @@ CHECKS = [
      'A-397 · A-401 · A-402 — 배열 category · 언어 판정 · 색인 설명'),
     ('카테고리 이름 사본',    'py',   'tools/check-category-labels.py',
      'A-407 — 세 곳의 대응표가 카테고리 페이지의 두 언어 h1 과 맞는지'),
+    ('죽은 미디어 규칙',      'py',   'tools/check-css-cascade.py',
+     'A-411 — @media 안의 수정이 뒤쪽 기본 규칙에 덮여 죽지 않았는지'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)
