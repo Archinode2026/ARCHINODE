@@ -8,7 +8,7 @@
 # 쓰는 법: 리포 뿌리에서 PowerShell 로 한 번만.
 #     .\tools\fetch-photos.ps1
 #
-# 사진 95장을 assets/photos/ 에 1800px 로 받는다. 작은 크기(600·240)는
+# 사진 115장을 assets/photos/ 에 1800px 로 받는다. 작은 크기(600·240)는
 # 노드가 이 원본에서 만들어 넣는다 — 그래서 받을 양이 반으로 줄었다.
 # 이미 있는 파일은 건너뛴다. 중간에 끊겨도 다시 돌리면 이어진다.
 
@@ -17,6 +17,28 @@ $dir = Join-Path $PSScriptRoot "..\assets\photos"
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
 
 $ids = @(
+  # ── A-379(2026-11-09) 카테고리 카드용 20장 추가 ──
+  'photo-1577412647305-991150c7d163'
+  'photo-1543751416-705d3e34d02a'
+  'photo-1463130456064-77fda7f96d6b'
+  'photo-1627257058769-0a99529e4312'
+  'photo-1606170033648-5d55a3edf314'
+  'photo-1606241018160-4985a8ab5dec'
+  'photo-1762117360871-f11fbad00ee1'
+  'photo-1565814329452-e1efa11c5b89'
+  'photo-1759722667550-81316a23d723'
+  'photo-1620517762957-3e4622447d9c'
+  'photo-1788448093731-6f7db7164ef3'
+  'photo-1590251024078-8a6d9f90b02d'
+  'photo-1523350165414-082d792c4bcc'
+  'photo-1643949700215-e61cdca053f7'
+  'photo-1553095066-5014bc7b7f2d'
+  'photo-1612764550058-b7ccce95a20e'
+  'photo-1576698483491-8c43f0862543'
+  'photo-1613849925362-38fb4c16ff36'
+  'photo-1534175262708-ebf71ac916c2'
+  'photo-1761053130711-2515ef532bb5'
+  # ── 기존 95장 ──
   'photo-1448630360428-65456885c650'
   'photo-1452860606245-08befc0ff44b'
   'photo-1466611653911-95081537e5b7'
