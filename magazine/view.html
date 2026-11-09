@@ -328,6 +328,26 @@ function renderBlocks(blocks) {
 }
 
 function renderArticle(a) {
+    /* ── A-410(2026-11-09): 태그가 저장된 영어 값 그대로 찍혔다 ───────────────
+       `a.tag` 는 브랜드가 포털의 선택칸에서 고른 값이고 **영어로 저장된다**
+       (`value="Brand Spotlight"` 등). 이 화면은 그 값을 그대로 찍으므로
+       한국어 화면에서도 영어로 남는다 — A-407 과 같은 꼴이다.
+
+       지금은 `articles` 컬렉션이 비어 있어 **드러나지 않는 잠복 결함**이다.
+       첫 브랜드 기사가 올라오는 순간 보인다. 아래 다섯 쌍은 지어낸 것이
+       아니라 **포털 선택칸의 `data-en`/`data-ko`**(A-395)에서 그대로 가져왔다.
+       모르는 값이면 양쪽을 같게 둔다 — 영어로 보여 주는 게 빈칸보다 낫다. */
+    const TAG_KO = {
+        'Brand Spotlight': '브랜드 스포트라이트',
+        'Trend': '트렌드',
+        'Project': '프로젝트',
+        'Interview': '인터뷰',
+        'Guide': '가이드'
+    };
+    const tagRaw = a.tag || '';
+    const tagEn = escapeHtml(tagRaw || 'Article');
+    const tagKo = escapeHtml(TAG_KO[tagRaw] || tagRaw || '기사');
+
     // A-259: 보는 사람 언어에 맞는 판을 고른다. 번역판이 없으면 원문을 주되 side.fellBack 이 선다.
     const side = (typeof window.artSide === 'function') ? window.artSide(a) : {
         title: a.title, excerpt: a.excerpt, blocks: a.blocks, content: a.content,
@@ -364,7 +384,7 @@ function renderArticle(a) {
     <div class="ma-hero">
         ${heroImg ? `<img loading="lazy" src="${escapeHtml(heroImg)}" alt="${escapeHtml(side.title || '')}">` : ''}
         <div class="ma-hero-overlay">
-            <span class="ma-hero-tag">${escapeHtml(a.tag || 'Article')}</span>
+            <span class="ma-hero-tag" data-en="${tagEn}" data-ko="${tagKo}">${tagEn}</span>
             <h1>${escapeHtml(side.title || '')}</h1>
         </div>
     </div>
@@ -377,7 +397,7 @@ function renderArticle(a) {
         </div>
 
         <div class="ma-meta">
-            <span>${escapeHtml(a.tag || '')}</span>
+            <span data-en="${tagEn}" data-ko="${tagKo}">${tagEn}</span>
             <span>·</span>
             ${brandLinkOpen}${escapeHtml(a.brandName || '')}${brandLinkClose}
             ${dateStr ? `<span>·</span><span>${dateStr}</span>` : ''}
