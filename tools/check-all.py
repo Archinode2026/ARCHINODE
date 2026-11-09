@@ -45,6 +45,8 @@ CHECKS = [
      'A-385 — style.css 를 안 싣는 페이지가 공용 처방을 놓쳤는지'),
     ('검색 회귀',            'node', 'tools/test-search.js',
      'A-397 · A-401 · A-402 — 배열 category · 언어 판정 · 색인 설명'),
+    ('카테고리 이름 사본',    'py',   'tools/check-category-labels.py',
+     'A-407 — 세 곳의 대응표가 카테고리 페이지의 두 언어 h1 과 맞는지'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

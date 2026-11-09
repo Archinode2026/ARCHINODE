@@ -496,6 +496,20 @@ async function loadProduct() {
         }
 
         renderProduct(product, related);
+        /* A-407: `brands/view.html` 은 A-353·A-347 에서 이 두 줄을 받았는데
+           **이 파일은 받지 않았다.** innerHTML 로 통째로 그려 넣으므로
+           lang.js 의 칠하기를 이미 지나쳤고, 언어를 바꿔도 다시 그릴 길이 없었다.
+           같은 약속으로 맞춘다 — 그려 넣은 뒤 한 번 칠하고, 언어 신호를 받으면
+           같은 자료로 다시 그린다. renderProduct 는 contentDiv.innerHTML 만 쓰는
+           순수 렌더라 다시 불러도 듣는 쪽이 겹치지 않는다. */
+        if (typeof window.applyLangAgain === 'function') window.applyLangAgain();
+        window.__productView = { product: product, related: related };
+        document.addEventListener('archinode:lang', function () {
+            var v = window.__productView;
+            if (!v) return;
+            renderProduct(v.product, v.related);
+            if (typeof window.applyLangAgain === 'function') window.applyLangAgain();
+        });
     } catch (err) {
         console.error('Error loading product:', err);
         showError('오류가 발생했습니다', '제품 정보를 불러오는 중 문제가 발생했습니다.');
@@ -526,11 +540,111 @@ function renderProduct(p, related) {
     const pBimFile = escapeHtml(p.bimFile || '');
     const pModel3d = escapeHtml(p.model3d || '');
     const pImages = (p.images || []).map(img => escapeHtml(img));
-    const catLabel = escapeHtml(p.category || '');
-    const catLabelLower = (p.category || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
-    const subLabel = p.subcategory ? p.subcategory.replace(/-/g, ' ') : '';
-    const subLabelEsc = escapeHtml(subLabel);
+    /* ── A-407(2026-11-09): 카테고리·하위 카테고리 이름이 영어로 고정돼 있었다 ──
+       전에는 `catLabel = p.category`(=「Furniture」), `subLabel = slug.replace(/-/g,' ')`
+       (=「chairs stools」)를 그대로 찍었다. 한국어 화면에서 빵부스러기와 카테고리
+       태그가 **영어로 남고**, 게다가 슬러그에서 만든 라벨은 `&` 가 빠져 정식
+       이름(「Chairs & Stools」)과도 달랐다(브론즈 20차).
+
+       아래 두 표는 **지어낸 것이 아니라 카테고리 페이지의 `<h1 data-en data-ko>`
+       에서 긁은 것**이다(상위 10 · 하위 67). `brands/view.html:601` 의 CAT_KO 와
+       `brand-portal/dashboard.html` 의 SUBCATEGORIES 가 같은 내용을 따로 들고
+       있어 **사본이 셋**이 됐다 — 그래서 `tools/check-category-labels.py` 로
+       **세 사본을 페이지와 맞춰 보는 검사**를 같이 뒀다. 어긋나면 검사가 잡는다.
+
+       모르는 값이면 양쪽을 같게 둔다 — 영어로 보여 주는 게 빈칸보다 낫다
+       (brands/view.html 과 같은 약속). */
+    const CAT_KO = {
+        'Bathroom': '욕실',
+        'Construction': '건축자재',
+        'Decor': '데코',
+        'Finishes': '마감재',
+        'Furniture': '가구',
+        'Kitchen': '주방',
+        'Lighting': '조명',
+        'Office': '오피스',
+        'Outdoor': '아웃도어',
+        'Wellness': '웰니스'
+    };
+    const SUBCAT = {
+        'acoustic-solutions': ['Acoustic Solutions', '방음 솔루션'],
+        'architectural-lighting': ['Architectural Lighting', '건축 조명'],
+        'art-wall-decor': ['Art & Wall Decor', '아트 & 월 데코'],
+        'bathroom-accessories': ['Bathroom Accessories', '욕실 액세서리'],
+        'bathroom-furniture': ['Bathroom Furniture', '욕실 가구'],
+        'bathroom-taps': ['Bathroom Taps', '수전'],
+        'bathtubs': ['Bathtubs', '욕조'],
+        'beds-bedroom': ['Beds & Bedroom', '침대 & 침실'],
+        'building-automation': ['Building Automation', '빌딩 자동화'],
+        'cabinets-sideboards': ['Cabinets & Sideboards', '캐비닛 & 사이드보드'],
+        'ceiling-lights': ['Ceiling Lights', '천장 조명'],
+        'chairs-stools': ['Chairs & Stools', '의자 & 스툴'],
+        'clocks-objects': ['Clocks & Objects', '시계 & 오브제'],
+        'countertops': ['Countertops', '상판'],
+        'decorative-panels': ['Decorative Panels', '장식 패널'],
+        'desks-workstations': ['Desks & Workstations', '데스크 & 워크스테이션'],
+        'facades-cladding': ['Facades & Cladding', '파사드 & 클래딩'],
+        'fire-pits-heaters': ['Fire Pits & Heaters', '파이어피트 & 히터'],
+        'fitness-equipment': ['Fitness Equipment', '피트니스 장비'],
+        'floor-lamps': ['Floor Lamps', '플로어 램프'],
+        'garden-decor': ['Garden Decor', '가든 데코'],
+        'insulation': ['Insulation', '단열재'],
+        'kids-furniture': ['Kids Furniture', '키즈 가구'],
+        'kitchen-appliances': ['Kitchen Appliances', '주방 가전'],
+        'kitchen-storage': ['Kitchen Storage', '주방 수납'],
+        'kitchen-systems': ['Kitchen Systems', '주방 시스템'],
+        'lounge-reception': ['Lounge & Reception', '라운지 & 리셉션'],
+        'meeting-conference': ['Meeting & Conference', '회의 & 컨퍼런스'],
+        'metal-finishes': ['Metal Finishes', '메탈 피니시'],
+        'mirrors': ['Mirrors', '거울'],
+        'mirrors-frames': ['Mirrors & Frames', '거울 & 프레임'],
+        'modular-systems': ['Modular Systems', '모듈러 시스템'],
+        'natural-stone': ['Natural Stone', '천연석'],
+        'office-chairs': ['Office Chairs', '오피스 체어'],
+        'office-storage': ['Office Storage', '오피스 수납'],
+        'outdoor-furniture': ['Outdoor Furniture', '아웃도어 가구'],
+        'outdoor-kitchens': ['Outdoor Kitchens', '아웃도어 주방'],
+        'outdoor-lighting': ['Outdoor Lighting', '아웃도어 조명'],
+        'pendant-lights': ['Pendant Lights', '펜던트 조명'],
+        'pergolas-canopies': ['Pergolas & Canopies', '퍼골라 & 캐노피'],
+        'planters-pots': ['Planters & Pots', '화분 & 플랜터'],
+        'pools-whirlpools': ['Pools & Whirlpools', '수영장 & 월풀'],
+        'roofing-systems': ['Roofing Systems', '지붕 시스템'],
+        'rugs-carpets': ['Rugs & Carpets', '러그 & 카펫'],
+        'saunas': ['Saunas', '사우나'],
+        'showers': ['Showers', '샤워'],
+        'sinks-taps': ['Sinks & Taps', '싱크 & 수전'],
+        'smart-lighting': ['Smart Lighting', '스마트 조명'],
+        'sofas-armchairs': ['Sofas & Armchairs', '소파 & 안락의자'],
+        'spa-hot-tubs': ['Spa & Hot Tubs', '스파 & 자쿠지'],
+        'stairs-railings': ['Stairs & Railings', '계단 & 난간'],
+        'steam-rooms': ['Steam Rooms', '스팀룸'],
+        'storage-shelving': ['Storage & Shelving', '수납 & 선반'],
+        'swimming-pools': ['Swimming Pools', '수영장'],
+        'table-lamps': ['Table Lamps', '테이블 램프'],
+        'tables-desks': ['Tables & Desks', '테이블 & 데스크'],
+        'tableware': ['Tableware', '테이블웨어'],
+        'textiles-cushions': ['Textiles & Cushions', '텍스타일 & 쿠션'],
+        'tiles-ceramics': ['Tiles & Ceramics', '타일 & 세라믹'],
+        'toilets-bidets': ['Toilets & Bidets', '변기 & 비데'],
+        'vases-planters': ['Vases & Planters', '화병 & 플랜터'],
+        'wall-lights': ['Wall Lights', '벽등'],
+        'wallcoverings': ['Wallcoverings', '벽면 마감'],
+        'washbasins-vanities': ['Washbasins & Vanities', '세면대 & 세면장'],
+        'wellness-showers': ['Wellness Showers', '웰니스 샤워'],
+        'windows-doors': ['Windows & Doors', '창호 & 도어'],
+        'wood-flooring': ['Wood Flooring', '목재 바닥']
+    };
+
+    const catRaw = p.category || '';
+    const catLabel = escapeHtml(catRaw);
+    const catLabelKo = escapeHtml(CAT_KO[catRaw] || catRaw);
+    const catLabelLower = catRaw.toLowerCase().replace(/[^a-z0-9-]/g, '');
     const subcategorySlug = (p.subcategory || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
+    const subPair = SUBCAT[subcategorySlug];
+    const subLabel = p.subcategory ? (subPair ? subPair[0] : p.subcategory.replace(/-/g, ' ')) : '';
+    const subLabelEsc = escapeHtml(subLabel);
+    const subLabelKo = escapeHtml(subPair ? subPair[1] : subLabel);
 
     // Specs rows
     const specs = [];
@@ -591,8 +705,8 @@ function renderProduct(p, related) {
         <!-- BREADCRUMB -->
         <div class="pp-breadcrumb">
             <a href="../index.html" data-en="Home" data-ko="홈">Home</a> &nbsp;/&nbsp;
-            ${catLabel ? `<a href="../categories/${catLabelLower}.html">${catLabel}</a> &nbsp;/&nbsp;` : ''}
-            ${subLabel ? `<a href="../categories/${catLabelLower}/${subcategorySlug}.html" style="text-transform:capitalize;">${subLabelEsc}</a> &nbsp;/&nbsp;` : ''}
+            ${catLabel ? `<a href="../categories/${catLabelLower}.html" data-en="${catLabel}" data-ko="${catLabelKo}">${catLabel}</a> &nbsp;/&nbsp;` : ''}
+            ${subLabel ? `<a href="../categories/${catLabelLower}/${subcategorySlug}.html" data-en="${subLabelEsc}" data-ko="${subLabelKo}">${subLabelEsc}</a> &nbsp;/&nbsp;` : ''}
             <span>${pName}</span>
         </div>
 
@@ -615,7 +729,7 @@ function renderProduct(p, related) {
                 <a href="../brands/view.html?id=${pBrandSlug}" class="pp-brand-link">${pBrandName}</a>
                 <h1 class="pp-name">${pName}</h1>
                 ${pCollection ? `<div class="pp-collection">${pCollection}</div>` : ''}
-                ${catLabel ? `<a href="../categories/${catLabelLower}.html" class="pp-category-tag">${catLabel}${subLabel ? ' / ' + subLabelEsc : ''}</a>` : ''}
+                ${catLabel ? `<a href="../categories/${catLabelLower}.html" class="pp-category-tag" data-en="${catLabel}${subLabel ? ' / ' + subLabelEsc : ''}" data-ko="${catLabelKo}${subLabel ? ' / ' + subLabelKo : ''}">${catLabel}${subLabel ? ' / ' + subLabelEsc : ''}</a>` : ''}
                 ${priceHtml}
                 ${pDescription ? `<div class="pp-description">${pDescription}</div>` : ''}
                 ${specsHtml}

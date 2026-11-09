@@ -375,7 +375,18 @@ body .topbar .lang-switch-btn:hover {
    데스크톱 포인터에는 적용하지 않는다.
    ─────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
-  .breadcrumb-list a,
+  /* A-408(2026-11-09): `.breadcrumb-list a` 로 적어 **92곳 중 87곳만** 덮었다.
+     빵부스러기 마크업이 네 꼴이다 — `.breadcrumb > .breadcrumb-list > a`(87) ·
+     `.breadcrumb > a` 직접(magazine · trend-report · 살로네 기사, 3) ·
+     `.pp-breadcrumb`(products/view) · `.ma-breadcrumb`(magazine/view).
+     표본 한 파일에서 선택자를 고르고 **마크업 변종을 세지 않은** 결과다.
+     이제 **감싸개**(`.breadcrumb`)를 기준으로 잡아 안쪽 구조와 무관하게 닿는다.
+     빠진 둘이 하필 상세 화면이었다(브론즈 20차). */
+  .breadcrumb a,
+  .pp-breadcrumb a,
+  .ma-breadcrumb a,
+  .pp-brand-link,
+  .pp-category-tag,
   .section-link,
   .footer-bottom-links a,
   .footer-contact a,
@@ -386,7 +397,11 @@ body .topbar .lang-switch-btn:hover {
   .cat-rail-btn { position: relative; }
 
   /* 세로만 — 한 줄에 나란히 있어 가로로 넓히면 이웃과 겹치는 것들 */
-  .breadcrumb-list a::after,
+  .breadcrumb a::after,
+  .pp-breadcrumb a::after,
+  .ma-breadcrumb a::after,
+  .pp-brand-link::after,
+  .pp-category-tag::after,
   .section-link::after,
   .footer-bottom-links a::after,
   .footer-contact a::after,
@@ -447,6 +462,30 @@ body .topbar .lang-switch-btn:hover {
    ─────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .scroll-top { bottom: 84px; }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   A-408(2026-11-09): 감기는 inline 링크에는 `::after` 가 반쪽만 덮는다
+
+   브론즈 20차가 영어 390px 에서 띠 링크(「Learn more →」)가 **두 줄로 감기는
+   것**을 찾았다. 줄박스가 둘인데(`(323,32,38,16)` · `(169,53,51,16)`)
+   `::after` 는 `position: absolute` 라 **합산 박스 하나**를 기준으로 깔린다 —
+   그래서 **아랫줄만 덮고 윗줄에는 넓힌 자리가 없다.**
+
+   CSS 로 줄마다 따로 깔 방법은 없다. 그래서 **감기지 않게** 한다 — 링크는
+   「Learn more →」·「Apply now →」로 짧고, 띠는 이미 여러 줄이라 한 덩어리로
+   내려가도 줄 수가 늘지 않는다.
+
+   ★ 이 지적은 **내 검증 방법의 맹점도 같이 드러냈다.** A-393 을 확인할 때
+   `elementFromPoint` 로 요소 중앙 ±21px 7점을 찍었는데, 감기는 inline 은
+   합산 박스 중앙이 **글자가 없는 자리**일 수 있다. 줄별로 보려면
+   `getClientRects()` 를 써야 한다 — 대장 A-408 에 적어 뒀다.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .announcement-bar a {
+    display: inline-block;
+    white-space: nowrap;
+  }
 }
 
 /* SEARCH OVERLAY */
