@@ -413,6 +413,81 @@ def check_public_sensitive(problems, notes):
 
 
 
+# ── [8] A-391: 페이지를 한 언어로 잠그면 들어오는 길에 빚이 생긴다 ──────────
+# A-382 가 `for-brands.html` 에 `data-langs="en"` 을 박았다. 맞는 판단이었다.
+# 그런데 **그 페이지로 들어오는 길을 세지 않았다** — 푸터의 한국어 라벨
+# 「한국 진출 안내」가 232 페이지에서 전부 영어인 화면으로 간다. 글자는
+# 영어지만 `€450–4,500` 은 언어와 무관하게 읽힌다.
+#
+# 그래서 잠금과 들어오는 링크를 **같이** 본다. 다음에 어떤 페이지를 한 언어로
+# 잠그면 이 검사가 그 길들을 바로 세어 준다.
+LINK_DECIDED = []
+LINK_PENDING = [
+    ('for-brands.html', '한국 진출 안내',
+     'A-391 — 승리님이 「사이트맵 성격의 푸터는 냅두고 콤보박스로 줄여 달라」고 '
+     '이미 결정한 자리다. 선택지 3개를 대장에 적어 두었다'),
+    ('brand-guide.html', '브랜드 가이드', 'A-391 — 같은 판단이 걸린다'),
+    ('brand-guide.html', '5분 브랜드 가이드', 'A-391 — 같은 판단이 걸린다'),
+]
+
+
+def check_inbound_links(problems, notes):
+    """[8] 한 언어로 잠긴 페이지로, 반대 언어 라벨을 달고 들어가는 링크가 있나."""
+    import posixpath
+
+    locked = {}
+    for f in html_files():
+        if f.startswith('admin/'):
+            continue
+        src = io.open(f, encoding='utf-8', errors='replace').read()
+        lang = page_locked_lang(src)
+        if lang:
+            locked[f] = lang
+    if not locked:
+        return
+
+    pending = collections.Counter()
+    decided = collections.Counter()
+    for f in html_files():
+        if f.startswith('admin/'):
+            continue
+        src = io.open(f, encoding='utf-8', errors='replace').read()
+        w = Walker()
+        w.feed(src)
+        for h in w.hits:
+            if h['tag'] != 'a':
+                continue
+            href = (h['d'].get('href') or '').split('#')[0].split('?')[0]
+            if not href or '://' in href:
+                continue
+            tgt = posixpath.normpath(posixpath.join(posixpath.dirname(f), href)).lstrip('./')
+            lang = locked.get(tgt)
+            if not lang:
+                continue
+            # 잠긴 언어의 반대쪽 라벨이 붙어 있고, 그 언어 가리개 안도 아니라면 빚이다
+            other = 'ko' if lang == 'en' else 'en'
+            label = h['d'].get('data-' + other)
+            if not label or h['gate'] == lang:
+                continue
+            key = (tgt, label)
+            if any(tgt == t and lb == label for t, lb, _ in LINK_PENDING):
+                pending[key] += 1
+            elif any(tgt == t and lb == label for t, lb, _ in LINK_DECIDED):
+                decided[key] += 1
+            else:
+                problems.append(('[8] 막다른 링크', f, h['line'],
+                                 '「%s」라고 적힌 링크가 %s 전용 페이지 `%s` 로 간다 — '
+                                 '라벨은 %s인데 그 페이지에는 %s가 없다. 링크를 '
+                                 '`data-lang-only="%s"` 로 가리거나, 라벨에 언어를 밝혀라'
+                                 % (label, lang, tgt, other, other, lang)))
+    for d, tag in ((decided, '판단이 끝난'), (pending, '승리님 결정 대기인')):
+        if d:
+            notes.append('%s 막다른 링크 %d곳 — %s'
+                         % (tag, sum(d.values()),
+                            ' / '.join('`%s` ← 「%s」 %d곳' % (t, lb, n)
+                                       for (t, lb), n in d.most_common())))
+
+
 def main():
     if not os.path.exists('lang.js'):
         print('리포 뿌리에서 실행해라 (lang.js 가 보이는 곳).', file=sys.stderr)
@@ -427,6 +502,7 @@ def main():
     check_elements(problems, supported, deferred)
     notes = check_stamps(problems) or []
     check_public_sensitive(problems, notes)
+    check_inbound_links(problems, notes)
 
     print('lang.js 가 훑는 접미사: %s'
           % ', '.join(sorted(x or '(없음)' for x in supported)))
@@ -438,7 +514,7 @@ def main():
               '쓸지 말지는 결정 대기, A-368 참고'
               % (len(deferred), len(set(x[0] for x in deferred))))
     if not problems:
-        print('언어 규약 검사 — 어긋난 것 없음 (검사 7종)')
+        print('언어 규약 검사 — 어긋난 것 없음 (검사 8종)')
         return 0
     by = collections.Counter(x[0] for x in problems)
     print('언어 규약 검사 — 어긋난 것 %d건' % len(problems))
