@@ -156,6 +156,15 @@
         const anchor = actions.querySelector('a[href*="login"], a[href*="brand-portal"]');
         if (anchor) actions.insertBefore(link, anchor);
         else actions.prepend(link);
+
+        /* A-434(2026-11-09): 이 단추는 `onAuthStateChanged` 안에서 만들어진다 —
+           lang.js 의 한 번뿐인 칠하기는 **이미 지나간 뒤**다. 그래서 바로 위에서
+           달아 둔 `data-ko="로그인"` 이 **한 번도 적용되지 않았고**, 머리띠의
+           「Log In」이 **lang.js 를 싣는 233 페이지 전부에서 영어로 고정**돼 있었다.
+           속성은 처음부터 멀쩡했다 — **부르지 않은 것뿐이다**(A-419·A-424 와 같은 꼴).
+           ★ 로그인하면 그 자리에 이메일이 떠서 **로그인한 눈으로는 구조적으로 안 보인다.**
+              브론즈가 손님 창(넷리파이 미리보기 origin)에서 처음 봤다. */
+        if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
     }
 
 

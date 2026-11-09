@@ -204,28 +204,33 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
             <h2><i class="fas fa-user"></i> <span data-en="Profile Information" data-ko="프로필 정보">Profile Information</span></h2>
             <form id="profileForm">
                 <div class="field-row">
+<!-- A-436(2026-11-09): 라벨이 입력칸과 이어져 있지 않았다 — 라벨을 눌러도 포커스가
+     안 가고 화면낭독기가 칸 이름을 모른다. 브론즈 25차 실측: signup 라벨 9개 중 **1개만**
+     연결·입력칸 8/9 이름 없음, login **0/2 연결·2/2 이름 없음**. 같은 저장소의
+     `request-consultation.html` 은 **12/12 완벽**이다 — 꼴은 이미 있었고 auth 둘만 빠졌다.
+     A-426 에서 포털에 한 것과 같은 방식으로 기계적으로 달았다. -->
                     <div class="field">
-                        <label data-en="Full Name" data-ko="이름">Full Name</label>
+                        <label for="editName" data-en="Full Name" data-ko="이름">Full Name</label>
                         <input type="text" id="editName" required>
                     </div>
                     <div class="field">
-                        <label data-en="Email" data-ko="이메일">Email</label>
+                        <label for="editEmail" data-en="Email" data-ko="이메일">Email</label>
                         <input type="email" id="editEmail" readonly class="readonly">
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Company / Firm" data-ko="회사 / 사무소">Company / Firm</label>
+                        <label for="editCompany" data-en="Company / Firm" data-ko="회사 / 사무소">Company / Firm</label>
                         <input type="text" id="editCompany">
                     </div>
                     <div class="field">
-                        <label data-en="Job Title" data-ko="직책">Job Title</label>
+                        <label for="editJobTitle" data-en="Job Title" data-ko="직책">Job Title</label>
                         <input type="text" id="editJobTitle">
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="Industry" data-ko="업종">Industry</label>
+                        <label for="editIndustry" data-en="Industry" data-ko="업종">Industry</label>
                         <select id="editIndustry">
                             <option value="architect" data-en="Architecture" data-ko="건축">Architecture</option>
                             <option value="interior" data-en="Interior Design" data-ko="인테리어 디자인">Interior Design</option>
@@ -239,7 +244,7 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
                         </select>
                     </div>
                     <div class="field">
-                        <label data-en="Phone" data-ko="전화번호">Phone</label>
+                        <label for="editPhone" data-en="Phone" data-ko="전화번호">Phone</label>
                         <input type="tel" id="editPhone">
                     </div>
                 </div>
@@ -256,11 +261,11 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
             <form id="passwordForm">
                 <div class="field-row">
                     <div class="field">
-                        <label data-en="New Password" data-ko="새 비밀번호">New Password</label>
+                        <label for="newPassword" data-en="New Password" data-ko="새 비밀번호">New Password</label>
                         <input type="password" id="newPassword" minlength="6" placeholder="Minimum 6 characters" data-en-placeholder="Minimum 6 characters" data-ko-placeholder="6자 이상">
                     </div>
                     <div class="field">
-                        <label data-en="Confirm Password" data-ko="비밀번호 확인">Confirm Password</label>
+                        <label for="confirmPassword" data-en="Confirm Password" data-ko="비밀번호 확인">Confirm Password</label>
                         <input type="password" id="confirmPassword" placeholder="Re-enter your password" data-en-placeholder="Re-enter your password" data-ko-placeholder="비밀번호 재입력">
                     </div>
                 </div>

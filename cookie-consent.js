@@ -18,6 +18,9 @@
     document.dispatchEvent(new CustomEvent('archinode:consent', { detail: c }));
     var banner = document.getElementById('archi-cookie-banner');
     if (banner) banner.parentNode.removeChild(banner);
+    // A-435: 「맨 위로」를 제자리로 되돌린다
+    document.documentElement.classList.remove('has-cookie-banner');
+    document.documentElement.style.removeProperty('--cc-h');
   }
 
   function showBanner(){
@@ -36,9 +39,9 @@
         '<p style="font-size:0.82rem;line-height:1.5;margin:0;color:#ccc;">' +
           (isKo
             ? 'ARCHINODE는 사이트 작동에 필요한 쿠키와 사용 분석용 쿠키를 사용합니다. '
-              + '<a href="/privacy.html" style="color:#c9a36a;text-decoration:underline;">개인정보 처리방침</a>을 확인하시고 선택해주세요.'
+              + '<a href="/privacy.html" class="cc-inline" style="color:#c9a36a;text-decoration:underline;">개인정보 처리방침</a>을 확인하시고 선택해주세요.'
             : 'ARCHINODE uses necessary cookies for the site to work and analytics cookies to improve it. '
-              + 'See our <a href="/privacy.html" style="color:#c9a36a;text-decoration:underline;">Privacy Policy</a>. Choose your preference below.'
+              + 'See our <a href="/privacy.html" class="cc-inline" style="color:#c9a36a;text-decoration:underline;">Privacy Policy</a>. Choose your preference below.'
           ) +
         '</p>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">' +
@@ -46,7 +49,7 @@
             (isKo ? '모두 수락' : 'Accept All') + '</button>' +
           '<button id="cc-necessary" style="background:transparent;color:#fff;border:1px solid #6b6459;padding:10px 18px;font-size:0.82rem;font-weight:600;border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px;">' +
             (isKo ? '필수만' : 'Necessary Only') + '</button>' +
-          '<a href="/privacy.html" style="align-self:center;font-size:0.76rem;color:#b5ab9b;text-decoration:none;margin-left:auto;">' +
+          '<a href="/privacy.html" class="cc-more" style="font-size:0.76rem;color:#b5ab9b;text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding:0 6px;">' +
             (isKo ? '자세히' : 'Manage / Learn more') + '</a>' +
         '</div>' +
       '</div>';
@@ -59,7 +62,36 @@
     var titleEl = wrap.querySelector('h3');
     if (titleEl) titleEl.id = 'archi-cookie-title';
 
+    /* A-435(2026-11-09): 배너가 `.scroll-top` 을 통째로 덮고 있었다.
+       브론즈 25차 실측 — 배너(y633~828)가 「맨 위로」(316,716,44,44)를 가려
+       **첫 방문자는 그 단추를 누를 수 없다.** 하필 A-411 에서 넷리파이 배지를
+       피하려고 올린 84px 자리가 배너 한가운데다. 한 가림을 피해 올린 자리가
+       **다른 가림의 한복판**이었다 — 고정 요소가 셋(배지·배너·맨 위로)이면
+       둘만 보고 자리를 정할 수 없다.
+       배너 높이는 글자 길이·화면 폭에 따라 달라지므로 **실제 높이를 재서** 넘긴다. */
+    if (!document.getElementById('cc-space-style')) {
+      var st = document.createElement('style');
+      st.id = 'cc-space-style';
+      st.textContent =
+        'html.has-cookie-banner body .scroll-top{bottom:calc(var(--cc-h,0px) + 28px);}' +
+        /* 본문 안내문의 링크도 손가락 기준으로 — 배너 문단엔 다른 링크가 없어
+           띠가 이웃 줄로 번져도 탭을 뺏지 않는다(A-421 과 같은 판단). */
+        '#archi-cookie-banner .cc-inline{position:relative;}' +
+        '#archi-cookie-banner .cc-inline::after{content:"";position:absolute;left:0;right:0;' +
+        'top:50%;height:44px;transform:translateY(-50%);}';
+      document.head.appendChild(st);
+    }
+
     document.body.appendChild(wrap);
+
+    function ccSyncSpace() {
+      var h = wrap.offsetHeight || 0;
+      document.documentElement.style.setProperty('--cc-h', h + 'px');
+      document.documentElement.classList.add('has-cookie-banner');
+    }
+    ccSyncSpace();
+    window.addEventListener('resize', ccSyncSpace);
+    if (window.ResizeObserver) { try { new ResizeObserver(ccSyncSpace).observe(wrap); } catch (e) {} }
 
     var acceptBtn = document.getElementById('cc-accept');
     acceptBtn.onclick = function(){

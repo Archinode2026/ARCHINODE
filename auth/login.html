@@ -133,12 +133,17 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
             <div class="error-msg" id="loginError"></div>
 
             <form id="loginForm">
+<!-- A-436(2026-11-09): 라벨이 입력칸과 이어져 있지 않았다 — 라벨을 눌러도 포커스가
+     안 가고 화면낭독기가 칸 이름을 모른다. 브론즈 25차 실측: signup 라벨 9개 중 **1개만**
+     연결·입력칸 8/9 이름 없음, login **0/2 연결·2/2 이름 없음**. 같은 저장소의
+     `request-consultation.html` 은 **12/12 완벽**이다 — 꼴은 이미 있었고 auth 둘만 빠졌다.
+     A-426 에서 포털에 한 것과 같은 방식으로 기계적으로 달았다. -->
                 <div class="field">
-                    <label data-en="Email" data-ko="이메일">Email</label>
+                    <label for="loginEmail" data-en="Email" data-ko="이메일">Email</label>
                     <input type="email" id="loginEmail" required placeholder="name@company.com">
                 </div>
                 <div class="field">
-                    <label data-en="Password" data-ko="비밀번호">Password</label>
+                    <label for="loginPassword" data-en="Password" data-ko="비밀번호">Password</label>
                     <input type="password" id="loginPassword" required placeholder="Enter your password" data-en-placeholder="Enter your password" data-ko-placeholder="비밀번호 입력">
                 </div>
                 <button type="submit" class="auth-btn" id="loginBtn" data-en="Log In" data-ko="로그인">Log In</button>
@@ -184,7 +189,7 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
             <div class="success-msg" id="resetSuccess"></div>
             <form id="resetForm">
                 <div class="field">
-                    <label data-en="Email" data-ko="이메일">Email</label>
+                    <label for="resetEmail" data-en="Email" data-ko="이메일">Email</label>
                     <input type="email" id="resetEmail" required placeholder="name@company.com">
                 </div>
                 <button type="submit" class="auth-btn" data-en="Send Reset Link" data-ko="재설정 링크 전송">Send Reset Link</button>
