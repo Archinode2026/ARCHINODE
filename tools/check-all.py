@@ -51,6 +51,8 @@ CHECKS = [
      'A-411 — @media 안의 수정이 뒤쪽 기본 규칙에 덮여 죽지 않았는지'),
     ('포털 카테고리 왕복',    'node', 'tools/test-bp-category.js',
      'A-415 — brands.category 는 배열이다. 저장이 그걸 지우지 않는지'),
+    ('로그인 갈림길',        'node', 'tools/test-login-gate.js',
+     'A-422 — 방금 로그인한 사람은 안내 화면이 아니라 목적지로 간다'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

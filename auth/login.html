@@ -63,6 +63,14 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .auth-btn:disabled { background: var(--gray-400); cursor: not-allowed; }
 
 .auth-links { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--ink-soft); line-height: 1.8; }
+/* A-422: 이 안내 화면의 링크는 그 칸에 **혼자** 있으므로 44px 띠를 둘러도
+   이웃 줄의 탭을 뺏지 않는다(A-393 의 방법). 로그인 칸의 `.auth-links` 는 링크가
+   세 줄로 붙어 있어 같은 처방을 못 쓴다 — 그건 줄 간격부터 봐야 해서 따로 남긴다. */
+#alreadySection .auth-links a { position: relative; display: inline-block; }
+#alreadySection .auth-links a::after {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%;
+    height: 44px; transform: translateY(-50%);
+}
 .auth-links a { color: var(--accent-ink); text-decoration: none; }
 .auth-links a:hover { text-decoration: underline; }
 
@@ -148,6 +156,26 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
             </div>
         </div>
 
+        <!-- ALREADY LOGGED IN — A-422(2026-11-09) ─────────────────────────
+             A-149 가 2026-11-03 에 signup.html 에서 똑같은 것을 고쳤다("아무 설명
+             없이 즉시 리다이렉트해서, 가입을 누른 사람이 영문도 모르고 대시보드로
+             밀려났다"). **로그인 쪽만 빠져 있었다.** 로그인된 사람이 「로그인」을
+             누르면 화면이 한 번 깜빡하고 사라지면서 어딘가로 끌려갔고, 어느 계정으로
+             로그인돼 있는지조차 보이지 않았다. 공용 PC 나 담당자가 바뀐 브랜드에게는
+             막다른 길이다. -->
+        <div id="alreadySection" style="display:none;">
+            <h1 data-en="You're already signed in" data-ko="이미 로그인되어 있습니다">You're already signed in</h1>
+            <p class="subtitle">
+                <strong id="aliEmail" style="color:var(--black);"></strong><span
+                    data-en=" is signed in on this browser." data-ko=" 계정으로 로그인된 상태입니다."> is signed in on this browser.</span>
+            </p>
+            <p class="next-msg" id="aliNextHint" style="display:none;"></p>
+            <button type="button" class="auth-btn" id="aliGo" data-en="Continue &rarr;" data-ko="계속하기 &rarr;">Continue &rarr;</button>
+            <div class="auth-links">
+                <a href="#" id="aliLogout" data-en="Log out and sign in with another account" data-ko="로그아웃하고 다른 계정으로 로그인">Log out and sign in with another account</a>
+            </div>
+        </div>
+
         <!-- RESET PASSWORD -->
         <div id="resetSection" class="reset-section">
             <h1 data-en="Reset Password" data-ko="비밀번호 재설정">Reset Password</h1>
@@ -219,25 +247,82 @@ function loginNextUrl() {
 // ── 세션 유지 ──
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistence error:', err));
 
-// ── 이미 로그인 상태면 리디렉션 ──
-auth.onAuthStateChanged(user => {
-    if (user) {
-        var next = loginNextUrl();
-        if (isAdmin(user.email)) {
-            window.location.href = next || '../admin/dashboard.html';
-            return;
-        }
-        // 관리자 전용 경로는 관리자가 아닐 때 따라가지 않는다 — 접근 거부 화면에 떨어뜨리는 대신
-        // 그 계정의 제 자리로 보낸다(브랜드는 포털, 그 외는 내 계정).
-        if (next && /^\/admin\//i.test(next)) next = '';
-        db.collection('brands').doc(user.uid).get().then(doc => {
-            if (doc.exists) {
-                window.location.href = next || '../brand-portal/dashboard.html';
-            } else {
-                window.location.href = next || 'profile.html';
-            }
-        });
+// ── 이미 로그인 상태면 안내 (A-422) ─────────────────────────────────────
+// ★ 조심할 것: 아래 제출 처리는 리디렉션을 **이 콜백에 맡기고 있다**(「onAuthStateChanged가
+//   리디렉션 처리」). 그래서 무조건 안내 화면을 띄우면 **방금 로그인한 사람도 거기 갇혀
+//   로그인이 통째로 깨진다.** 이 화면에서 방금 로그인했는지를 깃발로 갈라 둔다.
+var loginJustSubmitted = false;
+
+function showAlreadyLoggedIn(user, dest, destEn, destKo) {
+    var sec  = document.getElementById('alreadySection');
+    var form = document.getElementById('loginSection');
+    var rst  = document.getElementById('resetSection');
+    if (!sec) { window.location.href = dest; return; }   // 안내 칸이 없으면 예전처럼 보낸다
+    if (form) form.style.display = 'none';
+    if (rst)  rst.style.display = 'none';
+    sec.style.display = '';
+
+    var em = document.getElementById('aliEmail');
+    if (em) em.textContent = user.email || '';
+
+    // ?next= 로 왔다면 어디로 이어 가는지 한 줄 덧붙인다 (R-067 의 안내와 같은 모양)
+    var nx = loginNextUrl();
+    var hint = document.getElementById('aliNextHint');
+    if (nx && hint) {
+        hint.textContent = '';
+        var icon = document.createElement('i');
+        icon.className = 'fas fa-circle-info';
+        icon.setAttribute('aria-hidden', 'true');
+        hint.appendChild(icon);
+        var span = document.createElement('span');
+        hint.appendChild(span);
+        var hEn = ' You were headed to another page. Continue takes you there.';
+        var hKo = ' 원래 보려던 화면이 있습니다. 계속하기를 누르면 그리로 갑니다.';
+        if (window.setLangText) window.setLangText(span, hEn, hKo);
+        else span.textContent = hKo;
+        hint.style.display = 'block';
     }
+
+    var go = document.getElementById('aliGo');
+    if (go) {
+        // ?next= 가 있으면 「계속하기」, 없으면 그 계정의 제 자리 이름을 쓴다
+        if (nx) { destEn = 'Continue \u2192'; destKo = '계속하기 \u2192'; }
+        if (window.setLangText) window.setLangText(go, destEn, destKo);
+        go.onclick = function () { window.location.href = dest; };
+    }
+    var out = document.getElementById('aliLogout');
+    if (out) {
+        out.onclick = function (e) {
+            e.preventDefault();
+            // 새로고침으로 돌아간다 — ?next= 를 그대로 들고 있어서 로그인하면 원래 가려던 곳으로 간다
+            auth.signOut().then(function () { window.location.reload(); })
+                          .catch(function (err) { console.error('signOut failed', err); });
+        };
+    }
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+}
+
+function loginArrive(user, dest, destEn, destKo) {
+    if (loginJustSubmitted) { window.location.href = dest; return; }   // 방금 로그인한 사람
+    showAlreadyLoggedIn(user, dest, destEn, destKo);
+}
+
+auth.onAuthStateChanged(user => {
+    if (!user) return;
+    var next = loginNextUrl();
+    if (isAdmin(user.email)) {
+        loginArrive(user, next || '../admin/dashboard.html', 'Go to admin \u2192', '어드민으로 가기 \u2192');
+        return;
+    }
+    // 관리자 전용 경로는 관리자가 아닐 때 따라가지 않는다 — 접근 거부 화면에 떨어뜨리는 대신
+    // 그 계정의 제 자리로 보낸다(브랜드는 포털, 그 외는 내 계정).
+    if (next && /^\/admin\//i.test(next)) next = '';
+    db.collection('brands').doc(user.uid).get().then(doc => {
+        if (doc.exists) loginArrive(user, next || '../brand-portal/dashboard.html', 'Go to brand portal \u2192', '브랜드 포털로 가기 \u2192');
+        else            loginArrive(user, next || 'profile.html', 'Go to my page \u2192', '내 페이지로 가기 \u2192');
+    }).catch(function () {
+        loginArrive(user, next || 'profile.html', 'Go to my page \u2192', '내 페이지로 가기 \u2192');
+    });
 });
 
 // ── 로그인 ──
@@ -252,9 +337,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     try {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
+        loginJustSubmitted = true;                 // A-422 — 이 사람은 안내 화면이 아니라 목적지로 보낸다
         await auth.signInWithEmailAndPassword(email, password);
         // onAuthStateChanged가 리디렉션 처리
     } catch (error) {
+        loginJustSubmitted = false;                // A-422 — 실패했으면 깃발을 내린다
         btn.disabled = false;
         window.setLangText && window.setLangText(btn, "Log In", "로그인");
         errorDiv.style.display = 'block';
