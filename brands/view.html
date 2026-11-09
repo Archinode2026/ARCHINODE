@@ -703,7 +703,7 @@ function renderBrand(brand, products, articles) {
                             : (document.documentElement.lang === 'ko' ? 'ko' : 'en');
             const aTitle = escapeHtml(aSide.title || 'Untitled');
             const aExcerpt = escapeHtml((aSide.excerpt || '').substring(0, 140));
-            const aImg = escapeHtml(a.coverImage || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80');
+            const aImg = escapeHtml(a.coverImage || '../assets/photos/photo-1618221195710-dd6b41faaea6-600.jpg');
             const aTag = a.tag ? `<span class="article-card-tag">${escapeHtml(a.tag)}</span>` : '';
             // A-347: 날짜도 보는 언어를 따른다 (A-252 와 같은 결).
             const aDate = (a.publishedAt && a.publishedAt.toDate)

@@ -88,7 +88,7 @@
 
 <!-- TREND REPORT HERO -->
 <section class="page-hero">
-  <img loading="lazy" class="page-hero-bg" src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80" alt="ARCHINODE Brand Articles">
+  <img loading="lazy" class="page-hero-bg" src="assets/photos/photo-1486325212027-8081e485255e-1600.jpg" alt="ARCHINODE Brand Articles">
   <div class="page-hero-content">
     <div class="page-hero-inner">
       <span class="page-hero-tag" data-en="ARCHINODE TREND REPORT" data-ko="ARCHINODE 브랜드 아티클">ARCHINODE TREND REPORT</span>
@@ -109,7 +109,7 @@
 <section class="featured-article">
   <div class="container">
     <a href="trend-report/salone-del-mobile-2026-trends.html" class="featured-card fade-in" style="text-decoration:none;color:inherit;">
-      <img loading="lazy" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80" alt="Salone del Mobile 2026 — Urban Greenhouse">
+      <img loading="lazy" src="assets/photos/photo-1618221195710-dd6b41faaea6-1600.jpg" alt="Salone del Mobile 2026 — Urban Greenhouse">
       <div class="featured-overlay">
         <span class="featured-tag" data-en="EDITORIAL · MILANO" data-ko="에디토리얼 · 밀라노">EDITORIAL · MILANO</span>
         <h2 data-en="Salone del Mobile 2026 — The Urban Greenhouse Returns" data-ko="살로네 델 모빌 2026 — 도심 속 온실의 귀환">살로네 델 모빌 2026 — 도심 속 온실의 귀환</h2>
@@ -343,7 +343,7 @@ fadeEls.forEach(el => fadeObserver.observe(el));
     var side = (typeof window.artSide === 'function') ? window.artSide(a) : a;
     var viewLang = (typeof window.artViewLang === 'function') ? window.artViewLang()
                  : (document.documentElement.lang === 'ko' ? 'ko' : 'en');
-    var img = safeUrl(a.coverImage) || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80';   // A-218
+    var img = safeUrl(a.coverImage) || 'assets/photos/photo-1618221195710-dd6b41faaea6-600.jpg';   // A-218
     // A-347: 날짜도 보는 언어를 따른다 — 전에는 늘 ko-KR 이라 영어로 봐도 한국식이었다(A-252 와 같은 결).
     var date = a.publishedAt && a.publishedAt.toDate
              ? a.publishedAt.toDate().toLocaleDateString(viewLang === 'ko' ? 'ko-KR' : 'en-US') : '';
