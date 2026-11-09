@@ -106,6 +106,15 @@ SENSITIVE_DECIDED = [
      '한국 건축가·스펙라이터에게 **파는 상품 값**이다 — 브랜드에게 받는 요금이 아니다'),
     ('request-consultation.html', '$300',
      '브랜드·디자이너·건축가 양쪽에게 파는 자문 값이다'),
+    ('brand-portal/dashboard.html', '($500',
+     'A-395 — 브랜드가 **자기 제품의 가격대**를 고르는 칸이다. 아키노드가 받는 요금이 아니고, '
+     '한국어로 포털을 쓰는 브랜드에게는 보여야 한다'),
+    ('brand-portal/dashboard.html', '($2,000',
+     'A-395 — 같은 가격대 칸'),
+    ('brand-portal/dashboard.html', '($5,000',
+     'A-395 — 같은 가격대 칸'),
+    ('brand-portal/dashboard.html', '(500달러 미만',
+     'A-395 — 같은 가격대 칸'),
 ]
 
 # 승리님 결정을 기다리는 자리 — 통과시키되 보류로 알린다.
