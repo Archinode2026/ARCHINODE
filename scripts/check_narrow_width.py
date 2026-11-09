@@ -104,6 +104,10 @@ def main():
         return 2
 
     bad = 0
+
+    skipped = 0
+
+    measured = 0
     with sync_playwright() as pw:
         b = pw.chromium.launch()
         for w in widths:
@@ -117,8 +121,10 @@ def main():
                     d = pg.evaluate(PROBE)
                 except Exception as e:
                     print('   ? %-44s 열지 못함: %s' % (p, str(e).splitlines()[0][:60]))
+                    skipped += 1
                     pg.close()
                     continue
+                measured += 1
                 if d['over'] or d['sw'] > d['cw']:
                     bad += 1
                     print('   X %-44s 문서 %d/%d' % (p, d['sw'], d['cw']))
@@ -128,7 +134,19 @@ def main():
                     print('   . %-44s OK' % p)
                 pg.close()
         b.close()
-    print('\n결과: %s (넘치는 페이지 %d개)' % ('통과' if bad == 0 else '실패', bad))
+    # A-433(2026-11-09): **못 연 페이지를 조용히 건너뛰고 「통과」라고 적었다.**
+    # 컨테이너에서 서버 없이 처음 돌렸더니 27페이지가 전부 ERR_CONNECTION_REFUSED 인데
+    # 결과는 「통과 (넘치는 페이지 0개)」였다 — **빈손으로 통과하는 검사**다.
+    # 센 것이 0이면 통과가 아니라 **아무것도 모르는 것**이다.
+    if skipped:
+        print('\n결과: 실패 — **%d 페이지를 열지 못했다.** 센 것이 없으면 통과가 아니다.' % skipped)
+        print('        로컬 서버가 떠 있는지 보라:  python3 -m http.server 8321   (사이트 루트에서)')
+        return 1
+    if measured == 0:
+        print('\n결과: 실패 — 잰 페이지가 0개다.')
+        return 1
+    print('\n결과: %s (%d페이지 × %d폭 측정 · 넘치는 페이지 %d개)'
+          % ('통과' if bad == 0 else '실패', len(PAGES), len(widths), bad))
     return 1 if bad else 0
 
 

@@ -56,6 +56,19 @@ CHECKS = [
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)
+#
+# ★ 2026-11-09: 이 셋은 **만들어진 뒤 한 번도 실제로 돌아간 적이 없었다.**
+#   승리님 기계에서는 `cdn.playwright.dev` 가 막혀 크로미움을 못 받는다.
+#   돌리는 법 — 클라우드 컨테이너 쪽에 크로미움이 있으므로 저장소를 타르로 가져가서:
+#
+#     (사이트 루트에서) python3 -m http.server 8321 &
+#     ARCHINODE_ROOT=<루트> python3 scripts/check_narrow_width.py --base http://127.0.0.1:8321 --widths 360,390
+#     ARCHINODE_ROOT=<루트> python3 scripts/check_xss_output.py
+#     ARCHINODE_ROOT=<루트> python3 scripts/check_hover_contrast.py index.html brands.html ...
+#
+#   `check_narrow_width.py` 는 **로컬 HTTP 서버가 필요하다**(file:// 아님).
+#   처음 돌린 결과(2026-11-09): 좁은 폭 27페이지 × 360·390px **통과**,
+#   XSS 17화면 **통과**, 호버 대비 8페이지 **0건**.
 BROWSER_CHECKS = [
     ('호버 대비',  'py', 'scripts/check_hover_contrast.py', '호버 상태의 글자 대비'),
     ('좁은 폭',    'py', 'scripts/check_narrow_width.py',   '좁은 화면에서 넘침'),

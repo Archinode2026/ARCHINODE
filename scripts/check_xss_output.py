@@ -145,6 +145,7 @@ def main():
     png = bytes.fromhex('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489'
                         '0000000a49444154789c63000100000500010d0a2db40000000049454e44ae426082')
     bad = 0
+    measured = 0
     with sync_playwright() as pw:
         b = pw.chromium.launch()
         for page, seed in PAGES:
@@ -165,6 +166,7 @@ def main():
                 print('   ? %-38s 열지 못함: %s' % (page, str(e).splitlines()[0][:50]))
                 pg.close()
                 continue
+            measured += 1
             hit = d['run'] or d['injected'] or d['handlers'] or d['badUrls']
             if hit:
                 bad += 1
@@ -176,7 +178,15 @@ def main():
                 print('        URL %s' % u)
             pg.close()
         b.close()
-    print('\n결과: %s (구멍 있는 화면 %d개)' % ('통과' if bad == 0 else '실패', bad))
+    # A-433(2026-11-09): **못 연 페이지를 조용히 건너뛰고 「통과」라고 적었다.**
+    # 컨테이너에서 서버 없이 처음 돌렸더니 27페이지가 전부 ERR_CONNECTION_REFUSED 인데
+    # 결과는 「통과 (구멍 있는 화면 0개)」였다 — **빈손으로 통과하는 검사**다.
+    # 센 것이 0이면 통과가 아니라 **아무것도 모르는 것**이다.
+    if measured == 0:
+        print('\n결과: 실패 — 잰 화면이 0개다. 센 것이 없으면 통과가 아니다.')
+        return 1
+    print('\n결과: %s (%d화면 측정 · 구멍 있는 화면 %d개)'
+          % ('통과' if bad == 0 else '실패', measured, bad))
     return 1 if bad else 0
 
 
