@@ -431,7 +431,7 @@ function renderArticle(a) {
 function showError(title, msg) {
     loadingDiv.style.display = 'none';
     contentDiv.style.display = 'block';
-    contentDiv.innerHTML = `<div class="ma-error"><i class="fas fa-newspaper"></i><h2>${title}</h2><p>${msg}</p><a href="../magazine.html"><i class="fas fa-arrow-left"></i> Magazine</a></div>`;
+    contentDiv.innerHTML = `<div class="ma-error"><i class="fas fa-newspaper"></i><h2>${title}</h2><p>${msg}</p><a href="../magazine.html"><i class="fas fa-arrow-left"></i> <span data-en="Magazine" data-ko="매거진">매거진</span></a></div>`;
 }
 
 loadArticle();

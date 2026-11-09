@@ -64,11 +64,24 @@ BROWSER_CHECKS = [
 
 
 def have_playwright():
+    """playwright 가 **실제로 브라우저를 띄울 수 있는지**까지 본다.
+
+    ★ 2026-11-09: 전에는 `import playwright` 만 봤다. 모듈만 깔고 브라우저는
+      못 받은 기계(망에서 cdn.playwright.dev 가 막힌 곳)에서 이 함수가 True 를
+      돌려주는 바람에, **건너뛰어야 할 검사 3종이 실행되어 전부 실패했다** —
+      배포 경로가 통째로 빨개졌다. 내가 직접 만든 회귀다.
+      「있나」가 아니라 「되나」를 물어야 한다.
+    """
     try:
-        import playwright  # noqa: F401
-        return True
+        from playwright.sync_api import sync_playwright
     except Exception:
         return False
+    try:
+        with sync_playwright() as pw:
+            path = pw.chromium.executable_path
+    except Exception:
+        return False
+    return bool(path) and os.path.exists(path)
 
 
 def runner_for(kind):

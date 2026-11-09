@@ -31,7 +31,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .topbar .logo span { color: var(--navy-gold); font-size: 0.7rem; font-weight: 400; margin-left: 8px; }
 .topbar .user-info { display: flex; align-items: center; gap: 16px; }
 .topbar .user-email { color: var(--gray-400); font-size: 0.8rem; }
-.topbar .logout-btn { background: none; border: 1px solid var(--gray-700); color: var(--gray-400); padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+.topbar .logout-btn { background: none; border: 1px solid var(--gray-700); color: var(--gray-400); padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
 .topbar .logout-btn:hover { border-color: var(--accent); color: var(--navy-gold); }
 
 /* STATUS BADGE */
@@ -761,7 +761,7 @@ h1, h2, .section-card h2 {
             <h2><i class="fas fa-newspaper"></i> Magazine Articles</h2>
             <p style="font-size:0.88rem;color:#5d564c;margin-bottom:20px;" data-en="Write articles about your brand, products, or industry insights. Articles are reviewed before publishing." data-ko="브랜드·제품·업계 인사이트에 대한 글을 쓰세요. 게시 전에 검수를 거칩니다.">Write articles about your brand, products, or industry insights. Articles are reviewed before publishing.</p>
 
-            <button class="btn btn-primary" id="addArticleBtn"><i class="fas fa-plus"></i> Write Article</button>
+            <button class="btn btn-primary" id="addArticleBtn"><i class="fas fa-plus"></i> <span data-en="Write Article" data-ko="글 쓰기">Write Article</span></button>
             <!-- R-061: 매거진 쪽도 같은 자리. 전에는 네이티브 alert 영문 한 줄이었다(A-216 의 그 문제). -->
             <div class="bp-gate" id="artGateMsg"></div>
 
@@ -796,8 +796,8 @@ h1, h2, .section-card h2 {
                     <p style="font-size:0.78rem;color:#5d564c;margin:4px 0 12px;" data-en="Build your article by adding text and image blocks in any order. Drag an image into an image block to upload it." data-ko="글 상자와 이미지 상자를 원하는 순서로 더해 본문을 만드세요. 이미지 상자에 그림을 끌어다 놓으면 됩니다.">Build your article by adding text and image blocks in any order. Drag an image into an image block to upload it.</p>
                     <div id="artBlocks" role="group" aria-labelledby="artBodyLabel" style="display:flex;flex-direction:column;gap:12px;"></div>
                     <div style="display:flex;gap:8px;margin-top:12px;">
-                        <button type="button" class="btn btn-secondary" id="addTextBlockBtn"><i class="fas fa-paragraph"></i> Add Text</button>
-                        <button type="button" class="btn btn-secondary" id="addImageBlockBtn"><i class="fas fa-image"></i> Add Image</button>
+                        <button type="button" class="btn btn-secondary" id="addTextBlockBtn"><i class="fas fa-paragraph"></i> <span data-en="Add Text" data-ko="글 상자 추가">Add Text</span></button>
+                        <button type="button" class="btn btn-secondary" id="addImageBlockBtn"><i class="fas fa-image"></i> <span data-en="Add Image" data-ko="이미지 상자 추가">Add Image</span></button>
                     </div>
                 </div>
                 <div id="artFormMsg" style="margin-top:14px;font-size:0.85rem;"></div>
