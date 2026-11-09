@@ -166,25 +166,35 @@ if ($rulesChanged) {
     Write-Host ''
 }
 
-# ── 2.5 이스케이프 계약 검사 (A-167) ──
-# 매거진 글이 새로 들어올 때 이중 이스케이프(`&amp;apos;`)가 다시 섞이거나,
-# 평문이어야 할 search-index.json 에 엔티티가 들어오는 일을 push 전에 잡는다.
-# 증상만 고치면 재발하므로 배포 경로에 묶어 둔다. python3 이 없으면 건너뛰고 경고만.
+# ── 2.5 검사 모음 (A-406) ──
+# 전에는 이 자리에서 scripts/check_escaping.py **하나만** 돌렸다(A-167).
+# 2026-11-09 에 세어 보니 검사·시험 도구가 여덟 개였고, 그중 **일곱 개는
+# 부르는 자리가 없어** 사람이 기억해야 돌았다. 그래서 tools/check-all.py 로
+# 묶고 그것을 부른다 — 검사를 새로 만들면 그 파일의 CHECKS 에 한 줄 더하면
+# 배포 경로가 자동으로 집어 간다.
+#
+# 그날 돌려 보니 check_escaping.py 가 **실제로 어긋나 있었다** — 주석 한 줄
+# 때문에 오탐이었고(A-405 에서 고쳤다), 이 스크립트로 배포하면 멀쩡한
+# 저장소에서 push 가 막히는 상태였다. 아무도 몰랐던 이유는 평소에 git push 로
+# 직접 밀기 때문이다. **부르지 않는 검사는 틀린 채로 썩는다.**
+#
+# Playwright 가 필요한 검사 셋은 없으면 조용히 건너뛴다(실패가 아니다).
 # ?? 는 PowerShell 7+ 문법이다. 이 스크립트는 powershell.exe(5.1)로 돌아가므로 쓰지 않는다.
 $py = Get-Command python -ErrorAction SilentlyContinue
 if (-not $py) { $py = Get-Command python3 -ErrorAction SilentlyContinue }
 if ($py) {
-    Write-Host '[검사] 이스케이프 계약 (scripts/check_escaping.py)' -ForegroundColor Cyan
-    & $py.Source 'scripts/check_escaping.py'
+    Write-Host '[검사] 검사 모음 (tools/check-all.py)' -ForegroundColor Cyan
+    & $py.Source 'tools/check-all.py'
     if ($LASTEXITCODE -ne 0) {
         Write-Host ''
-        Write-Host '[중단] 이스케이프 위반이 있어 push 하지 않았습니다.' -ForegroundColor Red
-        Write-Host '       python3 scripts/check_escaping.py --fix  로 되돌린 뒤,' -ForegroundColor Red
-        Write-Host '       색인은 python3 scripts/make_search_index.py 로 재생성하세요.' -ForegroundColor Red
+        Write-Host '[중단] 검사가 어긋나 push 하지 않았습니다.' -ForegroundColor Red
+        Write-Host '       위에 적힌 명령으로 하나씩 돌려 보세요.' -ForegroundColor Red
+        Write-Host '       이스케이프 위반이면  python3 scripts/check_escaping.py --fix' -ForegroundColor Red
+        Write-Host '       색인을 다시 만들려면 python3 scripts/make_search_index.py' -ForegroundColor Red
         exit 1
     }
 } else {
-    Write-Host '[경고] python 을 찾지 못해 이스케이프 검사를 건너뜁니다.' -ForegroundColor Yellow
+    Write-Host '[경고] python 을 찾지 못해 검사 모음을 건너뜁니다.' -ForegroundColor Yellow
 }
 
 # ── 3. push ──

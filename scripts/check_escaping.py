@@ -45,6 +45,39 @@ ANY_ENTITY = re.compile(r'&[a-zA-Z]+;|&#x?[0-9a-fA-F]+;')
 PLAIN_JSON = ['search-index.json']
 
 
+# ── A-405(2026-11-09): 주석은 세지 않는다 ─────────────────────────────────────
+# 이 검사는 `deploy.ps1` 에 묶여 **push 를 막는다.** 그런데
+# `list-your-brand.html:924` 의 **주석** 한 줄에서 오탐이 나고 있었다:
+#
+#     // (&amp; 를 마지막에 풀어야 "&amp;lt;" 가 "<" 로 두 번 풀리지 않는다.)
+#
+# 이스케이프 위험을 **설명하는 주석**이라 그 글자가 당연히 들어 있다. 화면에
+# 나가는 내용이 아니다. 그런데 검사가 이것을 위반으로 세어 종료 코드 1 을
+# 돌려주므로, `deploy.ps1` 로 배포하면 **멀쩡한 저장소에서 push 가 막힌다.**
+#
+# 오탐으로 막는 검사는 결국 우회된다 — 그래서 주석을 가린 뒤 센다.
+# 다만 **가린 것을 조용히 버리지 않고** 따로 알린다: 가리는 규칙이 틀려
+# 진짜 위반을 놓치면 그 줄이 눈에 남아야 한다.
+#
+# 가리는 것은 셋뿐이다(좁게 잡는다 — 넓게 가리면 진짜 위반을 놓친다):
+#   · HTML 주석 `<!-- ... -->`
+#   · `/* ... */` 블록 (JS·CSS 공통)
+#   · 줄의 **처음**이 `//` 인 줄 (URL 의 `https://` 는 줄 처음에 안 온다)
+COMMENT_PATTERNS = [
+    re.compile(r'<!--.*?-->', re.S),
+    re.compile(r'/\*.*?\*/', re.S),
+    re.compile(r'^[ \t]*//[^\n]*', re.M),
+]
+
+
+def mask_comments(s):
+    """주석을 같은 길이의 공백으로 바꾼 사본. 길이가 같아 자릿수가 어긋나지 않는다."""
+    out = s
+    for pat in COMMENT_PATTERNS:
+        out = pat.sub(lambda m: ' ' * len(m.group(0)), out)
+    return out
+
+
 def walk(exts):
     for root, ds, fs in os.walk(ROOT):
         ds[:] = [d for d in ds if d not in SKIP_DIRS]
@@ -54,14 +87,24 @@ def walk(exts):
 
 
 def check_double(fix=False):
-    """HTML·JSON 에 두 번 이스케이프된 엔티티가 있는지."""
-    bad, fixed = [], 0
+    """HTML·JSON 에 두 번 이스케이프된 엔티티가 있는지.
+
+    A-405: 주석 안의 것은 `in_comment` 로 따로 모아 돌려준다 — 실패로 세지
+    않지만 출력에는 남긴다."""
+    bad, fixed, in_comment = [], 0, []
     for p in walk(('.html', '.json')):
         s = io.open(p, encoding='utf-8', errors='replace').read()
         hits = DOUBLE.findall(s)
         if not hits:
             continue
         rel = os.path.relpath(p, ROOT).replace('\\', '/')
+        masked = mask_comments(s)
+        real = DOUBLE.findall(masked)
+        if len(real) < len(hits):
+            in_comment.append((rel, len(hits) - len(real)))
+        if not real and not fix:
+            continue
+        hits = real or hits
         if fix:
             n = 0
             while True:
@@ -74,7 +117,7 @@ def check_double(fix=False):
             print(f'  고침 {rel}: {n}건')
         else:
             bad.append((rel, len(hits), sorted(set('&amp;' + h for h in hits))[:3]))
-    return bad, fixed
+    return bad, fixed, in_comment
 
 
 def check_plain_json():
@@ -109,15 +152,18 @@ def check_plain_json():
 def main():
     fix = '--fix' in sys.argv
     print('── 이중 이스케이프 (HTML · JSON)')
-    bad1, fixed = check_double(fix=fix)
+    bad1, fixed, in_comment = check_double(fix=fix)
     if fix:
         print(f'  복구 {fixed}건')
-        bad1, _ = check_double(fix=False)
+        bad1, _, in_comment = check_double(fix=False)
     if bad1:
         for rel, n, ex in bad1:
             print(f'  ✗ {rel}: {n}건  예: {", ".join(ex)}')
     else:
         print('  ✓ 없음')
+    if in_comment:
+        for rel, n in in_comment:
+            print(f'  (주석 {n}건은 세지 않았다 — {rel}. A-405)')
 
     print('── 평문 JSON 에 섞인 엔티티')
     bad2 = check_plain_json()
