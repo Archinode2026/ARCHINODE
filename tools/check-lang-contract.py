@@ -65,6 +65,61 @@ SENSITIVE = re.compile(
     r'|(?:딜러|유통|파트너)[^。.\n]{0,14}(?:검증|모니터링)')
 
 
+# ── [7] A-386: 세 번째 모양 ────────────────────────────────────────────────
+# 돈·딜러 문구가 한국어 화면에 새는 길은 **세 가지**다. 앞의 둘은 범위로
+# 막혀 있었다:
+#   A-365  `data-lang-only="en"` 가리개 **안**을 훑는다   → 검사 [6]
+#   A-382  `data-langs="en"` 로 **잠긴 페이지**를 훑는다  → 검사 [2b]·[6]
+# 세 번째는 **그 둘 어디에도 안 들어가는 평범한 두 언어 요소**다. 가리개도
+# 없고 페이지도 안 잠겼으니 `data-ko` 가 그냥 한국어 화면에 보인다. 상단 띠
+# 「첫 3개월 무료」가 **229 페이지**에 그렇게 떠 있었다(브론즈 17차).
+#
+# PUBLIC_SENSITIVE 는 [6] 의 SENSITIVE 보다 **좁다.** 공개 화면에는 한국
+# 이용자에게 **주는** 무료와 한국 이용자에게 **파는** 값이 정당하게 있다 —
+# 「무료 회원가입」·「무료 가이드 다운로드」·디지털 상품 한 건 $29.
+# 그래서 「무료」는 입점·리스팅·구독 문맥일 때만 민감으로 본다. 넓게 잡으면
+# 418건이 나오고(브론즈가 그렇게 세어 보고 직전에 거뒀다) 그 검사기는
+# 사람이 결국 무시한다.
+PUBLIC_SENSITIVE = re.compile(
+    r'[$€₩]\s?[\d,]'                                      # $29, €450
+    r'|(?:USD|EUR)\s?[\d,]'                                # EUR 10
+    r'|\d+\s*(?:만원|원|USD|EUR)'                           # 300 USD
+    r'|수수료|커미션'
+    r'|(?:첫|처음)\s*\d+\s*개월[^。.\n]{0,8}무료'              # 첫 3개월 무료
+    r'|무료[^。.\n]{0,8}(?:입점|리스팅|구독|플랜)'
+    r'|(?:입점|리스팅|구독|플랜)[^。.\n]{0,8}무료'
+    r'|딜러십?\s*(?:검증|스크리닝|모니터링|심사|평가)'
+    r'|(?:검증|스크리닝|모니터링|심사|평가)[^。.\n]{0,10}딜러')
+
+# 이미 판단이 끝난 자리 — (파일, 글자 조각, 근거). 통과시키되 적어서 보여 준다.
+# **지우지 마라.** 여기 없는 적중은 전부 실패로 뜨므로, 새 결정이 나면 한 줄 더한다.
+SENSITIVE_DECIDED = [
+    ('about.html', '딜러십 스크리닝 서비스',
+     'A-342 가 남기기로 결정 — 회사 연표의 서비스 이름이고 감시 문구가 아니다'),
+    ('about.html', '딜러 모니터링 서비스',
+     'A-342 가 남기기로 결정 — 같은 연표'),
+    ('terms.html', '딜러십 스크리닝',
+     '약관이 제공 서비스를 열거하는 자리 — 이름을 빼면 약관이 불완전해진다'),
+    ('terms.html', '3개월간 무료이며',
+     '한국 이용자가 동의하는 약관이라 요금이 한국어로 있어야 맞다'),
+    ('digital-products.html', '$29',
+     '한국 건축가·스펙라이터에게 **파는 상품 값**이다 — 브랜드에게 받는 요금이 아니다'),
+    ('request-consultation.html', '$300',
+     '브랜드·디자이너·건축가 양쪽에게 파는 자문 값이다'),
+]
+
+# 승리님 결정을 기다리는 자리 — 통과시키되 보류로 알린다.
+SENSITIVE_PENDING = [
+    ('list-your-brand.html', '첫 3개월 무료',
+     '브랜드 신청 페이지(`data-langs="en,ko"`)다. 한국어로 신청하는 브랜드에게는 '
+     '요금이 보여야 할 수도 있다'),
+    ('list-your-brand.html', '처음 3개월은 무료입니다',
+     '같은 페이지의 같은 내용'),
+    ('submit-trend.html', '첫 3개월 무료 입점',
+     '브랜드향 발행 안내 페이지다. 같은 판단이 걸린다'),
+]
+
+
 class Walker(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
@@ -303,6 +358,61 @@ def check_stamps(problems):
     return notes
 
 
+def check_public_sensitive(problems, notes):
+    """[7] 가리개도 잠금도 없는 평범한 자리에 돈·딜러 문구가 한국어로 있나.
+
+    매거진은 뺀다 — 한국어 기사 본문이고 건설 원가·분양가 얘기가 정당하게
+    나온다. 거기까지 세면 418건이 되고 검사가 쓸모를 잃는다."""
+    def classify(path, value):
+        for f, frag, why in SENSITIVE_DECIDED:
+            if path == f and frag in value:
+                return 'decided', why
+        for f, frag, why in SENSITIVE_PENDING:
+            if path == f and frag in value:
+                return 'pending', why
+        return 'new', None
+
+    decided = []
+    pending = []
+    for p in html_files():
+        if p.startswith('admin/') or is_ko_primary(p):
+            continue
+        src = io.open(p, encoding='utf-8', errors='replace').read()
+        if page_locked_lang(src) == 'en':
+            continue
+        w = Walker()
+        w.feed(src)
+        for h in w.hits:
+            if h['gate'] == 'en':
+                continue
+            for k, v in h['d'].items():
+                if not k.startswith('data-ko') or not v:
+                    continue
+                m = PUBLIC_SENSITIVE.search(v)
+                if not m:
+                    continue
+                kind, why = classify(p, v)
+                if kind == 'decided':
+                    decided.append((p, h['line'], m.group(0), why))
+                elif kind == 'pending':
+                    pending.append((p, h['line'], m.group(0), why))
+                else:
+                    problems.append(('[7] 공개 민감문', p, h['line'],
+                                     '가리개도 페이지 잠금도 없는 자리에 「%s」가 한국어로 있다 — '
+                                     '%s... / `%s`. 돈·딜러 문구는 영어 화면에만 둔다. '
+                                     '남겨야 하는 자리라면 SENSITIVE_DECIDED 에 근거와 함께 적어라'
+                                     % (m.group(0), v[:60], k)))
+    if decided:
+        notes.append('공개 화면의 민감문 %d곳은 **판단이 끝난 자리**다 — %s'
+                     % (len(decided),
+                        ' / '.join('%s:%d 「%s」' % (p, l, w) for p, l, w, _ in decided)))
+    if pending:
+        notes.append('공개 화면의 민감문 %d곳은 **승리님 결정 대기**다 — %s'
+                     % (len(pending),
+                        ' / '.join('%s:%d 「%s」' % (p, l, w) for p, l, w, _ in pending)))
+
+
+
 def main():
     if not os.path.exists('lang.js'):
         print('리포 뿌리에서 실행해라 (lang.js 가 보이는 곳).', file=sys.stderr)
@@ -316,6 +426,7 @@ def main():
     deferred = []
     check_elements(problems, supported, deferred)
     notes = check_stamps(problems) or []
+    check_public_sensitive(problems, notes)
 
     print('lang.js 가 훑는 접미사: %s'
           % ', '.join(sorted(x or '(없음)' for x in supported)))
@@ -327,7 +438,7 @@ def main():
               '쓸지 말지는 결정 대기, A-368 참고'
               % (len(deferred), len(set(x[0] for x in deferred))))
     if not problems:
-        print('언어 규약 검사 — 어긋난 것 없음 (검사 6종)')
+        print('언어 규약 검사 — 어긋난 것 없음 (검사 7종)')
         return 0
     by = collections.Counter(x[0] for x in problems)
     print('언어 규약 검사 — 어긋난 것 %d건' % len(problems))
