@@ -689,8 +689,8 @@ function renderBrand(brand, products, articles) {
                 <div class="product-card-content">
                     <span class="product-card-brand">${brandName}</span>
                     <h3 class="product-card-name">${pName}</h3>
-                    ${pMaterials ? `<p class="product-card-specs"><strong>Materials:</strong> ${pMaterials}</p>` : ''}
-                    ${pDimensions ? `<p class="product-card-specs"><strong>Dimensions:</strong> ${pDimensions}</p>` : ''}
+                    ${pMaterials ? `<p class="product-card-specs"><strong data-en="Materials:" data-ko="소재:">Materials:</strong> ${pMaterials}</p>` : ''}
+                    ${pDimensions ? `<p class="product-card-specs"><strong data-en="Dimensions:" data-ko="치수:">Dimensions:</strong> ${pDimensions}</p>` : ''}
                 </div>
             </a>
         `; }).join('');
@@ -770,8 +770,8 @@ function renderBrand(brand, products, articles) {
                 ${description ? `<p class="bp-hero-subtitle">${description.substring(0, 250)}${description.length > 250 ? '...' : ''}</p>` : ''}
                 <div class="bp-hero-meta">
                     ${country ? `<strong data-en="Country:" data-ko="국가:">Country:</strong> ${country}<br>` : ''}
-                    ${founded ? `<strong>Founded:</strong> ${founded}<br>` : ''}
-                    ${headquarters ? `<strong>HQ:</strong> ${headquarters}<br>` : ''}
+                    ${founded ? `<strong data-en="Founded:" data-ko="설립:">Founded:</strong> ${founded}<br>` : ''}
+                    ${headquarters ? `<strong data-en="HQ:" data-ko="본사:">HQ:</strong> ${headquarters}<br>` : ''}
                     ${website ? `<strong data-en="Website:" data-ko="웹사이트:">Website:</strong> <a href="${wsUrl}" target="_blank" style="color:var(--gray-700);" rel="noopener noreferrer">${website}</a>` : ''}
                 </div>
                 ${certifications.length > 0 ? `
