@@ -381,9 +381,9 @@ body .topbar .lang-switch-btn:hover {
   .footer-contact a,
   .announcement-bar a,
   body.home .promo-foot a,
-  body.home .hero-dot,
-  body.home .hero-pause-btn,
-  body.home .cat-rail-btn { position: relative; }
+  .hero-dot,
+  .hero-pause-btn,
+  .cat-rail-btn { position: relative; }
 
   /* 세로만 — 한 줄에 나란히 있어 가로로 넓히면 이웃과 겹치는 것들 */
   .breadcrumb-list a::after,
@@ -392,7 +392,7 @@ body .topbar .lang-switch-btn:hover {
   .footer-contact a::after,
   .announcement-bar a::after,
   body.home .promo-foot a::after,
-  body.home .hero-dot::after {
+  .hero-dot::after {
     content: '';
     position: absolute;
     left: 0;
@@ -403,8 +403,15 @@ body .topbar .lang-switch-btn:hover {
   }
 
   /* 44x44 — 주위에 20px 이상 여유가 있어 겹칠 이웃이 없는 아이콘 단추 */
-  body.home .hero-pause-btn::after,
-  body.home .cat-rail-btn::after {
+  /* A-398: `body.home` 을 떼었다. 브론즈 19차가 「`hero-dot` 은 2파일」이라고
+     지적했는데, **직접 세어 보니 마크업은 `index.html` 4곳뿐**이고
+     `magazine.html` 에는 `querySelectorAll('.hero-dot')` 라는 **JS 참조만**
+     남아 있다(복사해 온 슬라이더 코드. `.hero-slide` 가 없어 블록 자체가
+     안 돈다). 그러니 지금 피해는 **없다.** 그래도 `body.home` 을 떼는 쪽이
+     맞다 — 선택자가 페이지가 아니라 **마크업을 따라가게** 두면, 다음에
+     어느 페이지에 점을 넣어도 2px 짜리 타깃이 되지 않는다. */
+  .hero-pause-btn::after,
+  .cat-rail-btn::after {
     content: '';
     position: absolute;
     left: 50%;
@@ -472,7 +479,27 @@ body .topbar .lang-switch-btn:hover {
 .search-box input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .search-box button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
 .search-box button { position: absolute; right: 30px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--white); }
-.search-close { position: absolute; top: 40px; right: 40px; color: var(--white); font-size: 1.8rem; cursor: pointer; }
+/* A-398(2026-11-09): 닫기 단추가 **10.6 x 16px** 이었다(브론즈 19차 실측, 390px·
+   데스크톱 동일). 크기 지정이 아예 없어 글리프 크기가 곧 단추 크기였다.
+   Esc 로도 닫히지만 **터치 사용자에게 보이는 닫기 길은 이것뿐**이다.
+   여기는 A-393 처럼 `::after` 로 넓히지 않고 단추 자체를 44x44 로 만든다 —
+   오버레이 모서리라 겹칠 이웃이 없고, 누를 자리가 눈에 보이는 편이 낫다. */
+.search-close {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  color: var(--white);
+  font-size: 1.8rem;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  line-height: 1;
+}
 
 /* SECTION HEADER */
 .section-header {

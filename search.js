@@ -9,6 +9,36 @@
   var isLoaded = false;
   var brandIndex = null; // Firestore 승인 브랜드 목록 캐시 (A-072: 정적 search-index.json엔 brand 타입이 없음)
   var brandIndexLoading = false;
+  var badItemWarned = false;
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // A-397(2026-11-09): 검색이 227 페이지에서 통째로 죽어 있었다.
+  //
+  // `list-your-brand.html:783` 은 카테고리를 체크박스로 받아
+  // `category: [...].map(cb => cb.value)` 로 **항상 배열**로 저장한다.
+  // 그런데 아래 search() 는 `(item.category || '').toLowerCase()` 로
+  // **문자열을 전제**했다. 배열은 truthy 라 `|| ''` 를 통과하고
+  // `.toLowerCase` 가 없어 예외가 던져진다. 그 예외가 search() 밖으로
+  // 나가 renderResults 가 영영 안 불리고 **화면이 빈 채로 남았다** —
+  // 「결과 없음」조차 안 떴다. 승인 브랜드 3곳 중 한 곳이 배열이면
+  // 사이트 전체 검색이 멈춘다.
+  //
+  // 배열은 잘못된 데이터가 아니라 **신청서가 설계대로 넣은 모양**이다.
+  // 그래서 데이터를 고치는 게 아니라 **읽는 쪽이 어떤 모양이든 받도록** 한다.
+  // ─────────────────────────────────────────────────────────────────────────
+  function text(v, sep) {
+    if (v === null || v === undefined) return '';
+    if (Array.isArray(v)) {
+      return v.filter(function(x) { return x !== null && x !== undefined && x !== ''; })
+              .map(function(x) { return text(x, sep); })
+              .join(sep === undefined ? ' ' : sep);
+    }
+    if (typeof v === 'string') return v;
+    if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+    return '';   // 객체·함수는 검색어로 쓸 것이 없다
+  }
+
+  function lc(v) { return text(v).toLowerCase(); }
 
   // Determine base path relative to current page
   function getBasePath() {
@@ -90,15 +120,15 @@
         if (!b.brandName || !b.slug) return;
         list.push({
           type: 'brand',
-          name_en: b.brandName,
-          name_ko: b.brandName,
+          name_en: text(b.brandName),
+          name_ko: text(b.brandName),
           desc_en: '',
           desc_ko: '',
           parent_en: '',
           parent_ko: '',
-          country: b.country || '',
-          category: b.category || '',
-          url: 'brands/view.html?id=' + b.slug
+          country: text(b.country),
+          category: text(b.category, ', '),
+          url: 'brands/view.html?id=' + encodeURIComponent(text(b.slug))
         });
       });
       brandIndex = list;
@@ -130,16 +160,20 @@
     var combined = searchData.concat(brandIndex || []);
 
     for (var i = 0; i < combined.length; i++) {
+      // A-397: 항목 하나 때문에 검색 전체가 멈추던 것을 막는다. lc() 로 이미
+      //        모양 문제는 없어졌지만, 색인은 밖에서 들어오는 데이터다 —
+      //        한 줄이 나쁘면 그 줄만 건너뛰고 나머지는 찾아 준다.
+      try {
       var item = combined[i];
       var score = 0;
-      var nameEn = (item.name_en || '').toLowerCase();
-      var nameKo = (item.name_ko || '').toLowerCase();
-      var descEn = (item.desc_en || '').toLowerCase();
-      var descKo = (item.desc_ko || '').toLowerCase();
-      var parentEn = (item.parent_en || '').toLowerCase();
-      var parentKo = (item.parent_ko || '').toLowerCase();
-      var country = (item.country || '').toLowerCase();
-      var category = (item.category || '').toLowerCase();
+      var nameEn = lc(item.name_en);
+      var nameKo = lc(item.name_ko);
+      var descEn = lc(item.desc_en);
+      var descKo = lc(item.desc_ko);
+      var parentEn = lc(item.parent_en);
+      var parentKo = lc(item.parent_ko);
+      var country = lc(item.country);
+      var category = lc(item.category);
 
       // Exact name match (highest priority)
       if (nameEn === q || nameKo === q) {
@@ -176,8 +210,14 @@
         results.push({
           item: item,
           score: score,
-          url: basePath + item.url
+          url: basePath + text(item.url)
         });
+      }
+      } catch (e) {
+        if (!badItemWarned) {
+          badItemWarned = true;
+          console.warn('검색 색인의 항목 하나를 건너뛴다 (A-397):', e && e.message, combined[i]);
+        }
       }
     }
 
@@ -256,7 +296,8 @@
       if (item.type === 'subcategory') {
         sub = (lang === 'ko' ? item.parent_ko : item.parent_en) || '';
       } else if (item.type === 'brand') {
-        sub = (item.country || '') + (item.category ? ' · ' + item.category : '');
+        var catText = text(item.category, ' · ');
+        sub = text(item.country) + (catText ? ' · ' + catText : '');
       } else if (item.type === 'category') {
         sub = lang === 'ko' ? (item.desc_ko || '') : (item.desc_en || '');
       } else if (item.type === 'article') {
