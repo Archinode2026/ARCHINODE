@@ -38,22 +38,28 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# 공용 처방 목록 — (라벨, 정규식). 페이지의 인라인 CSS 에서 찾는다.
+# 공용 처방 목록 — (라벨, CSS 에서 찾을 정규식, 이 마크업이 있을 때만 본다).
+# 세 번째가 None 이면 늘 본다. 마크업이 없는 페이지에 처방을 요구하면
+# **없는 결함을 보고하는 검사기**가 된다 — 그건 결함보다 나쁘다.
 RULES = [
     ('메뉴 분기 1100px (A-275·A-327)',
-     r'@media[^{]*max-width:\s*1100px'),
+     r'@media[^{]*max-width:\s*1100px', None),
     ('햄버거 최소 타깃 44px (A-286·A-327)',
-     r'\.mobile-toggle\s*\{[^}]*min-width\s*:\s*44px'),
+     r'\.mobile-toggle\s*\{[^}]*min-width\s*:\s*44px', 'mobile-toggle'),
     ('머리띠 줄바꿈 (A-366·A-385)',
-     r'\.header \.container\s*\{[^}]*flex-wrap\s*:\s*wrap'),
+     r'\.header \.container\s*\{[^}]*flex-wrap\s*:\s*wrap', None),
     ('머리띠 높이 가변 (A-366·A-385)',
-     r'\.header \.container\s*\{[^}]*height\s*:\s*auto'),
+     r'\.header \.container\s*\{[^}]*height\s*:\s*auto', None),
     ('단추 묶음 오른쪽 (A-377)',
-     r'\.header-actions\s*\{[^}]*margin-left\s*:\s*auto'),
+     r'\.header-actions\s*\{[^}]*margin-left\s*:\s*auto', None),
     ('푸터 접기 (A-340)',
-     r'(?:details|summary)\s*[,{]'),
+     r'(?:details|summary)\s*[,{]', None),
     ('드롭다운 메뉴 (A-282 이후)',
-     r'\.nav-dropdown-menu\s*\{'),
+     r'\.nav-dropdown-menu\s*\{', 'nav-dropdown-menu'),
+    ('띠 링크 터치 타깃 44px (A-393)',
+     r'\.announcement-bar a::after', 'announcement-bar'),
+    ('「맨 위로」를 Netlify 배지 위로 (A-394)',
+     r'\.scroll-top\s*\{[^}]*bottom\s*:\s*84px', 'scroll-top'),
 ]
 
 # 머리띠를 가졌다고 보는 표시
@@ -101,9 +107,11 @@ def main():
             continue
         css = '\n'.join(blocks)
 
-        missing = [label for label, pat in RULES
-                   if not re.search(pat, css, re.S | re.I)]
-        checked.append((rel, len(RULES) - len(missing), len(RULES)))
+        missing = [label for label, pat, needs in RULES
+                   if (needs is None or needs in src)
+                   and not re.search(pat, css, re.S | re.I)]
+        applies = sum(1 for _, _, needs in RULES if needs is None or needs in src)
+        checked.append((rel, applies - len(missing), applies))
         for label in missing:
             problems.append((rel, '공용 처방 누락 — ' + label))
 

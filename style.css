@@ -348,6 +348,100 @@ body .topbar .lang-switch-btn:hover {
   .header-actions a, .header-actions button { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 4px 6px; }
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   A-393(2026-11-09): 44px 최소 타깃 — **글자를 키우지 않고 누를 자리만 넓힌다**
+
+   A-113 → A-286 → A-353 이 햄버거·돋보기·푸터 목록 링크를 44px 로 올렸다.
+   브론즈 18차가 390px 에서 남은 것을 전수로 셌다 — 빵부스러기 「홈」이
+   19.2px(모든 하위 페이지), 히어로 슬라이드 점이 **2px**, 멈춤 단추 32px,
+   카테고리 레일 화살표 38px, 「전체 보기」 25.6px, 푸터 법적 링크 18.4px.
+
+   `min-height` 로 올리지 않은 이유: 이 자리들은 **보이는 크기가 디자인**이다.
+   슬라이드 점을 44px 로 만들면 막대가 되고, 빵부스러기를 44px 로 만들면
+   그 줄이 두 배로 두꺼워진다. 그래서 투명한 `::after` 로 **누를 자리만**
+   넓혔다 — 보이는 것은 1px 도 바뀌지 않는다.
+
+   세로만 넓힌 것과 44×44 로 넓힌 것을 나눴다. 슬라이드 점은 32px 폭에
+   8px 간격이라 가로로 44px 을 주면 **이웃 점과 겹쳐 오탭이 난다**(중심
+   간격 40px). 떨어져 있는 멈춤 단추·레일 화살표만 44×44 로 한다.
+
+   라이브 실측(390px, `::after` 주입 후 `elementFromPoint` 로 세로 ±21px
+   7점 검사): 빵부스러기 3/7 → **7/7**, 점·멈춤·화살표·「전체 보기」·
+   푸터 링크 **7/7**. 적중하지 않은 한 자리는 Netlify 배지 iframe
+   (`position:fixed`, `z-index:2147483645`)이 덮은 것이고 이 규칙과 무관하다
+   — A-394 로 따로 적었다.
+
+   범위는 ≤1100px 다. A-356 에서 정한 대로 44px 은 손가락 기준이고,
+   데스크톱 포인터에는 적용하지 않는다.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .breadcrumb-list a,
+  .section-link,
+  .footer-bottom-links a,
+  .footer-contact a,
+  .announcement-bar a,
+  body.home .promo-foot a,
+  body.home .hero-dot,
+  body.home .hero-pause-btn,
+  body.home .cat-rail-btn { position: relative; }
+
+  /* 세로만 — 한 줄에 나란히 있어 가로로 넓히면 이웃과 겹치는 것들 */
+  .breadcrumb-list a::after,
+  .section-link::after,
+  .footer-bottom-links a::after,
+  .footer-contact a::after,
+  .announcement-bar a::after,
+  body.home .promo-foot a::after,
+  body.home .hero-dot::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+
+  /* 44x44 — 주위에 20px 이상 여유가 있어 겹칠 이웃이 없는 아이콘 단추 */
+  body.home .hero-pause-btn::after,
+  body.home .cat-rail-btn::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   A-394(2026-11-09): Netlify 배지가 「맨 위로」 단추를 덮는다
+
+   라이브 실측(390x844): `<iframe title="Powered by Netlify">` 가
+   `position: fixed` 로 **196x63, 오른쪽 아래(x 194~390, y 781~844)** 에
+   앉아 있고 `z-index: 2147483645` 다 — int 최대값에서 2 모자란 값이라
+   우리 쪽에서 올려 이길 수 있는 범위가 아니다(그리고 남의 배지를 우리
+   단추로 덮는 것은 할 일이 아니다).
+
+   `.scroll-top` 은 `bottom:30px; right:30px` 의 44x44 다. 즉 **단추의
+   75%(44x33)가 배지 아래 깔린다.** `elementFromPoint` 로 단추 중앙을
+   찍으면 배지 iframe 이 잡힌다 — **휴대폰에서 눌리지 않는 단추**다.
+
+   그래서 단추를 배지 위로 올린다. 배지가 아래 63px 을 쓰므로 84px 이면
+   21px 여유가 남는다. 실측: 겹침 44x33 → **0**, 7점 검사 2/7 → **7/7**.
+
+   함께 확인한 것 — **쿠키 배너는 괜찮다.** 두 단추가 x 40·139 에 있어
+   배지(x≥194)의 왼쪽이다(「필수만」 오른쪽 모서리 18x27 만 걸치고 중앙은
+   눌린다). 배너를 복제해 띄워 기하만 쟀고 저장값은 건드리지 않았다.
+
+   ★ 배지를 Netlify 설정에서 끌 수 있으면 이 규칙은 되돌려도 된다 —
+   승리님 결정 사항으로 대장 A-394 에 적었다.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .scroll-top { bottom: 84px; }
+}
+
 /* SEARCH OVERLAY */
 .search-overlay {
   position: fixed;

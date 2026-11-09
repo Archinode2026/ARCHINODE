@@ -563,6 +563,25 @@
         .scroll-to-top.visible {
             display: flex;
         }
+        /* ───────────────────────────────────────────────────────────────
+           A-393(2026-11-09): 띠 링크 터치 타깃. 390px 에서 높이가 16px
+           이었다. 이 페이지는 style.css 를 싣지 않아 공용 처방이 닿지
+           않는다(A-385) — `tools/check-standalone-css.py` 가 잡아 줬다.
+           글자 크기는 그대로 두고 투명한 `::after` 로 누를 자리만 넓힌다.
+           ─────────────────────────────────────────────────────────────── */
+        @media (max-width: 1100px) {
+          .announcement-bar a { position: relative; }
+          .announcement-bar a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 44px;
+            transform: translateY(-50%);
+          }
+        }
+
     </style>
 </head>
 <body>
