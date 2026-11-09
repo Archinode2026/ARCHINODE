@@ -158,4 +158,77 @@
         else actions.prepend(link);
     }
 
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       A-400(2026-11-09): 카테고리 드롭다운의 키보드·스크린리더 보강
+
+       브론즈 19차 실측(키보드만으로 다녀 보기):
+         · Tab 3회로 「카테고리」에 닿고 Enter 로 열리고 안쪽 10개 링크에
+           전부 닿고 Esc 로 닫힌다 — **여기까지는 제대로 된다**(진짜
+           `<button>` 이라 Enter 가 click 을 일으킨다).
+         · ❌ Esc 로 닫으면 **포커스가 BODY 로 떨어진다.** 다음 Tab 이 문서
+           맨 처음부터 시작한다. 같은 페이지의 모바일 메뉴는 닫을 때
+           `.mobile-toggle` 로 포커스를 **되돌린다** — 한 사이트에서 두
+           처리가 달랐다.
+         · ❌ `aria-expanded`·`aria-haspopup` 이 없다. 스크린리더가 이것이
+           여닫히는 것인지, 지금 열렸는지 모른다.
+
+       **왜 여기에 넣는가.** `toggleCatMenu` 와 Esc 핸들러는 **232개 HTML 에
+       인라인으로 복사**돼 있고 그마저 6가지 모양이다(`classList.toggle`
+       넷 · `style.display` 하나 · 공백만 다른 것). 232파일을 6가지로 나눠
+       고치는 것보다, **그 232파일 전부에 실리는 유일한 스크립트**인 이
+       파일에서 보강하는 쪽이 적게 건드리고 덜 어긋난다. (`lang.js` 는
+       231파일 — `privacy-en.html` 이 빠진다. A-282 참고.)
+
+       기존 인라인 코드는 **그대로 두고** 그 위에 덧댄다:
+         · 여닫는 상태는 MutationObserver 로 본다 — 클릭·바깥 클릭·Esc 가
+           어느 경로로 닫아도 `aria-expanded` 가 따라간다.
+         · Esc 는 **capture 단계**에서 먼저 받아 「열려 있었는지」를 기억하고,
+           인라인 핸들러가 닫은 **뒤에** 트리거로 포커스를 되돌린다.
+       ───────────────────────────────────────────────────────────────────────── */
+    (function enhanceCatDropdown() {
+        function ready(fn) {
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+            else fn();
+        }
+        ready(function () {
+            var trig = document.querySelector('.nav-dropdown-trigger');
+            var menu = document.getElementById('catMenu');
+            if (!trig || !menu) return;
+
+            function isOpen() {
+                return menu.classList.contains('active') || menu.style.display === 'block';
+            }
+            function sync() {
+                trig.setAttribute('aria-expanded', isOpen() ? 'true' : 'false');
+            }
+
+            trig.setAttribute('aria-haspopup', 'true');
+            trig.setAttribute('aria-controls', 'catMenu');
+            sync();
+
+            if (typeof MutationObserver === 'function') {
+                new MutationObserver(sync).observe(menu, {
+                    attributes: true, attributeFilter: ['class', 'style']
+                });
+            } else {
+                trig.addEventListener('click', function () { setTimeout(sync, 0); });
+            }
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape' && e.key !== 'Esc') return;
+                if (!isOpen()) return;
+                // 인라인 핸들러가 닫을 차례를 준 뒤에 포커스를 되돌린다.
+                setTimeout(function () {
+                    if (isOpen()) {
+                        menu.classList.remove('active');
+                        if (menu.style.display === 'block') menu.style.display = 'none';
+                        sync();
+                    }
+                    try { trig.focus(); } catch (err) {}
+                }, 0);
+            }, true);
+        });
+    })();
+
 })();

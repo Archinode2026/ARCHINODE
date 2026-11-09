@@ -68,6 +68,29 @@ def extract_title_desc(html: str) -> tuple[str, str, str, str]:
         desc_en = m.group(1).strip()
         desc_ko = m.group(2).strip()
 
+    # ── A-401(2026-11-09): 히어로 설명문을 두 언어로 가져온다 ──────────────────
+    # 위의 메타 description 갈래는 **한 값을 두 언어에 똑같이 넣는다**
+    # (`desc_ko = desc_en = meta`). 그래서 220개 중 `desc_en == desc_ko` 가 89개,
+    # **`desc_ko` 에 한글이 없는 것이 82개**였다(브론즈 19차 실측). A-397 로 검색이
+    # 살아나자마자 한국어 결과 설명 82개가 영어로 보이는 자리다.
+    #
+    # 카테고리·서브카테고리 페이지에는 `<h1 data-en data-ko>` 바로 뒤에
+    # **두 언어 설명 `<p>`** 가 있다(A-381 이 354곳을 번역해 둔 그것). class 가
+    # 없어서 위의 subtitle/lead 규칙에 안 걸렸다. 그래서 **h1 뒤를 본다** —
+    # 범위를 1,500자로 묶어 푸터·입점 CTA 의 두 언어 문단을 집지 않게 한다.
+    #
+    # 매거진 기사 130편은 한국어 본문이라 그대로 둔다 — 설명이 한국어인 것이
+    # 맞고, 영어 화면에서도 「Korean Articles」라고 이름부터 알리고 있다(A-348).
+    # `data-en-html` 도 받는다 — 홈의 히어로 제목이 `<h1 data-en-html="Launch Korea.<br>...">`
+    # 라서 `data-en` 만 보면 안 걸렸다.
+    h1m = re.search(r'<h1[^>]*data-en(?:-html)?\s*=\s*["\'][^"\']+["\'][^>]*>', html)
+    if h1m:
+        window = html[h1m.end():h1m.end() + 1500]
+        pm = re.search(r'<p[^>]*data-en\s*=\s*["\']([^"\']{20,})["\'][^>]*data-ko\s*=\s*["\']([^"\']{10,})["\']', window)
+        if pm:
+            desc_en = pm.group(1).strip()
+            desc_ko = pm.group(2).strip()
+
     return name_en, name_ko, desc_en, desc_ko
 
 

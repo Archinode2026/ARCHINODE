@@ -268,9 +268,31 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  /* ── A-402(2026-11-09): 검색 결과가 보는 사람 언어를 안 따랐다 ─────────────
+     전에는 `localStorage.getItem('archinode-lang')` **하나만** 봤다. 그런데 그
+     키는 `lang.js:232` 에서 **사용자가 언어 단추를 직접 눌렀을 때만** 저장된다.
+     한국 IP 로 들어와 한국어로 칠해진 방문자나(A-359 의 IP 판정),
+     브라우저 언어로 한국어가 된 방문자는 **그 키가 아예 없다** — 그래서
+     `|| 'en'` 으로 떨어져 **한국어 화면인데 검색 결과만 영어**로 떴다.
+     화면의 현재 언어를 아는 정본은 `document.documentElement.lang` 이다
+     (`lang.js:319` 가 세운다). 그걸 먼저 보고, 없으면 저장된 선택,
+     그다음 영어로 떨어진다. `localStorage` 는 사생활 모드에서 던질 수
+     있으므로 `lang.js:34` 처럼 감싼다.
+     ── 같은 종류의 결함을 A-347 에서 한 번 고쳤다: 「목록이 보는 사람 언어를
+        안 따른다」. 그때 이 파일은 세지 않았다. */
+  function currentLang() {
+    var l = document.documentElement.lang;
+    if (l === 'ko' || l === 'en') return l;
+    try {
+      var saved = localStorage.getItem('archinode-lang');
+      if (saved === 'ko' || saved === 'en') return saved;
+    } catch (e) {}
+    return 'en';
+  }
+
   function renderResults(results) {
     if (!resultsContainer) return;
-    var lang = localStorage.getItem('archinode-lang') || 'en';
+    var lang = currentLang();
 
     if (results.length === 0) {
       var q = searchInput ? searchInput.value.trim() : '';
