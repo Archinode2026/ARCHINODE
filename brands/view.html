@@ -323,7 +323,7 @@
       <span class="sep">/</span>
       <a href="../brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
       <span class="sep">/</span>
-      <span class="current" id="breadcrumbName">Loading...</span>
+      <span class="current" id="breadcrumbName" data-en="Loading..." data-ko="불러오는 중...">Loading...</span>
     </div>
   </div>
 </div>
@@ -823,7 +823,7 @@ function renderBrand(brand, products, articles) {
         <!-- DESCRIPTION (if no story) -->
         ${!brandStory && description ? `
         <section class="bp-description">
-            <h2>About ${brandName}</h2>
+            <h2 data-en="About ${brandName}" data-ko="${brandName} 소개">About ${brandName}</h2>
             <p>${description}</p>
         </section>` : ''}
 

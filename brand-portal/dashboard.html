@@ -1602,7 +1602,10 @@ async function loadProducts() {
 
     prows.forEach(p => {
         const statusClass = p.status === 'approved' ? 'status-approved' : p.status === 'rejected' ? 'status-rejected' : 'status-pending';
-        const pName = escapeHtml(p.name || (ko ? '(이름 없음)' : '(untitled)'));
+        /* A-377: 이름이 빈 제품의 대체 문구가 그릴 때 굳었다 */
+        const pNameEn = escapeHtml(p.name || '(untitled)');
+        const pNameKo = escapeHtml(p.name || '(이름 없음)');
+        const pName = ko ? pNameKo : pNameEn;
         const pImageUrl = escapeHtml(bpSafeUrl(p.imageUrl));   // A-218 — 스킴까지 본다
         const pCollection = escapeHtml(p.collection || '');
         const pMaterials = escapeHtml(p.materials || '');
@@ -1620,7 +1623,7 @@ async function loadProducts() {
             <div class="product-card">
                 <div class="img-area">${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : 'No image'}</div>
                 <div class="info">
-                    <h4>${pName}</h4>
+                    <h4 data-en="${pNameEn}" data-ko="${pNameKo}">${pName}</h4>
                     <p>${pCollection} ${p.materials ? '· ' + pMaterials : ''}</p>
                     <span class="status-badge ${statusClass}" style="margin-top:8px;" data-en="${pStatusEn}" data-ko="${pStatusKo}">${pStatus}</span>
                     ${rejectReasonHtml(pSt, p.reviewerNote)}
@@ -1657,16 +1660,21 @@ function reviewerNoteHtml(status, note) {
     const rejected = (status === 'rejected');
     const headEn = rejected ? 'Reason for rejection' : 'Requested changes';
     const headKo = rejected ? '반려 사유' : '수정 요청 사유';
-    const body = (note || '').trim()
-        ? escapeHtml(note.trim())
-        : (ko ? '사유가 입력되지 않았습니다. 문의해 주세요.' : 'No reason was given. Please contact us.');
+    /* A-377: 머리말에는 짝이 있는데 **본문만 없어서**, 언어를 바꾸면 한 상자 안에서
+       머리말만 바뀌었다. 사유가 적혀 있으면 양쪽이 같은 글이고, 비어 있을 때만
+       갈린다 — 그 경우에도 따라오도록 양쪽을 만들어 둔다.
+       이 함수는 `rejectReasonHtml` 이라는 옛 이름으로 **제품 카드도 같이 쓴다.** */
+    const written = (note || '').trim();
+    const bodyEn = written ? escapeHtml(written) : 'No reason was given. Please contact us.';
+    const bodyKo = written ? escapeHtml(written) : '사유가 입력되지 않았습니다. 문의해 주세요.';
+    const body = ko ? bodyKo : bodyEn;
     const line = rejected ? '#b91c1c' : '#a07c4a';
     const bg   = rejected ? '#fef2f2' : '#faf6ef';
     const fg   = rejected ? '#991b1b' : '#6b4f2a';
     return `<p style="margin-top:8px;padding:10px 12px;border-left:3px solid ${line};background:${bg};
                       color:${fg};font-size:0.8rem;line-height:1.65;border-radius:0 6px 6px 0;white-space:pre-wrap;">
                 <strong style="display:block;margin-bottom:3px;font-size:0.74rem;letter-spacing:0.04em;"
-                        data-en="${escapeHtml(headEn)}" data-ko="${escapeHtml(headKo)}">${escapeHtml(ko ? headKo : headEn)}</strong>${body}</p>`;
+                        data-en="${escapeHtml(headEn)}" data-ko="${escapeHtml(headKo)}">${escapeHtml(ko ? headKo : headEn)}</strong><span data-en="${bodyEn}" data-ko="${bodyKo}">${body}</span></p>`;
 }
 // 옛 이름으로 부르는 곳이 남아 있어도 깨지지 않게 (제품 카드가 쓴다)
 function rejectReasonHtml(status, note) { return reviewerNoteHtml(status, note); }
@@ -1717,18 +1725,24 @@ async function loadArticles() {
         const statusClass = st === 'approved' ? 'status-approved'
                           : st === 'rejected' ? 'status-rejected'
                           : st === 'revision-requested' ? 'status-revision' : 'status-pending';
-        const aTitle = escapeHtml(a.title || (ko ? '(제목 없음)' : '(untitled)'));
+        /* A-377: 제목이 빈 기사의 대체 문구가 그릴 때 굳었다 */
+        const aTitleEn = escapeHtml(a.title || '(untitled)');
+        const aTitleKo = escapeHtml(a.title || '(제목 없음)');
+        const aTitle = ko ? aTitleKo : aTitleEn;
         const aTag = escapeHtml(a.tag || '');
         const aContent = escapeHtml((a.content || '').substring(0, 100));
         const ms = articleMillis(a);
-        const when = ms ? new Date(ms).toLocaleDateString(ko ? 'ko-KR' : 'en-US') : '';
+        /* A-377: 날짜 형식이 그릴 때 굳어서 언어를 바꿔도 안 따라왔다. 양쪽을 만들어 둔다. */
+        const whenEn = ms ? new Date(ms).toLocaleDateString('en-US') : '';
+        const whenKo = ms ? new Date(ms).toLocaleDateString('ko-KR') : '';
+        const when = ko ? whenKo : whenEn;
         list.innerHTML += `
             <div style="padding:16px;border:1px solid #ede7dc;border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
                 <div style="min-width:0;">
                     <strong style="font-size:0.92rem;">${aTitle}</strong>
                     <span style="font-size:0.75rem;color:#7a5c32;margin-left:8px;">${aTag}</span>
                     <p style="font-size:0.8rem;color:#6b6459;margin-top:4px;">${aContent}${aContent ? '...' : ''}</p>
-                    ${when ? `<p style="font-size:0.72rem;color:#6b6459;margin-top:4px;">${ko ? '제출일' : 'Submitted'} ${when}</p>` : ''}
+                    ${when ? `<p style="font-size:0.72rem;color:#6b6459;margin-top:4px;"><span data-en="Submitted" data-ko="제출일">${ko ? '제출일' : 'Submitted'}</span> <span data-en="${whenEn}" data-ko="${whenKo}">${when}</span></p>` : ''}
                     ${reviewerNoteHtml(st, a.reviewerNote)}
                 </div>
                 <span class="status-badge ${statusClass}" style="white-space:nowrap;"
