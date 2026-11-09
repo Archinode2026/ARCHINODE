@@ -467,6 +467,13 @@ async function loadRegisteredBrands() {
 
            URL 은 이스케이프만으로 안 된다 — `javascript:` 는 `&<>"` 가 없어
            그대로 통과한다. 스킴을 따로 봐야 한다(`safeUrl`). */
+        /* A-415(2026-11-09): brands.category 는 **배열**이다(list-your-brand.html:783 이
+           체크박스를 map 해서 쓴다). 여기는 문자열로 다뤄서 `"Furniture,Lighting"` 처럼
+           쉼표가 붙은 원문 슬러그가 그대로 손님 화면에 찍혔다. A-397 에서 search.js 의
+           같은 결함을 고치면서 **읽는 자리를 전수로 세지 않은** 탓이다. 배열·문자열 둘 다 받는다. */
+        const catText = (v) => (Array.isArray(v) ? v : String(v == null ? '' : v).split(','))
+            .map((x) => String(x == null ? '' : x).trim()).filter(Boolean).join(' \u00b7 ');
+
         const escapeHtml = (v) => v === null || v === undefined ? '' : String(v)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -494,7 +501,7 @@ async function loadRegisteredBrands() {
                 <span class="reg-badge">Partner</span>
                 <div class="reg-logo">${logoHtml}</div>
                 <div class="reg-name">${escapeHtml(b.brandName)}</div>
-                <div class="reg-meta">${escapeHtml(b.country || '')} ${b.category ? '· ' + escapeHtml(b.category) : ''}</div>
+                <div class="reg-meta">${escapeHtml(b.country || '')} ${catText(b.category) ? '· ' + escapeHtml(catText(b.category)) : ''}</div>
             </a>`;
         });
 

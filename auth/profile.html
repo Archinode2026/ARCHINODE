@@ -102,6 +102,13 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
     font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
     transition: background 0.2s;
 }
+/* A-419(2026-11-09): 보이는 동그라미는 32px 그대로 두고 **누를 수 있는 넓이만** 44px 로
+   넓힌다(A-393 에서 쓴 방법과 같다). 동그라미를 키우면 작은 카드 사진을 가린다.
+   44px 띠는 카드 안에 머문다 — top/right 8px 에서 양옆으로 6px 씩이라 가장자리까지 2px 남는다. */
+.unlike-btn::after {
+    content: ''; position: absolute; left: 50%; top: 50%;
+    width: 44px; height: 44px; transform: translate(-50%, -50%);
+}
 .unlike-btn:hover { background: var(--white); }
 
 .empty-state { text-align: center; padding: 48px 20px; color: var(--ink-soft); }
@@ -365,7 +372,7 @@ async function loadLikedProducts() {
         const p = entry.data;
         html += `
             <div class="liked-card">
-                <button class="unlike-btn" onclick="unlikeProduct('${doc.id}')" title="Remove from saved"><i class="fas fa-bookmark"></i></button>
+                <button class="unlike-btn" onclick="unlikeProduct('${doc.id}')" title="Remove from saved" data-en-title="Remove from saved" data-ko-title="저장 목록에서 빼기"><i class="fas fa-bookmark"></i></button>
                 <a href="../products/view.html?id=${p.slug || ''}" style="text-decoration:none;color:inherit;">
                     <div class="liked-card-img">
                         ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<i class="fas fa-cube" style="font-size:2rem;color:var(--ink-soft);"></i>'}
@@ -379,6 +386,20 @@ async function loadLikedProducts() {
     });
     grid.innerHTML = html || '';
     if (!html) empty.style.display = 'block';
+    /* A-419: 이 카드들은 DOMContentLoaded 뒤에 만들어진다. lang.js 의 한 번뿐인
+       applyLanguage() 는 이미 지나간 뒤라, 여기 달린 data-ko-title 은 다시 입히지
+       않으면 끝까지 죽은 속성이다. 이 파일에는 그 호출이 **한 번도 없었다.** */
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+}
+
+/* A-415(2026-11-09): brands.category 는 **배열**이다(list-your-brand.html:783 이
+   체크박스를 map 해서 쓴다). 여기는 문자열로 다뤄서 `"Furniture,Lighting"` 처럼
+   쉼표가 붙은 원문 슬러그가 그대로 손님 화면에 찍혔다. A-397 에서 search.js 의
+   같은 결함을 고치면서 **읽는 자리를 전수로 세지 않은** 탓이다. 배열·문자열 둘 다 받는다. */
+function catText(v) {
+    return (Array.isArray(v) ? v : String(v == null ? '' : v).split(','))
+        .map(function (x) { return String(x == null ? '' : x).trim(); })
+        .filter(Boolean).join(' \u00b7 ');
 }
 
 // ── 저장한 브랜드 로드 ──
@@ -397,20 +418,24 @@ async function loadLikedBrands() {
         const b = entry.data;
         html += `
             <div class="liked-card">
-                <button class="unlike-btn" onclick="unlikeBrand('${doc.id}')" title="Remove from saved"><i class="fas fa-bookmark"></i></button>
+                <button class="unlike-btn" onclick="unlikeBrand('${doc.id}')" title="Remove from saved" data-en-title="Remove from saved" data-ko-title="저장 목록에서 빼기"><i class="fas fa-bookmark"></i></button>
                 <a href="../brands/view.html?id=${b.slug || ''}" style="text-decoration:none;color:inherit;">
                     <div class="liked-card-img">
                         ${b.logoUrl ? `<img loading="lazy" src="${b.logoUrl}" alt="${b.brandName}" style="object-fit:contain;padding:20px;">` : '<i class="fas fa-building" style="font-size:2rem;color:var(--ink-soft);"></i>'}
                     </div>
                     <div class="liked-card-body">
                         <h3>${b.brandName || 'Brand'}</h3>
-                        <p>${b.country || ''} · ${b.category || ''}</p>
+                        <p>${[b.country, catText(b.category)].filter(Boolean).join(' · ')}</p>
                     </div>
                 </a>
             </div>`;
     });
     grid.innerHTML = html || '';
     if (!html) empty.style.display = 'block';
+    /* A-419: 이 카드들은 DOMContentLoaded 뒤에 만들어진다. lang.js 의 한 번뿐인
+       applyLanguage() 는 이미 지나간 뒤라, 여기 달린 data-ko-title 은 다시 입히지
+       않으면 끝까지 죽은 속성이다. 이 파일에는 그 호출이 **한 번도 없었다.** */
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
 }
 
 // ── 저장 해제 ──

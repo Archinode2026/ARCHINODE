@@ -65,6 +65,20 @@
 .support-card .role { font-size:0.7rem; letter-spacing:0.18em; color:var(--navy-gold); font-weight:700; text-transform:uppercase; margin-bottom:10px; }
 .support-card .name { font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:6px; }
 .support-card .detail { font-size:0.85rem; color:#888; line-height:1.7; }
+
+/* A-421(2026-11-09): 이 페이지의 산문 링크 4개가 좁은 폭에서 손가락 기준(44px)에 못
+   미쳤다 — 「contact page」 99x20 · 로그인 주소 241x20 · 메일 주소 139x16 두 곳.
+   실측으로 확인한 것: 푸터 링크 3개는 A-393 의 44px 띠가 이미 **라이브에서 살아** 있고
+   (7/7), 여기 네 개만 1/7 이었다. style.css 를 건드리지 않고 이 페이지 안에서만 넓힌다 —
+   .detail 은 이 파일에만 있는 이름이고, 산문 링크에 띠를 두르는 건 페이지마다 판단이 다르다.
+   띠가 윗줄·아랫줄로 10px 안팎 번지지만 그 줄들에 링크가 없는 것은 확인했다. */
+@media (max-width: 1100px) {
+  .bg-intro p a, .step-body p a, .support-card .detail a { position: relative; }
+  .bg-intro p a::after, .step-body p a::after, .support-card .detail a::after {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%;
+    height: 44px; transform: translateY(-50%);
+  }
+}
 .support-card a { color:var(--navy-gold); text-decoration:none; }
 .support-card a:hover { text-decoration:underline; }
 

@@ -5,15 +5,19 @@
    HTML content: data-{lang}-html. Placeholder: data-{lang}-placeholder.
 */
 (function() {
+  /* A-418(2026-11-09): `aria` 는 **언어 전환 단추 자체의 이름**이다. 전에는
+     buildSwitcherInner() 가 aria-label="Language" 를 박아 넣어서, lang.js 를 싣는
+     244개 파일 전부에서 화면낭독기가 한국어 화면에서도 "Language" 라고 읽었다.
+     lang.js:295 가 data-{lang}-aria-label 을 이미 지원하는데 정작 제 단추엔 안 썼다. */
   var LANG_LABELS = {
-    en: { native: 'English',    short: 'EN', label: 'English' },
-    ko: { native: '한국어',     short: 'KR', label: 'Korean' },
-    it: { native: 'Italiano',   short: 'IT', label: 'Italian' },
-    de: { native: 'Deutsch',    short: 'DE', label: 'German' },
-    fr: { native: 'Français',   short: 'FR', label: 'French' },
-    es: { native: 'Español',    short: 'ES', label: 'Spanish' },
-    nl: { native: 'Nederlands', short: 'NL', label: 'Dutch' },
-    da: { native: 'Dansk',      short: 'DA', label: 'Danish' }
+    en: { native: 'English',    short: 'EN', label: 'English',  aria: 'Language' },
+    ko: { native: '한국어',     short: 'KR', label: 'Korean',   aria: '언어' },
+    it: { native: 'Italiano',   short: 'IT', label: 'Italian',  aria: 'Lingua' },
+    de: { native: 'Deutsch',    short: 'DE', label: 'German',   aria: 'Sprache' },
+    fr: { native: 'Français',   short: 'FR', label: 'French',   aria: 'Langue' },
+    es: { native: 'Español',    short: 'ES', label: 'Spanish',  aria: 'Idioma' },
+    nl: { native: 'Nederlands', short: 'NL', label: 'Dutch',    aria: 'Taal' },
+    da: { native: 'Dansk',      short: 'DA', label: 'Danish',   aria: 'Sprog' }
   };
 
   var availableLangs = ['en', 'ko'];
@@ -145,7 +149,13 @@
         + '<small>' + LANG_LABELS[l].short + '</small></a>';
     }).join('');
     var curShort = LANG_LABELS[currentLang] ? LANG_LABELS[currentLang].short : 'EN';
-    return '<button class="lang-switch-btn" type="button" onclick="toggleLangMenu(event)" aria-label="Language" aria-haspopup="true" aria-expanded="false">'
+    /* A-418: 첫 칠에 맞는 이름을 박고(initSwitcher 는 applyLanguage 보다 먼저 돈다),
+       나중에 언어를 바꿔도 따라오도록 data-{lang}-aria-label 을 같이 단다. */
+    var curAria = (LANG_LABELS[currentLang] && LANG_LABELS[currentLang].aria) || 'Language';
+    var ariaAttrs = Object.keys(LANG_LABELS).map(function (l) {
+      return 'data-' + l + '-aria-label="' + LANG_LABELS[l].aria + '"';
+    }).join(' ');
+    return '<button class="lang-switch-btn" type="button" onclick="toggleLangMenu(event)" aria-label="' + curAria + '" ' + ariaAttrs + ' aria-haspopup="true" aria-expanded="false">'
       + '<span class="lang-current">' + curShort + '</span>'
       + ' <i class="fas fa-chevron-down" aria-hidden="true"></i>'
       + '</button>'

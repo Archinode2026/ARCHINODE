@@ -79,6 +79,12 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); background: var(--white); }
 .field textarea { resize: vertical; min-height: 80px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+/* A-415: 브랜드 카테고리는 여러 개를 고를 수 있다(쓰는 쪽이 배열이다). 칸 높이 44px 는
+   손가락 기준 최소 타깃 — A-393 에서 쓴 기준과 같다. */
+.bp-cat-grid { display: flex; flex-wrap: wrap; gap: 2px 16px; padding: 4px 0 2px; }
+.bp-cat-check { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; font-size: 0.85rem; color: var(--gray-700); cursor: pointer; }
+.bp-cat-check input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin: 0; }
+.bp-cat-check input:checked + span { font-weight: 700; color: var(--black); }
 .readonly { background: var(--gray-200) !important; color: var(--ink-soft); }
 
 /* BUTTONS */
@@ -429,18 +435,25 @@ h1, h2, .section-card h2 {
                 <div class="field-row">
                     <div class="field">
                         <label data-en="Category" data-ko="카테고리">Category</label>
-                        <select id="editCategory">
-                            <option value="Bathroom" data-en="Bathroom" data-ko="욕실">Bathroom</option>
-                            <option value="Construction" data-en="Construction" data-ko="건축자재">Construction</option>
-                            <option value="Decor" data-en="Decor" data-ko="데코">Decor</option>
-                            <option value="Finishes" data-en="Finishes" data-ko="마감재">Finishes</option>
-                            <option value="Furniture" data-en="Furniture" data-ko="가구">Furniture</option>
-                            <option value="Kitchen" data-en="Kitchen" data-ko="주방">Kitchen</option>
-                            <option value="Lighting" data-en="Lighting" data-ko="조명">Lighting</option>
-                            <option value="Office" data-en="Office" data-ko="오피스">Office</option>
-                            <option value="Outdoor" data-en="Outdoor" data-ko="아웃도어">Outdoor</option>
-                            <option value="Wellness" data-en="Wellness" data-ko="웰니스">Wellness</option>
-                        </select>
+                        <!-- A-415(2026-11-09): 이 자리는 단일 <select> 였다. 그런데 brands.category 는
+                             list-your-brand.html:783 이 **배열**로 쓴다. 카테고리를 2개 이상 고른 브랜드가
+                             이 화면에서 무엇이든(설명 한 줄이라도) 저장하면 select.value 가 "Furniture,Lighting"
+                             이 되어 어떤 option 과도 안 맞고 selectedIndex 가 -1 이 된다. 그 상태로 저장하면
+                             **빈 문자열이 Firestore 에 덮어써졌다** — 브랜드가 모르는 사이에 제 카테고리가
+                             통째로 지워진 것이다. A-311 이 바로 윗줄 editCountry 에서 똑같은 모양을 이미
+                             고쳤는데 그 아래 한 줄은 그대로였다. 쓰는 쪽과 같은 모양으로 맞춘다. -->
+                        <div class="bp-cat-grid" id="editCategoryGroup">
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Bathroom"><span data-en="Bathroom" data-ko="욕실">Bathroom</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Construction"><span data-en="Construction" data-ko="건축자재">Construction</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Decor"><span data-en="Decor" data-ko="데코">Decor</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Finishes"><span data-en="Finishes" data-ko="마감재">Finishes</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Furniture"><span data-en="Furniture" data-ko="가구">Furniture</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Kitchen"><span data-en="Kitchen" data-ko="주방">Kitchen</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Lighting"><span data-en="Lighting" data-ko="조명">Lighting</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Office"><span data-en="Office" data-ko="오피스">Office</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Outdoor"><span data-en="Outdoor" data-ko="아웃도어">Outdoor</span></label>
+                          <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Wellness"><span data-en="Wellness" data-ko="웰니스">Wellness</span></label>
+                        </div>
                     </div>
                     <div class="field">
                         <label data-en="Website" data-ko="웹사이트">Website</label>
@@ -1210,7 +1223,7 @@ function populateDashboard() {
         }
         sel.value = cur;
     })();
-    document.getElementById('editCategory').value = brandData.category || '';
+    bpSetCategory(brandData.category);   // A-415
     document.getElementById('editWebsite').value = brandData.website || '';
     document.getElementById('editDescription').value = brandData.description || '';
     document.getElementById('editTagline').value = brandData.tagline || '';
@@ -1320,12 +1333,63 @@ async function deleteCertification(index) {
     renderCertList(updatedCerts);
 }
 
+/* A-415(2026-11-09) ─ brands.category 는 배열이다 ─────────────────────────────
+   list-your-brand.html:783 이 체크박스 10개를 map 해서 **배열**로 쓴다. 그런데 이
+   화면은 단일 <select> 로 읽고 .value 하나를 도로 썼다. 2개 이상 고른 브랜드가
+   무엇이든 저장하면 카테고리가 통째로 지워졌다(조용히).
+
+   아래 세 함수가 지키는 약속:
+     읽기 — 배열도 문자열("a,b" 꼴 옛 문서)도 받는다.
+     쓰기 — **언제나 배열**로 쓴다. 0개면 [] 다.
+     모르는 값 — 목록에 없는 값(옛 표기·오타)은 지우지 않고 "확인 필요" 를 달아
+                 체크된 채로 남긴다. A-311 이 editCountry 에서 쓴 방법과 같다.
+   tools/test-bp-category.js 가 이 세 함수를 HTML 에서 그대로 뽑아 돌린다. */
+function bpCategoryToArray(v) {
+    if (v === null || v === undefined) return [];
+    if (Array.isArray(v)) {
+        return v.map(function (x) { return (x === null || x === undefined) ? '' : String(x).trim(); })
+                .filter(function (x) { return x !== ''; });
+    }
+    return String(v).split(',').map(function (x) { return x.trim(); })
+                    .filter(function (x) { return x !== ''; });
+}
+
+function bpSetCategory(v, root) {
+    var group = root || document.getElementById('editCategoryGroup');
+    if (!group) return [];
+    var want = bpCategoryToArray(v);
+    var known = {};
+    Array.prototype.forEach.call(group.querySelectorAll('input[type="checkbox"]'), function (b) {
+        known[b.value] = true;
+        b.checked = want.indexOf(b.value) !== -1;
+    });
+    var unknown = want.filter(function (x) { return !known[x]; });
+    unknown.forEach(function (x) {
+        var lab = document.createElement('label');
+        lab.className = 'bp-cat-check';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.name = 'editCategory'; cb.value = x; cb.checked = true;
+        var sp = document.createElement('span');
+        sp.textContent = x + ' \u2014 \ud655\uc778 \ud544\uc694';
+        lab.appendChild(cb); lab.appendChild(sp);
+        group.appendChild(lab);
+    });
+    return unknown;
+}
+
+function bpGetCategory(root) {
+    var group = root || document.getElementById('editCategoryGroup');
+    if (!group) return [];
+    return Array.prototype.slice.call(group.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(function (b) { return b.value; });
+}
+
 // ── 브랜드 정보 저장 ──
 document.getElementById('brandInfoForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     await db.collection('brands').doc(currentUser.uid).update({
         country: document.getElementById('editCountry').value || brandData.country || '',
-        category: document.getElementById('editCategory').value,
+        category: bpGetCategory(),   // A-415 — 언제나 배열로 쓴다
         website: document.getElementById('editWebsite').value,
         description: document.getElementById('editDescription').value,
         tagline: document.getElementById('editTagline').value,

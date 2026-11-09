@@ -106,9 +106,18 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
    줄 자체에 `min-height: 44px` 을 줘 **라벨을 눌러도 토글되는 44px 짜리 줄**로
    만든다(`<label for>` 이라 라벨 클릭이 체크박스를 켠다).
    `list-your-brand.html` 의 격자 라벨은 **이미 44px**(간격 60px)이라 손대지 않았다. */
-.terms-check { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0 8px; font-size: 0.8rem; color: var(--gray-700); min-height: 44px; }
-.terms-check input { margin-top: 2px; accent-color: var(--accent); width: 20px; height: 20px; flex-shrink: 0; }
-.terms-check a { color: var(--accent-ink); }
+/* A-420(2026-11-09): 줄에 min-height:44px 를 준 것만으로는 **아무것도 커지지 않았다.**
+   align-items:flex-start 라 줄만 44px 가 되고 체크박스·라벨·링크는 20.5px 짜리로 그
+   위에 붙어 있었다(브론즈 22차 실측: 체크박스 2/7, 라벨 3/7, 링크 3/7). 높이를 준
+   자리와 **손가락이 닿는 자리가 다르다** — 또 같은 실수다.
+   체크박스는 대체 요소라 ::after 를 못 단다. 진짜 타깃은 <label for> 다. */
+.terms-check { display: flex; align-items: center; gap: 8px; margin: 20px 0 8px; font-size: 0.8rem; color: var(--gray-700); min-height: 44px; }
+.terms-check input { accent-color: var(--accent); width: 20px; height: 20px; flex-shrink: 0; }
+/* gap 이 필요한 이유: flex 안에서는 요소 사이의 공백만 있는 텍스트 노드가 사라진다.
+   그대로 두면 「동의합니다:이용약관및…」 로 붙어 버린다. */
+.terms-check label { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; min-height: 44px; }
+.terms-check a { color: var(--accent-ink); position: relative; }
+.terms-check a::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); }
 
 @media (max-width: 560px) {
     .auth-box { padding: 32px 24px; }
@@ -256,7 +265,7 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
                     <span data-en="I agree to the" data-ko="동의합니다:">I agree to the</span>
                     <a href="../terms.html" target="_blank" data-en="Terms of Service" data-ko="이용약관" rel="noopener noreferrer">Terms of Service</a>
                     <span data-en="and" data-ko="및">and</span>
-                    <a href="../privacy.html" target="_blank" data-en="Privacy Policy" data-ko="개인정보처리방침" data-en-href="../privacy-en.html" data-ko-href="../privacy.html" rel="noopener noreferrer">Privacy Policy</a>
+                    <a href="../privacy.html" target="_blank" data-en="Privacy Policy" data-ko="개인정보 처리방침" data-en-href="../privacy-en.html" data-ko-href="../privacy.html" rel="noopener noreferrer">Privacy Policy</a>
                 </label>
             </div>
 

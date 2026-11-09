@@ -473,7 +473,7 @@ async function loadBrands() {
             <tr>
                 <td><strong>${escapeHtml(b.brandName)}</strong></td>
                 <td class="adm-col-sub">${escapeHtml(b.country || '-')}</td>
-                <td class="adm-col-sub">${escapeHtml(b.category || '-')}</td>
+                <td class="adm-col-sub">${escapeHtml(catText(b.category) || '-')}</td>
                 <td class="adm-col-sub">${escapeHtml(b.contactName || '-')}<br><small style="color:#6b6459;">${escapeHtml(b.email)}</small></td>
                 <td class="adm-col-sub">${b.koreanDealer && b.koreanDealer.name ? `<strong>${escapeHtml(b.koreanDealer.name)}</strong><br><small style="color:#6b6459;">${escapeHtml(b.koreanDealer.contact || '')}</small>` : '<span style="color:#ddd5c7;">—</span>'}</td>
                 <td><span class="status status-${b.status}">${b.status}</span></td>
@@ -711,7 +711,7 @@ async function viewBrand(docId) {
         <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value"><span class="status status-${b.status}">${b.status}</span></div></div>
         ${statusHistoryHtml}
         <div class="detail-row"><div class="detail-label">Country</div><div class="detail-value">${escapeHtml(b.country || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${escapeHtml(b.category || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${escapeHtml(catText(b.category) || '-')}</div></div>
         <div class="detail-row"><div class="detail-label">Website</div><div class="detail-value"><a href="${escapeHtml(safeWebsite)}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.website || '-')}</a></div></div>
         <div class="detail-row"><div class="detail-label">Contact</div><div class="detail-value">${escapeHtml(b.contactName || '-')} (${escapeHtml(b.position || '-')})</div></div>
         <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${escapeHtml(b.email)}</div></div>
@@ -753,6 +753,16 @@ function brandActionButtonsForModal(b, docId) {
 }
 
 // ── XSS 방어 — 사유 문자열 출력용 ──
+/* A-415(2026-11-09): brands.category 는 **배열**이다(list-your-brand.html:783 이
+   체크박스를 map 해서 쓴다). 여기는 문자열로 다뤄서 `"Furniture,Lighting"` 처럼
+   쉼표가 붙은 원문 슬러그가 그대로 손님 화면에 찍혔다. A-397 에서 search.js 의
+   같은 결함을 고치면서 **읽는 자리를 전수로 세지 않은** 탓이다. 배열·문자열 둘 다 받는다. */
+function catText(v) {
+    return (Array.isArray(v) ? v : String(v == null ? '' : v).split(','))
+        .map(function (x) { return String(x == null ? '' : x).trim(); })
+        .filter(Boolean).join(' \u00b7 ');
+}
+
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = String(text == null ? '' : text);

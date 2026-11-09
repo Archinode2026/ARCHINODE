@@ -80,9 +80,12 @@
   <div style="background:#332e27;width:100%;height:300px;position:absolute;top:0;left:0;"></div>
   <div class="page-hero-content">
     <div class="page-hero-inner">
-      <span class="page-hero-tag">Legal</span>
-      <h1>Privacy Policy</h1>
-      <p>개인정보처리방침</p>
+      <!-- A-416(2026-11-09): 이 줄들만 짝이 없어서 **한국어 화면에서도 영어로** 나왔다.
+           바로 아래 <p> 는 거꾸로 영어 화면에서 한국어로 나왔다 — 제목이 한 언어,
+           부제가 다른 언어인 꼴을 그대로 둔 채 짝만 채운다. -->
+      <span class="page-hero-tag" data-en="Legal" data-ko="법적 고지">Legal</span>
+      <h1 data-en="Privacy Policy" data-ko="개인정보 처리방침">Privacy Policy</h1>
+      <p data-en="개인정보 처리방침" data-ko="Privacy Policy">개인정보 처리방침</p>
     </div>
   </div>
 </section>
@@ -92,7 +95,7 @@
     <div class="breadcrumb-list">
       <a href="index.html" data-en="Home" data-ko="홈">Home</a>
       <span class="sep">/</span>
-      <span class="current">Privacy Policy</span>
+      <span class="current" data-en="Privacy Policy" data-ko="개인정보 처리방침">Privacy Policy</span>
     </div>
   </div>
 </div>

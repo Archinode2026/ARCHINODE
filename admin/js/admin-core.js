@@ -210,11 +210,21 @@ function admGetCache(name) { return adm_caches.hasOwnProperty(String(name)) ? ad
 // ── 검색 대상 정의 — 종류 뱃지 · 사이드바 항목(id) · 상세 함수 이름(없으면 화면만) · 라벨/부제/검색 본문 ──
 //    부제: 브랜드=국가/카테고리, 제품=브랜드·카테고리, 아티클=브랜드·태그, 리드=유형/상태, 회원=회사, 검수=상태, 공지=대상/노출, 문의=보낸 사람/상태.
 //    hay 에 이메일이 들어가는 건 검색용일 뿐 — 결과에는 이름·회사만 찍는다(개인정보는 상세에서).
+/* A-415(2026-11-09): brands.category 는 **배열**이다(list-your-brand.html:783 이
+   체크박스를 map 해서 쓴다). 여기는 문자열로 다뤄서 `"Furniture,Lighting"` 처럼
+   쉼표가 붙은 원문 슬러그가 그대로 손님 화면에 찍혔다. A-397 에서 search.js 의
+   같은 결함을 고치면서 **읽는 자리를 전수로 세지 않은** 탓이다. 배열·문자열 둘 다 받는다. */
+function admCatText(v) {
+    return (Array.isArray(v) ? v : String(v == null ? '' : v).split(','))
+        .map(function (x) { return String(x == null ? '' : x).trim(); })
+        .filter(Boolean).join(' \u00b7 ');
+}
+
 var ADM_SEARCH_SOURCES = [
     { key: 'brands',       en: 'Brand',   ko: '브랜드', cls: 'adm-kind-brand',   menu: 'brands',   view: 'viewBrand',
       label: function (d) { return d.brandName || d.id; },
-      sub:   function (d) { return [d.country, d.category].filter(Boolean).join(' / '); },
-      hay:   function (d) { return [d.brandName, d.country, d.category, d.contactName, d.email, d.slug, d.status].join(' '); } },
+      sub:   function (d) { return [d.country, admCatText(d.category)].filter(Boolean).join(' / '); },
+      hay:   function (d) { return [d.brandName, d.country, admCatText(d.category), d.contactName, d.email, d.slug, d.status].join(' '); } },
     { key: 'products',     en: 'Product', ko: '제품',   cls: 'adm-kind-product', menu: 'products', view: '',
       label: function (d) { return d.name || d.id; },
       sub:   function (d) { return [d.brandName, d.category].filter(Boolean).join(' · '); },
