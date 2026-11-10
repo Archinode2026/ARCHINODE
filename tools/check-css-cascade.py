@@ -105,6 +105,49 @@ def rules(src):
     return out
 
 
+# ---------------------------------------------------------------------------
+# A-446(2026-11-10): 폭에 묶으면 안 되는 선언
+#
+#   A-411 은 「맨 위로」 단추를 Netlify 배지 위로 올리는 규칙을
+#   `@media (max-width: 1100px)` 안에 넣었다. 그런데 그 배지는 `position:fixed` 로
+#   **폭과 무관하게** 오른쪽 아래에 앉는다. 그래서 1100px 을 넘는 화면에서는
+#   고치기 전 그대로였다 - 라이브 실측으로 단추의 **75%(44x33)** 가 덮이고
+#   8점 중 4점(가운데 포함)이 배지에 맞았다.
+#
+#   죽은 규칙이 아니라 **살아 있지만 일부 폭에서만 사는** 규칙이라 위 검사로는
+#   안 잡힌다. 그래서 「이 선언만은 미디어쿼리 밖에 있어야 한다」를 따로 본다.
+#   값까지는 보지 않는다 - 배지 높이가 바뀌면 값은 바뀌어도 되지만, 폭에 묶이는
+#   것은 언제나 틀리기 때문이다.
+# ---------------------------------------------------------------------------
+WIDTH_GATE_FORBIDDEN = [
+    ('style.css', 'body .scroll-top', 'bottom',
+     'Netlify 배지는 폭과 무관하게 오른쪽 아래에 앉는다 (A-446)'),
+]
+
+
+def width_gate_check():
+    out = []
+    for rel, want_sel, want_prop, why in WIDTH_GATE_FORBIDDEN:
+        path = os.path.join(ROOT, rel)
+        if not os.path.exists(path):
+            out.append('%s 가 없다 - `%s` 를 확인하지 못했다' % (rel, want_sel))
+            continue
+        src = io.open(path, encoding='utf-8', errors='replace').read()
+        found = 0
+        for line, media, sels, decls in rules(src):
+            if want_sel not in sels or want_prop not in decls:
+                continue
+            found += 1
+            if media:
+                out.append('%s:%d - `%s { %s }` 가 `%s` 안에 있다. '
+                           '폭에 묶으면 안 된다: %s'
+                           % (rel, line, want_sel, want_prop, media, why))
+        if found == 0:
+            out.append('%s 에 `%s { %s }` 선언이 하나도 없다 - 지웠나? (%s)'
+                       % (rel, want_sel, want_prop, why))
+    return out
+
+
 def main():
     problems = []
     notes = []
@@ -156,6 +199,8 @@ def main():
                     % (rel, sel, prop, mline, mcond, mval, bline, bval))
         print('검사함  %s — 규칙 %d개, 미디어·기본이 같이 손대는 (선택자·속성) %d쌍'
               % (rel, len(rs), checked))
+
+    problems = problems + width_gate_check()
 
     print('')
     for x in notes:
