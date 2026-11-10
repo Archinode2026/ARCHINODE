@@ -38,8 +38,14 @@ service cloud.firestore {
     }
 
     // 업데이트 시 immutable 필드 변경 방지
-    function notChanging(field) {
-      return request.resource.data[field] == resource.data[field];
+    // 2026-11-10 A-441: 예전 헬퍼는 request.resource.data[필드] == resource.data[필드] 였다.
+    // Firestore 규칙은 **문서에 없는 키를 읽으면 식 전체가 오류**가 되어 그 분기가 거부된다. 그래서 보호
+    // 필드 중 하나라도 문서에 없으면(브랜드 문서엔 history 가 없고, 승인 전 제품엔 approvedAt 이, 미게시
+    // 글엔 publishedAt 이 없다) 소유자가 자기 문서를 **아무것도** 못 고치는 상태로 막혀 있었다.
+    // diff().affectedKeys() 는 없는 키에도 오류를 내지 않고, 값 변경뿐 아니라 '없던 보호 필드를 새로
+    // 넣는 것' 까지 함께 막는다.
+    function notChangingAny(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
     }
 
     // 허니팟 스팸 방지: 공개 폼의 숨겨진 'hp' 필드가 비어있어야 함(봇은 보통 모든 필드를 채움)
@@ -113,14 +119,9 @@ service cloud.firestore {
       allow update: if (isAdmin()
                        && request.resource.data.status in ['pending','approved','suspended','rejected'])
                     || (isOwner(brandId)
-                        && notChanging('status')
-                        && notChanging('createdAt')
-                        && notChanging('brandName')
-                        && notChanging('approvedAt')
-                        && notChanging('statusReason')
-                        && notChanging('statusChangedAt')
-                        && notChanging('statusChangedBy')
-                        && notChanging('history'))   // history 는 어드민만(2026-09-12 블랙 지적)
+                        && notChangingAny(['status', 'createdAt', 'brandName', 'approvedAt',
+                                           'statusReason', 'statusChangedAt', 'statusChangedBy',
+                                           'history']))   // history 는 어드민만(2026-09-12 블랙 지적)
                     || isLikeToggle(brandId, 'likedBrands');   // 2026-11-03 A-144
 
       // 삭제: 어드민만
@@ -158,10 +159,7 @@ service cloud.firestore {
       // 자기 제품을 더 이상 수정할 수 없다(leads 인박스 건과 동일 패턴)
       allow update: if isAdmin()
                     || (isApprovedBrand(resource.data.brandId)
-                        && notChanging('status')
-                        && notChanging('brandId')
-                        && notChanging('createdAt')
-                        && notChanging('approvedAt'))
+                        && notChangingAny(['status', 'brandId', 'createdAt', 'approvedAt']))
                     || isLikeToggle(productId, 'likedProducts');   // 2026-11-03 A-144
 
       // 삭제: 어드민만
@@ -196,10 +194,7 @@ service cloud.firestore {
       // 2026-11-02: isApprovedBrand() 추가 — 정지된 브랜드는 자기 매거진 글도 더 이상 수정할 수 없다
       allow update: if isAdmin()
                     || (isApprovedBrand(resource.data.brandId)
-                        && notChanging('status')
-                        && notChanging('brandId')
-                        && notChanging('createdAt')
-                        && notChanging('publishedAt'));
+                        && notChangingAny(['status', 'brandId', 'createdAt', 'publishedAt']));
 
       // 삭제: 어드민만
       allow delete: if isAdmin();
@@ -216,9 +211,7 @@ service cloud.firestore {
                     && request.resource.data.role == 'professional'
                     && request.resource.data.email is string;
       allow update: if isOwner(userId)
-                    && notChanging('email')
-                    && notChanging('createdAt')
-                    && notChanging('role');
+                    && notChangingAny(['email', 'createdAt', 'role']);
       allow delete: if isOwner(userId) || isAdmin();
     }
 

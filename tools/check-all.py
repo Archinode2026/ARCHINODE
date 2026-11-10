@@ -53,6 +53,8 @@ CHECKS = [
      'A-415 — brands.category 는 배열이다. 저장이 그걸 지우지 않는지'),
     ('로그인 갈림길',        'node', 'tools/test-login-gate.js',
      'A-422 — 방금 로그인한 사람은 안내 화면이 아니라 목적지로 간다'),
+    ('규칙 불변 비교',        'py',   'scripts/check_rules_immutable.py',
+     'A-441 — 없는 필드를 비교하는 불변 검사(문서에 그 필드가 없으면 소유자가 아무것도 못 고친다)'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)
