@@ -72,6 +72,9 @@ CHECKS = [
 #         주소가 되어 27화면이 전부 `Protocol error: Cannot navigate` 로 열리지 않는다.
 #         2026-11-10 에 내가 그렇게 돌려서 한 번 헛돌았다.
 #     ARCHINODE_ROOT=<루트> python3 scripts/check_hover_contrast.py index.html brands.html ...
+#     ARCHINODE_ROOT=<루트> python3 scripts/check_search_overlay.py http://127.0.0.1:8321
+#       ↑ 이것도 주소를 위치 인수로 받는다. 오버레이를 **열어야** 보이는 결함이라
+#         좁은 폭 검사와 따로 있다(좁은 폭 검사는 오버레이를 열지 않는다).
 #
 #   `check_narrow_width.py` 는 **로컬 HTTP 서버가 필요하다**(file:// 아님).
 #   처음 돌린 결과(2026-11-09): 좁은 폭 27페이지 × 360·390px **통과**,
@@ -80,6 +83,7 @@ BROWSER_CHECKS = [
     ('호버 대비',  'py', 'scripts/check_hover_contrast.py', '호버 상태의 글자 대비'),
     ('좁은 폭',    'py', 'scripts/check_narrow_width.py',   '좁은 화면에서 넘침'),
     ('XSS 출력',   'py', 'scripts/check_xss_output.py',     '출력 이스케이프'),
+    ('검색 오버레이', 'py', 'scripts/check_search_overlay.py', 'A-445 — 결과가 검색창 옆에 깔려 글자칸이 0px 이 되는지'),
 ]
 
 

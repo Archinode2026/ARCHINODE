@@ -3736,3 +3736,32 @@ body.mag .cta-listing p  { max-width: 60ch; word-break: keep-all; }
   transition: color 0.3s, border-color 0.3s;
 }
 .footer-contact a:hover { color: var(--white); border-color: var(--white); }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   A-445(2026-11-10): 검색 오버레이에 `flex-direction` 선언이 없었다.
+
+   `.search-overlay { display:none; align-items:flex-start; justify-content:center }`
+   에 `.search-overlay.active { display:flex }` 만 붙어 있어서 기본값 `row` 로
+   깔렸다. 흐름에 든 자식은 `.search-box` 와 search.js 가 만들어 붙이는
+   `.search-results` 둘(`.search-close` 는 position:absolute 라 흐름 밖) —
+   그 둘이 **좌우로 나란히** 놓였다.
+
+   `.search-results { max-width:680px; margin:16px auto 0 }` 는 검색창 **아래**에
+   놓일 것을 전제한 선언이다. 실측(컨테이너 크로미움, 브론즈 27차 1번 재측정):
+     360px — 검색창 124px / 결과 236px, 기사 제목에 돌아간 글자칸 **0px**,
+             서브카테고리 22px (배지 `SUBCATEGORY` 가 90px 를 먼저 먹는다)
+     390px — 검색창 139px / 결과 251px, 기사 제목 15px
+     1133px — 검색창 667px(왼쪽) / 결과 466px(오른쪽): 글자는 읽히지만
+              결과가 검색창 아래가 아니라 **옆에** 뜬다
+   즉 휴대폰 손님은 검색 결과가 무엇인지 읽을 수 없었다.
+
+   세로로 세운다. column 에서는 교차축이 가로이므로 `align-items` 를 center 로,
+   주축이 세로이므로 `justify-content` 를 flex-start 로 바꿔야 `padding-top:140px`
+   가 뜻대로 동작한다(그대로 두면 각각 왼쪽 정렬·세로 가운데가 된다).
+   ─────────────────────────────────────────────────────────────────────────── */
+body .search-overlay {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+body .search-overlay > .search-results { width: 100%; }
