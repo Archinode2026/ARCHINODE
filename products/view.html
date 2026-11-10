@@ -1027,6 +1027,36 @@ function updateLikeUI() {
     label.setAttribute('data-ko', kr);
 }
 
+/* A-440(2026-11-10): 저장 단추의 안내를 `alert()` 로 띄우고 있었다.
+   **`alert` 이 막혀 있는 환경에서는 눌러도 정말 아무것도 안 보인다** —
+   승리님이 브랜드 계정으로 제품 페이지의 「저장」을 누르며 「저장이 안 된다」고
+   하신 것이 이것이었다. 실제로는 「브랜드 계정으로는 저장할 수 없습니다」가
+   **열두 번** 떴는데 화면에 하나도 안 나왔다(콘솔에만 남았다).
+   A-082 에서 뉴스레터 안내를 같은 이유로 `alert` → 화면 안내문으로 바꿨는데
+   **이 두 곳은 남아 있었다.** 단추 옆에 말풍선으로 띄운다. */
+function likeNote(msg, isErr) {
+    /* 단추 id 가 화면마다 다르다 — products 는 `likeBtn`, brands 는 `brandLikeBtn`.
+       ★ 처음엔 `likeBtn` 만 찾게 썼다가 brands 쪽에서 또 아무것도 안 보일 뻔했다.
+          **보이게 만드는 코드가 안 보이면 아무 소용이 없다.** */
+    var btn = document.getElementById('likeBtn') || document.getElementById('brandLikeBtn')
+              || document.querySelector('.btn-like');
+    if (!btn) { try { console.warn(msg); } catch (e) {} return; }
+    var box = document.getElementById('likeNote');
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'likeNote';
+        box.setAttribute('role', 'status');
+        box.style.cssText = 'margin-top:8px;font-size:0.82rem;line-height:1.5;padding:10px 12px;' +
+            'border-radius:6px;max-width:420px;word-break:keep-all;';
+        btn.parentNode.insertBefore(box, btn.nextSibling);
+    }
+    box.style.background = isErr ? '#fdecec' : '#f3efe6';
+    box.style.color = isErr ? '#8a2b2b' : '#5d564c';
+    box.style.border = '1px solid ' + (isErr ? '#e8c9c9' : '#e0d8c8');
+    box.textContent = msg;
+    try { box.scrollIntoView({ block: 'nearest' }); } catch (e) {}
+}
+
 async function toggleLike() {
     const user = auth.currentUser;
     if (!user) {
@@ -1051,9 +1081,9 @@ async function toggleLike() {
         var lang2 = document.documentElement.lang === 'en' ? 'en' : 'ko';
         const brandDoc = await db.collection('brands').doc(user.uid).get();
         if (brandDoc.exists) {
-            alert(lang2 === 'en'
+            likeNote(lang2 === 'en'
                 ? 'Brand accounts cannot save products. Please use a member account.'
-                : '브랜드 계정으로는 저장할 수 없습니다. 회원 계정으로 로그인해 주세요.');
+                : '브랜드 계정으로는 저장할 수 없습니다. 회원 계정으로 로그인해 주세요.', true);
             return;
         }
         try {
@@ -1068,7 +1098,7 @@ async function toggleLike() {
             });
         } catch (mkErr) {
             console.error('User doc create failed:', mkErr);
-            alert(lang2 === 'en' ? 'Could not set up your account. Please try again.' : '계정 설정에 실패했습니다. 다시 시도해 주세요.');
+            likeNote(lang2 === 'en' ? 'Could not set up your account. Please try again.' : '계정 설정에 실패했습니다. 다시 시도해 주세요.', true);
             return;
         }
     }
