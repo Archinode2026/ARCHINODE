@@ -401,11 +401,26 @@ async function loadLikedProducts() {
    체크박스를 map 해서 쓴다). 여기는 문자열로 다뤄서 `"Furniture,Lighting"` 처럼
    쉼표가 붙은 원문 슬러그가 그대로 손님 화면에 찍혔다. A-397 에서 search.js 의
    같은 결함을 고치면서 **읽는 자리를 전수로 세지 않은** 탓이다. 배열·문자열 둘 다 받는다. */
-function catText(v) {
+function catList(v) {
     return (Array.isArray(v) ? v : String(v == null ? '' : v).split(','))
         .map(function (x) { return String(x == null ? '' : x).trim(); })
-        .filter(Boolean).join(' \u00b7 ');
+        .filter(Boolean);
 }
+/* A-438(2026-11-10): A-424 에서 `brands.html` 목록의 카테고리를 번역했는데
+   **이 화면은 또 빠뜨렸다.** 승리님이 회원 계정으로 로그인해 주셔서 저장한 브랜드가
+   처음 보였고, 한국어 화면인데 밑줄이 「Albania · Bathroom」 영어로 찍혀 있었다.
+   브랜드 상세(`brands/view.html`)는 「욕실」인데 마이페이지는 「Bathroom」 —
+   같은 값이 두 화면에서 다른 언어다. A-424 와 **글자 그대로 같은 결함**이고,
+   A-415 → A-424 → 여기까지 **같은 수정을 세 번에 걸쳐 절반씩** 한 셈이다.
+   표는 `brands/view.html:601` · `products/view.html:557` · `brands.html:481` 과 같다. */
+const CAT_KO = {
+    'Furniture': '가구', 'Bathroom': '욕실', 'Outdoor': '아웃도어',
+    'Lighting': '조명', 'Kitchen': '주방', 'Office': '오피스',
+    'Finishes': '마감재', 'Wellness': '웰니스', 'Decor': '데코',
+    'Construction': '건축자재'
+};
+function catText(v)   { return catList(v).join(' \u00b7 '); }
+function catTextKo(v) { return catList(v).map(function (c) { return CAT_KO[c] || c; }).join(' \u00b7 '); }
 
 // ── 저장한 브랜드 로드 ──
 async function loadLikedBrands() {
@@ -430,7 +445,7 @@ async function loadLikedBrands() {
                     </div>
                     <div class="liked-card-body">
                         <h3>${b.brandName || 'Brand'}</h3>
-                        <p>${[b.country, catText(b.category)].filter(Boolean).join(' · ')}</p>
+                        <p>${b.country || ''}${catText(b.category) ? ` <span data-en="\u00b7 ${catText(b.category)}" data-ko="\u00b7 ${catTextKo(b.category)}">\u00b7 ${catText(b.category)}</span>` : ''}</p>
                     </div>
                 </a>
             </div>`;
