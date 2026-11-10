@@ -1231,21 +1231,21 @@ function populateDashboard() {
         sel.value = cur;
     })();
     bpSetCategory(brandData.category);   // A-415
-    document.getElementById('editWebsite').value = brandData.website || '';
+    document.getElementById('editWebsite').value = bpFixUrl(brandData.website);   // A-439
     document.getElementById('editDescription').value = brandData.description || '';
     document.getElementById('editTagline').value = brandData.tagline || '';
     document.getElementById('editFounded').value = brandData.founded || '';
     document.getElementById('editHeadquarters').value = brandData.headquarters || '';
-    document.getElementById('editLogoUrl').value = brandData.logoUrl || '';
-    document.getElementById('editHeroImage').value = brandData.heroImage || '';
-    document.getElementById('editGallery1').value = brandData.gallery1 || '';
-    document.getElementById('editGallery2').value = brandData.gallery2 || '';
-    document.getElementById('editGallery3').value = brandData.gallery3 || '';
+    document.getElementById('editLogoUrl').value = bpFixUrl(brandData.logoUrl);   // A-439
+    document.getElementById('editHeroImage').value = bpFixUrl(brandData.heroImage);   // A-439
+    document.getElementById('editGallery1').value = bpFixUrl(brandData.gallery1);   // A-439
+    document.getElementById('editGallery2').value = bpFixUrl(brandData.gallery2);   // A-439
+    document.getElementById('editGallery3').value = bpFixUrl(brandData.gallery3);   // A-439
     document.getElementById('editBrandStory').value = brandData.brandStory || '';
-    document.getElementById('editInstagram').value = brandData.instagram || '';
-    document.getElementById('editLinkedin').value = brandData.linkedin || '';
-    document.getElementById('editPinterest').value = brandData.pinterest || '';
-    document.getElementById('editYoutube').value = brandData.youtube || '';
+    document.getElementById('editInstagram').value = bpFixUrl(brandData.instagram);   // A-439
+    document.getElementById('editLinkedin').value = bpFixUrl(brandData.linkedin);   // A-439
+    document.getElementById('editPinterest').value = bpFixUrl(brandData.pinterest);   // A-439
+    document.getElementById('editYoutube').value = bpFixUrl(brandData.youtube);   // A-439
 
     // Certifications
     renderCertList(brandData.certifications || []);
@@ -1255,7 +1255,7 @@ function populateDashboard() {
     document.getElementById('editDealerName').value = dealer.name || '';
     document.getElementById('editDealerContact').value = dealer.contact || '';
     document.getElementById('editDealerEmail').value = dealer.email || '';
-    document.getElementById('editDealerWebsite').value = dealer.website || '';
+    document.getElementById('editDealerWebsite').value = bpFixUrl(dealer.website);   // A-439
     document.getElementById('editDealerAddress').value = dealer.address || '';
     document.getElementById('editDealerShowroom').value = dealer.showroom || '';
 
@@ -1391,32 +1391,71 @@ function bpGetCategory(root) {
                 .map(function (b) { return b.value; });
 }
 
+/* A-439(2026-11-10) ─ 저장 단추가 눌러도 아무 일이 없었다 ────────────────────
+   승리님이 브랜드 계정으로 포털에 들어가 「저장이 활성화가 안 된다」고 하셨다.
+   단추는 멀쩡했다(`disabled:false`). **폼이 통째로 무효**였다 —
+   `form.checkValidity()` 가 false 인데 `required` 미충족은 **0개**.
+
+   범인은 `#editWebsite`(`type="url"`) 에 들어 있던 **`www.rainkiss.co.kr`** 이다.
+   스킴이 없어서 브라우저가 URL 로 인정하지 않는다(`typeMismatch`).
+
+   ★ 두 폼이 서로 모순이었다 — 신청서(`list-your-brand.html:410`)의 웹사이트 칸은
+     **`type="text"`** 라 그 값을 받아서 저장하는데, 포털의 같은 칸은 **`type="url"`**
+     이라 거부한다. **한쪽이 받은 것을 다른 쪽이 거부한다.** 그래서 그렇게 신청한
+     브랜드는 포털에서 **무엇도 저장할 수 없다** — 설명도 안 나온다.
+     포털에 `type="url"` 칸이 **11개**라 그중 하나만 걸려도 폼 전체가 막힌다.
+     그리고 이 파일엔 `reportValidity()` 를 부르는 코드가 **하나도 없었다.** */
+/* A-439: 막혔으면 **어느 칸이 왜 막는지 보여 준다.** 전에는 브라우저가 제 말풍선을
+   띄울 뿐이고, 그 칸이 화면 밖이면 「눌러도 아무 일이 없다」로만 보였다.
+   이 화면의 제출 자리 **넷 모두** 같은 침묵을 갖고 있었다. */
+function bpBlocked(form) {
+    if (!form || form.checkValidity()) return false;
+    var bad = Array.prototype.find.call(form.elements, function (el) {
+        return el.willValidate && !el.checkValidity();
+    });
+    if (bad) {
+        try { bad.scrollIntoView({ block: 'center' }); } catch (e) {}
+        try { bad.focus({ preventScroll: true }); } catch (e) {}
+        try { bad.reportValidity(); } catch (e) {}
+    }
+    return true;
+}
+
+function bpFixUrl(v) {
+    var t = String(v == null ? '' : v).trim();
+    if (!t) return '';
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(t)) return t;   // 이미 스킴이 있다
+    if (/^(mailto:|tel:)/i.test(t)) return t;
+    return 'https://' + t.replace(/^\/+/, '');
+}
+
 // ── 브랜드 정보 저장 ──
 document.getElementById('brandInfoForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (bpBlocked(e.currentTarget)) return;   // A-439
     await db.collection('brands').doc(currentUser.uid).update({
         country: document.getElementById('editCountry').value || brandData.country || '',
         category: bpGetCategory(),   // A-415 — 언제나 배열로 쓴다
-        website: document.getElementById('editWebsite').value,
+        website: bpFixUrl(document.getElementById('editWebsite').value),
         description: document.getElementById('editDescription').value,
         tagline: document.getElementById('editTagline').value,
         founded: document.getElementById('editFounded').value,
         headquarters: document.getElementById('editHeadquarters').value,
-        logoUrl: document.getElementById('editLogoUrl').value,
-        heroImage: document.getElementById('editHeroImage').value,
-        gallery1: document.getElementById('editGallery1').value,
-        gallery2: document.getElementById('editGallery2').value,
-        gallery3: document.getElementById('editGallery3').value,
+        logoUrl: bpFixUrl(document.getElementById('editLogoUrl').value),
+        heroImage: bpFixUrl(document.getElementById('editHeroImage').value),
+        gallery1: bpFixUrl(document.getElementById('editGallery1').value),
+        gallery2: bpFixUrl(document.getElementById('editGallery2').value),
+        gallery3: bpFixUrl(document.getElementById('editGallery3').value),
         brandStory: document.getElementById('editBrandStory').value,
-        instagram: document.getElementById('editInstagram').value,
-        linkedin: document.getElementById('editLinkedin').value,
-        pinterest: document.getElementById('editPinterest').value,
-        youtube: document.getElementById('editYoutube').value,
+        instagram: bpFixUrl(document.getElementById('editInstagram').value),
+        linkedin: bpFixUrl(document.getElementById('editLinkedin').value),
+        pinterest: bpFixUrl(document.getElementById('editPinterest').value),
+        youtube: bpFixUrl(document.getElementById('editYoutube').value),
         koreanDealer: {
             name: document.getElementById('editDealerName').value,
             contact: document.getElementById('editDealerContact').value,
             email: document.getElementById('editDealerEmail').value,
-            website: document.getElementById('editDealerWebsite').value,
+            website: bpFixUrl(document.getElementById('editDealerWebsite').value),   // A-439
             address: document.getElementById('editDealerAddress').value,
             showroom: document.getElementById('editDealerShowroom').value,
         },
@@ -1427,6 +1466,7 @@ document.getElementById('brandInfoForm').addEventListener('submit', async (e) =>
 // ── 연락처 저장 ──
 document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (bpBlocked(e.currentTarget)) return;   // A-439
     await db.collection('brands').doc(currentUser.uid).update({
         contactName: document.getElementById('editContactName').value,
         position: document.getElementById('editPosition').value,
@@ -1438,6 +1478,7 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
 // ── 비밀번호 변경 ──
 document.getElementById('passwordForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (bpBlocked(e.currentTarget)) return;   // A-439
     const pw = document.getElementById('newPassword').value;
     const confirm = document.getElementById('confirmPassword').value;
     const msg = document.getElementById('pwSaveMsg');

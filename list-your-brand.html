@@ -779,7 +779,16 @@ form.addEventListener('submit', async function(e) {
             brandName: escapeHtml(brandName),
             slug: slug,
             country: document.getElementById('country').value.trim(),
-            website: document.getElementById('website').value.trim(),
+            /* A-439(2026-11-10): 이 칸은 `type="text"` 라 `www.rainkiss.co.kr` 처럼
+               스킴 없는 주소를 그대로 받아 저장했다. 그런데 브랜드 포털의 같은 칸은
+               `type="url"` 이라 그 값을 **거부**한다 — 그래서 그렇게 신청한 브랜드는
+               포털에서 **무엇도 저장할 수 없었다**(설명도 없이). 받는 쪽에서 맞춰 둔다. */
+            website: (function (v) {
+                var t = String(v == null ? '' : v).trim();
+                if (!t) return '';
+                if (/^[a-z][a-z0-9+.-]*:\/\//i.test(t)) return t;
+                return 'https://' + t.replace(/^\/+/, '');
+            })(document.getElementById('website').value),
             category: Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value),
             productType: escapeHtml(document.getElementById('productType').value.trim()),
             description: escapeHtml(document.getElementById('description').value.trim()),
