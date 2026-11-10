@@ -165,7 +165,9 @@
     "name_ko": "욕실 액세서리",
     "desc_en": "Towel racks, soap dispensers, and bathroom accessories — the finishing touches of design.",
     "desc_ko": "타월 걸이, 디스펜서, 욕실 액세서리 — 디자인을 완성하는 마지막 손길.",
-    "url": "categories/bathroom/bathroom-accessories.html"
+    "url": "categories/bathroom/bathroom-accessories.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -173,7 +175,9 @@
     "name_ko": "욕실 가구",
     "desc_en": "Bathroom cabinets, shelving, and furniture — elegant storage solutions for wet spaces.",
     "desc_ko": "욕실 수납장, 선반, 가구 — 젖는 공간을 위한 우아한 수납.",
-    "url": "categories/bathroom/bathroom-furniture.html"
+    "url": "categories/bathroom/bathroom-furniture.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -181,7 +185,9 @@
     "name_ko": "수전",
     "desc_en": "Precision-crafted bathroom taps and faucets — blending technology with timeless design.",
     "desc_ko": "정밀하게 만든 욕실 수전 — 기술과 변하지 않는 디자인의 결합.",
-    "url": "categories/bathroom/bathroom-taps.html"
+    "url": "categories/bathroom/bathroom-taps.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -189,7 +195,9 @@
     "name_ko": "욕조",
     "desc_en": "Freestanding and built-in bathtubs — transforming bathrooms into personal sanctuaries.",
     "desc_ko": "독립형·매립형 욕조 — 욕실을 개인의 안식처로.",
-    "url": "categories/bathroom/bathtubs.html"
+    "url": "categories/bathroom/bathtubs.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -197,7 +205,9 @@
     "name_ko": "거울",
     "desc_en": "Bathroom mirrors with integrated lighting and smart features — functional art for the bathroom.",
     "desc_ko": "조명과 스마트 기능을 품은 욕실 거울 — 욕실의 기능적 예술.",
-    "url": "categories/bathroom/mirrors.html"
+    "url": "categories/bathroom/mirrors.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -205,7 +215,9 @@
     "name_ko": "샤워",
     "desc_en": "Designer shower systems and enclosures — rain showers, walk-in solutions, and luxury fixtures.",
     "desc_ko": "디자이너 샤워 시스템과 부스 — 레인 샤워, 워크인, 고급 설비.",
-    "url": "categories/bathroom/showers.html"
+    "url": "categories/bathroom/showers.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -213,7 +225,9 @@
     "name_ko": "스팀룸",
     "desc_en": "Luxury steam room solutions for modern wellness and spa spaces.",
     "desc_ko": "현대 웰니스·스파 공간을 위한 고급 스팀룸 솔루션.",
-    "url": "categories/bathroom/steam-rooms.html"
+    "url": "categories/bathroom/steam-rooms.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -221,7 +235,9 @@
     "name_ko": "변기 & 비데",
     "desc_en": "Modern toilets and bidets — intelligent hygiene solutions with sleek contemporary design.",
     "desc_ko": "현대적인 변기와 비데 — 매끈한 디자인의 지능형 위생 설비.",
-    "url": "categories/bathroom/toilets-bidets.html"
+    "url": "categories/bathroom/toilets-bidets.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -229,7 +245,9 @@
     "name_ko": "세면대 & 세면장",
     "desc_en": "Premium washbasins and vanity units — from minimalist designs to sculptural statement pieces.",
     "desc_ko": "프리미엄 세면대와 세면장 — 미니멀 디자인부터 조형적인 작품까지.",
-    "url": "categories/bathroom/washbasins-vanities.html"
+    "url": "categories/bathroom/washbasins-vanities.html",
+    "parent_en": "Bathroom",
+    "parent_ko": "욕실"
   },
   {
     "type": "subcategory",
@@ -237,7 +255,9 @@
     "name_ko": "빌딩 자동화",
     "desc_en": "Smart building systems — HVAC control, motorized shading, security, and home automation.",
     "desc_ko": "스마트 빌딩 시스템 — 공조 제어, 전동 차양, 보안, 홈 오토메이션.",
-    "url": "categories/construction/building-automation.html"
+    "url": "categories/construction/building-automation.html",
+    "parent_en": "Construction",
+    "parent_ko": "건축자재"
   },
   {
     "type": "subcategory",
@@ -245,7 +265,9 @@
     "name_ko": "파사드 & 클래딩",
     "desc_en": "Ventilated facades, curtain walls, and cladding systems — the skin of modern architecture.",
     "desc_ko": "통기성 외피, 커튼월, 클래딩 시스템 — 현대 건축의 피부.",
-    "url": "categories/construction/facades-cladding.html"
+    "url": "categories/construction/facades-cladding.html",
+    "parent_en": "Construction",
+    "parent_ko": "건축자재"
   },
   {
     "type": "subcategory",
@@ -253,7 +275,9 @@
     "name_ko": "단열재",
     "desc_en": "Thermal and acoustic insulation — energy efficiency and comfort for sustainable buildings.",
     "desc_ko": "단열·흡음재 — 지속가능한 건물을 위한 에너지 효율과 쾌적함.",
-    "url": "categories/construction/insulation.html"
+    "url": "categories/construction/insulation.html",
+    "parent_en": "Construction",
+    "parent_ko": "건축자재"
   },
   {
     "type": "subcategory",
@@ -261,7 +285,9 @@
     "name_ko": "지붕 시스템",
     "desc_en": "Roofing materials and systems — flat roofs, pitched roofs, and green roof solutions.",
     "desc_ko": "지붕 자재와 시스템 — 평지붕, 경사지붕, 녹화지붕 솔루션.",
-    "url": "categories/construction/roofing-systems.html"
+    "url": "categories/construction/roofing-systems.html",
+    "parent_en": "Construction",
+    "parent_ko": "건축자재"
   },
   {
     "type": "subcategory",
@@ -269,7 +295,9 @@
     "name_ko": "계단 & 난간",
     "desc_en": "Designer staircases and railing systems — sculptural elements connecting architectural levels.",
     "desc_ko": "디자이너 계단과 난간 시스템 — 층을 잇는 조형 요소.",
-    "url": "categories/construction/stairs-railings.html"
+    "url": "categories/construction/stairs-railings.html",
+    "parent_en": "Construction",
+    "parent_ko": "건축자재"
   },
   {
     "type": "subcategory",
@@ -277,7 +305,9 @@
     "name_ko": "창호 & 도어",
     "desc_en": "High-performance windows and architectural doors — thermal efficiency and design precision.",
     "desc_ko": "고성능 창호와 건축용 도어 — 단열 성능과 디자인 정밀도.",
-    "url": "categories/construction/windows-doors.html"
+    "url": "categories/construction/windows-doors.html",
+    "parent_en": "Construction",
+    "parent_ko": "건축자재"
   },
   {
     "type": "subcategory",
@@ -285,7 +315,9 @@
     "name_ko": "아트 & 월 데코",
     "desc_en": "Wall art, prints, and decorative wall installations — curated pieces for distinctive interiors.",
     "desc_ko": "벽면 아트, 프린트, 장식 설치물 — 공간을 구별 짓는 큐레이션.",
-    "url": "categories/decor/art-wall-decor.html"
+    "url": "categories/decor/art-wall-decor.html",
+    "parent_en": "Decor",
+    "parent_ko": "데코"
   },
   {
     "type": "subcategory",
@@ -293,7 +325,9 @@
     "name_ko": "시계 & 오브제",
     "desc_en": "Designer clocks, bookends, and decorative objects — small details with big impact.",
     "desc_ko": "디자이너 시계, 북엔드, 장식 오브제 — 작지만 큰 차이를 만드는 디테일.",
-    "url": "categories/decor/clocks-objects.html"
+    "url": "categories/decor/clocks-objects.html",
+    "parent_en": "Decor",
+    "parent_ko": "데코"
   },
   {
     "type": "subcategory",
@@ -301,7 +335,9 @@
     "name_ko": "거울 & 프레임",
     "desc_en": "Decorative mirrors and picture frames — reflections and displays that elevate walls.",
     "desc_ko": "장식 거울과 액자 — 벽을 끌어올리는 반사와 전시.",
-    "url": "categories/decor/mirrors-frames.html"
+    "url": "categories/decor/mirrors-frames.html",
+    "parent_en": "Decor",
+    "parent_ko": "데코"
   },
   {
     "type": "subcategory",
@@ -309,7 +345,9 @@
     "name_ko": "러그 & 카펫",
     "desc_en": "Handwoven rugs, designer carpets, and luxury floor coverings — texture and warmth for every room.",
     "desc_ko": "손으로 짠 러그, 디자이너 카펫, 고급 바닥 깔개 — 모든 공간에 질감과 온기를.",
-    "url": "categories/decor/rugs-carpets.html"
+    "url": "categories/decor/rugs-carpets.html",
+    "parent_en": "Decor",
+    "parent_ko": "데코"
   },
   {
     "type": "subcategory",
@@ -317,7 +355,9 @@
     "name_ko": "텍스타일 & 쿠션",
     "desc_en": "Luxury fabrics, cushions, throws, and curtains — soft furnishings that complete interiors.",
     "desc_ko": "고급 원단, 쿠션, 스로우, 커튼 — 공간을 완성하는 패브릭.",
-    "url": "categories/decor/textiles-cushions.html"
+    "url": "categories/decor/textiles-cushions.html",
+    "parent_en": "Decor",
+    "parent_ko": "데코"
   },
   {
     "type": "subcategory",
@@ -325,7 +365,9 @@
     "name_ko": "화병 & 플랜터",
     "desc_en": "Decorative vases and indoor planters — ceramic, glass, and metal pieces for greenery and flowers.",
     "desc_ko": "장식 화병과 실내 화분 — 세라믹·유리·메탈로 담는 초록과 꽃.",
-    "url": "categories/decor/vases-planters.html"
+    "url": "categories/decor/vases-planters.html",
+    "parent_en": "Decor",
+    "parent_ko": "데코"
   },
   {
     "type": "subcategory",
@@ -333,7 +375,9 @@
     "name_ko": "장식 패널",
     "desc_en": "3D wall panels, acoustic tiles, and decorative surfaces — adding dimension and texture.",
     "desc_ko": "3D 월 패널, 흡음 타일, 장식 표면재 — 깊이와 질감을 더한다.",
-    "url": "categories/finishes/decorative-panels.html"
+    "url": "categories/finishes/decorative-panels.html",
+    "parent_en": "Finishes",
+    "parent_ko": "마감재"
   },
   {
     "type": "subcategory",
@@ -341,7 +385,9 @@
     "name_ko": "메탈 피니시",
     "desc_en": "Metal cladding, mesh, and decorative metal finishes — industrial elegance for modern spaces.",
     "desc_ko": "메탈 클래딩, 메시, 장식 금속 마감 — 현대 공간의 인더스트리얼 우아함.",
-    "url": "categories/finishes/metal-finishes.html"
+    "url": "categories/finishes/metal-finishes.html",
+    "parent_en": "Finishes",
+    "parent_ko": "마감재"
   },
   {
     "type": "subcategory",
@@ -349,7 +395,9 @@
     "name_ko": "천연석",
     "desc_en": "Marble, granite, travertine, and natural stone — timeless materials for floors and walls.",
     "desc_ko": "대리석, 화강암, 트래버틴 등 천연석 — 바닥과 벽을 위한 변하지 않는 자재.",
-    "url": "categories/finishes/natural-stone.html"
+    "url": "categories/finishes/natural-stone.html",
+    "parent_en": "Finishes",
+    "parent_ko": "마감재"
   },
   {
     "type": "subcategory",
@@ -357,7 +405,9 @@
     "name_ko": "타일 & 세라믹",
     "desc_en": "Premium ceramic and porcelain tiles — from large-format slabs to artisanal mosaics.",
     "desc_ko": "프리미엄 도기·자기 타일 — 대형 슬랩부터 수공 모자이크까지.",
-    "url": "categories/finishes/tiles-ceramics.html"
+    "url": "categories/finishes/tiles-ceramics.html",
+    "parent_en": "Finishes",
+    "parent_ko": "마감재"
   },
   {
     "type": "subcategory",
@@ -365,7 +415,9 @@
     "name_ko": "벽면 마감",
     "desc_en": "Wallpapers, fabric wallcoverings, and decorative wall panels — texture and pattern for interiors.",
     "desc_ko": "벽지, 패브릭 벽지, 장식 월 패널 — 실내에 질감과 패턴을.",
-    "url": "categories/finishes/wallcoverings.html"
+    "url": "categories/finishes/wallcoverings.html",
+    "parent_en": "Finishes",
+    "parent_ko": "마감재"
   },
   {
     "type": "subcategory",
@@ -373,7 +425,9 @@
     "name_ko": "목재 바닥",
     "desc_en": "Engineered and solid wood flooring — oak, walnut, and exotic species with premium finishes.",
     "desc_ko": "강마루와 원목마루 — 오크·월넛·이국적 수종에 프리미엄 마감.",
-    "url": "categories/finishes/wood-flooring.html"
+    "url": "categories/finishes/wood-flooring.html",
+    "parent_en": "Finishes",
+    "parent_ko": "마감재"
   },
   {
     "type": "subcategory",
@@ -381,7 +435,9 @@
     "name_ko": "침대 & 침실",
     "desc_en": "Luxury beds, headboards, and bedroom furniture — creating perfect rest spaces.",
     "desc_ko": "고급 침대, 헤드보드, 침실 가구 — 완벽한 휴식 공간을 만든다.",
-    "url": "categories/furniture/beds-bedroom.html"
+    "url": "categories/furniture/beds-bedroom.html",
+    "parent_en": "Furniture",
+    "parent_ko": "가구"
   },
   {
     "type": "subcategory",
@@ -389,7 +445,9 @@
     "name_ko": "캐비닛 & 사이드보드",
     "desc_en": "Elegant cabinets and sideboards — statement storage pieces that enhance any interior.",
     "desc_ko": "우아한 수납장과 사이드보드 — 공간을 끌어올리는 수납 가구.",
-    "url": "categories/furniture/cabinets-sideboards.html"
+    "url": "categories/furniture/cabinets-sideboards.html",
+    "parent_en": "Furniture",
+    "parent_ko": "가구"
   },
   {
     "type": "subcategory",
@@ -397,7 +455,9 @@
     "name_ko": "의자 & 스툴",
     "desc_en": "From iconic designer chairs to versatile stools — find seating that defines spaces.",
     "desc_ko": "상징적인 디자이너 체어부터 다용도 스툴까지 — 공간을 정의하는 좌석.",
-    "url": "categories/furniture/chairs-stools.html"
+    "url": "categories/furniture/chairs-stools.html",
+    "parent_en": "Furniture",
+    "parent_ko": "가구"
   },
   {
     "type": "subcategory",
@@ -405,7 +465,9 @@
     "name_ko": "키즈 가구",
     "desc_en": "Playful yet sophisticated furniture for children — designed for safety, creativity, and growth.",
     "desc_ko": "유쾌하면서도 정교한 어린이 가구 — 안전·창의·성장을 생각한 설계.",
-    "url": "categories/furniture/kids-furniture.html"
+    "url": "categories/furniture/kids-furniture.html",
+    "parent_en": "Furniture",
+    "parent_ko": "가구"
   },
   {
     "type": "subcategory",
@@ -413,7 +475,9 @@
     "name_ko": "모듈러 시스템",
     "desc_en": "Versatile modular furniture systems — customize layouts and configurations for any space.",
     "desc_ko": "유연한 모듈 가구 시스템 — 어떤 공간에도 맞춰 구성한다.",
-    "url": "categories/furniture/modular-systems.html"
+    "url": "categories/furniture/modular-systems.html",
+    "parent_en": "Furniture",
+    "parent_ko": "가구"
   },
   {
     "type": "subcategory",
@@ -421,7 +485,9 @@
     "name_ko": "소파 & 안락의자",
     "desc_en": "Explore premium sofas and armchairs from world-renowned furniture brands — comfort meets design excellence.",
     "desc_ko": "세계적인 가구 브랜드의 프리미엄 소파와 안락의자 — 편안함과 디자인의 만남.",
-    "url": "categories/furniture/sofas-armchairs.html"
+    "url": "categories/furniture/sofas-armchairs.html",
+    "parent_en": "Furniture",
+    "parent_ko": "가구"
   },
   {
     "type": "subcategory",
@@ -429,7 +495,9 @@
     "name_ko": "수납 & 선반",
     "desc_en": "Functional and beautiful storage solutions — bookcases, shelving systems, and modular storage.",
     "desc_ko": "기능적이고 아름다운 수납 — 책장, 선반 시스템, 모듈 수납.",
-    "url": "categories/furniture/storage-shelving.html"
+    "url": "categories/furniture/storage-shelving.html",
+    "parent_en": "Furniture",
+    "parent_ko": "가구"
   },
   {
     "type": "subcategory",
@@ -437,7 +505,9 @@
     "name_ko": "테이블 & 데스크",
     "desc_en": "Discover designer tables and desks — dining tables, coffee tables, side tables, and work desks from leading brands.",
     "desc_ko": "디자이너 테이블과 책상 — 다이닝·커피·사이드 테이블과 업무용 책상.",
-    "url": "categories/furniture/tables-desks.html"
+    "url": "categories/furniture/tables-desks.html",
+    "parent_en": "Furniture",
+    "parent_ko": "가구"
   },
   {
     "type": "subcategory",
@@ -445,7 +515,9 @@
     "name_ko": "상판",
     "desc_en": "Kitchen countertop surfaces — natural stone, engineered quartz, ceramics, and solid surfaces.",
     "desc_ko": "주방 상판 — 천연석, 엔지니어드 쿼츠, 세라믹, 인조대리석.",
-    "url": "categories/kitchen/countertops.html"
+    "url": "categories/kitchen/countertops.html",
+    "parent_en": "Kitchen",
+    "parent_ko": "주방"
   },
   {
     "type": "subcategory",
@@ -453,7 +525,9 @@
     "name_ko": "주방 가전",
     "desc_en": "Premium kitchen appliances — ovens, cooktops, refrigerators, and dishwashers from top brands.",
     "desc_ko": "프리미엄 주방 가전 — 오븐, 쿡탑, 냉장고, 식기세척기.",
-    "url": "categories/kitchen/kitchen-appliances.html"
+    "url": "categories/kitchen/kitchen-appliances.html",
+    "parent_en": "Kitchen",
+    "parent_ko": "주방"
   },
   {
     "type": "subcategory",
@@ -461,7 +535,9 @@
     "name_ko": "주방 수납",
     "desc_en": "Kitchen storage systems — pull-outs, pantry solutions, and organizational accessories.",
     "desc_ko": "주방 수납 시스템 — 슬라이딩 수납, 팬트리, 정리 액세서리.",
-    "url": "categories/kitchen/kitchen-storage.html"
+    "url": "categories/kitchen/kitchen-storage.html",
+    "parent_en": "Kitchen",
+    "parent_ko": "주방"
   },
   {
     "type": "subcategory",
@@ -469,7 +545,9 @@
     "name_ko": "주방 시스템",
     "desc_en": "Complete kitchen systems — modular designs from leading Italian and European manufacturers.",
     "desc_ko": "완성형 주방 시스템 — 이탈리아와 유럽 제조사의 모듈 디자인.",
-    "url": "categories/kitchen/kitchen-systems.html"
+    "url": "categories/kitchen/kitchen-systems.html",
+    "parent_en": "Kitchen",
+    "parent_ko": "주방"
   },
   {
     "type": "subcategory",
@@ -477,7 +555,9 @@
     "name_ko": "싱크 & 수전",
     "desc_en": "Kitchen sinks and taps — functional design meets precision engineering.",
     "desc_ko": "주방 싱크와 수전 — 기능적 디자인과 정밀 엔지니어링.",
-    "url": "categories/kitchen/sinks-taps.html"
+    "url": "categories/kitchen/sinks-taps.html",
+    "parent_en": "Kitchen",
+    "parent_ko": "주방"
   },
   {
     "type": "subcategory",
@@ -485,7 +565,9 @@
     "name_ko": "테이블웨어",
     "desc_en": "Designer tableware — plates, glasses, cutlery, and serving pieces for elevated dining.",
     "desc_ko": "디자이너 테이블웨어 — 접시, 글라스, 커틀러리, 서빙 피스.",
-    "url": "categories/kitchen/tableware.html"
+    "url": "categories/kitchen/tableware.html",
+    "parent_en": "Kitchen",
+    "parent_ko": "주방"
   },
   {
     "type": "subcategory",
@@ -493,7 +575,9 @@
     "name_ko": "건축 조명",
     "desc_en": "Recessed, track, and linear lighting systems — precision illumination for architecture.",
     "desc_ko": "매입·트랙·라인 조명 시스템 — 건축을 위한 정밀 조명.",
-    "url": "categories/lighting/architectural-lighting.html"
+    "url": "categories/lighting/architectural-lighting.html",
+    "parent_en": "Lighting",
+    "parent_ko": "조명"
   },
   {
     "type": "subcategory",
@@ -501,7 +585,9 @@
     "name_ko": "천장 조명",
     "desc_en": "Flush and semi-flush ceiling lights — clean overhead illumination for modern interiors.",
     "desc_ko": "플러시·세미플러시 실링 라이트 — 현대 실내를 위한 깔끔한 천장 조명.",
-    "url": "categories/lighting/ceiling-lights.html"
+    "url": "categories/lighting/ceiling-lights.html",
+    "parent_en": "Lighting",
+    "parent_ko": "조명"
   },
   {
     "type": "subcategory",
@@ -509,7 +595,9 @@
     "name_ko": "플로어 램프",
     "desc_en": "Designer floor lamps — sculptural lighting that transforms living and working spaces.",
     "desc_ko": "디자이너 플로어 램프 — 생활과 업무 공간을 바꾸는 조형 조명.",
-    "url": "categories/lighting/floor-lamps.html"
+    "url": "categories/lighting/floor-lamps.html",
+    "parent_en": "Lighting",
+    "parent_ko": "조명"
   },
   {
     "type": "subcategory",
@@ -517,7 +605,9 @@
     "name_ko": "아웃도어 조명",
     "desc_en": "Weather-resistant outdoor luminaires — landscape, pathway, and facade lighting.",
     "desc_ko": "내후성 옥외 조명 — 조경·보행로·외피 조명.",
-    "url": "categories/lighting/outdoor-lighting.html"
+    "url": "categories/lighting/outdoor-lighting.html",
+    "parent_en": "Lighting",
+    "parent_ko": "조명"
   },
   {
     "type": "subcategory",
@@ -525,7 +615,9 @@
     "name_ko": "펜던트 조명",
     "desc_en": "Statement pendant lights — suspended fixtures that define and illuminate spaces.",
     "desc_ko": "존재감 있는 펜던트 조명 — 공간을 규정하고 밝히는 매달린 조명.",
-    "url": "categories/lighting/pendant-lights.html"
+    "url": "categories/lighting/pendant-lights.html",
+    "parent_en": "Lighting",
+    "parent_ko": "조명"
   },
   {
     "type": "subcategory",
@@ -533,7 +625,9 @@
     "name_ko": "스마트 조명",
     "desc_en": "Connected and intelligent lighting systems — tunable, automated, and app-controlled.",
     "desc_ko": "연결되는 지능형 조명 — 색온도 조절, 자동화, 앱 제어.",
-    "url": "categories/lighting/smart-lighting.html"
+    "url": "categories/lighting/smart-lighting.html",
+    "parent_en": "Lighting",
+    "parent_ko": "조명"
   },
   {
     "type": "subcategory",
@@ -541,7 +635,9 @@
     "name_ko": "테이블 램프",
     "desc_en": "Iconic table lamps — from classic desk lamps to contemporary accent lighting.",
     "desc_ko": "상징적인 테이블 램프 — 클래식 데스크 램프부터 현대적 무드 조명까지.",
-    "url": "categories/lighting/table-lamps.html"
+    "url": "categories/lighting/table-lamps.html",
+    "parent_en": "Lighting",
+    "parent_ko": "조명"
   },
   {
     "type": "subcategory",
@@ -549,7 +645,9 @@
     "name_ko": "벽등",
     "desc_en": "Wall-mounted lighting fixtures — sconces and wall lamps that add depth and character.",
     "desc_ko": "벽 부착 조명 — 깊이와 개성을 더하는 브래킷과 벽등.",
-    "url": "categories/lighting/wall-lights.html"
+    "url": "categories/lighting/wall-lights.html",
+    "parent_en": "Lighting",
+    "parent_ko": "조명"
   },
   {
     "type": "subcategory",
@@ -557,7 +655,9 @@
     "name_ko": "방음 솔루션",
     "desc_en": "Acoustic panels, phone booths, and sound management systems for open offices.",
     "desc_ko": "흡음 패널, 폰부스, 음환경 관리 시스템 — 개방형 사무실을 위한 해법.",
-    "url": "categories/office/acoustic-solutions.html"
+    "url": "categories/office/acoustic-solutions.html",
+    "parent_en": "Office",
+    "parent_ko": "오피스"
   },
   {
     "type": "subcategory",
@@ -565,7 +665,9 @@
     "name_ko": "데스크 & 워크스테이션",
     "desc_en": "Office desks, sit-stand workstations, and executive desks — built for productivity.",
     "desc_ko": "사무용 책상, 모션데스크, 임원용 책상 — 생산성을 위한 설계.",
-    "url": "categories/office/desks-workstations.html"
+    "url": "categories/office/desks-workstations.html",
+    "parent_en": "Office",
+    "parent_ko": "오피스"
   },
   {
     "type": "subcategory",
@@ -573,7 +675,9 @@
     "name_ko": "라운지 & 리셉션",
     "desc_en": "Lounge chairs, sofas, and reception furniture — creating welcoming workplace spaces.",
     "desc_ko": "라운지 체어, 소파, 리셉션 가구 — 반기는 업무 공간을 만든다.",
-    "url": "categories/office/lounge-reception.html"
+    "url": "categories/office/lounge-reception.html",
+    "parent_en": "Office",
+    "parent_ko": "오피스"
   },
   {
     "type": "subcategory",
@@ -581,7 +685,9 @@
     "name_ko": "회의 & 컨퍼런스",
     "desc_en": "Conference tables, meeting room furniture, and collaborative workspace solutions.",
     "desc_ko": "회의 테이블과 회의실 가구, 협업 공간 솔루션.",
-    "url": "categories/office/meeting-conference.html"
+    "url": "categories/office/meeting-conference.html",
+    "parent_en": "Office",
+    "parent_ko": "오피스"
   },
   {
     "type": "subcategory",
@@ -589,7 +695,9 @@
     "name_ko": "오피스 체어",
     "desc_en": "Ergonomic and designer office chairs — combining comfort, health, and aesthetics.",
     "desc_ko": "인체공학·디자이너 사무용 의자 — 편안함과 건강, 그리고 미감.",
-    "url": "categories/office/office-chairs.html"
+    "url": "categories/office/office-chairs.html",
+    "parent_en": "Office",
+    "parent_ko": "오피스"
   },
   {
     "type": "subcategory",
@@ -597,7 +705,9 @@
     "name_ko": "오피스 수납",
     "desc_en": "Office filing, lockers, and storage systems — organized workspaces, streamlined workflows.",
     "desc_ko": "사무용 파일링, 락커, 수납 시스템 — 정돈된 공간, 매끄러운 업무.",
-    "url": "categories/office/office-storage.html"
+    "url": "categories/office/office-storage.html",
+    "parent_en": "Office",
+    "parent_ko": "오피스"
   },
   {
     "type": "subcategory",
@@ -605,7 +715,9 @@
     "name_ko": "파이어피트 & 히터",
     "desc_en": "Outdoor fire pits and heating solutions — warmth and ambiance for outdoor gatherings.",
     "desc_ko": "야외 파이어핏과 난방 — 모임에 온기와 분위기를.",
-    "url": "categories/outdoor/fire-pits-heaters.html"
+    "url": "categories/outdoor/fire-pits-heaters.html",
+    "parent_en": "Outdoor",
+    "parent_ko": "아웃도어"
   },
   {
     "type": "subcategory",
@@ -613,7 +725,9 @@
     "name_ko": "가든 데코",
     "desc_en": "Decorative elements for outdoor spaces — sculptures, water features, and garden art.",
     "desc_ko": "옥외 공간의 장식 요소 — 조각, 수경 시설, 정원 아트.",
-    "url": "categories/outdoor/garden-decor.html"
+    "url": "categories/outdoor/garden-decor.html",
+    "parent_en": "Outdoor",
+    "parent_ko": "아웃도어"
   },
   {
     "type": "subcategory",
@@ -621,7 +735,9 @@
     "name_ko": "아웃도어 가구",
     "desc_en": "Weather-resistant outdoor furniture — sofas, dining sets, and loungers for exterior living.",
     "desc_ko": "내후성 야외 가구 — 소파, 다이닝 세트, 라운저.",
-    "url": "categories/outdoor/outdoor-furniture.html"
+    "url": "categories/outdoor/outdoor-furniture.html",
+    "parent_en": "Outdoor",
+    "parent_ko": "아웃도어"
   },
   {
     "type": "subcategory",
@@ -629,7 +745,9 @@
     "name_ko": "아웃도어 주방",
     "desc_en": "Outdoor kitchen systems and BBQ islands — professional cooking in open-air settings.",
     "desc_ko": "야외 주방 시스템과 바비큐 아일랜드 — 열린 공간에서의 전문 조리.",
-    "url": "categories/outdoor/outdoor-kitchens.html"
+    "url": "categories/outdoor/outdoor-kitchens.html",
+    "parent_en": "Outdoor",
+    "parent_ko": "아웃도어"
   },
   {
     "type": "subcategory",
@@ -637,7 +755,9 @@
     "name_ko": "아웃도어 조명",
     "desc_en": "Landscape and architectural outdoor lighting — illuminating gardens, terraces, and facades.",
     "desc_ko": "조경·건축 옥외 조명 — 정원, 테라스, 외피를 밝힌다.",
-    "url": "categories/outdoor/outdoor-lighting.html"
+    "url": "categories/outdoor/outdoor-lighting.html",
+    "parent_en": "Outdoor",
+    "parent_ko": "아웃도어"
   },
   {
     "type": "subcategory",
@@ -645,7 +765,9 @@
     "name_ko": "퍼골라 & 캐노피",
     "desc_en": "Architectural pergolas and shade systems — extending living spaces outdoors.",
     "desc_ko": "건축적 퍼걸러와 차양 시스템 — 생활 공간을 밖으로 넓힌다.",
-    "url": "categories/outdoor/pergolas-canopies.html"
+    "url": "categories/outdoor/pergolas-canopies.html",
+    "parent_en": "Outdoor",
+    "parent_ko": "아웃도어"
   },
   {
     "type": "subcategory",
@@ -653,7 +775,9 @@
     "name_ko": "화분 & 플랜터",
     "desc_en": "Architectural planters and designer pots — showcasing greenery with style.",
     "desc_ko": "건축적 플랜터와 디자이너 화분 — 초록을 멋지게 담는다.",
-    "url": "categories/outdoor/planters-pots.html"
+    "url": "categories/outdoor/planters-pots.html",
+    "parent_en": "Outdoor",
+    "parent_ko": "아웃도어"
   },
   {
     "type": "subcategory",
@@ -661,7 +785,9 @@
     "name_ko": "수영장",
     "desc_en": "Luxury swimming pools and aquatic features — design, engineering, and water art.",
     "desc_ko": "고급 수영장과 수경 시설 — 디자인, 엔지니어링, 물의 예술.",
-    "url": "categories/outdoor/swimming-pools.html"
+    "url": "categories/outdoor/swimming-pools.html",
+    "parent_en": "Outdoor",
+    "parent_ko": "아웃도어"
   },
   {
     "type": "subcategory",
@@ -669,7 +795,9 @@
     "name_ko": "피트니스 장비",
     "desc_en": "Designer fitness equipment — home gyms, cycling, and training machines with premium aesthetics.",
     "desc_ko": "디자이너 피트니스 장비 — 홈짐, 사이클, 프리미엄 감각의 트레이닝 머신.",
-    "url": "categories/wellness/fitness-equipment.html"
+    "url": "categories/wellness/fitness-equipment.html",
+    "parent_en": "Wellness",
+    "parent_ko": "웰니스"
   },
   {
     "type": "subcategory",
@@ -677,7 +805,9 @@
     "name_ko": "수영장 & 월풀",
     "desc_en": "Indoor pools, swim spas, and whirlpool systems — aquatic wellness at home.",
     "desc_ko": "실내 수영장, 스윔스파, 월풀 시스템 — 집에서 누리는 아쿠아 웰니스.",
-    "url": "categories/wellness/pools-whirlpools.html"
+    "url": "categories/wellness/pools-whirlpools.html",
+    "parent_en": "Wellness",
+    "parent_ko": "웰니스"
   },
   {
     "type": "subcategory",
@@ -685,7 +815,9 @@
     "name_ko": "사우나",
     "desc_en": "Indoor and outdoor saunas — Finnish, infrared, and designer wellness cabins.",
     "desc_ko": "실내외 사우나 — 핀란드식, 적외선, 디자이너 웰니스 캐빈.",
-    "url": "categories/wellness/saunas.html"
+    "url": "categories/wellness/saunas.html",
+    "parent_en": "Wellness",
+    "parent_ko": "웰니스"
   },
   {
     "type": "subcategory",
@@ -693,7 +825,9 @@
     "name_ko": "스파 & 자쿠지",
     "desc_en": "Luxury spa baths and hot tubs — hydrotherapy and relaxation for home and hospitality.",
     "desc_ko": "고급 스파 배스와 온수욕조 — 가정과 호스피탈리티를 위한 수치료와 휴식.",
-    "url": "categories/wellness/spa-hot-tubs.html"
+    "url": "categories/wellness/spa-hot-tubs.html",
+    "parent_en": "Wellness",
+    "parent_ko": "웰니스"
   },
   {
     "type": "subcategory",
@@ -701,7 +835,9 @@
     "name_ko": "스팀룸",
     "desc_en": "Designer steam rooms and hammam systems — luxury wellness with advanced steam technology.",
     "desc_ko": "디자이너 스팀룸과 하맘 시스템 — 진보한 스팀 기술의 고급 웰니스.",
-    "url": "categories/wellness/steam-rooms.html"
+    "url": "categories/wellness/steam-rooms.html",
+    "parent_en": "Wellness",
+    "parent_ko": "웰니스"
   },
   {
     "type": "subcategory",
@@ -709,7 +845,9 @@
     "name_ko": "웰니스 샤워",
     "desc_en": "Experience showers with chromotherapy, aromatherapy, and multi-sensory water features.",
     "desc_ko": "컬러·아로마 테라피와 다양한 물줄기를 갖춘 체험형 샤워.",
-    "url": "categories/wellness/wellness-showers.html"
+    "url": "categories/wellness/wellness-showers.html",
+    "parent_en": "Wellness",
+    "parent_ko": "웰니스"
   },
   {
     "type": "article",

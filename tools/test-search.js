@@ -263,7 +263,33 @@ const BRANDS_REAL = [
   ok('카테고리 여러 개는 카드와 같은 ` · ` 로 이어 붙인다',
      /Bathroom · Furniture · Decor/.test(r.text), r.text.slice(0, 90));
 
-  console.log('\n[6] 빈 쿼리·없는 말');
+  console.log('\n[6] A-449 — 서브카테고리는 부모 이름을 달고 나온다');
+  // search.js 는 서브카테고리 부제로 부모 이름을 쓰고 점수에도 쓰는데, 색인이 그 필드를
+  // 한 번도 넣은 적이 없었다(69/69 비어 있었다). 그래서 이름이 겹치는 쌍이 화면에서
+  // 구분되지 않았다 — 「아웃도어 조명」(조명 / 아웃도어) · 「스팀룸」(욕실 / 웰니스).
+  const subs = real.filter(x => x.type === 'subcategory');
+  const noParent = subs.filter(x => !x.parent_en || !x.parent_ko);
+  ok('색인의 서브카테고리가 모두 부모 이름을 갖고 있다',
+     subs.length > 0 && noParent.length === 0,
+     '서브카테고리 ' + subs.length + '개 중 부모 없는 것 ' + noParent.length + '개');
+
+  // 이름이 겹치는 쌍은 **부모가 서로 달라야** 화면에서 구분된다
+  const byName = {};
+  subs.forEach(x => { (byName[x.name_ko] = byName[x.name_ko] || []).push(x); });
+  const dupes = Object.keys(byName).filter(k => byName[k].length > 1);
+  const indistinct = dupes.filter(k => {
+      const ps = byName[k].map(x => x.parent_ko);
+      return new Set(ps).size !== ps.length;
+  });
+  ok('이름이 겹치는 서브카테고리는 부모가 서로 다르다',
+     dupes.length > 0 && indistinct.length === 0,
+     '겹치는 이름 ' + dupes.length + '개(' + dupes.join(', ') + ') · 구분 안 되는 것 ' + indistinct.length + '개');
+
+  r = await run({ htmlLang: 'ko', staticIndex: real, brands: BRANDS_REAL }, '스팀룸');
+  ok('「스팀룸」 두 줄이 욕실 / 웰니스 로 갈린다',
+     /욕실/.test(r.text) && /웰니스/.test(r.text), r.text.slice(0, 90));
+
+  console.log('\n[7] 빈 쿼리·없는 말');
   r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: BRANDS_REAL }, 'zzzzqqqq');
   ok('없는 말을 치면 빈 상태 안내가 뜬다 (빈 화면이 아니다)', r.html.length > 0 && r.count === 0,
      'HTML ' + r.html.length + '자, 결과 ' + r.count + '건');

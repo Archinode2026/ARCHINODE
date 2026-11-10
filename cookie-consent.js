@@ -1,7 +1,8 @@
 /* ARCHINODE Cookie Consent Banner (P3-2)
    경량 쿠키 동의 배너. GDPR 최소 준수:
    - 방문 시 배너 표시 (localStorage에 결정 저장 안 된 상태)
-   - "Accept All", "Necessary Only", "Manage" 3버튼
+   - "Accept All", "Necessary Only", "Learn more" 3버튼 (A-448: 전에는 "Manage" 였는데
+     쿠키 설정 UI 가 없으므로 없는 기능을 약속하는 말이었다)
    - 결정 후 재방문 시 표시 안 함
    - Analytics·Marketing 쿠키는 Accept All 선택 시만 로드 (window.__cookieConsent.analytics)
 */
@@ -68,10 +69,16 @@
           bi('Necessary Only', '필수만', 'button',
              'id="cc-necessary" style="background:transparent;color:#fff;border:1px solid #6b6459;padding:10px 18px;' +
              'font-size:0.82rem;font-weight:600;border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px;"') +
-          '<a href="/privacy.html" class="cc-more" data-en="Manage / Learn more" data-ko="자세히"' +
+          /* A-448(2026-11-10): 영어 라벨이 "Manage / Learn more" 였는데 이 링크는
+             설정 화면이 아니라 **개인정보 처리방침 문서**로 간다. "Manage" 는
+             **없는 기능을 약속하는 말**이다(쿠키 설정 UI 가 없다). 한국어는 처음부터
+             「자세히」였으니 영어만 거짓을 말하고 있었다. 문서로 간다는 뜻대로 적는다.
+             덤: 영어 배너가 KO 222px 대 EN 294px 로 72px 더 높아 단추가 두 줄이 됐는데,
+             라벨이 짧아지면서 그것도 줄어든다. (브론즈 27차 12번) */
+          '<a href="/privacy.html" class="cc-more" data-en="Learn more" data-ko="자세히"' +
             ' style="font-size:0.76rem;color:#b5ab9b;text-decoration:none;display:inline-flex;' +
             'align-items:center;min-height:44px;padding:0 6px;">' +
-            (isKo ? '자세히' : 'Manage / Learn more') + '</a>' +
+            (isKo ? '자세히' : 'Learn more') + '</a>' +
         '</div>' +
       '</div>';
 

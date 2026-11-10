@@ -151,6 +151,46 @@ def main():
         if item:
             items.append(item)
 
+    # ───────────────────────────────────────────────────────────────────────
+    # A-449(2026-11-10): 서브카테고리 69개 **전부** parent_en/parent_ko 가 없었다.
+    #
+    #   `search.js` 는 서브카테고리 결과의 **부제로 부모 이름**을 쓰고
+    #   (`sub = lang === 'ko' ? item.parent_ko : item.parent_en`),
+    #   점수에서도 「부모 이름이 질의를 품으면 30점」 가지를 둔다. 그런데 색인이
+    #   그 필드를 **한 번도 넣은 적이 없어서** 부제는 늘 비었고 30점 가지는
+    #   **돌 수 없는 죽은 코드**였다.
+    #
+    #   눈에 띈 계기(브론즈 27차 8번): 「아웃도어」를 검색하면 「아웃도어 조명」이
+    #   **두 줄** 나온다 — `categories/lighting/outdoor-lighting.html` 과
+    #   `categories/outdoor/outdoor-lighting.html`. 부제가 비어 있으니 손님 눈에는
+    #   **똑같은 두 줄**이고 어느 걸 눌러야 할지 알 수 없다. 같은 모양이
+    #   「스팀룸」(bathroom / wellness)에도 있다.
+    #
+    #   부모는 경로에 이미 있다 — `categories/<부모>/<자식>.html`. 같은 실행에서
+    #   만든 category 항목의 이름을 끌어다 쓴다(새 대응표를 만들지 않는다).
+    # ───────────────────────────────────────────────────────────────────────
+    cat_by_slug = {}
+    for it in items:
+        if it["type"] == "category":
+            slug = it["url"].split("/")[-1].rsplit(".", 1)[0]
+            cat_by_slug[slug] = it
+    filled = missing = 0
+    for it in items:
+        if it["type"] != "subcategory":
+            continue
+        parts = it["url"].split("/")
+        parent = cat_by_slug.get(parts[1]) if len(parts) > 2 else None
+        if parent:
+            it["parent_en"] = parent["name_en"]
+            it["parent_ko"] = parent["name_ko"]
+            filled += 1
+        else:
+            missing += 1
+    if missing:
+        raise SystemExit(
+            "서브카테고리 %d개의 부모 카테고리를 찾지 못했다 — 경로 규약이 바뀌었나?" % missing)
+    print("부모를 채운 서브카테고리: %d개" % filled)
+
     # 정렬: type → url
     type_order = {"page": 0, "category": 1, "subcategory": 2, "brand": 3,
                   "article": 4, "trend-report": 5}
