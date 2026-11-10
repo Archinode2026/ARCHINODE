@@ -38,6 +38,51 @@
     return '';   // 객체·함수는 검색어로 쓸 것이 없다
   }
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // A-442(2026-11-10): 화면에는 「욕실 · 마감재」로 보여주면서 검색은 **영문만** 봤다.
+  //
+  // 브랜드 색인의 category 는 영문 값(Bathroom…)뿐이라, 한글로 「마감재」를 치면
+  // 그 브랜드는 점수가 **0**이었다. brands.html 카드가 `욕실 · 마감재` 로 보여주는
+  // 바로 그 말로는 찾을 수 없었다 — A-424 · A-438 과 같은 계열(번역은 했는데
+  // 동작은 영문만 본다).
+  //
+  // 대응표를 **네 번째로 베끼지 않는다.** search-index.json 의 category 항목 10개가
+  // 이미 name_en · name_ko 를 들고 있고, 그 값의 정본은 카테고리 페이지의 두 언어
+  // h1 이다(A-407 이 그 정본과 세 사본을 맞춰 보는 검사다). 거기서 뽑아 쓰면
+  // 사본이 늘지 않고 어긋날 수도 없다.
+  // ─────────────────────────────────────────────────────────────────────────
+  var catKoCache = null;
+  function catKoMap() {
+    if (catKoCache) return catKoCache;
+    var m = {};
+    var n = 0;
+    if (searchData && searchData.length) {
+      for (var i = 0; i < searchData.length; i++) {
+        var it = searchData[i];
+        if (it && it.type === 'category' && it.name_en && it.name_ko) {
+          m[String(it.name_en).toLowerCase()] = String(it.name_ko);
+          n++;
+        }
+      }
+      if (n) catKoCache = m;   // 색인을 실제로 읽은 뒤에만 캐시한다
+    }
+    return m;
+  }
+
+  // 영문 카테고리(배열이든 쉼표 문자열이든)를 한글로. 대응표에 없는 값은 **그대로 남긴다**
+  // — 모르는 값을 지우면 검색이 조용히 좁아진다(A-311 과 같은 약속).
+  function catKo(v) {
+    var m = catKoMap();
+    var parts = Array.isArray(v) ? v : text(v, ',').split(',');
+    var out = [];
+    for (var i = 0; i < parts.length; i++) {
+      var one = text(parts[i]).trim();
+      if (!one) continue;
+      out.push(m[one.toLowerCase()] || one);
+    }
+    return out.join(', ');
+  }
+
   function lc(v) { return text(v).toLowerCase(); }
 
   // Determine base path relative to current page
@@ -174,6 +219,7 @@
       var parentKo = lc(item.parent_ko);
       var country = lc(item.country);
       var category = lc(item.category);
+      var categoryKo = lc(catKo(item.category));   // A-442
 
       // Exact name match (highest priority)
       if (nameEn === q || nameKo === q) {
@@ -194,7 +240,16 @@
       else if (parentEn.indexOf(q) !== -1 || parentKo.indexOf(q) !== -1) {
         score = 30;
       }
-      else if (country.indexOf(q) !== -1 || category.indexOf(q) !== -1) {
+      // A-442: 카테고리 일치를 country 에서 떼어내 50점으로 올렸다(한글 이름도 본다).
+      //   전에는 둘이 한 묶음 20점이었고, 브랜드는 20+5=25점이라 **12개 자르기에서
+      //   늘 떨어졌다.** 실측: 「Finishes」로 검색하면 카테고리 페이지(104) ·
+      //   이름에 든 서브카테고리(63) · 기사(42) 가 자리를 다 먹었다. 카테고리 이름으로
+      //   검색한 사람이 찾는 것은 **그 카테고리에 속한 브랜드**이므로, 설명(40) 위
+      //   이름 일부 일치(60) 아래인 50 에 둔다.
+      else if (category.indexOf(q) !== -1 || categoryKo.indexOf(q) !== -1) {
+        score = 50;
+      }
+      else if (country.indexOf(q) !== -1) {
         score = 20;
       }
 

@@ -218,7 +218,43 @@ const BRANDS_REAL = [
   const noKo = real.filter(x => x.desc_ko && !/[가-힣]/.test(x.desc_ko)).length;
   ok('색인의 desc_ko 중 한글이 없는 것이 3개 이하', noKo <= 3, '지금 ' + noKo + '개');
 
-  console.log('\n[5] 빈 쿼리·없는 말');
+  console.log('\n[5] A-442 — 화면에 보이는 한글 카테고리로 브랜드를 찾을 수 있다');
+  // 브랜드 색인의 category 는 영문 값뿐인데 카드는 「욕실 · 마감재」로 보여준다.
+  // 대응표는 search-index.json 의 category 항목(name_en/name_ko)에서 뽑는다.
+  r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: BRANDS_REAL }, '욕실');
+  ok('한글 「욕실」로 Bathroom 브랜드가 찾힌다', /테스트/.test(r.text), r.text.slice(0, 90));
+
+  // 생산에서 실제로 브랜드를 떨어뜨린 것은 **설명이 일치하는 기사들**이었다(40+2=42점).
+  // 옛 점수에서 브랜드는 20+5=25점이라 12개 자르기에서 늘 밀렸다.
+  const CROWD = STATIC.concat(Array.from({ length: 14 }, (_, i) => ({
+    type: 'article', name_en: 'Piece ' + i, name_ko: '글 ' + i,
+    desc_en: 'A long read about bathroom design', desc_ko: '욕실 디자인 이야기',
+    parent_en: '', parent_ko: '', url: 'magazine/piece-' + i + '.html'
+  })));
+  r = await run({ htmlLang: 'en', staticIndex: CROWD, brands: BRANDS_REAL }, 'bathroom');
+  ok('같은 말이 든 기사 14편에 밀려도 브랜드가 12개 안에 남는다', /테스트/.test(r.text),
+     '결과 ' + r.count + '건: ' + r.text.slice(0, 90));
+
+  // ※ 처음엔 「대응표에 없는 카테고리 값도 그대로 검색된다」를 시험했는데, catKo 가
+  //   모르는 값을 **버리게 고쳐도 그 시험이 통과했다** — 영문 category 로도 매칭되니
+  //   구분이 안 된다. 못 깨지는 시험은 거짓 안심이라 지웠다. 대신 한국어 경로가
+  //   **조용히 죽는 진짜 조건**을 지킨다: 색인의 category 항목에 name_ko 가 비면
+  //   대응표가 통째로 비고, 한글 검색이 아무 예외 없이 못 찾게 된다.
+  const catItems = real.filter(x => x.type === 'category');
+  const noNameKo = catItems.filter(x => !x.name_ko || !/[가-힣]/.test(x.name_ko));
+  ok('색인의 카테고리 10개가 모두 한글 이름을 갖고 있다 (대응표의 공급원)',
+     catItems.length === 10 && noNameKo.length === 0,
+     '카테고리 ' + catItems.length + '개, 한글 이름 없는 것 ' + noNameKo.length + '개');
+
+  r = await run({ htmlLang: 'ko', staticIndex: real, brands: BRANDS_REAL }, '마감재');
+  ok('실제 색인으로도 한글 카테고리 검색이 예외 없이 돈다', r.errs.length === 0,
+     JSON.stringify(r.errs));
+
+  // country 가 카테고리 분리로 죽지 않았는지 (같은 묶음에서 떼어냈다)
+  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: BRANDS_REAL }, 'albania');
+  ok('나라 이름으로도 여전히 찾힌다', /테스트/.test(r.text), r.text.slice(0, 80));
+
+  console.log('\n[6] 빈 쿼리·없는 말');
   r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: BRANDS_REAL }, 'zzzzqqqq');
   ok('없는 말을 치면 빈 상태 안내가 뜬다 (빈 화면이 아니다)', r.html.length > 0 && r.count === 0,
      'HTML ' + r.html.length + '자, 결과 ' + r.count + '건');
