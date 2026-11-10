@@ -31,28 +31,50 @@
     wrap.id = 'archi-cookie-banner';
     // R-007: 두 단추가 390px 에서 높이 38px 이라 손가락 기준(44px)에 못 미쳤다 — min-height 로 올린다.
     wrap.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#332e27;color:#fff;padding:20px 24px;border-radius:10px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:720px;margin:0 auto;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;';
+    /* A-437(2026-11-09): **배너가 영어로 떴다 — 한국 손님이 처음 보는 화면이다.**
+       브론즈 26차가 손님 origin(넷리파이 미리보기) 네 페이지에서 전부 영어를 봤다.
+       그 순간 `lang="ko"` · 저장값 `ko` · 머리띠는 「로그인」 한국어였는데 배너만 영어였다.
+
+       기제: 바로 위 `var isKo = lang === 'ko'` 가 **배너를 만드는 순간 한 번 읽고 굳는다.**
+       이 파일은 `defer` 라 파싱이 끝나자마자 돌고, `lang.js` 의 칠하기는 `DOMContentLoaded`
+       에서 돈다 — **배너가 먼저 만들어진다.** 게다가 배너 안에 `data-ko` 가 **0개**여서
+       나중에 칠할 방법조차 없었다. **순서에 기댄 경주**였고, 캐시 없는 첫 방문에서 진다.
+
+       ★ A-419(profile) → A-434(머리띠) 에 이은 **세 번째**이고 가장 나쁘다 —
+         앞의 둘은 짝이 있어서 「부르기만 하면」 됐는데 여기는 **짝 자체가 없었다.**
+       고치는 법은 같다: **두 언어를 속성에 심고**, 넣은 뒤 다시 칠한다.
+       그러면 순서가 어떻든, 나중에 언어를 바꾸든 따라온다. 범위 231 페이지. */
+    function bi(en, ko, tag, attrs) {
+      return '<' + (tag || 'span') + ' data-en="' + en.replace(/"/g, '&quot;') + '"' +
+             ' data-ko="' + ko.replace(/"/g, '&quot;') + '"' + (attrs ? ' ' + attrs : '') + '>' +
+             (isKo ? ko : en) + '</' + (tag || 'span') + '>';
+    }
+    var LINK = 'class="cc-inline" style="color:#c9a36a;text-decoration:underline;"';
     wrap.innerHTML =
       '<div style="display:flex;flex-direction:column;gap:12px;">' +
-        '<h3 style="font-size:0.95rem;font-weight:700;margin:0;color:#c9a36a;">' +
-          (isKo ? '쿠키 사용에 대한 안내' : 'We use cookies') +
-        '</h3>' +
+        bi('We use cookies', '쿠키 사용에 대한 안내', 'h3',
+           'style="font-size:0.95rem;font-weight:700;margin:0;color:#c9a36a;"') +
         '<p style="font-size:0.82rem;line-height:1.5;margin:0;color:#ccc;">' +
-          (isKo
-            ? 'ARCHINODE는 사이트 작동에 필요한 쿠키와 사용 분석용 쿠키를 사용합니다. '
-              + '<a href="/privacy.html" class="cc-inline" style="color:#c9a36a;text-decoration:underline;">개인정보 처리방침</a>을 확인하시고 선택해주세요.'
-            : 'ARCHINODE uses necessary cookies for the site to work and analytics cookies to improve it. '
-              + 'See our <a href="/privacy.html" class="cc-inline" style="color:#c9a36a;text-decoration:underline;">Privacy Policy</a>. Choose your preference below.'
-          ) +
+          bi('ARCHINODE uses necessary cookies for the site to work and analytics cookies to improve it. See our ',
+             'ARCHINODE는 사이트 작동에 필요한 쿠키와 사용 분석용 쿠키를 사용합니다. ') +
+          '<a href="/privacy.html" ' + LINK + ' data-en="Privacy Policy" data-ko="개인정보 처리방침">' +
+            (isKo ? '개인정보 처리방침' : 'Privacy Policy') + '</a>' +
+          bi('. Choose your preference below.', '을 확인하시고 선택해주세요.') +
         '</p>' +
-        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">' +
-          '<button id="cc-accept" style="background:#c9a36a;color:#332e27;border:none;padding:10px 18px;font-size:0.82rem;font-weight:700;border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px;">' +
-            (isKo ? '모두 수락' : 'Accept All') + '</button>' +
-          '<button id="cc-necessary" style="background:transparent;color:#fff;border:1px solid #6b6459;padding:10px 18px;font-size:0.82rem;font-weight:600;border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px;">' +
-            (isKo ? '필수만' : 'Necessary Only') + '</button>' +
-          '<a href="/privacy.html" class="cc-more" style="font-size:0.76rem;color:#b5ab9b;text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding:0 6px;">' +
+        '<div class="cc-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">' +
+          bi('Accept All', '모두 수락', 'button',
+             'id="cc-accept" style="background:#c9a36a;color:#332e27;border:none;padding:10px 18px;' +
+             'font-size:0.82rem;font-weight:700;border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px;"') +
+          bi('Necessary Only', '필수만', 'button',
+             'id="cc-necessary" style="background:transparent;color:#fff;border:1px solid #6b6459;padding:10px 18px;' +
+             'font-size:0.82rem;font-weight:600;border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px;"') +
+          '<a href="/privacy.html" class="cc-more" data-en="Manage / Learn more" data-ko="자세히"' +
+            ' style="font-size:0.76rem;color:#b5ab9b;text-decoration:none;display:inline-flex;' +
+            'align-items:center;min-height:44px;padding:0 6px;">' +
             (isKo ? '자세히' : 'Manage / Learn more') + '</a>' +
         '</div>' +
       '</div>';
+
     // A-097: 접근성 — 배너를 dialog 역할로 선언하고, 뜨자마자 "모두 수락" 버튼에 초점을 둬
     // 키보드 사용자가 76번 Tab을 눌러야 닿던 문제를 해결한다. (dialog는 non-modal이라
     // 포커스 트랩은 두지 않음 — 사용자가 원하면 Shift+Tab 또는 Tab으로 페이지로 돌아갈 수 있음.)
@@ -76,6 +98,10 @@
         'html.has-cookie-banner body .scroll-top{bottom:calc(var(--cc-h,0px) + 28px);}' +
         /* 본문 안내문의 링크도 손가락 기준으로 — 배너 문단엔 다른 링크가 없어
            띠가 이웃 줄로 번져도 탭을 뺏지 않는다(A-421 과 같은 판단). */
+        /* A-437: 「자세히」가 넷리파이 배지와 세로 27px 겹쳐 3/7 이었다(브론즈 26차).
+           **왼쪽으로는 못 피한다** — 배지를 비키려면 x<148 인데 「필수만」이 x208 까지 쓴다.
+           한 줄에 셋이면 세 번째는 반드시 걸린다. 그래서 **줄 자체를 올린다.** */
+        '@media (max-width:760px){#archi-cookie-banner{padding-bottom:47px !important;}}' +
         '#archi-cookie-banner .cc-inline{position:relative;}' +
         '#archi-cookie-banner .cc-inline::after{content:"";position:absolute;left:0;right:0;' +
         'top:50%;height:44px;transform:translateY(-50%);}';
@@ -89,6 +115,9 @@
       document.documentElement.style.setProperty('--cc-h', h + 'px');
       document.documentElement.classList.add('has-cookie-banner');
     }
+    // A-437: 넣은 직후 현재 언어로 다시 칠한다. lang.js 가 아직 안 돌았으면
+    // 위에서 박은 글자가 그대로 쓰이고, 나중에 돌 때 data-* 를 보고 따라온다.
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
     ccSyncSpace();
     window.addEventListener('resize', ccSyncSpace);
     if (window.ResizeObserver) { try { new ResizeObserver(ccSyncSpace).observe(wrap); } catch (e) {} }
