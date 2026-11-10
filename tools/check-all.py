@@ -65,7 +65,10 @@ CHECKS = [
 #
 #     (사이트 루트에서) python3 -m http.server 8321 &
 #     ARCHINODE_ROOT=<루트> python3 scripts/check_narrow_width.py --base http://127.0.0.1:8321 --widths 360,390
-#     ARCHINODE_ROOT=<루트> python3 scripts/check_xss_output.py
+#     ARCHINODE_ROOT=<루트> python3 scripts/check_xss_output.py http://127.0.0.1:8321
+#       ↑ 주소를 **위치 인수**로 받는다(`--base` 가 아니다). `--base` 를 주면 그 글자가
+#         주소가 되어 27화면이 전부 `Protocol error: Cannot navigate` 로 열리지 않는다.
+#         2026-11-10 에 내가 그렇게 돌려서 한 번 헛돌았다.
 #     ARCHINODE_ROOT=<루트> python3 scripts/check_hover_contrast.py index.html brands.html ...
 #
 #   `check_narrow_width.py` 는 **로컬 HTTP 서버가 필요하다**(file:// 아님).
