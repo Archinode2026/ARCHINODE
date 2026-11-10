@@ -254,6 +254,15 @@ const BRANDS_REAL = [
   r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: BRANDS_REAL }, 'albania');
   ok('나라 이름으로도 여전히 찾힌다', /테스트/.test(r.text), r.text.slice(0, 80));
 
+  // 찾는 것만 고치고 보이는 것을 안 고치면 같은 결함이 반쪽 남는다(A-424 · A-438 의 교훈).
+  r = await run({ htmlLang: 'ko', staticIndex: real, brands: BRANDS_REAL }, '테스트');
+  ok('한국어 화면에서는 결과 부제의 카테고리도 한글이다',
+     /욕실/.test(r.text) && !/Bathroom/.test(r.text), r.text.slice(0, 80));
+
+  r = await run({ htmlLang: 'en', staticIndex: real, brands: BRANDS_REAL }, '멀티');
+  ok('카테고리 여러 개는 카드와 같은 ` · ` 로 이어 붙인다',
+     /Bathroom · Furniture · Decor/.test(r.text), r.text.slice(0, 90));
+
   console.log('\n[6] 빈 쿼리·없는 말');
   r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: BRANDS_REAL }, 'zzzzqqqq');
   ok('없는 말을 치면 빈 상태 안내가 뜬다 (빈 화면이 아니다)', r.html.length > 0 && r.count === 0,

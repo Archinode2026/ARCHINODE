@@ -373,7 +373,16 @@
       if (item.type === 'subcategory') {
         sub = (lang === 'ko' ? item.parent_ko : item.parent_en) || '';
       } else if (item.type === 'brand') {
-        var catText = text(item.category, ' · ');
+        /* A-442(2026-11-10, 2차): 찾는 것만 고치고 **보이는 것을 안 고쳤다.**
+           한국어 화면에서도 부제가 `Albania · Bathroom, Finishes` 로 영문이었다 —
+           같은 브랜드를 brands.html 카드는 `욕실 · 마감재` 로 보여주는데.
+           또, 색인의 category 는 이미 쉼표로 이어 붙인 문자열이라 여기 ' · ' 구분자는
+           **한 번도 쓰이지 않았다**(그래서 카드와 구분자도 달랐다). 둘 다 맞춘다. */
+        var catSrc = lang === 'ko' ? catKo(item.category) : item.category;
+        var catText = text(catSrc, ' · ').split(',')
+                        .map(function (x) { return x.trim(); })
+                        .filter(function (x) { return x; })
+                        .join(' · ');
         sub = text(item.country) + (catText ? ' · ' + catText : '');
       } else if (item.type === 'category') {
         sub = lang === 'ko' ? (item.desc_ko || '') : (item.desc_en || '');
