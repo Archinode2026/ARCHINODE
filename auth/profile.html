@@ -348,6 +348,23 @@ function populateProfile() {
 // 문서 1건씩 get() 으로 바꾸면 규칙이 실제 문서를 보고 판정하므로 이 문제가 사라지고,
 // 중간에 비승인으로 바뀐 항목이 섞여 있어도 그 항목만 건너뛰고 나머지는 정상 표시된다.
 // 저장 목록은 개인 북마크라 건수가 적어 개별 읽기 비용도 문제되지 않는다.
+/* ── A-471(2026-11-11): 이 화면은 브랜드가 입력한 값을 **원문 그대로**
+   innerHTML 에 꽂고 있었다 — 제품의 name·brandName·slug·imageUrl, 브랜드의
+   brandName·country·slug·logoUrl. 저장 목록은 **남의 브랜드가 쓴 값**을 그리므로
+   저장된 XSS 가 그대로 돈다. 같은 자료를 그리는 사본 다섯 중(products/view ·
+   brands/view · brand-portal · category-products.js · 여기) **둘만 A-218 처방을
+   못 받았다.** brand-portal 의 escapeHtml · bpSafeUrl 과 같은 모양으로 맞춘다.
+   「빼기」 단추도 onclick 문자열 조립을 버리고 data 속성 + 위임으로 바꾼다 —
+   escapeHtml 이 만든 &#39; 가 속성 파싱 때 되돌아와 핸들러가 깨지는 A-026 함정. */
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+/* `javascript:` 에는 `&<>"'` 가 없어 escapeHtml 을 통과한다 — 스킴까지 본다. */
+function safeUrl(u) { return (u && /^https?:\/\//i.test(String(u))) ? String(u) : ''; }
+
 async function fetchSavedDocs(collection, ids) {
     const out = [];
     for (const id of ids) {
@@ -375,16 +392,21 @@ async function loadLikedProducts() {
     entries.forEach(entry => {
         const doc = { id: entry.id };
         const p = entry.data;
+        const pId = escapeHtml(entry.id);                  // A-471
+        const pSlug = escapeHtml(p.slug || '');
+        const pName = escapeHtml(p.name || '');
+        const pBrandName = escapeHtml(p.brandName || '');
+        const pImageUrl = escapeHtml(safeUrl(p.imageUrl));
         html += `
             <div class="liked-card">
-                <button class="unlike-btn" onclick="unlikeProduct('${doc.id}')" title="Remove from saved" data-en-title="Remove from saved" data-ko-title="저장 목록에서 빼기"><i class="fas fa-bookmark"></i></button>
-                <a href="../products/view.html?id=${p.slug || ''}" style="text-decoration:none;color:inherit;">
+                <button class="unlike-btn" data-unlike-product="${pId}" title="Remove from saved" data-en-title="Remove from saved" data-ko-title="저장 목록에서 빼기"><i class="fas fa-bookmark"></i></button>
+                <a href="../products/view.html?id=${pSlug}" style="text-decoration:none;color:inherit;">
                     <div class="liked-card-img">
-                        ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
+                        ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                     </div>
                     <div class="liked-card-body">
-                        <h3>${p.name || 'Product'}</h3>
-                        <p>${p.brandName || ''}</p>
+                        <h3>${pName || 'Product'}</h3>
+                        <p>${pBrandName}</p>
                     </div>
                 </a>
             </div>`;
@@ -436,16 +458,23 @@ async function loadLikedBrands() {
     entries.forEach(entry => {
         const doc = { id: entry.id };
         const b = entry.data;
+        const bId = escapeHtml(entry.id);                  // A-471
+        const bSlug = escapeHtml(b.slug || '');
+        const bName = escapeHtml(b.brandName || '');
+        const bCountry = escapeHtml(b.country || '');
+        const bLogoUrl = escapeHtml(safeUrl(b.logoUrl));
+        const bCatEn = escapeHtml(catText(b.category) || '');
+        const bCatKo = escapeHtml(catTextKo(b.category) || '');
         html += `
             <div class="liked-card">
-                <button class="unlike-btn" onclick="unlikeBrand('${doc.id}')" title="Remove from saved" data-en-title="Remove from saved" data-ko-title="저장 목록에서 빼기"><i class="fas fa-bookmark"></i></button>
-                <a href="../brands/view.html?id=${b.slug || ''}" style="text-decoration:none;color:inherit;">
+                <button class="unlike-btn" data-unlike-brand="${bId}" title="Remove from saved" data-en-title="Remove from saved" data-ko-title="저장 목록에서 빼기"><i class="fas fa-bookmark"></i></button>
+                <a href="../brands/view.html?id=${bSlug}" style="text-decoration:none;color:inherit;">
                     <div class="liked-card-img">
-                        ${b.logoUrl ? `<img loading="lazy" src="${b.logoUrl}" alt="${b.brandName}" style="object-fit:contain;padding:20px;">` : '<i class="fas fa-building" style="font-size:2rem;color:var(--ink-soft);"></i>'}
+                        ${bLogoUrl ? `<img loading="lazy" src="${bLogoUrl}" alt="${bName}" style="object-fit:contain;padding:20px;">` : '<i class="fas fa-building" style="font-size:2rem;color:var(--ink-soft);"></i>'}
                     </div>
                     <div class="liked-card-body">
-                        <h3>${b.brandName || 'Brand'}</h3>
-                        <p>${b.country || ''}${catText(b.category) ? ` <span data-en="\u00b7 ${catText(b.category)}" data-ko="\u00b7 ${catTextKo(b.category)}">\u00b7 ${catText(b.category)}</span>` : ''}</p>
+                        <h3>${bName || 'Brand'}</h3>
+                        <p>${bCountry}${bCatEn ? ` <span data-en="\u00b7 ${bCatEn}" data-ko="\u00b7 ${bCatKo}">\u00b7 ${bCatEn}</span>` : ''}</p>
                     </div>
                 </a>
             </div>`;
@@ -459,6 +488,20 @@ async function loadLikedBrands() {
 }
 
 // ── 저장 해제 ──
+/* A-471: onclick 문자열 조립을 버린 대신 위임으로 받는다.
+   두 격자에 한 번씩만 단다 — 목록을 다시 그려도 핸들러가 겹치지 않는다. */
+['likedProductsGrid', 'likedBrandsGrid'].forEach(function (gid) {
+    const g = document.getElementById(gid);
+    if (!g || g.dataset.unlikeBound) return;
+    g.dataset.unlikeBound = '1';
+    g.addEventListener('click', function (ev) {
+        const bp = ev.target.closest('[data-unlike-product]');
+        if (bp) { ev.preventDefault(); unlikeProduct(bp.getAttribute('data-unlike-product')); return; }
+        const bb = ev.target.closest('[data-unlike-brand]');
+        if (bb) { ev.preventDefault(); unlikeBrand(bb.getAttribute('data-unlike-brand')); }
+    });
+});
+
 async function unlikeProduct(productId) {
     await db.collection('users').doc(currentUser.uid).update({
         likedProducts: firebase.firestore.FieldValue.arrayRemove(productId)

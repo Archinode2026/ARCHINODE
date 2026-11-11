@@ -67,6 +67,8 @@ CHECKS = [
      'A-469 — src·srcset·url() 이 가리키는 그림이 git 에 있는지(디스크에 있어도 .gitignore 면 배포 안 된다)'),
     ('소분류 이름 여섯 자리',  'py',   'tools/check-subcategory-names.py',
      'A-470 — 한 페이지 안의 title·og:title·JSON-LD·빵부스러기 + 부모 카드 + 색인이 h1 과 같은지(&amp; 무관)'),
+    ('날값 꽂기(출력 XSS)',   'py',   'tools/check-raw-interpolation.py',
+     'A-471 — 자료를 그리는 사본 6개가 브랜드 입력을 이스케이프 없이 innerHTML 에 꽂지 않는지. Playwright 불필요'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

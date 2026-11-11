@@ -481,6 +481,9 @@ function brandInitial(name) {
     return m ? m[0].toUpperCase() : '?';
 }
 
+/* A-471: `javascript:` 에는 `&<>"'` 가 없어 escapeHtml 을 통과한다 —
+   href·src 에 넣기 전에 스킴을 본다 (brand-portal 의 bpSafeUrl 과 같은 방식). */
+function safeUrl(u) { return (u && /^https?:\/\//i.test(String(u))) ? String(u) : ''; }
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -813,8 +816,8 @@ function renderBrand(brand, products, articles) {
                 ${certifications.length > 0 ? `
                 <div class="bp-cert-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
                     ${certifications.map(cert => `
-                        <a href="${cert.fileUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#f4efe6;border:1px solid #e0e0e0;border-radius:20px;font-size:0.78rem;color:#333;text-decoration:none;" rel="noopener noreferrer">
-                            <i class="fas fa-certificate" style="color:#7a5c32;"></i>${cert.name}
+                        <a href="${escapeHtml(safeUrl(cert.fileUrl))}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#f4efe6;border:1px solid #e0e0e0;border-radius:20px;font-size:0.78rem;color:#333;text-decoration:none;" rel="noopener noreferrer">
+                            <i class="fas fa-certificate" style="color:#7a5c32;"></i>${escapeHtml(cert.name)}
                         </a>
                     `).join('')}
                 </div>` : ''}
@@ -884,14 +887,14 @@ function renderBrand(brand, products, articles) {
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
                 <div style="display:flex;flex-direction:column;gap:12px;">
-                    <div style="font-size:1.2rem;font-weight:700;color:#332e27;">${dealer.name}</div>
-                    ${dealer.address ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-map-marker-alt" style="width:18px;color:#7a5c32;"></i> ${dealer.address}</div>` : ''}
-                    ${dealer.showroom ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-store" style="width:18px;color:#7a5c32;"></i> ${dealer.showroom}</div>` : ''}
+                    <div style="font-size:1.2rem;font-weight:700;color:#332e27;">${escapeHtml(dealer.name)}</div>
+                    ${dealer.address ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-map-marker-alt" style="width:18px;color:#7a5c32;"></i> ${escapeHtml(dealer.address)}</div>` : ''}
+                    ${dealer.showroom ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-store" style="width:18px;color:#7a5c32;"></i> ${escapeHtml(dealer.showroom)}</div>` : ''}
                 </div>
                 <div style="display:flex;flex-direction:column;gap:12px;">
-                    ${dealer.contact ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-phone" style="width:18px;color:#7a5c32;"></i> ${dealer.contact}</div>` : ''}
-                    ${dealer.email ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-envelope" style="width:18px;color:#7a5c32;"></i> <a href="mailto:${dealer.email}" style="color:#333;">${dealer.email}</a></div>` : ''}
-                    ${dealer.website ? `<div style="font-size:0.88rem;"><a href="${escapeHtml(dealer.website.startsWith('http') ? dealer.website : 'https://'+dealer.website)}" target="_blank" style="color:#7a5c32;font-weight:600;" rel="noopener noreferrer"><i class="fas fa-external-link-alt" style="width:18px;"></i> <span data-en="Visit Dealer Website" data-ko="딜러 웹사이트 방문">Visit Dealer Website</span></a></div>` : ''}
+                    ${dealer.contact ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-phone" style="width:18px;color:#7a5c32;"></i> ${escapeHtml(dealer.contact)}</div>` : ''}
+                    ${dealer.email ? `<div style="font-size:0.88rem;color:#555;"><i class="fas fa-envelope" style="width:18px;color:#7a5c32;"></i> <a href="mailto:${escapeHtml(dealer.email)}" style="color:#333;">${escapeHtml(dealer.email)}</a></div>` : ''}
+                    ${dealer.website ? `<div style="font-size:0.88rem;"><a href="${escapeHtml(safeUrl(/^https?:\/\//i.test(String(dealer.website)) ? dealer.website : 'https://' + dealer.website))}" target="_blank" style="color:#7a5c32;font-weight:600;" rel="noopener noreferrer"><i class="fas fa-external-link-alt" style="width:18px;"></i> <span data-en="Visit Dealer Website" data-ko="딜러 웹사이트 방문">Visit Dealer Website</span></a></div>` : ''}
                 </div>
             </div>
         </section>` : ''}

@@ -423,7 +423,7 @@ async function loadAll() {
 function brandActionButtons(b, docId) {
     const viewBtn = `<button class="act-btn act-view" onclick="viewBrand('${docId}')">View</button>`;
     const pageBtn = (b.status === 'approved' && b.slug)
-        ? `<a class="act-btn" href="../brands/view.html?id=${b.slug}" target="_blank" style="text-decoration:none;background:#e0f2fe;color:#0369a1;" rel="noopener noreferrer">Page</a>`
+        ? `<a class="act-btn" href="../brands/view.html?id=${escapeHtml(b.slug)}" target="_blank" style="text-decoration:none;background:#e0f2fe;color:#0369a1;" rel="noopener noreferrer">Page</a>`   /* A-471: 이 한 줄만 날값이었다 */
         : '';
 
     if (b.status === 'pending') {
@@ -609,8 +609,8 @@ function openReasonModal(opts) {
             ? 'Required — describe the reason (max 200 chars)'
             : 'Optional — note for internal record (max 200 chars)';
         content.innerHTML = `
-            <h2>${opts.title}</h2>
-            ${opts.brandName ? `<p style="color:#6b6459;font-size:0.85rem;margin-bottom:16px;">${opts.brandName} → <strong>${opts.newStatus}</strong></p>` : ''}
+            <h2>${escapeHtml(opts.title)}</h2>
+            ${opts.brandName ? `<p style="color:#6b6459;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(opts.brandName)} → <strong>${escapeHtml(opts.newStatus)}</strong></p>` : ''}
             <div class="reason-modal-content">
                 <label for="reasonInput">Reason ${opts.required ? '<span style="color:#b91c1c;">*</span>' : '<span style="color:#6b6459;font-weight:400;">(optional)</span>'}</label>
                 <textarea id="reasonInput" maxlength="200" placeholder="${placeholderText}"></textarea>

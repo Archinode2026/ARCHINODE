@@ -20,6 +20,24 @@
     const subcategory = container.dataset.subcategory;
     if (!category) return;
 
+    /* ── A-471(2026-11-11): 이 파일은 브랜드가 입력한 값을 **원문 그대로**
+       innerHTML 에 꽂고 있었다 — `p.name` · `p.brandName` · `p.materials` ·
+       `p.slug`(href) · `p.imageUrl`(src) 다섯. 이 파일은 **공개 카테고리 69개
+       페이지**를 그린다. 제품명에 `"><img src=x onerror=...>` 를 넣고 승인만
+       받으면 손님 브라우저에서 돈다.
+       같은 자료를 그리는 사본이 다섯인데(products/view · brands/view ·
+       brand-portal · 여기 · auth/profile) **A-218 의 처방이 둘에만 안 왔다.**
+       brand-portal 의 escapeHtml · bpSafeUrl 과 같은 모양으로 맞춘다. */
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    /* 이스케이프만으로는 URL 을 막을 수 없다 — `javascript:` 에는 `&<>"'` 가
+       없어 escapeHtml 을 그대로 통과한다. href·src 에 넣기 전에 스킴을 본다. */
+    function safeUrl(u) { return (u && /^https?:\/\//i.test(String(u))) ? String(u) : ''; }
+
     // 기본 경로 계산 (페이지 깊이에 따라)
     function getBasePath() {
         const path = window.location.pathname;
@@ -63,15 +81,21 @@
 
             snap.forEach(doc => {
                 const p = doc.data();
+                // A-471: 꽂기 전에 전부 이스케이프. 주소는 스킴까지 본다.
+                const pSlug = escapeHtml(p.slug || '');
+                const pName = escapeHtml(p.name || '');
+                const pBrandName = escapeHtml(p.brandName || '');
+                const pMaterials = escapeHtml(p.materials || '');
+                const pImageUrl = escapeHtml(safeUrl(p.imageUrl));
                 html += `
-                <a href="${base}products/view.html?id=${p.slug || ''}" class="cp-card">
+                <a href="${base}products/view.html?id=${pSlug}" class="cp-card">
                     <div class="cp-thumb">
-                        ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
+                        ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                     </div>
                     <div class="cp-body">
-                        <div class="cp-brand">${p.brandName}</div>
-                        <div class="cp-name">${p.name}</div>
-                        ${p.materials ? `<div class="cp-mat">${p.materials}</div>` : ''}
+                        <div class="cp-brand">${pBrandName}</div>
+                        <div class="cp-name">${pName}</div>
+                        ${pMaterials ? `<div class="cp-mat">${pMaterials}</div>` : ''}
                     </div>
                 </a>`;
             });
