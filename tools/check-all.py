@@ -71,6 +71,8 @@ CHECKS = [
      'A-471 — 자료를 그리는 사본 6개가 브랜드 입력을 이스케이프 없이 innerHTML 에 꽂지 않는지. Playwright 불필요'),
     ('로딩 감시견',          'node', 'tools/test-loading-watchdog.js',
      'A-475 — window.auth 로 보면 멀쩡한 화면에서 거짓 실패를 띄운다(const 는 window 속성이 아니다) · 12화면이 싣는지'),
+    ('사이트맵 모순',        'py',   'tools/check-sitemap.py',
+     'A-476 — noindex 페이지·view.html 라우터가 섞였나 · 색인 가능한 페이지가 빠졌나 · 중복'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

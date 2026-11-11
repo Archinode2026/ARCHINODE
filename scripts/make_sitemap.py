@@ -12,6 +12,7 @@
 
 from __future__ import annotations
 import os
+import re
 import subprocess
 from pathlib import Path
 from datetime import datetime
@@ -70,14 +71,41 @@ def get_lastmod(path: Path) -> str:
     return datetime.fromtimestamp(path.stat().st_mtime).strftime("%Y-%m-%d")
 
 
+NOINDEX = re.compile(r'<meta\s+name="robots"\s+content="[^"]*noindex', re.I)
+
+
+def declares_noindex(path: Path) -> bool:
+    """A-476: `noindex` 를 선언한 페이지는 사이트맵에 넣지 않는다.
+
+    사이트맵은 「색인해라」, 페이지는 「하지 마라」 — 모순이고 구글 서치콘솔이
+    오류로 잡는다(Submitted URL marked 'noindex'). 실제로 2026-11-11 재생성에서
+    `products/bim-download.html`(noindex, nofollow)이 들어갔다.
+    """
+    try:
+        return bool(NOINDEX.search(path.read_text(encoding="utf-8", errors="replace")))
+    except OSError:
+        return False
+
+
 def main():
     urls: list[dict] = []
+    skipped_noindex: list[str] = []
+    skipped_router: list[str] = []
     for p in sorted(ROOT.rglob("*.html")):
         rel = p.relative_to(ROOT)
         # exclude directory
         if any(part in EXCLUDE_DIRS for part in rel.parts):
             continue
         if rel.name in EXCLUDE_FILES:
+            continue
+        # A-476: 라우터(`view.html`)는 **어느 폴더에 있든** 제외한다.
+        # 전에는 priority_for 의 **한 분기에만** 그 규칙이 있어서
+        # `products/view.html` 만 사이트맵에 들어갔다(빈 껍데기가 색인된다).
+        if rel.name == "view.html":
+            skipped_router.append(str(rel).replace(os.sep, "/"))
+            continue
+        if declares_noindex(p):
+            skipped_noindex.append(str(rel).replace(os.sep, "/"))
             continue
         pr, cf = priority_for(rel)
         if pr is None:
@@ -88,6 +116,11 @@ def main():
             "changefreq": cf,
             "priority": pr,
         })
+
+    if skipped_router:
+        print("  제외(라우터): %s" % ", ".join(sorted(skipped_router)))
+    if skipped_noindex:
+        print("  제외(noindex): %s" % ", ".join(sorted(skipped_noindex)))
 
     # 정렬: priority 내림차순, loc 알파벳 오름차순
     urls.sort(key=lambda u: (-u["priority"], u["loc"]))
