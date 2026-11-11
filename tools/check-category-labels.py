@@ -40,7 +40,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 그래서 지금 어긋나는 23개는 **통과시키되 보류로 알린다** — 그러면
 # **새로 생기는 어긋남만** 실패로 잡힌다. 결정이 나면 한쪽을 고치고
 # 이 목록에서 지운다.
-PENDING_PORTAL = ['acoustic-solutions', 'art-wall-decor', 'bathroom-taps', 'countertops', 'decorative-panels', 'desks-workstations', 'fire-pits-heaters', 'meeting-conference', 'metal-finishes', 'office-chairs', 'office-storage', 'outdoor-kitchens', 'planters-pots', 'pools-whirlpools', 'spa-hot-tubs', 'tables-desks', 'tableware', 'vases-planters', 'wall-lights', 'wallcoverings', 'washbasins-vanities', 'windows-doors', 'wood-flooring']
+PENDING_PORTAL = []  # A-409 해결: 공개·포털 소분류 이름 일치 (2026-11-11)
 
 
 
