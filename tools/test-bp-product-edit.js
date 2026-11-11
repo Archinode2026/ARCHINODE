@@ -130,6 +130,69 @@ function run() {
   ok(els.prodImagePreview.style.display === 'none', '사진 없으면 미리보기가 닫힌다');
 }
 
+
+// ── ④ A-472: 제출 핸들러의 **구조**를 본다 (브론즈 29차 ①②③) ──
+//
+// 결함의 모양: 핸들러가 `editing` 과 `name` 만 미리 읽고 **나머지 칸은 업로드
+// await 뒤에** 읽었다. 그 사이 사람이 폼을 갈아타면 업로드가 끝난 뒤 **먼저
+// 고르던 문서**에 지금 화면의 값이 들어간다(제품 A 가 B 의 내용으로 덮어써졌다).
+// 그래서 불변식은 이것이다 — **첫 await 뒤에는 입력칸을 읽지 않는다.**
+{
+  const i = html.indexOf("document.getElementById('submitProduct').addEventListener");
+  ok(i >= 0, '제출 핸들러를 찾는다');
+  // 핸들러 끝: 다음 최상위 `});` 까지
+  const end = html.indexOf('\n});', i);
+  // ★ 주석을 **지우고** 본다. 내 주석에도 「업로드 await 가 끝난 뒤에」처럼 `await `
+  //   라는 글자가 들어 있어서, 안 지우면 첫 await 자리를 주석에서 잡는다
+  //   (처음 이 시험을 쓸 때 그래서 15건이 거짓으로 떨어졌다 — 코드는 맞았다).
+  const h = html.slice(i, end > 0 ? end : i + 14000)
+                .replace(/\/\*[\s\S]*?\*\//g, '')
+                .replace(/^[ \t]*\/\/.*$/gm, '');
+
+  const firstAwait = h.search(/\bawait\s+[A-Za-z_$(]/);
+  ok(firstAwait > 0, '핸들러 안에 await 가 있다');
+  const after = h.slice(firstAwait);
+  const reads = [...after.matchAll(/getElementById\('(prod[A-Za-z0-9]*)'\)\s*\.\s*(value|files)/g)]
+                  .map(m => m[1] + '.' + m[2]);
+  ok(reads.length === 0,
+     '첫 await 뒤에 입력칸을 다시 읽지 않는다 (A-472 ①)',
+     reads.length ? '읽는 칸: ' + [...new Set(reads)].join(', ') : '');
+
+  // 스냅샷이 await 앞에 있다
+  const before = h.slice(0, firstAwait);
+  ['prodName', 'prodCollection', 'prodDesc', 'prodCategory', 'prodSubcategory', 'prodMaterials',
+   'prodDimensions', 'prodDesigner', 'prodPrice', 'prodMoq', 'prodLeadTime', 'prodSupplyType']
+    .forEach(id => ok(before.includes("getElementById('" + id + "')"),
+                      '칸을 await 앞에서 읽는다: ' + id));
+
+  // 제출 중 잠금 (A-472 ①)
+  ok(/bpSubmitting\s*=\s*true/.test(before), '제출 시작에 bpSubmitting 을 켠다');
+  ok(/cancelProduct'\)\.disabled\s*=\s*true/.test(before), '제출 중 「취소」도 잠근다');
+  ok(/if\s*\(bpSubmitting\)\s*return/.test(html), '「취소」 핸들러가 제출 중이면 아무것도 안 한다');
+  ok(/if\s*\(bpSubmitting\)\s*\{/.test(html), '폼 열기가 제출 중이면 거절한다');
+
+  // 영구 정지 방지 (A-472 ③)
+  ok(/\}\s*finally\s*\{\s*(\/\*[\s\S]*?\*\/\s*)?restoreBtn\(\);/.test(h),
+     'finally 에서 restoreBtn() 을 반드시 부른다 (A-472 ③)');
+  const tryAt = h.indexOf('\n  try {');
+  const restoreAt = h.indexOf('const restoreBtn');
+  ok(restoreAt > 0 && tryAt > 0 && restoreAt < tryAt,
+     'restoreBtn 선언이 try 블록 **밖**이다 (const 는 블록 스코프라 finally 에서 안 보인다)');
+
+  // 라벨 복원이 한 군데서만 (A-472 ②)
+  const labelPatches = [...h.matchAll(/setLangText\(btn,\s*"Submit for Review"/g)].length;
+  ok(labelPatches === 0,
+     '핸들러 안에서 「검수 요청」 글자를 직접 박는 자리가 없다 (restoreBtn 이 모드를 보고 고른다)',
+     labelPatches ? labelPatches + '곳 남음' : '');
+
+  // 수정 payload 가 공개 주소를 지킨다
+  const upd = h.slice(h.indexOf('const updates'), h.indexOf('const updates') + 900);
+  ok(!/\bslug\s*:/.test(upd), '수정 payload 에 slug 이 없다 (공개 주소 보존)');
+  ok(!/\bbrandId\s*:/.test(upd) && !/\bcreatedAt\s*:/.test(upd),
+     '수정 payload 에 brandId·createdAt 이 없다 (규칙이 보호한다)');
+  ok(/status:\s*'pending'/.test(upd), '수정 payload 가 status 를 pending 으로 둔다');
+}
+
 console.log('포털 제품 수정 — 시험 ' + n + '개, 실패 ' + fail + '개');
 if (fail) process.exit(1);
 console.log('통과');

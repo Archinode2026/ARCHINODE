@@ -111,8 +111,11 @@
      일치해야 한다 — `tools/test-basepath.js` 가 두 사본을 맞춰 본다.
      ──────────────────────────────────────────────────────────────────────── */
   function getBasePath() {
-    var segs = window.location.pathname.split('/');
-    var depth = Math.max(0, segs.length - 2);
+    /* A-473(브론즈 29차 ⑥⑦): 조각을 그냥 세면 **겹슬래시에서 한 단 더** 올라갔다
+       (`//products/view.html` · `/products//view.html` → `../../`).
+       파일 이름을 떼어 **폴더 부분만** 보고, 빈 조각을 뺀 개수를 센다. */
+    var dir = window.location.pathname.replace(/[^/]*$/, '');
+    var depth = dir.split('/').filter(function (x) { return !!x; }).length;
     var prefix = '';
     for (var i = 0; i < depth; i++) prefix += '../';
     return prefix;

@@ -43,7 +43,17 @@ const TABLE = [
   ['/categories/bathroom.html', '../'],
   ['/categories/bathroom/bathroom-taps.html', '../../'],
   ['/categories/bathroom/', '../../'],
-  ['/products/', '../']
+  ['/products/', '../'],
+  // ── 브론즈 29차 ⑥⑦ 가 찾은 구멍. 내 첫 표는 깊이 2 까지만 봤고 겹슬래시를 안 봤다.
+  //    그래서 두 사본이 깊이 3 에서 갈린 것과 겹슬래시 결함을 둘 다 못 잡았다.
+  ['/a/b/c/d/e.html', '../../../../'],
+  ['/a/b/c/', '../../../'],
+  ['/categories/a/b/c.html', '../../../'],
+  ['//products/view.html', '../'],
+  ['/products//view.html', '../'],
+  ['/trend-report/view.html', '../'],
+  ['/카테고리/제품1.html', '../'],
+  ['/my%20folder/a%20b.html', '../']
 ];
 
 const impls = [

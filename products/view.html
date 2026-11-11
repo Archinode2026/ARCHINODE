@@ -414,6 +414,10 @@ function archinodeWithTimeout(promise, ms) {
 }
 
 // XSS 방어: 사용자(브랜드)가 입력한 텍스트를 화면에 넣기 전 이스케이프 (A-003)
+/* A-473(브론즈 29차 ⑨): `javascript:` 에는 `&<>"'` 가 없어 escapeHtml 을 통과한다.
+   href·src 에 넣기 전에 스킴을 본다 (brand-portal 의 bpSafeUrl 과 같은 방식). */
+function safeUrl(u) { return (u && /^https?:\/\//i.test(String(u))) ? String(u) : ''; }
+
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -537,11 +541,14 @@ function renderProduct(p, related) {
     const pMoq = escapeHtml(p.moq || '');
     const pLeadTime = escapeHtml(p.leadTime || '');
     const pDescription = escapeHtml(p.description || '');
-    const pImageUrl = escapeHtml(p.imageUrl || '');
+    const pImageUrl = escapeHtml(safeUrl(p.imageUrl));   // A-473 — 스킴까지
     const pCatalogPdf = escapeHtml(p.catalogPdf || '');
     const pBimFile = escapeHtml(p.bimFile || '');
     const pModel3d = escapeHtml(p.model3d || '');
-    const pImages = (p.images || []).map(img => escapeHtml(img));
+    /* A-473: 전에는 `escapeHtml` 만 걸고 **빈 원소를 안 걸렀다**. `images` 에
+       빈 문자열이 섞이면 `src=""` 가 찍혀 브라우저가 **페이지 자신을 사진으로**
+       불러왔다. 스킴까지 보고 쓸 수 있는 것만 남긴다. */
+    const pImages = (p.images || []).map(img => escapeHtml(safeUrl(img))).filter(Boolean);
     /* ── A-407(2026-11-09): 카테고리·하위 카테고리 이름이 영어로 고정돼 있었다 ──
        전에는 `catLabel = p.category`(=「Furniture」), `subLabel = slug.replace(/-/g,' ')`
        (=「chairs stools」)를 그대로 찍었다. 한국어 화면에서 빵부스러기와 카테고리
@@ -721,7 +728,7 @@ function renderProduct(p, related) {
                 <div class="pp-main-image">
                     ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}" id="mainImg">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                 </div>
-                ${pImages.length > 0 ? `
+                ${(pImageUrl && pImages.length > 0) ? `
                 <div class="pp-thumbs">
                     ${pImageUrl ? `<div class="pp-thumb active" onclick="changeImg('${pImageUrl}',this)"><img loading="lazy" src="${pImageUrl}" alt="Main"></div>` : ''}
                     ${pImages.map(img => `<div class="pp-thumb" onclick="changeImg('${img}',this)"><img loading="lazy" src="${img}" alt="${pName}"></div>`).join('')}
@@ -761,9 +768,13 @@ function renderProduct(p, related) {
 }
 
 function changeImg(url, el) {
-    document.getElementById('mainImg').src = url;
+    /* A-473(브론즈 29차 ⑨): 대표 사진이 없으면 그 자리에는 「사진 준비 중」 조각만
+       있고 `#mainImg` 는 **아예 없다**. 전에는 `null.src` 로 TypeError 가 났다. */
+    const main = document.getElementById('mainImg');
+    if (!main) return;
+    main.src = url;
     document.querySelectorAll('.pp-thumb').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
+    if (el) el.classList.add('active');
 }
 
 function showError(title, msg) {

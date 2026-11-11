@@ -40,11 +40,16 @@
 
     // 기본 경로 계산 (페이지 깊이에 따라)
     function getBasePath() {
-        const path = window.location.pathname;
-        const depth = (path.match(/\//g) || []).length - 1;
-        if (depth >= 2) return '../../';
-        if (depth >= 1) return '../';
-        return '';
+        /* A-473(브론즈 29차 ⑦): 여기엔 A-468 이 안 왔다. 전에는 **깊이 2 에서
+           잘랐고**(`depth >= 2 → '../../'`) 겹슬래시도 못 봤다. 지금 가장 깊은
+           페이지가 깊이 2(`categories/<대>/<소>.html`)라 화면에 틀린 값은
+           없었지만, 깊이 3 페이지가 생기는 순간 이 파일이 만드는
+           `${base}products/view.html` 과 `${base}list-your-brand.html` 이
+           전부 깨진다. search.js 와 **같은 식**으로 맞춘다 —
+           tools/test-basepath.js 가 두 사본을 맞춰 본다. */
+        const dir = window.location.pathname.replace(/[^/]*$/, '');
+        const depth = dir.split('/').filter(x => !!x).length;
+        return '../'.repeat(depth);
     }
     const base = getBasePath();
 

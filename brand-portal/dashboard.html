@@ -1572,6 +1572,9 @@ window.bpApplyGate = function() {
    등록 폼을 그대로 다시 쓴다 — 폼이 둘로 갈리면 하나만 고쳐진다(이 저장소에서
    반복된 실패: A-458 · A-460 · A-466). */
 let bpEditingProductId = null;
+/* A-472: 제출이 도는 동안 켜진다. 저장 단추만 잠그면 **취소·수정은 그대로 눌려서**
+   업로드가 끝난 뒤 엉뚱한 문서에 쓰는 길이 났다(브론즈 29차 ①). */
+let bpSubmitting = false;
 
 // 폼 비우기 — 전에는 제출 뒤 **거래조건·스펙 파일 6칸을 안 비웠다**(다음 제품에 묻어
 // 갔다). 비우는 자리를 한 군데로 모아 둘 다 고친다.
@@ -1616,8 +1619,15 @@ function bpFillProductForm(p) {
 }
 
 // 폼 열기 — product 가 없으면 등록, 있으면 수정
-function bpOpenProductForm(product) {
-    if (!window.bpCanSubmit()) { window.bpApplyGate(); return; }
+async function bpOpenProductForm(product) {
+    /* A-472: 저장이 도는 중에는 폼을 갈아타지 못한다. 갈아타면 업로드가 끝난 뒤
+       **먼저 고르던 문서**에 지금 화면의 값이 들어간다. */
+    if (bpSubmitting) {
+        prodMsg(document.documentElement.lang !== 'en'
+            ? '저장이 끝날 때까지 기다려 주세요.' : 'Please wait until the save finishes.', true);
+        return;
+    }
+    if (!window.bpCanSubmit()) { window.bpApplyGate(); bpEditingProductId = null; return; }
     bpFormUid = (auth.currentUser && auth.currentUser.uid) || null;   // A-213 — 이 폼의 주인
     window.bpFormUid = bpFormUid;
     bpEditingProductId = (product && product.__id) || null;
@@ -1633,18 +1643,37 @@ function bpOpenProductForm(product) {
     /* 승인돼서 **지금 공개 중인** 제품을 고치면 다시 심사 대기로 내려간다 —
        그 사이 공개 목록에서 빠진다. 누르고 나서 알게 되면 안 되니 미리 말한다. */
     const warn = document.getElementById('prodEditWarn');
-    if (product && product.status === 'approved') {
-        warn.style.display = 'block';
-        window.setLangText && window.setLangText(warn.querySelector('span'),
-            'This product is live. Saving sends it back for review, so it leaves the public listing until it is approved again.',
-            '이 제품은 지금 공개 중입니다. 저장하면 다시 심사 대기로 내려가고, 다시 승인될 때까지 공개 목록에서 빠집니다.');
-    } else {
-        warn.style.display = 'none';
+    function setWarn(on) {
+        if (on) {
+            warn.style.display = 'block';
+            window.setLangText && window.setLangText(warn.querySelector('span'),
+                'This product is live. Saving sends it back for review, so it leaves the public listing until it is approved again.',
+                '이 제품은 지금 공개 중입니다. 저장하면 다시 심사 대기로 내려가고, 다시 승인될 때까지 공개 목록에서 빠집니다.');
+        } else {
+            warn.style.display = 'none';
+        }
     }
+    // 우선 목록 값으로 정하고 **폼은 바로 연다** — 사람이 기다리지 않게.
+    setWarn(!!product && product.status === 'approved');
 
     document.getElementById('productForm').style.display = 'block';
     document.getElementById('addProductBtn').style.display = 'none';
     document.getElementById('productForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    /* ★ A-472(브론즈 29차 ④): 상태를 **목록 사본**(bpProductRows)에서만 읽었는데
+       그건 마지막 loadProducts() 시점이다. 목록을 그린 뒤 어드민이 승인하면 카드는
+       「심사 대기중」이고 경고도 안 떠서, 저장하는 순간 공개 중이던 제품이 목록에서
+       빠진다. 저장할 때는 문서를 다시 읽는데(그건 맞게 했다) **경고 판정만 묵은
+       자료를 썼다.** 폼을 연 뒤 한 번 더 읽어 바로잡는다. 못 읽으면 목록 값이 남는다. */
+    if (product && product.__id) {
+        try {
+            const fresh = await db.collection('products').doc(product.__id).get();
+            // 그 사이 사람이 폼을 닫거나 다른 제품으로 갈아탔으면 건드리지 않는다
+            if (fresh.exists && bpEditingProductId === product.__id) {
+                setWarn((fresh.data() || {}).status === 'approved');
+            }
+        } catch (e) { /* 못 읽으면 목록 값을 쓴다 */ }
+    }
 }
 
 // 목록의 「수정」 — 인라인 onclick 에 값을 끼우지 않는다(A-026 에서 겪은 함정:
@@ -1666,6 +1695,7 @@ document.getElementById('addProductBtn').addEventListener('click', () => {
     bpOpenProductForm(null);
 });
 document.getElementById('cancelProduct').addEventListener('click', () => {
+    if (bpSubmitting) return;                       // A-472
     bpEditingProductId = null;
     document.getElementById('productForm').style.display = 'none';
     document.getElementById('addProductBtn').style.display = 'inline-block';
@@ -1696,6 +1726,18 @@ function prodMsg(text, isErr) {
     if (!el) { if (text) alert(text); return; }       // 자리가 없으면 옛 방식으로
     el.textContent = text || '';
     el.style.color = isErr ? '#991b1b' : '#15803d';
+    /* ★ A-472(브론즈 29차 ⑤): `#prodFormMsg` 는 `#productForm` **안**에 있어서
+       폼이 닫혀 있으면 아무도 못 본다. 「수정」을 눌렀는데 그 제품이 목록에 없을 때
+       (다른 탭에서 지워졌을 때) 안내가 숨은 상자에 들어가 **화면 변화가 0** 이었다.
+       폼이 닫혀 있으면 폼 밖의 자리에도 같이 적는다. */
+    const outside = document.getElementById('prodGateMsg');
+    const formOpen = document.getElementById('productForm').style.display !== 'none';
+    if (outside && !formOpen) {
+        outside.textContent = text || '';
+        outside.style.color = isErr ? '#991b1b' : '#15803d';
+    } else if (outside && text === '') {
+        outside.textContent = '';
+    }
 }
 
 // 제품 제출
@@ -1704,68 +1746,94 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     // R-061: 이미지 업로드보다 **먼저** 본다. 폼을 열어 둔 사이에 관리자가 정지시켰을 수 있고,
     // 뒤에서 막으면 스토리지에 파일만 올라간 뒤 permission-denied 로 끝난다.
     if (!window.bpCanSubmit()) { prodMsg(window.bpGateMessage(), true); window.bpApplyGate(); return; }
-    const name = document.getElementById('prodName').value.trim();
+    /* ★★ A-472(2026-11-11, 브론즈 29차 ①): 전에는 `editing` 과 `name` 만 여기서
+       읽고 **나머지 칸은 업로드 await 가 끝난 뒤에** 읽었다. 그 사이에 사람이
+       폼을 바꿀 수 있으므로 이런 길이 났다 —
+         ㄱ. 제품 A 의 「수정」 → 큰 사진을 고르고 저장 (업로드가 수 초 돈다)
+         ㄴ. 업로드 중 「취소」는 그대로 눌린다(잠근 것은 저장 단추 하나뿐이었다)
+         ㄷ. 「제품 추가」 → 새 제품 B 를 타이핑
+         ㄹ. 업로드가 끝나면 핸들러가 **지금 화면의 값(B)** 을 읽어 **A 의 문서**에 쓴다
+       결과: A 가 B 의 내용으로 덮어써지고(이름만 A 의 옛 이름) B 는 만들어지지 않는다.
+       고치는 방법 둘 다 쓴다 — ① 칸을 **전부 지금 읽어** 스냅샷으로 들고 간다.
+       ② 제출이 도는 동안 **취소·수정 단추도 잠근다**(bpSubmitting). */
+    const form = {
+        name:        document.getElementById('prodName').value.trim(),
+        collection:  document.getElementById('prodCollection').value.trim(),
+        description: document.getElementById('prodDesc').value.trim(),
+        category:    document.getElementById('prodCategory').value,
+        subcategory: document.getElementById('prodSubcategory').value,
+        materials:   document.getElementById('prodMaterials').value.trim(),
+        dimensions:  document.getElementById('prodDimensions').value.trim(),
+        designer:    document.getElementById('prodDesigner').value.trim(),
+        priceRange:  document.getElementById('prodPrice').value,
+        moq:         document.getElementById('prodMoq').value.trim(),
+        leadTime:    document.getElementById('prodLeadTime').value.trim(),
+        supplyType:  document.getElementById('prodSupplyType').value
+    };
+    /* 파일 입력도 **지금** 들고 간다. 업로드는 여러 번 await 를 거치는데, 그 사이에
+       사람이 다른 파일을 고르면 뒤쪽 업로드가 새 파일을 집어 간다. File 객체를
+       미리 잡아 두면 그 길이 막힌다. */
+    const files = {
+        image:   (document.getElementById('prodImage').files || [])[0] || null,
+        catalog: (document.getElementById('prodCatalogFile').files || [])[0] || null,
+        bim:     (document.getElementById('prodBimFile').files || [])[0] || null,
+        model3d: (document.getElementById('prodModel3dFile').files || [])[0] || null
+    };
+    const name = form.name;
     if (!name) { prodMsg(document.documentElement.lang !== 'en' ? '제품명을 입력해 주세요.' : 'Product name is required', true); return; }
+    if (!form.category || !form.subcategory) {
+        prodMsg(document.documentElement.lang !== 'en'
+            ? '카테고리와 서브카테고리를 모두 골라 주세요.' : 'Category and subcategory are required', true);
+        return;   // A-472: 업로드보다 **먼저** 본다 — 전에는 사진을 올린 뒤에 막아 쓰레기 파일이 남았다
+    }
 
     const btn = document.getElementById('submitProduct');
     /* A-467: 되살릴 라벨이 모드마다 다르다. 전에는 「검수 요청」 하나만 되살려서,
        수정 중에 막히면 단추가 엉뚱한 글자로 남는다. 한 군데서 고른다. */
     const editing = bpEditingProductId;
     const restoreBtn = () => {
+        bpSubmitting = false;                       // A-472 — 잠금 해제는 여기 한 군데서만
+        document.getElementById('cancelProduct').disabled = false;
         btn.disabled = false;
         window.setLangText && window.setLangText(btn,
             editing ? "Save & Resubmit" : "Submit for Review",
             editing ? "저장하고 다시 검수 요청" : "검수 요청");
     };
+    bpSubmitting = true;                            // A-472 — 취소·수정 단추까지 잠근다
+    document.getElementById('cancelProduct').disabled = true;
     btn.disabled = true;
     window.setLangText && window.setLangText(btn, "Uploading...", "올리는 중...");
 
-    async function uploadIfPresent(inputId, folder) {
-        const file = document.getElementById(inputId).files[0];
+  /* ★ A-472(브론즈 29차 ③): 업로드·쓰기가 거부되면 reject 가 아무 데서도 안 잡혀
+     `restoreBtn()` 에 도달하지 못했다 — 단추가 「올리는 중...」으로 **영구 정지**하고
+     안내도 비어 있었다. 새로고침 말고 벗어날 길이 없었다. 여기서부터 감싸고
+     finally 에서 반드시 되살린다. `restoreBtn` 은 `const` 라 try 블록 안에서
+     선언하면 finally 에서 안 보인다 — 그래서 선언을 try **밖**에 둔다. */
+  try {
+
+    /* A-472: 입력칸 id 가 아니라 **미리 잡아 둔 File 객체**를 받는다. */
+    async function uploadFile(file, folder) {
         if (!file) return '';
         const ref = storage.ref(`${folder}/${currentUser.uid}/${Date.now()}_${file.name}`);
         await ref.put(file);
         return await ref.getDownloadURL();
     }
 
-    let imageUrl = '';
-    const imageFile = document.getElementById('prodImage').files[0];
-    if (imageFile) {
-        const ref = storage.ref(`products/${currentUser.uid}/${Date.now()}_${imageFile.name}`);
-        await ref.put(imageFile);
-        imageUrl = await ref.getDownloadURL();
-    }
-
-    const category = document.getElementById('prodCategory').value;
-    const subcategory = document.getElementById('prodSubcategory').value;
-    if (!category || !subcategory) { prodMsg(document.documentElement.lang !== 'en' ? '카테고리와 서브카테고리를 모두 골라 주세요.' : 'Category and subcategory are required', true); btn.disabled = false; window.setLangText && window.setLangText(btn, "Submit for Review", "검수 요청"); return; }
+    const imageUrl = await uploadFile(files.image, 'products');
 
     // A-213: 업로드 전에 한 번 — 파일을 올리고 나서 멈추면 쓰레기 파일이 남는다
     let bpId = bpIdentity(bpFormUid);
     if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); restoreBtn(); return; }
 
-    const catalogPdf = await uploadIfPresent('prodCatalogFile', 'products-specs');
-    const bimFile = await uploadIfPresent('prodBimFile', 'products-specs');
-    const model3d = await uploadIfPresent('prodModel3dFile', 'products-specs');
+    const catalogPdf = await uploadFile(files.catalog, 'products-specs');
+    const bimFile = await uploadFile(files.bim, 'products-specs');
+    const model3d = await uploadFile(files.model3d, 'products-specs');
 
     // A-213: 업로드는 await 를 여러 번 거친다. 그 사이에 계정이 바뀌었을 수 있으므로 다시 확인한다.
     bpId = bpIdentity(bpFormUid);
     if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); restoreBtn(); return; }
 
-    const fields = {
-        name: name,
-        collection: document.getElementById('prodCollection').value.trim(),
-        description: document.getElementById('prodDesc').value.trim(),
-        category: category,
-        subcategory: subcategory,
-        materials: document.getElementById('prodMaterials').value.trim(),
-        dimensions: document.getElementById('prodDimensions').value.trim(),
-        designer: document.getElementById('prodDesigner').value.trim(),
-        priceRange: document.getElementById('prodPrice').value,
-        moq: document.getElementById('prodMoq').value.trim(),
-        leadTime: document.getElementById('prodLeadTime').value.trim(),
-        supplyType: document.getElementById('prodSupplyType').value
-    };
+    const fields = form;   // A-472 — 핸들러 맨 앞에서 뜬 스냅샷. 업로드 뒤에 다시 읽지 않는다.
 
     if (editing) {
         /* ── A-467 수정 ────────────────────────────────────────────────────────
@@ -1825,31 +1893,20 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
         return;
     }
 
-    await db.collection('products').add({
+    // A-472: 등록 쪽도 **스냅샷**을 쓴다 — 업로드 뒤에 칸을 다시 읽지 않는다.
+    await db.collection('products').add(Object.assign({
         brandId: bpId.uid,            // A-213 — brandId·brandName·brandSlug 를 한 객체에서 함께
         brandName: bpId.brandName,
         brandSlug: bpId.brandSlug,
-        name: name,
-        slug: generateSlug(name),
-        collection: document.getElementById('prodCollection').value.trim(),
-        description: document.getElementById('prodDesc').value.trim(),
-        category: category,
-        subcategory: subcategory,
-        materials: document.getElementById('prodMaterials').value.trim(),
-        dimensions: document.getElementById('prodDimensions').value.trim(),
-        designer: document.getElementById('prodDesigner').value.trim(),
-        priceRange: document.getElementById('prodPrice').value,
+        slug: generateSlug(form.name),
         imageUrl: imageUrl,
         images: [],
         catalogPdf: catalogPdf,
         bimFile: bimFile,
         model3d: model3d,
-        moq: document.getElementById('prodMoq').value.trim(),
-        leadTime: document.getElementById('prodLeadTime').value.trim(),
-        supplyType: document.getElementById('prodSupplyType').value,
         status: 'pending',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    }, form));
 
     restoreBtn();
     document.getElementById('productForm').style.display = 'none';
@@ -1860,6 +1917,15 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
 
     loadProducts();
     loadStats();   // R-027: 목록만 다시 읽고 위쪽 카드 숫자는 그대로여서, 방금 올린 제품이 카드에 안 잡혔다
+  } catch (err) {
+    console.error('submitProduct failed:', err);
+    prodMsg(document.documentElement.lang !== 'en'
+        ? '저장하지 못했습니다. 잠시 후 다시 시도해 주세요. 계속 실패하면 관리자에게 알려 주세요.'
+        : 'Could not save. Please try again; tell the administrator if it keeps failing.', true);
+  } finally {
+    /* 성공 경로에서도 한 번 더 불린다 — restoreBtn 은 멱등하다(잠금 해제·라벨 복원뿐). */
+    restoreBtn();
+  }
 });
 
 // ── 제품 목록 로드 ──
