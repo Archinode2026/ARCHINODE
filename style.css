@@ -305,10 +305,10 @@ body .topbar .lang-switch-btn:hover {
   /* A-353(2026-11-06): A-286 은 햄버거만 44px 로 올렸고 **검색 돋보기는 빼놓았다**.
      1133px 에서 14x17px 로 실측됐다(브론즈 11차). 같은 줄에 나란히 있는 단추인데
      하나만 손가락 기준(Apple HIG 44px)을 지키고 있었다. */
-  .search-toggle {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 44px; min-height: 44px;
-  }
+  /* A-460(2026-11-11): 이 규칙은 아래 파일 끝으로 옮겼다. 손가락 기준은 폭과 무관한데
+     `@media (max-width: 1100px)` 안에 있어서 **데스크톱에서는 14x16px** 이었다 —
+     A-353 이 「1133px 에서 14x17px 로 실측됐다」고 적어 놓고 고침은 1100px 이하에만
+     걸어 둔 것이다. A-446 과 같은 자리. */
   /* 햄버거를 '열었을 때' 의 모양도 같이 올라와야 한다. 이게 768px 에 남아 있으면
      769~1100px 에서 메뉴를 열었을 때 패널이 아니라 맨 플렉스 줄로 튀어나온다. */
   .main-nav.active {
@@ -3785,3 +3785,17 @@ body .search-overlay {
   justify-content: flex-start;
 }
 body .search-overlay > .search-results { width: 100%; }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   A-460(2026-11-11): 검색 돋보기의 손가락 영역 — **폭과 무관하다**
+
+   A-353 이 `min-width/height: 44px` 을 넣었는데 `@media (max-width: 1100px)` 안이라
+   1100px 을 넘는 화면에서는 안 걸렸다. 실측(브론즈 28차 → 내가 재확인):
+     360 / 390 / 768px → 44x44        1280px → **14x16**
+   마우스 쓰는 화면이라도 WCAG 2.2 Target Size(Minimum)는 24x24 CSS px 이고,
+   같은 줄의 햄버거·언어 스위처는 이미 44px 이다. 폭 게이트를 걷어낸다.
+   ─────────────────────────────────────────────────────────────────────────── */
+body .search-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px;
+}

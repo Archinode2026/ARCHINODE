@@ -122,6 +122,8 @@ def rules(src):
 WIDTH_GATE_FORBIDDEN = [
     ('style.css', 'body .scroll-top', 'bottom',
      'Netlify 배지는 폭과 무관하게 오른쪽 아래에 앉는다 (A-446)'),
+    ('style.css', 'body .search-toggle', 'min-height',
+     '손가락·포인터 최소 크기는 화면 폭과 무관하다 (A-460)'),
 ]
 
 
