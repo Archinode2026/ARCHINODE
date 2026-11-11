@@ -54,6 +54,10 @@ JS_URL = 'javascript:window.__xss.push(4)'
 ALLOW = ['javascript:void(0)']          # 페이지 자신의 마크업 (사용자 값 아님)
 
 PAGES = [
+    # A-471(2026-11-11): 이 목록에 **카테고리 하위 페이지가 없었다.** 거기를 그리는
+    # `category-products.js` 가 브랜드 입력을 날것으로 꽂고 있었는데(공개 69개 페이지)
+    # 이 검사의 대상이 아니라 잡힐 길이 없었다. 대표로 한 장을 넣는다.
+    ('categories/furniture/sofas-armchairs.html', False),
     ('brands.html', False), ('brands/view.html?brand=s', False),
     ('products/view.html?product=s', False), ('magazine/view.html?slug=s', False),
     ('index.html', False), ('categories.html', False), ('magazine.html', False),
