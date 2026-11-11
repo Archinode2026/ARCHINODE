@@ -495,7 +495,15 @@ body .topbar .lang-switch-btn:hover {
 
      이 파일의 관례대로 `body ` 접두로 특정도를 올려 순서와 무관하게 이기게 한다
      (A-366·A-377 이 `body .header .container` 로 같은 일을 했다). */
-body .scroll-top { bottom: 84px; }
+body .scroll-top {
+  bottom: 84px;
+  /* A-461(2026-11-11): 전이 속성도 여기서 못 박는다. `index.html` **한 곳만** 자기
+     `<style>` 안에 `.scroll-top` 사본을 들고 있고(712행), 페이지 안 스타일은 `style.css`
+     를 이긴다 — 그래서 style.css 쪽만 좁혔더니 홈에서는 여전히 `transition: all` 이었다.
+     `body ` 접두로 특정도를 올리면 순서·사본과 무관하게 이긴다(A-366·A-377·A-411·A-446
+     과 같은 처방). `background` 는 호버를 위해 남긴다. */
+  transition: opacity 0.3s, visibility 0.3s, background 0.3s;
+}
 
 /* ───────────────────────────────────────────────────────────────────────────
    A-408(2026-11-09): 감기는 inline 링크에는 `::after` 가 반쪽만 덮는다
@@ -872,7 +880,11 @@ html[lang="ko"] [data-lang-only="en"] { display: none !important; }
   z-index: 900;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s;
+  /* A-461(2026-11-11): `transition: all` 이면 **`bottom` 까지 애니메이션된다.** 쿠키 배너가
+     뜨는 동안 `--cc-h` 가 정해지면서 단추가 `bottom 84px → 250px` 로 **미끄러져 올라간다**
+     (실측: 로드 직후 161.7px → 244.9px → 250px). 들어오고 나가는 것만 부드럽게 하고
+     위치는 즉시 잡게 속성을 좁힌다. `background` 는 호버를 위해 남긴다. */
+  transition: opacity 0.3s, visibility 0.3s, background 0.3s;
 }
 .scroll-top.visible { opacity: 1; visibility: visible; }
 .scroll-top:hover { background: var(--gray-800); }
