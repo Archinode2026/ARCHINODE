@@ -526,7 +526,7 @@ async function loadRegisteredBrands() {
 
             html += `
             <a href="${escapeHtml(link)}" class="reg-brand-card fade-in">
-                <span class="reg-badge">Partner</span>
+                <span class="reg-badge" data-en="Partner" data-ko="파트너">Partner</span>
                 <div class="reg-logo">${logoHtml}</div>
                 <div class="reg-name">${escapeHtml(b.brandName)}</div>
                 <div class="reg-meta">${escapeHtml(b.country || '')}${catText(b.category) ? ` <span data-en="\u00b7 ${escapeHtml(catText(b.category))}" data-ko="\u00b7 ${escapeHtml(catTextKo(b.category))}">\u00b7 ${escapeHtml(catText(b.category))}</span>` : ''}</div>
@@ -534,7 +534,11 @@ async function loadRegisteredBrands() {
         });
 
         grid.innerHTML = html;
-        countEl.textContent = count + ' brand' + (count !== 1 ? 's' : '');
+        // A-457: 영어로만 만들고 있었다. 한국어 화면에서 「3 brands」가 그대로 남는다.
+        //        setLangText 는 data-en/ko 를 달아 두므로 언어를 바꿔도 다시 칠해진다.
+        window.setLangText
+            ? window.setLangText(countEl, count + ' brand' + (count !== 1 ? 's' : ''), '브랜드 ' + count + '개')
+            : (countEl.textContent = count + ' brand' + (count !== 1 ? 's' : ''));
 
         /* A-424: 카드는 여기서 만들어진다 — lang.js 의 한 번뿐인 칠하기는 이미 지나갔다.
            **빈 상태 쪽(457행)에만 applyLang() 이 있고 카드 쪽에는 없었다.** 그래서 위

@@ -178,6 +178,28 @@ def main():
                 if len(held) > 4:
                     print('          … 그리고 %d개 더. 전부 보려면 PENDING_PORTAL 을 비우고 돌려라' % (len(held) - 4))
 
+    # ───────────────────────────────────────────────────────────────────────
+    # A-457(2026-11-11): 네 번째 사본 — `list-your-brand.html` 의 신청 폼 체크박스.
+    #   전에는 평문 영어라 한국어 손님에게 영어로 보였다(브론즈 28차 8번). data-ko 를
+    #   달면서 **사본이 하나 늘었으므로** 여기서도 정본과 맞춰 본다. A-407 이 세 사본을
+    #   맞춰 보는 검사인데, 사본을 늘리면서 검사에 등록하지 않으면 그 자체가 결함이다.
+    # ───────────────────────────────────────────────────────────────────────
+    src = read('list-your-brand.html')
+    if src:
+        lyb = dict(re.findall(
+            r'<span data-en="([^"]+)" data-ko="([^"]+)"></span>|'
+            r'<span data-en="([^"]+)" data-ko="([^"]+)">[^<]*</span>', src)
+            and [(m[0] or m[2], m[1] or m[3]) for m in re.findall(
+                r'name="category" value="[^"]*"><span data-en="([^"]+)" data-ko="([^"]+)"', src)])
+        if not lyb:
+            problems.append('list-your-brand.html: 카테고리 체크박스의 data-en/ko 를 읽지 못했다 — 모양이 바뀌었나')
+        else:
+            bad, miss = compare('list-your-brand 체크박스', lyb, cats, '상위')
+            problems += bad
+            print('검사함  list-your-brand 체크박스 — %d개 (정본과 어긋남 %d)' % (len(lyb), len(bad)))
+            if len(lyb) != 10:
+                problems.append('list-your-brand.html: 체크박스가 10개여야 하는데 %d개다' % len(lyb))
+
     print('')
     if problems:
         for p in problems:

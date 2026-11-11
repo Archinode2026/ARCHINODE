@@ -1169,5 +1169,24 @@ window.addEventListener('scroll', () => { header.classList.toggle('scrolled', wi
 <script src="../cookie-consent.js?v=20260630" defer></script>
 <script src="../analytics-loader.js?v=20260630" defer></script>
 <script src="../sentry-loader.js?v=20260630" defer></script>
+<!-- SCROLL TO TOP — A-458(2026-11-11): A-451 에서 네 페이지에 넣었는데 **더 긴 페이지들을
+     빠뜨렸다.** 매거진 기사 131편은 이 사이트에서 가장 긴 문서들이고, 제품 상세 ·
+     for-brands · list-your-brand 도 넣은 네 곳보다 길다. (브론즈 28차 11번)
+     A-451 과 같은 자급식 — 남의 변수에 기대지 않고, 두 번 실행돼도 안전하다. -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
+  <i class="fas fa-chevron-up"></i>
+</button>
+<script>
+  (function () {
+    var b = document.getElementById('scrollTop');
+    if (!b || b.dataset.stBound) return;
+    b.dataset.stBound = '1';
+    function sync() { b.classList.toggle('visible', window.scrollY > 400); }
+    window.addEventListener('scroll', sync, { passive: true });
+    sync();
+  })();
+</script>
+
 </body>
 </html>
