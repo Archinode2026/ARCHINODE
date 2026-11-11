@@ -689,7 +689,7 @@ function renderProduct(p, related) {
                         return `
                         <a href="view.html?id=${rSlug}" class="pp-rel-card">
                             <div class="pp-rel-card-img">
-                                ${rImageUrl ? `<img loading="lazy" src="${rImageUrl}" alt="${rName}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-soft);"><i class="fas fa-cube" style="font-size:2rem;"></i></div>'}
+                                ${rImageUrl ? `<img loading="lazy" src="${rImageUrl}" alt="${rName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                             </div>
                             <div class="pp-rel-card-body">
                                 <div class="pp-rel-card-brand">${rBrandName}</div>
@@ -717,11 +717,11 @@ function renderProduct(p, related) {
             <!-- IMAGE -->
             <div class="pp-gallery">
                 <div class="pp-main-image">
-                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}" id="mainImg">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-soft);font-size:3rem;"><i class="fas fa-cube"></i></div>'}
+                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}" id="mainImg">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                 </div>
                 ${pImages.length > 0 ? `
                 <div class="pp-thumbs">
-                    <div class="pp-thumb active" onclick="changeImg('${pImageUrl}',this)"><img loading="lazy" src="${pImageUrl}" alt="Main"></div>
+                    ${pImageUrl ? `<div class="pp-thumb active" onclick="changeImg('${pImageUrl}',this)"><img loading="lazy" src="${pImageUrl}" alt="Main"></div>` : ''}
                     ${pImages.map(img => `<div class="pp-thumb" onclick="changeImg('${img}',this)"><img loading="lazy" src="${img}" alt="${pName}"></div>`).join('')}
                 </div>` : ''}
             </div>

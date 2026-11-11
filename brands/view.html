@@ -720,7 +720,7 @@ function renderBrand(brand, products, articles) {
             return `
             <a href="../products/view.html?id=${pSlug}" class="product-card fade-in" style="text-decoration:none;color:inherit;">
                 <div class="product-card-image">
-                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-soft);font-size:2rem;"><i class="fas fa-cube"></i></div>'}
+                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                 </div>
                 <div class="product-card-content">
                     <span class="product-card-brand">${brandName}</span>

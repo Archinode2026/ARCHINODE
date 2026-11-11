@@ -66,7 +66,7 @@
                 html += `
                 <a href="${base}products/view.html?id=${p.slug || ''}" class="cp-card">
                     <div class="cp-thumb">
-                        ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<span class="cp-noimg"><i class="fas fa-cube"></i></span>'}
+                        ${p.imageUrl ? `<img loading="lazy" src="${p.imageUrl}" alt="${p.name}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                     </div>
                     <div class="cp-body">
                         <div class="cp-brand">${p.brandName}</div>
