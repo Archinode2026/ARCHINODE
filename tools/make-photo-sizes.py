@@ -27,7 +27,9 @@ def used_paths():
             if 'backup' in p or '/docs/' in p:
                 continue
             s = io.open(p, encoding='utf-8', errors='replace').read()
-            for m in re.findall(r'assets/photos/([A-Za-z0-9._-]+\.jpg)', s):
+            # A-474: `.webp` 도 센다. 전에는 `.jpg` 만 봐서 WebP 를 만들지도,
+            #        고아 판정에 넣지도 않았다.
+            for m in re.findall(r'assets/photos/([A-Za-z0-9._-]+\.(?:jpg|webp))', s):
                 want.add(m)
     return want
 
@@ -35,15 +37,15 @@ def main():
     if not os.path.isdir(D):
         print('%s 가 없다.' % D, file=sys.stderr); return 2
     want = used_paths()
-    have = {f for f in os.listdir(D) if f.endswith('.jpg')}
+    have = {f for f in os.listdir(D) if f.endswith(('.jpg', '.webp'))}
     masters = {f for f in have if f.endswith('-1800.jpg')}
 
     made = collections.Counter(); total = collections.Counter(); missing_master = []
     for f in sorted(want - have):
-        m = re.match(r'(photo-[a-z0-9-]+)-(\d+)\.jpg$', f)
+        m = re.match(r'(photo-[a-z0-9-]+)-(\d+)\.(jpg|webp)$', f)
         if not m:
             missing_master.append(f); continue
-        pid, size = m.group(1), m.group(2)
+        pid, size, ext = m.group(1), m.group(2), m.group(3)
         src = os.path.join(D, pid + '-1800.jpg')
         if not os.path.exists(src):
             missing_master.append(f); continue
@@ -54,8 +56,14 @@ def main():
             w = int(size)
             g = im.copy() if im.width <= w else im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
         out = os.path.join(D, f)
-        g.save(out, 'JPEG', quality=82, optimize=True, progressive=True)
-        made[size] += 1; total[size] += os.path.getsize(out)
+        if ext == 'webp':
+            # A-474: q=85·method=6 — 1800 마스터를 기준으로 재면 **지금 커밋된 JPEG 보다
+            # 작고 동시에 마스터에 더 가깝다**(PSNR 39.98 dB vs 39.49 dB, 27% 감소).
+            # method=6 은 가장 느리지만 가장 작다. 한 번 만들어 커밋하는 파일이니 느려도 된다.
+            g.save(out, 'WEBP', quality=85, method=6)
+        else:
+            g.save(out, 'JPEG', quality=82, optimize=True, progressive=True)
+        made[size + '.' + ext] += 1; total[size + '.' + ext] += os.path.getsize(out)
 
     # 아무도 안 가리키는 파생 파일은 지운다 (원본은 남긴다)
     orphan = sorted((have | set(want)) - want - masters)
@@ -65,7 +73,9 @@ def main():
         if os.path.exists(q):
             os.remove(q); removed += 1
 
-    kept = sorted(f for f in os.listdir(D) if f.endswith('.jpg') and not f.endswith('-1800.jpg'))
+    # A-474: webp 도 센다
+    kept = sorted(f for f in os.listdir(D)
+                  if f.endswith(('.jpg', '.webp')) and not f.endswith('-1800.jpg'))
     size_kept = sum(os.path.getsize(os.path.join(D, f)) for f in kept)
     print('HTML 이 가리키는 파일: %d' % len(want))
     for s in sorted(made):
@@ -76,6 +86,9 @@ def main():
     if missing_master:
         print('  ★ 원본이 없어 못 만든 것: %s' % missing_master, file=sys.stderr)
         return 1
+    jpg_kept = [f for f in kept if f.endswith('.jpg')]
+    webp_kept = [f for f in kept if f.endswith('.webp')]
+    print('    그중 JPEG %d장 · WebP %d장' % (len(jpg_kept), len(webp_kept)))
     bad = sorted(want - set(os.listdir(D)))
     if bad:
         print('  ★ 가리키는데 없는 파일: %s' % bad, file=sys.stderr)
