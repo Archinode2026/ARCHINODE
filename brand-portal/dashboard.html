@@ -619,7 +619,9 @@ h1, h2, .section-card h2 {
 
             <!-- Add Product Form (hidden) -->
             <div id="productForm" style="display:none;margin-top:24px;padding:24px;background:#f7f3ec;border-radius:8px;">
-                <h3 style="font-size:1rem;margin-bottom:16px;" data-en="New Product" data-ko="제품 등록">New Product</h3>
+                <h3 id="productFormTitle" style="font-size:1rem;margin-bottom:16px;" data-en="New Product" data-ko="제품 등록">New Product</h3>
+                <!-- A-467: 공개 중인 제품을 고치면 다시 심사 대기로 내려간다 -->
+                <div id="prodEditWarn" style="display:none;margin-bottom:16px;padding:10px 12px;border:1px solid #fde68a;background:#fffbeb;border-radius:4px;font-size:0.82rem;line-height:1.6;color:#92400e;"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> <span></span></div>
                 <div class="field-row">
                     <div class="field">
                         <label for="prodName" data-en="Product Name *" data-ko="제품명 *">Product Name *</label>
@@ -1561,16 +1563,110 @@ window.bpApplyGate = function() {
     if (!ok && window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
 };
 
-// ── 제품 추가 ──
-document.getElementById('addProductBtn').addEventListener('click', () => {
-    // R-061: 폼을 열기 전에 한 번 더 본다 (상태가 세션 도중 바뀔 수 있다).
+/* ── A-467 (2026-11-11, 승리님 결정) ─────────────────────────────────────────
+   전에는 브랜드도 어드민도 **올린 제품을 고칠 수 없었다** — 포털은 add() 만 했고
+   어드민은 승인·반려만 눌렀다. 규칙(firestore.rules)은 소유 브랜드의 update 를
+   이미 허용했는데 그걸 쓰는 화면이 어디에도 없었다. 그래서 사진 없이 올라간
+   제품은 영영 사진이 없었고, 제품명 오타도 영영 남았다.
+   승리님 결정: 「고치면 다시 심사 대기로」 · 「제품 정보 전체」.
+   등록 폼을 그대로 다시 쓴다 — 폼이 둘로 갈리면 하나만 고쳐진다(이 저장소에서
+   반복된 실패: A-458 · A-460 · A-466). */
+let bpEditingProductId = null;
+
+// 폼 비우기 — 전에는 제출 뒤 **거래조건·스펙 파일 6칸을 안 비웠다**(다음 제품에 묻어
+// 갔다). 비우는 자리를 한 군데로 모아 둘 다 고친다.
+function bpClearProductForm() {
+    ['prodName','prodCollection','prodDesc','prodMaterials','prodDimensions','prodDesigner',
+     'prodMoq','prodLeadTime'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    ['prodPrice','prodCategory','prodSupplyType'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    ['prodImage','prodCatalogFile','prodBimFile','prodModel3dFile'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    updateSubcategories();
+    document.getElementById('prodImagePreview').style.display = 'none';
+    prodMsg('', false);
+}
+
+// 폼 채우기 (수정)
+function bpFillProductForm(p) {
+    document.getElementById('prodName').value = p.name || '';
+    document.getElementById('prodCollection').value = p.collection || '';
+    document.getElementById('prodDesc').value = p.description || '';
+    document.getElementById('prodMaterials').value = p.materials || '';
+    document.getElementById('prodDimensions').value = p.dimensions || '';
+    document.getElementById('prodDesigner').value = p.designer || '';
+    document.getElementById('prodPrice').value = p.priceRange || '';
+    document.getElementById('prodMoq').value = p.moq || '';
+    document.getElementById('prodLeadTime').value = p.leadTime || '';
+    document.getElementById('prodSupplyType').value = p.supplyType || '';
+    // 카테고리를 먼저 넣고 하위 목록을 **다시 만든 뒤** 하위를 넣는다 — 순서가 바뀌면
+    // 하위 선택칸에 그 값이 아직 없어서 조용히 빈칸이 된다.
+    document.getElementById('prodCategory').value = p.category || '';
+    updateSubcategories();
+    document.getElementById('prodSubcategory').value = p.subcategory || '';
+    // 이미 올라간 사진은 미리보기로 보여 준다(새로 고르지 않으면 그대로 쓴다).
+    const pv = document.getElementById('prodImagePreview');
+    const img = document.getElementById('prodPreviewImg');
+    const safe = bpSafeUrl(p.imageUrl);
+    if (safe) {
+        img.src = safe;
+        img.alt = document.documentElement.lang !== 'en' ? '지금 등록된 제품 이미지' : 'The product image currently on file';
+        pv.style.display = 'block';
+    } else {
+        pv.style.display = 'none';
+    }
+}
+
+// 폼 열기 — product 가 없으면 등록, 있으면 수정
+function bpOpenProductForm(product) {
     if (!window.bpCanSubmit()) { window.bpApplyGate(); return; }
     bpFormUid = (auth.currentUser && auth.currentUser.uid) || null;   // A-213 — 이 폼의 주인
     window.bpFormUid = bpFormUid;
+    bpEditingProductId = (product && product.__id) || null;
+    bpClearProductForm();
+    if (product) bpFillProductForm(product);
+
+    const ko = document.documentElement.lang !== 'en';
+    const head = document.getElementById('productFormTitle');
+    const btn = document.getElementById('submitProduct');
+    window.setLangText && window.setLangText(head, product ? 'Edit Product' : 'New Product', product ? '제품 수정' : '제품 등록');
+    window.setLangText && window.setLangText(btn, product ? 'Save & Resubmit' : 'Submit for Review', product ? '저장하고 다시 검수 요청' : '검수 요청');
+
+    /* 승인돼서 **지금 공개 중인** 제품을 고치면 다시 심사 대기로 내려간다 —
+       그 사이 공개 목록에서 빠진다. 누르고 나서 알게 되면 안 되니 미리 말한다. */
+    const warn = document.getElementById('prodEditWarn');
+    if (product && product.status === 'approved') {
+        warn.style.display = 'block';
+        window.setLangText && window.setLangText(warn.querySelector('span'),
+            'This product is live. Saving sends it back for review, so it leaves the public listing until it is approved again.',
+            '이 제품은 지금 공개 중입니다. 저장하면 다시 심사 대기로 내려가고, 다시 승인될 때까지 공개 목록에서 빠집니다.');
+    } else {
+        warn.style.display = 'none';
+    }
+
     document.getElementById('productForm').style.display = 'block';
     document.getElementById('addProductBtn').style.display = 'none';
+    document.getElementById('productForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 목록의 「수정」 — 인라인 onclick 에 값을 끼우지 않는다(A-026 에서 겪은 함정:
+// escapeHtml 이 만든 &#39; 가 속성 파싱 때 되돌아와 핸들러가 깨졌다). 위임으로 받는다.
+document.getElementById('productGrid').addEventListener('click', (ev) => {
+    const b = ev.target.closest('[data-prod-edit]');
+    if (!b) return;
+    const id = b.getAttribute('data-prod-edit');
+    const p = (window.bpProductRows || []).find(x => x.__id === id);
+    if (!p) { prodMsg(document.documentElement.lang !== 'en'
+        ? '제품을 찾지 못했습니다. 새로고침 후 다시 시도해 주세요.'
+        : 'Could not find that product. Please refresh and try again.', true); return; }
+    bpOpenProductForm(p);
+});
+
+// ── 제품 추가 ──
+document.getElementById('addProductBtn').addEventListener('click', () => {
+    // R-061: 폼을 열기 전에 한 번 더 본다 (상태가 세션 도중 바뀔 수 있다).
+    bpOpenProductForm(null);
 });
 document.getElementById('cancelProduct').addEventListener('click', () => {
+    bpEditingProductId = null;
     document.getElementById('productForm').style.display = 'none';
     document.getElementById('addProductBtn').style.display = 'inline-block';
 });
@@ -1612,6 +1708,15 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     if (!name) { prodMsg(document.documentElement.lang !== 'en' ? '제품명을 입력해 주세요.' : 'Product name is required', true); return; }
 
     const btn = document.getElementById('submitProduct');
+    /* A-467: 되살릴 라벨이 모드마다 다르다. 전에는 「검수 요청」 하나만 되살려서,
+       수정 중에 막히면 단추가 엉뚱한 글자로 남는다. 한 군데서 고른다. */
+    const editing = bpEditingProductId;
+    const restoreBtn = () => {
+        btn.disabled = false;
+        window.setLangText && window.setLangText(btn,
+            editing ? "Save & Resubmit" : "Submit for Review",
+            editing ? "저장하고 다시 검수 요청" : "검수 요청");
+    };
     btn.disabled = true;
     window.setLangText && window.setLangText(btn, "Uploading...", "올리는 중...");
 
@@ -1637,7 +1742,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
 
     // A-213: 업로드 전에 한 번 — 파일을 올리고 나서 멈추면 쓰레기 파일이 남는다
     let bpId = bpIdentity(bpFormUid);
-    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); btn.disabled = false; window.setLangText && window.setLangText(btn, "Submit for Review", "검수 요청"); return; }
+    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); restoreBtn(); return; }
 
     const catalogPdf = await uploadIfPresent('prodCatalogFile', 'products-specs');
     const bimFile = await uploadIfPresent('prodBimFile', 'products-specs');
@@ -1645,7 +1750,80 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
 
     // A-213: 업로드는 await 를 여러 번 거친다. 그 사이에 계정이 바뀌었을 수 있으므로 다시 확인한다.
     bpId = bpIdentity(bpFormUid);
-    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); btn.disabled = false; window.setLangText && window.setLangText(btn, "Submit for Review", "검수 요청"); return; }
+    if (!bpId.ok) { prodMsg(bpIdentityMessage(bpId.reason), true); restoreBtn(); return; }
+
+    const fields = {
+        name: name,
+        collection: document.getElementById('prodCollection').value.trim(),
+        description: document.getElementById('prodDesc').value.trim(),
+        category: category,
+        subcategory: subcategory,
+        materials: document.getElementById('prodMaterials').value.trim(),
+        dimensions: document.getElementById('prodDimensions').value.trim(),
+        designer: document.getElementById('prodDesigner').value.trim(),
+        priceRange: document.getElementById('prodPrice').value,
+        moq: document.getElementById('prodMoq').value.trim(),
+        leadTime: document.getElementById('prodLeadTime').value.trim(),
+        supplyType: document.getElementById('prodSupplyType').value
+    };
+
+    if (editing) {
+        /* ── A-467 수정 ────────────────────────────────────────────────────────
+           지금 문서를 **다시 읽는다**. 폼을 열어 둔 사이에 어드민이 상태를 바꿨을 수
+           있고, 파일을 새로 고르지 않았을 때 지금 올라가 있는 URL 을 그대로 써야 한다
+           (목록 자료만 믿으면 그 사이의 변화를 덮어쓴다).
+           `slug` 은 **바꾸지 않는다** — 공개 주소가 `?id=<slug>` 라서, 이름을 고치면서
+           슬러그까지 바꾸면 이미 돌아다니는 링크가 전부 죽는다.
+           `brandId` · `createdAt` 은 payload 에 아예 넣지 않는다(규칙이 보호한다).  */
+        let cur;
+        try {
+            cur = await db.collection('products').doc(editing).get();
+        } catch (err) {
+            console.error('product re-read failed:', err);
+            prodMsg(document.documentElement.lang !== 'en'
+                ? '제품을 다시 읽지 못했습니다. 잠시 후 다시 시도해 주세요.'
+                : 'Could not re-read the product. Please try again.', true);
+            restoreBtn(); return;
+        }
+        if (!cur.exists) {
+            prodMsg(document.documentElement.lang !== 'en'
+                ? '이 제품이 더 이상 없습니다. 목록을 새로고침해 주세요.'
+                : 'That product no longer exists. Please refresh the list.', true);
+            restoreBtn(); return;
+        }
+        const prev = cur.data();
+        const updates = Object.assign({}, fields, {
+            imageUrl: imageUrl || prev.imageUrl || '',
+            catalogPdf: catalogPdf || prev.catalogPdf || '',
+            bimFile: bimFile || prev.bimFile || '',
+            model3d: model3d || prev.model3d || '',
+            status: 'pending',          // 승리님 결정 — 고치면 다시 심사 대기
+            reviewerNote: null,         // 옛 반려 사유를 들고 가지 않는다
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        try {
+            await db.collection('products').doc(editing).update(updates);
+        } catch (err) {
+            console.error('product update failed:', err);
+            /* 규칙이 거부하면 거의 언제나 **규칙이 아직 게시되지 않은** 경우다
+               (git push 로는 규칙이 안 올라간다 — 콘솔에서 따로 게시해야 한다). */
+            prodMsg(document.documentElement.lang !== 'en'
+                ? '저장하지 못했습니다. 권한이 거부되었다면 관리자에게 알려 주세요.'
+                : 'Could not save. If permission was denied, please tell the administrator.', true);
+            restoreBtn(); return;
+        }
+        bpEditingProductId = null;
+        restoreBtn();
+        document.getElementById('productForm').style.display = 'none';
+        document.getElementById('addProductBtn').style.display = 'inline-block';
+        bpClearProductForm();
+        prodMsg(document.documentElement.lang !== 'en'
+            ? '저장했습니다. 다시 심사 대기로 올라갔습니다.'
+            : 'Saved. It is back in the review queue.', false);
+        loadProducts();
+        loadStats();
+        return;
+    }
 
     await db.collection('products').add({
         brandId: bpId.uid,            // A-213 — brandId·brandName·brandSlug 를 한 객체에서 함께
@@ -1673,18 +1851,12 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    btn.disabled = false;
-    window.setLangText && window.setLangText(btn, "Submit for Review", "검수 요청");
+    restoreBtn();
     document.getElementById('productForm').style.display = 'none';
     document.getElementById('addProductBtn').style.display = 'inline-block';
 
-    // Reset form
-    ['prodName','prodCollection','prodDesc','prodMaterials','prodDimensions','prodDesigner'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('prodPrice').value = '';
-    document.getElementById('prodCategory').value = '';
-    document.getElementById('prodSubcategory').innerHTML = '<option value="" data-en="Select subcategory" data-ko="하위 카테고리 선택">' + (document.documentElement.lang !== 'en' ? '하위 카테고리 선택' : 'Select subcategory') + '</option>';
-    document.getElementById('prodImage').value = '';
-    document.getElementById('prodImagePreview').style.display = 'none';
+    // Reset form — A-467: 거래조건·스펙 파일 6칸까지 함께 비운다(전에는 다음 제품에 묻어 갔다)
+    bpClearProductForm();
 
     loadProducts();
     loadStats();   // R-027: 목록만 다시 읽고 위쪽 카드 숫자는 그대로여서, 방금 올린 제품이 카드에 안 잡혔다
@@ -1697,6 +1869,7 @@ async function loadProducts() {
     const empty = document.getElementById('emptyProducts');
     const ko = document.documentElement.lang !== 'en';
     grid.innerHTML = '';
+    window.bpProductRows = [];   // A-467 — 비거나 실패해도 묵은 자료가 「수정」 에 남지 않게
 
     let snap;
     try {
@@ -1715,7 +1888,9 @@ async function loadProducts() {
     empty.style.display = 'none';
 
     const prows = [];
-    snap.forEach(doc => prows.push(doc.data()));
+    /* A-467: 전에는 doc.data() 만 담아 **문서 id 를 버렸다**. 수정에는 id 가 필요하다. */
+    snap.forEach(doc => prows.push(Object.assign({ __id: doc.id }, doc.data())));
+    window.bpProductRows = prows;   // A-467 — 「수정」 이 같은 자료를 그대로 쓴다
     prows.sort((x, y) => articleMillis(y) - articleMillis(x));
 
     prows.forEach(p => {
@@ -1745,6 +1920,8 @@ async function loadProducts() {
                     <p>${pCollection} ${p.materials ? '· ' + pMaterials : ''}</p>
                     <span class="status-badge ${statusClass}" style="margin-top:8px;" data-en="${pStatusEn}" data-ko="${pStatusKo}">${pStatus}</span>
                     ${rejectReasonHtml(pSt, p.reviewerNote)}
+                    ${pImageUrl ? '' : `<p style="margin-top:8px;font-size:0.78rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:6px 8px;line-height:1.5;"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> <span data-en="No photo yet — add one in Edit. Buyers skip products with no photo." data-ko="사진이 없습니다 — 「수정」에서 올려 주세요. 사진 없는 제품은 바이어가 거의 안 엽니다.">No photo yet — add one in Edit.</span></p>`}
+                    <button type="button" class="btn btn-secondary" style="margin-top:10px;padding:6px 14px;font-size:0.8rem;" data-prod-edit="${escapeHtml(p.__id || '')}"><i class="fas fa-pen" aria-hidden="true"></i> <span data-en="Edit" data-ko="수정">Edit</span></button>
                 </div>
             </div>`;
     });
