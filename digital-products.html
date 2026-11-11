@@ -616,5 +616,25 @@ async function submitNotify(e) {
   <p style="font-size:0.95rem;margin-bottom:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;" data-en="Contact us with the product name and we will send a PayPal invoice within 24 hours." data-ko="원하시는 상품명을 알려주시면 24시간 내 PayPal 인보이스를 보내드립니다.">Contact us with the product name and we will send a PayPal invoice within 24 hours.</p>
   <a href="mailto:office@archinode.org?subject=ARCHINODE%20Digital%20Product%20Order" style="display:inline-block;background:#332e27;color:#fff;padding:14px 36px;font-size:0.95rem;font-weight:700;text-decoration:none;border-radius:6px;" data-en="Order via Email →" data-ko="이메일로 주문 →">Order via Email &rarr;</a>
 </div>
+<!-- SCROLL TO TOP — A-451(2026-11-11): 이 네 페이지에는 「맨 위로」가 **아예 없었다.**
+     360px 에서 digital-products 는 문서 높이 4979px(6.2화면), request-consultation 은
+     5025px(6.3화면)인데 손님이 위로 돌아갈 수단이 없었다. (브론즈 27차 3번)
+     다른 페이지의 토글 코드는 그 페이지의 `header` 변수에 얹혀 있어서, 여기서는
+     **남의 변수에 기대지 않는 자급식**으로 넣는다. 두 번 실행돼도 안전하다. -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
+  <i class="fas fa-chevron-up"></i>
+</button>
+<script>
+  (function () {
+    var b = document.getElementById('scrollTop');
+    if (!b || b.dataset.stBound) return;
+    b.dataset.stBound = '1';
+    function sync() { b.classList.toggle('visible', window.scrollY > 400); }
+    window.addEventListener('scroll', sync, { passive: true });
+    sync();
+  })();
+</script>
+
 </body>
 </html>
