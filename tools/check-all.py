@@ -65,6 +65,8 @@ CHECKS = [
      'A-468 — 폴더를 나열하지 않고 세는지. 사본 둘(search.js · category-products.js)이 같은 답인지'),
     ('그림 자산 배포',        'py',   'tools/check-image-assets.py',
      'A-469 — src·srcset·url() 이 가리키는 그림이 git 에 있는지(디스크에 있어도 .gitignore 면 배포 안 된다)'),
+    ('소분류 이름 여섯 자리',  'py',   'tools/check-subcategory-names.py',
+     'A-470 — 한 페이지 안의 title·og:title·JSON-LD·빵부스러기 + 부모 카드 + 색인이 h1 과 같은지(&amp; 무관)'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)
