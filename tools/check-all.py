@@ -63,6 +63,8 @@ CHECKS = [
      'A-467 — 채우기 순서(카테고리→하위) · 폼 비우기 15칸 · 사진 URL 스킴'),
     ('basePath 사본',        'node', 'tools/test-basepath.js',
      'A-468 — 폴더를 나열하지 않고 세는지. 사본 둘(search.js · category-products.js)이 같은 답인지'),
+    ('그림 자산 배포',        'py',   'tools/check-image-assets.py',
+     'A-469 — src·srcset·url() 이 가리키는 그림이 git 에 있는지(디스크에 있어도 .gitignore 면 배포 안 된다)'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)
