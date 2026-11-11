@@ -2774,7 +2774,10 @@ body .footer .footer-bottom::before {
 body .footer .footer-bottom p,
 body .footer .footer-bottom-links a { font-size: .72rem; color: rgba(237,242,247,.52); }
 body .footer .footer-bottom-links a:hover { color: var(--navy-gold); }
-body .footer .footer-business-info { color: rgba(237,242,247,.42) !important; }
+/* A-456(2026-11-11): 알파 .42 는 #253040 위에서 **3.34** 다(법적 표시사항인데).
+   .52 도 4.38 로 모자라고 .60 이면 5.36 이다. 브론즈 28차가 지난 라운드 자기 오탐을
+   역추적해 「이 글자는 .footer-bottom::before 의 어두운 띠 **밖**」임을 확인해서 잡았다. */
+body .footer .footer-business-info { color: rgba(237,242,247,.60) !important; }
 
 
 /* ──────────────────────────────────────────────────────────────────────────

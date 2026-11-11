@@ -78,7 +78,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .consult-hero .price-tag {
   display: inline-block;
-  background: rgba(160,124,74,0.15);
+  /* A-456: 이 칩의 **자기 배경**이 금빛이라 배경을 밝혀 4.12 로 내려갔다.
+     (내 픽셀 측정이 글자를 visibility:hidden 으로 숨겨 **자기 배경까지 지우는** 바람에
+      4.82 로 잘못 읽었다 — 브론즈 28차가 잡았다.) 채우기를 어둡게, 테두리는 금색 유지. */
+  background: rgba(51,46,39,0.55);
   color: var(--accent-on-dark);   /* A-454: 2.94 → 측정값은 아래 주석 참고 */
   padding: 8px 20px;
   border-radius: 4px;
