@@ -62,7 +62,11 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .auth-btn:hover { background: var(--accent); }
 .auth-btn:disabled { background: var(--gray-400); cursor: not-allowed; }
 
-.auth-links { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--ink-soft); line-height: 1.8; }
+/* A-464(2026-11-11, 승리님 「받아」): 링크 세 줄이 각 16px 에 중심 간격 **24px** 이라
+   44px 띠를 두르면 서로 탭을 뺏는다(A-422 가 「줄 간격부터 봐야 한다」고 남겨 둔 자리).
+   줄 높이를 44px 로 올려 띠가 겹치지 않게 한다. 상자 높이 71 → 132px (+61px). */
+.auth-links { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--ink-soft); line-height: 44px; }
+.auth-links a { display: inline-block; min-height: 44px; }
 /* A-422: 이 안내 화면의 링크는 그 칸에 **혼자** 있으므로 44px 띠를 둘러도
    이웃 줄의 탭을 뺏지 않는다(A-393 의 방법). 로그인 칸의 `.auth-links` 는 링크가
    세 줄로 붙어 있어 같은 처방을 못 쓴다 — 그건 줄 간격부터 봐야 해서 따로 남긴다. */

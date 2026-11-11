@@ -460,6 +460,7 @@ a { text-decoration: none; color: inherit; }
 </style>
 </head>
 <body data-langs="en">
+<a class="skip-link" href="#main" data-en="Skip to content" data-ko="본문으로 건너뛰기">Skip to content</a>
 
 <!-- ANNOUNCEMENT BAR -->
 <div class="announcement-bar" data-lang-only="en" style="background:#332e27;color:#fdfbf7;text-align:center;padding:10px 20px;font-size:0.8rem;letter-spacing:0.05em;">
@@ -503,6 +504,7 @@ a { text-decoration: none; color: inherit; }
     </div>
   </div>
 </header>
+<div id="main" tabindex="-1"></div>
 
 <div class="search-overlay" id="searchOverlay">
   <button type="button" class="search-close" onclick="toggleSearch()" aria-label="Close search" data-en-aria-label="Close search" data-ko-aria-label="검색 닫기" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;line-height:1;padding:0;font-family:inherit;">&times;</button>
@@ -864,7 +866,7 @@ a { text-decoration: none; color: inherit; }
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
           <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
                이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
-          <li>
+          <li data-lang-only="en">
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
               <ul>

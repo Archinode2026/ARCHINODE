@@ -64,7 +64,11 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .auth-btn:hover { background: var(--accent); }
 .auth-btn:disabled { background: var(--gray-400); cursor: not-allowed; }
 
-.auth-links { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--ink-soft); }
+/* A-464(2026-11-11): login.html 과 같은 이유 — 링크 줄의 44px 띠가 겹치지 않게
+   줄 높이를 올린다. 이 페이지는 링크가 한 줄뿐이라도 같은 규칙을 쓴다(사본이 갈리면
+   둘 중 하나만 고쳐지는 일이 반복됐다). */
+.auth-links { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--ink-soft); line-height: 44px; }
+.auth-links a { display: inline-block; min-height: 44px; }
 .auth-links a { color: var(--accent-ink); text-decoration: none; }
 .auth-links a:hover { text-decoration: underline; }
 
