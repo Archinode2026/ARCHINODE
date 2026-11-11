@@ -86,19 +86,33 @@
   function lc(v) { return text(v).toLowerCase(); }
 
   // Determine base path relative to current page
+  /* ────────────────────────────────────────────────────────────────────────
+     A-468(2026-11-11): 전에는 폴더 이름을 **나열**했다 — categories · magazine ·
+     brands · brand-portal · admin · auth. 나열에서 빠진 폴더는 깊이 0 으로 계산돼
+     색인을 **자기 폴더에서** 찾다가 404 를 맞았다.
+
+     빠진 폴더가 둘 있었다: **`/products/` 와 `/trend-report/`**.
+     그래서 제품 상세와 브랜드 매거진 글에서 `search-index.json` 이 404 →
+     A-353 의 「실패해도 콜백은 부른다」 처방대로 빈 배열로 넘어가 **정적 항목
+     220개가 통째로 사라졌다**. 화면에는 「검색 결과가 없습니다」만 떴다.
+     게다가 결과 링크도 같은 basePath 를 쓰므로, 브랜드 결과 하나가 떠도
+     `/products/brands/view.html?id=oska`(404) 로 갔다 — 실측으로 확인.
+
+     폴더 이름을 더 적는 것은 같은 결함을 또 심는 것이다(다음에 폴더가 생기면
+     또 빠진다). **폴더를 센다.** 마지막 조각은 파일 이름이거나 빈 문자열이고
+     첫 조각은 항상 빈 문자열이므로, 그 둘을 뺀 나머지가 폴더 깊이다.
+       `/`                            → ['','']                       → 0
+       `/index.html` · `/about`       → ['','index.html']             → 0
+       `/products/view.html` · `/products/view` → 3조각              → 1
+       `/categories/bathroom/x.html`  → 4조각                         → 2
+       `/categories/bathroom/`        → ['','categories','bathroom',''] → 2
+     확장자 없는 「예쁜 주소」도 이 사이트에서 200 으로 열리므로(실측) 깊이 계산은
+     `.html` 여부를 보지 않는다. `category-products.js` 의 같은 함수도 결과가
+     일치해야 한다 — `tools/test-basepath.js` 가 두 사본을 맞춰 본다.
+     ──────────────────────────────────────────────────────────────────────── */
   function getBasePath() {
-    var path = window.location.pathname;
-    // Count depth from root
-    var parts = path.split('/').filter(function(p) { return p && !p.includes('.html'); });
-    // Remove leading empty or domain parts
-    var depth = 0;
-    if (path.includes('/categories/') && path.split('/categories/')[1] && path.split('/categories/')[1].includes('/')) {
-      depth = 2; // categories/bathroom/something.html
-    } else if (path.includes('/magazine/') || path.includes('/brands/') || path.includes('/categories/')) {
-      depth = 1;
-    } else if (path.includes('/brand-portal/') || path.includes('/admin/') || path.includes('/auth/')) {
-      depth = 1;
-    }
+    var segs = window.location.pathname.split('/');
+    var depth = Math.max(0, segs.length - 2);
     var prefix = '';
     for (var i = 0; i < depth; i++) prefix += '../';
     return prefix;

@@ -61,6 +61,8 @@ CHECKS = [
      'A-466 — 사진 없는 자리의 사본 6개가 같은 글자를 말하는지(전에는 여섯 다 글자가 없었다)'),
     ('포털 제품 수정',        'node', 'tools/test-bp-product-edit.js',
      'A-467 — 채우기 순서(카테고리→하위) · 폼 비우기 15칸 · 사진 URL 스킴'),
+    ('basePath 사본',        'node', 'tools/test-basepath.js',
+     'A-468 — 폴더를 나열하지 않고 세는지. 사본 둘(search.js · category-products.js)이 같은 답인지'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)
