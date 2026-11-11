@@ -246,8 +246,23 @@
       <h2 class="section-title" style="font-size:2rem;" data-en="OSKA Awards &amp; Patents" data-ko="OSKA 수상·특허">OSKA Awards &amp; Patents</h2>
       <p style="color:var(--gray-700); font-weight:300; margin-top:14px; max-width:680px; margin-left:auto; margin-right:auto;" data-en="A snapshot of OSKA's recognitions, patents, and certifications — excerpted from the OSKA company brochure." data-ko="OSKA가 보유한 수상·특허·인증 현황. OSKA 회사 브로슈어 발췌.">A snapshot of OSKA's recognitions, patents, and certifications — excerpted from the OSKA company brochure.</p>
     </div>
+    <!-- A-455(2026-11-11): 원본이 1848x658 인데 390px 화면에서 318x114(**17%**)로 줄어
+         상장·특허 문구가 전부 뭉개진다. 작게 보여 주고 끝내면 이 구간은 장식일 뿐이다.
+         원본을 새 탭에서 열 수 있게 감싼다 — JS 없이 링크 하나로. `width`/`height` 를
+         달아 뜨기 전에도 자리를 잡아 둔다. (브론즈 27차 9번 · 승리님 결정 ⑤) -->
     <div style="text-align:center; max-width:1100px; margin:0 auto; padding:0 16px;">
-      <img loading="lazy" src="assets/certifications/oska-credentials-overview.png" alt="OSKA Awards, Patents and Certifications Overview" style="max-width:100%; height:auto; border:1px solid #e5e5e5; box-shadow:0 4px 18px rgba(0,0,0,0.06); border-radius:4px;">
+      <a href="assets/certifications/oska-credentials-overview.png" target="_blank" rel="noopener"
+         aria-label="Open the OSKA credentials image at full size"
+         data-en-aria-label="Open the OSKA credentials image at full size"
+         data-ko-aria-label="OSKA 수상·특허 이미지를 원본 크기로 열기"
+         style="display:inline-block; max-width:100%;">
+        <img loading="lazy" src="assets/certifications/oska-credentials-overview.png" width="1848" height="658" alt="OSKA Awards, Patents and Certifications Overview" style="max-width:100%; height:auto; border:1px solid #e5e5e5; box-shadow:0 4px 18px rgba(0,0,0,0.06); border-radius:4px;">
+      </a>
+      <p style="margin-top:12px; font-size:0.82rem; color:var(--ink-soft);">
+        <a href="assets/certifications/oska-credentials-overview.png" target="_blank" rel="noopener"
+           style="color:var(--accent-ink); text-decoration:underline; display:inline-flex; align-items:center; min-height:44px;"
+           data-en="Open at full size (1848 x 658)" data-ko="원본 크기로 보기 (1848 x 658)">Open at full size (1848 x 658)</a>
+      </p>
     </div>
   </div>
 </section>
