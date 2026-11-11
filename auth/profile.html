@@ -281,6 +281,7 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
 </div>
 
 <script src="../firebase-config.js"></script>
+<script src="../loading-watchdog.js?v=20261111a"></script>
 <script src="../lang.js?v=20261106a"></script>
 <script>
 let currentUser = null;
@@ -288,6 +289,11 @@ let userData = null;
 
 // ── 인증 체크 ──
 auth.onAuthStateChanged(async (user) => {
+  /* ★ A-475(2026-11-11): 이 콜백에는 try/catch 가 **아예 없었다.** 안쪽 Firestore
+     읽기가 거부·실패하면(규칙 미게시 · 오프라인) 로딩 화면이 **영원히 남았다** —
+     「Loading your profile...」 바람개비만 돌고 안내도 없었다. A-023 이
+     `admin/dashboard.html` 에 같은 처방을 넣었는데 이 파일은 받지 못했다. */
+  try {
     if (!user) {
         // R-069: 끊긴 자리로 돌아오게 next 를 붙인다(로그인 화면이 같은 사이트 경로만 받는다).
         window.location.href = 'login.html?next=' + encodeURIComponent(window.location.pathname + window.location.search);
@@ -328,6 +334,11 @@ auth.onAuthStateChanged(async (user) => {
 
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('dashboardContent').style.display = 'block';
+  } catch (err) {
+    console.error('profile load failed:', err);
+    // 조용한 멈춤 대신 읽을 수 있는 안내 + 「다시 시도」 (loading-watchdog.js)
+    if (window.archinodeLoadingFailed) window.archinodeLoadingFailed('profile: ' + (err && err.code || err));
+  }
 });
 
 // ── 프로필 채우기 ──

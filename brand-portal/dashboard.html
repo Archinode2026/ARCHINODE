@@ -930,6 +930,7 @@ h1, h2, .section-card h2 {
 </div>
 
 <script src="../firebase-config.js"></script>
+<script src="../loading-watchdog.js?v=20261111a"></script>
 <script src="../search.js?v=20261106a"></script>
 <script src="../lang.js?v=20261106a"></script>
 <script>
@@ -1145,6 +1146,9 @@ async function loadBrandData(uid) {
         document.getElementById('dashboardContent').style.display = 'block';
     } catch (err) {
         console.error('Error loading brand:', err);
+        /* A-475: 전에는 로그만 남기고 **로딩 화면을 그대로 뒀다** — 로딩 화면은
+           성공 경로에서만 걷히므로 손님은 영원히 도는 바람개비만 봤다. */
+        if (window.archinodeLoadingFailed) window.archinodeLoadingFailed('brand: ' + (err && err.code || err));
     }
 }
 
