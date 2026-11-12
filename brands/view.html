@@ -1098,30 +1098,30 @@ async function toggleBrandLike() {
     }
     const btn = document.getElementById('brandLikeBtn');
     btn.disabled = true;
+    /* A-482(2026-11-12): 목록과 카운터를 한 묶음(batch)으로. 규칙이 getAfter 로
+       「목록이 이 쓰기에서 바뀌었는가」를 보므로 따로 쓰면 거부된다 — products/view.html 과 같다. */
+    const uref2 = db.collection('users').doc(user.uid);
+    const bref2 = db.collection('brands').doc(currentBrandDocId);
+    const FV2 = firebase.firestore.FieldValue;
     try {
+        const batch2 = db.batch();
         if (isBrandLiked) {
-            await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayRemove(currentBrandDocId) });
-            // 2026-11-03 A-144: likeCount 쓰기가 실패하면 users 문서를 되돌려 두 기록이 어긋나지 않게 한다
-            try {
-                await db.collection('brands').doc(currentBrandDocId).update({ likeCount: firebase.firestore.FieldValue.increment(-1) });
-            } catch (countErr) {
-                await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayUnion(currentBrandDocId) });
-                throw countErr;
-            }
-            isBrandLiked = false;
+            batch2.update(uref2, { likedBrands: FV2.arrayRemove(currentBrandDocId) });
+            batch2.update(bref2, { likeCount: FV2.increment(-1) });
         } else {
-            await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayUnion(currentBrandDocId) });
-            // 2026-11-03 A-144: likeCount 쓰기가 실패하면 users 문서를 되돌려 두 기록이 어긋나지 않게 한다
-            try {
-                await db.collection('brands').doc(currentBrandDocId).update({ likeCount: firebase.firestore.FieldValue.increment(1) });
-            } catch (countErr) {
-                await db.collection('users').doc(user.uid).update({ likedBrands: firebase.firestore.FieldValue.arrayRemove(currentBrandDocId) });
-                throw countErr;
-            }
-            isBrandLiked = true;
+            batch2.update(uref2, { likedBrands: FV2.arrayUnion(currentBrandDocId) });
+            batch2.update(bref2, { likeCount: FV2.increment(1) });
         }
+        await batch2.commit();
+        isBrandLiked = !isBrandLiked;
         updateBrandLikeUI();
-    } catch (err) { console.error('Brand like error:', err); }
+    } catch (err) {
+        console.error('Brand like error:', err);
+        var langB = document.documentElement.lang === 'en' ? 'en' : 'ko';
+        likeNote(langB === 'en'
+            ? 'Could not save. Please reload the page and try again.'
+            : '저장하지 못했습니다. 페이지를 새로 불러온 뒤 다시 시도해 주세요.', true);
+    }
     btn.disabled = false;
 }
 

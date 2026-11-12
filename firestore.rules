@@ -74,9 +74,19 @@ service cloud.firestore {
     //      (+1 이면 목록에 있어야 하고, -1 이면 없어야 한다)
     // 3) 때문에 한 사용자가 같은 대상에 기여할 수 있는 값은 최대 +1 이다.
     // 클라이언트는 users 문서를 먼저 쓰고 그다음 likeCount 를 올린다(순서 중요).
-    function likedList(field) {
+    function likedList(field) {       // 이 쓰기 **전**의 내 목록
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get(field, []);
     }
+    function likedListAfter(field) {  // 이 쓰기 **후**의 내 목록 (같은 batch 안이어야 달라진다)
+      return getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.get(field, []);
+    }
+    /* A-482(2026-11-12): 전에는 「+1 은 내 목록에 **있으면**, -1 은 **없으면**」 이었다.
+       목록은 내가 쓰는 내 문서이므로, 먼저 목록에 넣고 나서 +1 을 **몇 번이든** 보낼 수 있었고
+       (규칙 주석의 「최대 +1」 은 사실이 아니었다), 목록에서 빼고 나면 **한 번도 좋아하지 않은**
+       아무 승인 문서나 -1 로 0 까지 깎을 수 있었다. 카운터를 목록의 **변화**에 묶는다 —
+       +1 은 「전에 없었고 후에 있다」, -1 은 「전에 있었고 후에 없다」. getAfter 는 같은
+       batch 안의 결과를 보므로, 클라이언트는 목록과 카운터를 **한 묶음(batch)** 으로 써야 한다.
+       따로 쓰면 getAfter 가 지금 값과 같아져 규칙이 거부한다 — 그게 의도다. */
     function isLikeToggle(docId, field) {
       return isSignedIn()
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
@@ -85,9 +95,11 @@ service cloud.firestore {
         && request.resource.data.likeCount >= 0
         && resource.data.status == 'approved'
         && ((request.resource.data.likeCount == resource.data.get('likeCount', 0) + 1
-             && (docId in likedList(field)))
+             && !(docId in likedList(field))
+             && (docId in likedListAfter(field)))
             || (request.resource.data.likeCount == resource.data.get('likeCount', 0) - 1
-                && !(docId in likedList(field))));
+                && (docId in likedList(field))
+                && !(docId in likedListAfter(field))));
     }
 
     // ────────────────────────────────────────────────────────────────────
