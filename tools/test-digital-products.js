@@ -30,6 +30,7 @@ const code = [
   grab('var DP_PRODUCTS = [', '];'),
   grab('function dpEsc', '\n}'),
   grab('function dpPayUrl', '\n}'),
+  grab('function dpPreviewUrl', '\n}'),
   grab('function dpPick', '\n}'),
   grab('var DP_CAT_LABEL', '};'),
   grab('function dpRenderProducts', '\n}')
@@ -48,8 +49,8 @@ function reset(lang) {
 reset('ko');
 /* 'use strict' 안의 eval 은 **제 스코프**에 함수를 만든다 — 바깥에서 그냥 부를 수 없다.
    그래서 끝에 한 줄을 붙여 밖으로 꺼낸다(DP_PRODUCTS 는 배열이라 참조로 따라온다). */
-eval(code + '\n;globalThis.__dp = { dpEsc, dpPayUrl, dpPick, dpRenderProducts, DP_PRODUCTS };');
-const { dpEsc, dpPayUrl, dpPick, dpRenderProducts, DP_PRODUCTS } = globalThis.__dp;
+eval(code + '\n;globalThis.__dp = { dpEsc, dpPayUrl, dpPreviewUrl, dpPick, dpRenderProducts, DP_PRODUCTS };');
+const { dpEsc, dpPayUrl, dpPreviewUrl, dpPick, dpRenderProducts, DP_PRODUCTS } = globalThis.__dp;
 
 // ── 1) 결제 주소 검사 ──────────────────────────────────────────────────
 [['https://www.paypal.com/ncp/payment/ABC', true],
@@ -63,6 +64,21 @@ const { dpEsc, dpPayUrl, dpPick, dpRenderProducts, DP_PRODUCTS } = globalThis.__
  [undefined, false]
 ].forEach(([u, want]) => ok('결제 주소 ' + JSON.stringify(u), !!dpPayUrl(u) === want));
 
+// ── 1-2) 미리보기 주소 검사 — 시험 사용 수단은 우리가 책임지는 곳만 ────
+[['/previews/a.pdf', true],
+ ['/samples/x/y.pdf', true],
+ ['https://archinodekr.com/previews/a.pdf', true],
+ ['https://www.archinode.org/p.pdf', true],
+ ['https://firebasestorage.googleapis.com/v0/b/x/o/a.pdf?alt=media', true],
+ ['//evil.example/a.pdf', false],                   // 스킴 없는 바깥 주소
+ ['https://evil.example/previews/a.pdf', false],
+ ['https://archinodekr.com.evil.example/a.pdf', false],
+ ['http://archinodekr.com/a.pdf', false],           // https 아님
+ ['javascript:alert(1)', false],
+ ['', false],
+ [undefined, false]
+].forEach(([u, want]) => ok('미리보기 주소 ' + JSON.stringify(u), !!dpPreviewUrl(u) === want));
+
 // ── 2) 상품이 없으면 안내문을 건드리지 않는다 ──────────────────────────
 reset('ko');
 DP_PRODUCTS.length = 0;
@@ -75,17 +91,27 @@ reset('ko');
 DP_PRODUCTS.length = 0;
 DP_PRODUCTS.push(
   { id: 'a', category: 'market-intel', priceEur: 29, nameEn: 'Market <brief>', nameKo: '시장 <브리프>',
-    descEn: 'd', descKo: 'ㄷ', format: 'PDF · 24p', paypalUrl: 'https://www.paypal.com/ncp/payment/ABC' },
+    descEn: 'd', descKo: 'ㄷ', format: 'PDF · 24p', previewUrl: '/previews/a.pdf',
+    paypalUrl: 'https://www.paypal.com/ncp/payment/ABC' },
   { id: 'b', category: 'cad-library', priceEur: 49, nameEn: 'CAD', nameKo: '캐드',
-    descEn: 'd', descKo: 'ㄷ', format: 'DWG', paypalUrl: 'javascript:alert(1)' }
+    descEn: 'd', descKo: 'ㄷ', format: 'DWG', previewUrl: '/previews/b.pdf',
+    paypalUrl: 'javascript:alert(1)' },
+  /* 결제 주소는 성한데 **맛보기가 없는** 상품 — 전자상거래법 제17조②5호의
+     「시험 사용 상품」이 없으면 청약철회 제한이 서지 않으므로 팔지 않는다 */
+  { id: 'c', category: 'spec-sheet', priceEur: 19, nameEn: 'Spec', nameKo: '스펙',
+    descEn: 'd', descKo: 'ㄷ', format: 'PDF',
+    paypalUrl: 'https://www.paypal.com/ncp/payment/DEF' }
 );
 dpRenderProducts();
 const h = grid.innerHTML;
-ok('카드 2장', (h.match(/class="dp-card"/g) || []).length === 2);
+ok('카드 3장', (h.match(/class="dp-card"/g) || []).length === 3);
 ok('안내문을 숨긴다', empty.style.display === 'none');
 ok('그리드를 grid 로 바꾼다', grid.style.display === 'grid');
-ok('결제 주소가 성한 상품만 살아 있는 단추', (h.match(/data-buy=/g) || []).length === 1);
-ok('나쁜 주소는 비활성 단추', (h.match(/dp-card-btn disabled/g) || []).length === 1);
+ok('결제·맛보기가 둘 다 성한 상품만 살아 있는 단추', (h.match(/data-buy=/g) || []).length === 1);
+ok('살아 있는 단추는 a 상품뿐', /data-buy="a"/.test(h) && !/data-buy="c"/.test(h));
+ok('맛보기 없는 상품은 비활성 단추', (h.match(/dp-card-btn disabled/g) || []).length === 2);
+ok('맛보기 링크는 2개(c 는 없다)', (h.match(/class="dp-preview-link"/g) || []).length === 2);
+ok('맛보기 링크는 새 탭·noopener', !/dp-preview-link[^>]*target="_blank"[^>]*rel="noopener noreferrer"/.test(h) === false);
 ok('나쁜 주소가 HTML 에 안 들어간다', !/javascript:/.test(h), h.slice(0, 80));
 ok('꺾쇠를 이스케이프한다', /Market &lt;brief&gt;/.test(h));
 ok('div 균형', (h.match(/<div/g) || []).length === (h.match(/<\/div>/g) || []).length);
@@ -109,6 +135,26 @@ ok('복귀 페이지는 검색에서 뺀다(noindex)', /noindex/.test(OC));
 const OC_TEXT = OC.replace(/<!--[\s\S]*?-->/g, '');
 ok('복귀 페이지가 결제를 단정하지 않는다', !/결제가 완료되었습니다|결제가 완료/.test(OC_TEXT));
 ok('복귀 페이지 제목도 단정하지 않는다', !/<title>[^<]*결제 완료/.test(OC_TEXT));
+
+// ── 6) 결제 전에 「파는 사람이 누구인지」를 보여 준다 ───────────────────
+/* 피싱 걱정에 대한 답은 「믿어 주세요」가 아니라 **대조할 수 있는 사실**이다.
+   신고번호는 공개 대장과 맞춰 볼 수 있고, 이동할 주소는 눈으로 확인된다. */
+const DP_BUY = SRC.slice(SRC.indexOf('function dpOpenBuy'));
+ok('구매창이 맛보기 없이는 열리지 않는다', /if \(!pay \|\| !prev\) return;/.test(DP_BUY));
+ok('구매창에 상호가 있다', /비비들리바이브/.test(DP_BUY));
+ok('구매창에 사업자등록번호가 있다', /640-03-02879/.test(DP_BUY));
+ok('구매창에 통신판매업신고번호가 있다', /2026-안양동안-0318/.test(DP_BUY));
+ok('구매창 영문에도 신고번호가 있다', /2026-Anyang Dongan-0318/.test(DP_BUY));
+ok('구매창에 주소가 있다', /흥안대로 528/.test(DP_BUY));
+ok('이동 전에 주소창 확인을 먼저 말한다', /주소창이 paypal\.com/.test(DP_BUY));
+ok('이동 전 안내가 영문에도 있다', /address bar reads paypal\.com/.test(DP_BUY));
+ok('이동할 주소를 화면에 보여 준다', /dpEsc\(pay\)/.test(DP_BUY));
+ok('카드 정보를 묻지 않는다고 분명히 적는다', /카드 정보를 묻지 않습니다/.test(DP_BUY));
+ok('구매창에 맛보기 링크가 있다', /dpEsc\(prev\)/.test(DP_BUY));
+
+// ── 7) 모든 페이지 푸터의 사업자 정보 ──────────────────────────────────
+ok('디지털 상품 페이지 푸터에 신고번호', /2026-안양동안-0318/.test(SRC.slice(SRC.indexOf('footer-business-info'))));
+ok('복귀 페이지 푸터에 신고번호', /2026-안양동안-0318/.test(OC));
 
 console.log('\n디지털 상품 — 시험 ' + (pass + fail) + '개, 실패 ' + fail + '개');
 process.exit(fail ? 1 : 0);
