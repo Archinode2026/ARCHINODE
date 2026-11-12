@@ -336,6 +336,19 @@
       el.style.display = (not.indexOf(lang) === -1) ? '' : 'none';
     });
 
+    /* A-507(2026-11-13): **브라우저 탭 제목은 언제나 한국어였다.** 화면 안의 글자는
+       A-362~A-402 로 다 갈라 놨는데 `<title>` 만 그 바깥에 있었다 — 영어로 보는
+       손님이 탭을 여러 개 띄우면, 북마크를 만들면, 창을 공유하면 거기 한국어만 남는다.
+       `<title>` 에 data-en/data-ko 를 달고 여기서 **document.title 로** 옮긴다.
+       (textContent 로 바꿔도 되지만 그건 우연히 되는 것이고, 여기 적어 두면 뜻이 보인다.)
+       ※ 정적 HTML 의 `<title>`·`og:title` 은 그대로 둔다 — 크롤러가 읽는 정본은
+         한국어판이고, 이건 **보는 사람의 탭**만 바꾸는 일이다. */
+    var titleEl = document.querySelector('title[data-' + lang + ']');
+    if (titleEl) {
+      var tdoc = titleEl.getAttribute('data-' + lang);
+      if (tdoc) document.title = tdoc;
+    }
+
     document.documentElement.lang = lang;
   }
 

@@ -38,6 +38,7 @@ ARCHINODE 언어 규약 검사기 (A-362, 2026-11-06)
 끝값: 어긋난 것이 있으면 1, 없으면 0.
 """
 import io, os, re, sys, collections
+import html as htmlmod
 from html.parser import HTMLParser
 
 VOID = {'br','img','input','meta','link','hr','source','area','base',
@@ -602,6 +603,75 @@ def check_js_placeholder(problems, notes):
                     'products/view.html:803-811 처럼 글자와 두 속성을 함께 바꿔라.' % i))
 
 
+# ── [10] A-507: 탭 제목만 언어 바깥에 있었다 ────────────────────────────────
+#
+# 화면 안의 글자는 A-362~A-402 로 다 갈라 놨는데 `<title>` 은 그 바깥에 있었다 —
+# 영어로 보는 손님의 탭·북마크·공유 화면에는 언제나 한국어가 남았다(221페이지).
+# `<title>` 에 data-en/data-ko 를 달고 lang.js 가 document.title 로 옮긴다.
+#
+# 한국어로만 쓰인 글(영문 머리글이 아예 없는 매거진 기사)은 **면제**다 —
+# 내용이 한국어인데 제목만 영어로 다는 것은 거짓말이다. 그래서 「영문 h1 이 있는데
+# 제목은 안 갈린 쪽」만 잡는다.
+TITLE_KO_ONLY_OK = re.compile(r'[가-힣]')
+
+
+def check_doc_title(problems, notes):
+    """[10] 영문판이 있는 페이지인데 탭 제목이 한국어로 굳어 있지 않은가."""
+    got = tagged = exempt = 0
+    for f in html_files():
+        src = io.open(f, encoding='utf-8', errors='replace').read()
+        m = re.search(r'<title([^>]*)>(.*?)</title>', src, re.S)
+        if not m:
+            continue
+        attrs, body = m.group(1), m.group(2).strip()
+        has_ko_attr = 'data-ko=' in attrs
+        has_en_attr = 'data-en=' in attrs
+        if has_ko_attr or has_en_attr:
+            tagged += 1
+            if not (has_ko_attr and has_en_attr):
+                problems.append(('[10] 탭제목', f, 0,
+                                 '`<title>` 에 data-en/data-ko 가 **한쪽만** 있다 — 짝으로 달아야 한다'))
+                continue
+            en = re.search(r'data-en="([^"]*)"', attrs).group(1)
+            ko = re.search(r'data-ko="([^"]*)"', attrs).group(1)
+            if TITLE_KO_ONLY_OK.search(en):
+                problems.append(('[10] 탭제목', f, 0,
+                                 'data-en 안에 한글이 남아 있다: %s' % en[:60]))
+            # `<title>` 본문은 날 `&` 를 쓰고 속성은 `&amp;` 를 써야 한다 —
+            # 바이트로 견주면 29페이지가 거짓으로 걸린다(실제로 걸렸다). 뜻으로 본다.
+            if htmlmod.unescape(ko).strip() != htmlmod.unescape(body).strip():
+                problems.append(('[10] 탭제목', f, 0,
+                                 'data-ko 가 화면에 박힌 제목과 다르다 — 정본이 둘이 된다'))
+            continue
+        if not TITLE_KO_ONLY_OK.search(body):
+            continue                       # 한글이 없으면 갈릴 것도 없다
+        # 한글 제목인데 속성이 없다 — 이 페이지에 **영문 머리글**이 있나?
+        h1 = re.search(r'<h1[^>]*\sdata-en="([^"]*)"[^>]*>', src)
+        if h1 and h1.group(1).strip():
+            problems.append(('[10] 탭제목', f, 0,
+                             '영문 h1 이 있는데 `<title>` 은 한국어로 굳어 있다 — '
+                             '영어로 보는 손님의 탭에 한국어가 남는다'))
+        else:
+            exempt += 1
+        got += 1
+    # 속성을 달아 놓고 lang.js 가 안 읽으면 **죽은 속성**이다(A-363 과 같은 실패).
+    ljs = io.open('lang.js', encoding='utf-8').read()
+    # 주석은 벗기고 본다 — 「lang.js 가 document.title 로 옮긴다」고 적어 둔 **내 주석**에
+    # 이 검사가 걸렸다(음성 시험이 통과해 버렸다). A-492·A-502·A-506 에 이어 네 번째다.
+    ljs_code = re.sub(r'/\*[\s\S]*?\*/', '', ljs)
+    ljs_code = re.sub(r'^\s*//[^\n]*', '', ljs_code, flags=re.M)
+    if 'document.title' not in ljs_code:
+        problems.append(('[10] 탭제목', 'lang.js', 0,
+                         '`<title>` 에 data-en/data-ko 를 220쪽에 달아 뒀는데 lang.js 가 '
+                         'document.title 을 바꾸지 않는다 — 달아 놓고 안 듣는 죽은 속성이다'))
+    # 허수 방지 — 달린 페이지가 갑자기 줄면 검사가 멈춘 것이다
+    if tagged < 200:
+        problems.append(('[10] 탭제목', '(검사 자체)', 0,
+                         'data-en/data-ko 가 달린 `<title>` 을 %d개만 찾았다 — 200개 밑이면 검사가 멈춘 것으로 본다' % tagged))
+    if exempt:
+        notes.append('탭 제목 면제 %d페이지 — 영문 머리글이 없는 한국어 전용 글이라 제목도 한국어가 맞다' % exempt)
+
+
 def main():
     if not os.path.exists('lang.js'):
         print('리포 뿌리에서 실행해라 (lang.js 가 보이는 곳).', file=sys.stderr)
@@ -618,6 +688,7 @@ def main():
     check_public_sensitive(problems, notes)
     check_inbound_links(problems, notes)
     check_js_placeholder(problems, notes)
+    check_doc_title(problems, notes)
 
     print('lang.js 가 훑는 접미사: %s'
           % ', '.join(sorted(x or '(없음)' for x in supported)))
@@ -629,7 +700,7 @@ def main():
               '쓸지 말지는 결정 대기, A-368 참고'
               % (len(deferred), len(set(x[0] for x in deferred))))
     if not problems:
-        print('언어 규약 검사 — 어긋난 것 없음 (검사 9종)')
+        print('언어 규약 검사 — 어긋난 것 없음 (검사 10종)')
         return 0
     by = collections.Counter(x[0] for x in problems)
     print('언어 규약 검사 — 어긋난 것 %d건' % len(problems))

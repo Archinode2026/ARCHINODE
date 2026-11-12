@@ -78,7 +78,9 @@ for parent, slug, path in pages:
     checked += 1
 
     seen = {
-        'title':      pick(r'<title>(.*?)</title>', s),
+        # A-507: `<title>` 에 data-en/data-ko 가 붙었다. 속성을 허용하지 않으면
+        # 69페이지가 한꺼번에 「title 가 없다」로 떨어진다(실제로 떨어졌다).
+        'title':      pick(r'<title[^>]*>(.*?)</title>', s),
         'og:title':   pick(r'<meta\s+property="og:title"\s+content="([^"]*)"', s),
         'JSON-LD name': pick(r'"name"\s*:\s*"([^"]*—[^"]*)"', s),
         '빵부스러기': None,
