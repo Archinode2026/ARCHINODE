@@ -38,10 +38,10 @@
     return s.length > n ? s.slice(0, n) + '…' : s;
   }
 
-  /* lead = leads 에 넣은 그 객체 그대로 넘기면 된다. */
-  window.notifyNewLead = function (lead) {
-    try {
-      if (typeof db === 'undefined' || !db) return;
+  /* lead = leads 에 넣은 그 객체 그대로 넘기면 된다. 메일 문서를 만들어 돌려준다.
+     A-490(2026-11-12): 전에는 이 안에서 바로 `mail` 에 쓰고 실패를 삼켰다.
+     만드는 일과 보내는 일을 갈라, 접수와 **한 묶음**으로 쓸 수 있게 한다. */
+  window.buildLeadMailDoc = function (lead) {
       lead = lead || {};
       var label = TYPE_LABEL[lead.type] || String(lead.type || '문의');
       var who = String(lead.brandName || '').trim();
@@ -69,12 +69,49 @@
         ADMIN_URL
       ]);
 
-      // 기다리지 않는다. 접수는 이미 끝난 일이다.
-      db.collection('mail').add({
+      return {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         to: ADMIN_TO,
         message: { subject: subject, text: lines.join('\n') }
-      }).catch(function (err) {
+      };
+  };
+
+  /* ★ A-490(2026-11-12, 브론즈 30차 ㉑): 전에는 접수(`leads`)를 먼저 쓰고 알림을
+     **기다리지 않고** 던진 뒤 실패를 `console.warn` 으로 삼켰다. 그래서 알림이
+     안 간 리드는 **아무 데도 남지 않았고**, 어드민이 인박스를 열기 전까지 아무도
+     몰랐다 — A-263 이 막으려던 바로 그 상태로 조용히 돌아간다.
+
+     그렇다고 알림 실패로 접수를 막으면 더 나쁘다(A-263 의 원칙 1).
+     그래서 둘을 **한 묶음(batch)** 으로 쓴다:
+       · 성공하면 「접수됐다」가 곧 「알림이 큐에 들어갔다」를 뜻한다.
+       · 묶음이 거부되면 **접수만 따로** 한다 — 접수는 절대 잃지 않는다.
+         대신 그 문서에 `notifyPending: true` 를 박아 **어드민 화면에 표시**한다.
+     어느 쪽이든 「갔는지 안 갔는지 모르는 상태」는 남지 않는다. */
+  window.submitLeadWithNotify = function (leadDoc) {
+    if (typeof db === 'undefined' || !db) return Promise.reject(new Error('db 없음'));
+    var col = db.collection('leads');
+    var mailDoc = null;
+    try { mailDoc = window.buildLeadMailDoc(leadDoc); } catch (e) {
+      console.warn('[lead] 알림 본문을 못 만들었다', e);
+    }
+    if (!mailDoc) {
+      return col.add(Object.assign({}, leadDoc, { notifyPending: true }));
+    }
+    var leadRef = col.doc();
+    var batch = db.batch();
+    batch.set(leadRef, leadDoc);
+    batch.set(db.collection('mail').doc(), mailDoc);
+    return batch.commit().then(function () { return leadRef; }, function (err) {
+      console.warn('[lead] 접수+알림 묶음 실패 — 접수만 따로 한다', (err && err.code) || err);
+      return col.add(Object.assign({}, leadDoc, { notifyPending: true }));
+    });
+  };
+
+  /* 옛 이름 — 이미 접수한 뒤에 알림만 따로 보낼 때. 실패는 삼킨다(그 자리에선 할 수 있는 게 없다). */
+  window.notifyNewLead = function (lead) {
+    try {
+      var doc = window.buildLeadMailDoc(lead);
+      if (doc) db.collection('mail').add(doc).catch(function (err) {
         console.warn('[lead] admin notification skipped:', err);
       });
     } catch (err) {

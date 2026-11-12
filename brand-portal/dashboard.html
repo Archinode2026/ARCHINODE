@@ -2300,6 +2300,8 @@ function inbox_open(id) {
     document.getElementById('inboxModalContent').innerHTML = '<h2>' + inbox_esc(it.name || '-') + ' ' + inbox_typeBadge(it.type) + ' ' + inbox_statusBadge(it.status) + '</h2>'
         + '<dl class="inbox-dl">' + dd('Company', '회사', it.company) + dd('Email', '이메일', it.email) + dd('Phone', '전화', it.phone) + dd('Industry', '업종', it.industry)
         + dd('Product', '제품', it.productName) + dd('Received', '접수', inbox_fmtDate(it.createdAt)) + dd('Assigned', '배정', inbox_fmtDate(it.assignedAt)) + dd('Message', '본문', it.message) + '</dl>'
+        /* A-491: 샘플 요청의 배송지 — 샘플을 보내는 쪽이 브랜드다. 전에는 어디에도 안 나왔다. */
+        + (it.shippingAddress ? dd('Shipping address', '배송지', it.shippingAddress) : '')
         + '<div class="inbox-bar"><label for="inboxStatus" ' + inbox_attr('Status', '상태') + '>' + inbox_esc(inbox_t('Status', '상태')) + '</label><select id="inboxStatus">' + opts + '</select>'
         + '<input type="text" id="inboxNote" maxlength="200" value="' + inbox_attrEsc(it.brandNote || '') + '" placeholder="' + inbox_attrEsc(inbox_t('Your note (one line, optional)', '메모 한 줄 (선택)')) + '" data-en-placeholder="Your note (one line, optional)" data-ko-placeholder="메모 한 줄 (선택)"></div>'
         + '<div class="inbox-err" id="inboxErr"></div>'

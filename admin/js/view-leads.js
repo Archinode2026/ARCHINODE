@@ -473,7 +473,14 @@ async function lead_view(id) {
         + dd('Source', '출처', lead_sourceLabel(it.source) + (it.userId ? ' · uid ' + it.userId : ''))
         + dd('Received', '접수', fmtDate(it.createdAt))
         + dd('Assigned brand', '배정 브랜드', it.brandName ? it.brandName + (it.assignedAt ? ' · ' + fmtDate(it.assignedAt) : '') : '')
+        /* A-491(2026-11-12): 샘플 요청의 배송지(`shippingAddress`)는 **담기기만 하고
+           아무 화면에도 안 나왔다** — 전수로 세니 저장소에서 그 키를 읽는 코드가 0곳,
+           쓰는 코드만 1곳이었다. 받아 놓고 아무도 못 보니 샘플을 보낼 수가 없다. */
         + dd('Message', '본문', it.message)
+        + (it.shippingAddress ? dd('Shipping address', '배송지', it.shippingAddress) : '')
+        /* A-490: 접수는 됐는데 알림 메일이 안 들어간 건. 묶음이 거부된 경우에만 박힌다. */
+        + (it.notifyPending ? '<dt>' + escapeHtml(t('Notification', '알림')) + '</dt><dd style="color:#8a2b2b;">'
+             + escapeHtml(t('Admin e-mail was NOT queued for this lead.', '이 리드는 알림 메일이 들어가지 않았습니다.')) + '</dd>' : '')
         + (it.brandNote ? dd('Brand note', '브랜드 메모', it.brandNote) : '')
         + '</dl>'
         // 배정 — 승인 브랜드 select

@@ -78,10 +78,53 @@ for need in ['name', 'email', 'message', 'company', 'phone']:
     if need not in CAPS:
         errors.append('[규칙] "%s" 의 상한을 못 찾았다 — 규칙이 바뀌었거나 탐지가 멈췄다' % need)
 
+# ── 1-b) 폼이 담는 키가 규칙의 키 목록 안에 있는지 ─────────────────────────
+#   ★ 이 대조가 없으면 조건부로 붙는 칸(예: 샘플 요청의 shippingAddress)이
+#     목록에서 빠진 줄 모르고 규칙을 올렸다가 **폼 하나가 통째로 거부된다.**
+#     실제로 A-485 를 쓸 때 그 칸이 빠졌고, 이 검사를 만들면서 찾았다.
+def allow_list(clause):
+    m = re.search(r"keys\(\)\.hasOnly\(\s*\[(.*?)\]\s*\)", clause, re.S)
+    return set(re.findall(r"'(\w+)'", m.group(1))) if m else set()
+
+
+LEAD_FORMS = {
+    'brands/view.html': 'leadDoc',
+    'products/view.html': 'data',
+    'sourcing-inquiry.html': 'leadDoc',
+    'admin/js/view-leads.js': 'doc',
+}
+allowed = allow_list(lead_cl)
+if not allowed:
+    errors.append('[규칙] leads create 의 키 목록을 읽지 못했다')
+else:
+    for rel, var in LEAD_FORMS.items():
+        src = strip_comments(io.open(os.path.join(ROOT, rel), encoding='utf-8').read())
+        m = re.search(r'(?:const|let|var)\s+' + var + r'\s*=\s*\{', src)
+        if not m:
+            errors.append('[폼] %s 에서 리드 객체(%s)를 못 찾았다 — 탐지가 멈췄다' % (rel, var))
+            continue
+        i = src.index('{', m.end() - 1)
+        d, j = 0, i
+        while j < len(src):
+            if src[j] == '{': d += 1
+            elif src[j] == '}':
+                d -= 1
+                if d == 0: break
+            j += 1
+        keys = set(re.findall(r'(?m)^\s*([A-Za-z_]\w*)\s*:', src[i:j + 1]))
+        # 리터럴 뒤에 조건부로 더 붙이는 칸까지 센다 (data.shippingAddress = … 꼴)
+        for mm in re.finditer(r'\b' + var + r'\.([A-Za-z_]\w*)\s*=[^=]', src):
+            keys.add(mm.group(1))
+        extra = sorted(k for k in keys - allowed)
+        if extra:
+            errors.append('[키] %s 가 담는 칸 %s 이(가) 규칙의 키 목록에 없다 — '
+                          '규칙을 올리는 순간 이 폼이 통째로 거부된다' % (rel, ', '.join(extra)))
+
 # ── 2) 폼의 maxlength 가 규칙 상한 이하인지 ────────────────────────────────
 FORMS = {
     'brands/view.html':      {'rfqName': 'name', 'rfqCompany': 'company', 'rfqEmail': 'email', 'rfqMessage': 'message'},
     'products/view.html':    {'rfqName': 'name', 'rfqCompany': 'company', 'rfqEmail': 'email', 'rfqMessage': 'message',
+                              'rfqShipping': 'shippingAddress',
                               'bimName': 'name', 'bimCompany': 'company', 'bimTitle': 'title', 'bimEmail': 'email',
                               'bimPhone': 'phone', 'bimProjectName': 'projectName'},
     'sourcing-inquiry.html': {'srcName': 'name', 'srcCompany': 'company', 'srcEmail': 'email', 'srcMessage': 'message'},
@@ -104,8 +147,8 @@ for rel, fields in FORMS.items():
         if cap is not None and int(ml.group(1)) > cap:
             errors.append('[폼] %s / %s 의 maxlength=%s 가 규칙 상한 %d 보다 크다 — '
                           '다 쓰고 나서 거부당한다' % (rel, fid, ml.group(1), cap))
-if checked < 18:
-    errors.append('[자기검사] maxlength 를 %d칸만 확인했다(18칸이어야 한다)' % checked)
+if checked < 19:
+    errors.append('[자기검사] maxlength 를 %d칸만 확인했다(19칸이어야 한다)' % checked)
 
 # ── 3) 읽기 규칙 (A-486) ───────────────────────────────────────────────────
 bare = re.findall(r'allow read:[^;]*?resource\.data\.status\s*==', rules_code, re.S)

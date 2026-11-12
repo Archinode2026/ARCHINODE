@@ -380,9 +380,10 @@ async function submitSourcing(e) {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       assignedAt: null
     };
-    await db.collection('leads').add(leadDoc);
-    // 기다리지 않는다 — 메일이 늦거나 실패해도 접수는 이미 끝난 일이다(A-263).
-    if (window.notifyNewLead) window.notifyNewLead(leadDoc);
+    /* A-490(2026-11-12): 접수와 알림을 **한 묶음**으로. 묶음이 거부되면 접수만
+       따로 하고 `notifyPending` 을 박는다. */
+    if (window.submitLeadWithNotify) await window.submitLeadWithNotify(leadDoc);
+    else await db.collection('leads').add(Object.assign({}, leadDoc, { notifyPending: true }));
     document.getElementById('sourcingFormWrap').style.display = 'none';
     document.getElementById('sourcingSuccessWrap').style.display = 'block';
   } catch (err) {
