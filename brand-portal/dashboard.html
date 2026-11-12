@@ -679,10 +679,12 @@ h1, h2, .section-card h2 {
                         <label for="prodPrice" data-en="Price Range" data-ko="가격대">Price Range</label>
                         <select id="prodPrice">
                             <option value="" data-en="Select" data-ko="선택">Select</option>
-                            <option value="$" data-en="$ (Under $500)" data-ko="$ (500달러 미만)">$ (Under $500)</option>
-                            <option value="$$" data-en="$$ ($500–$2,000)" data-ko="$$ ($500–$2,000)">$$ ($500–$2,000)</option>
-                            <option value="$$$" data-en="$$$ ($2,000–$5,000)" data-ko="$$$ ($2,000–$5,000)">$$$ ($2,000–$5,000)</option>
-                            <option value="$$$$" data-en="$$$$ ($5,000+)" data-ko="$$$$ ($5,000+)">$$$$ ($5,000+)</option>
+                            <!-- A-498(2026-11-12): 보이는 글자는 유로, `value` 는 그대로다.
+                                 값은 이미 올라간 제품이 쓰는 열쇠이고 공개 페이지가 그걸 찍는다. -->
+                            <option value="$" data-en="€ (Under EUR 500)" data-ko="€ (500유로 미만)">€ (Under EUR 500)</option>
+                            <option value="$$" data-en="€€ (EUR 500–2,000)" data-ko="€€ (EUR 500–2,000)">€€ (EUR 500–2,000)</option>
+                            <option value="$$$" data-en="€€€ (EUR 2,000–5,000)" data-ko="€€€ (EUR 2,000–5,000)">€€€ (EUR 2,000–5,000)</option>
+                            <option value="$$$$" data-en="€€€€ (EUR 5,000+)" data-ko="€€€€ (EUR 5,000+)">€€€€ (EUR 5,000+)</option>
                             <option value="Contact" data-en="Contact for price" data-ko="가격 문의">Contact for price</option>
                         </select>
                     </div>

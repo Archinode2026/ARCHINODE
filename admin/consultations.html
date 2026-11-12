@@ -276,9 +276,12 @@ const CATEGORY_LABEL = {
   'material-sourcing': 'Material Sourcing',
   'other': 'Other / Custom'
 };
+/* A-498(2026-11-12): 보이는 금액은 유로다(승리님 결정 — 고객 타겟이 유럽).
+   열쇠(`single-300`·`package-1000`)는 **이미 저장된 신청서가 쓰는 값**이라 그대로 둔다 —
+   열쇠의 숫자는 가격이 아니라 이름이다. 공개 폼의 글자와 여기를 **같이** 고쳐야 한다. */
 const BUDGET_LABEL = {
-  'single-300': '$300 (single session)',
-  'package-1000': '$1,000+ (multi-session)',
+  'single-300': 'EUR 280 (single session)',
+  'package-1000': 'EUR 1,000+ (multi-session)',
   'custom': 'Custom — discuss',
   'not-sure': 'Not sure yet'
 };

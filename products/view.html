@@ -686,8 +686,13 @@ function renderProduct(p, related) {
 
     // Price badge
     /* A-471: 이 한 줄만 날값이었다 — 같은 파일의 다른 자리는 전부 escapeHtml 을 거친다 */
-    const pPriceRange = escapeHtml(p.priceRange || '');
-    const priceHtml = pPriceRange ? `<div class="pp-price-badge">${pPriceRange === 'Contact' ? 'Contact for price' : pPriceRange}</div>` : '';
+    /* A-498(2026-11-12): 저장된 값은 `$`·`$$`·`$$$`·`$$$$` 다(이미 올라간 제품이 쓰는 열쇠라
+   그대로 둔다). 보이는 글자만 유로 기호로 바꾼다 — 승리님 결정으로 우리 화면의 통화는 전부 유로다.
+   ★ 값을 바꾸지 않는 이유: 공개 제품 페이지가 **저장값을 그대로 찍는다**. 값을 바꾸면
+   이미 올라간 제품은 빈 칸이 되거나 옛 기호가 남아 두 가지가 섞인다. */
+    const PRICE_TIER = { '$': '€', '$$': '€€', '$$$': '€€€', '$$$$': '€€€€' };
+    const pPriceRange = escapeHtml(PRICE_TIER[p.priceRange] || p.priceRange || '');
+    const priceHtml = pPriceRange ? `<div class="pp-price-badge">${p.priceRange === 'Contact' ? 'Contact for price' : pPriceRange}</div>` : '';
 
     // Related products
     let relatedHtml = '';
