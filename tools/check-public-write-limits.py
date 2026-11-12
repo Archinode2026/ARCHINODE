@@ -120,6 +120,31 @@ else:
             errors.append('[키] %s 가 담는 칸 %s 이(가) 규칙의 키 목록에 없다 — '
                           '규칙을 올리는 순간 이 폼이 통째로 거부된다' % (rel, ', '.join(extra)))
 
+# 자료 신청(bim-requests)도 같은 대조 — 이쪽도 공개 제품 페이지의 폼이다
+bim_cl = create_clause('bim-requests') or ''
+bim_allowed = allow_list(bim_cl)
+if not bim_allowed:
+    errors.append('[규칙] bim-requests create 의 키 목록을 읽지 못했다')
+else:
+    src = strip_comments(io.open(os.path.join(ROOT, 'products/view.html'), encoding='utf-8').read())
+    m = re.search(r"collection\('bim-requests'\)\.add\(", src)
+    if not m:
+        errors.append('[폼] products/view.html 에서 자료 신청 쓰기를 못 찾았다 — 탐지가 멈췄다')
+    else:
+        i = src.index('{', m.end() - 1)
+        d, j = 0, i
+        while j < len(src):
+            if src[j] == '{': d += 1
+            elif src[j] == '}':
+                d -= 1
+                if d == 0: break
+            j += 1
+        keys = set(re.findall(r'(?m)^\s*([A-Za-z_]\w*)\s*:', src[i:j + 1]))
+        extra = sorted(keys - bim_allowed)
+        if extra:
+            errors.append('[키] 자료 신청 폼이 담는 칸 %s 이(가) 규칙의 키 목록에 없다 — '
+                          '규칙을 올리는 순간 신청이 통째로 거부된다' % ', '.join(extra))
+
 # ── 2) 폼의 maxlength 가 규칙 상한 이하인지 ────────────────────────────────
 FORMS = {
     'brands/view.html':      {'rfqName': 'name', 'rfqCompany': 'company', 'rfqEmail': 'email', 'rfqMessage': 'message'},
