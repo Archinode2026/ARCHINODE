@@ -10,14 +10,105 @@
    안내를 화면에 보여줘 "버튼이 고장났나?"로 오인하지 않도록 한다.
 */
 (function(){
+  /* ── A-517(브론즈 36차 N36-2·N36-8): 폼이 **손님의 언어로 말하지 않았다** ──────
+     ㄱ) 빈 칸이나 잘못된 이메일을 두고 제출하면 나오는 말은 **브라우저 기본 문구**다.
+        그 문구의 언어를 정하는 것은 우리 사이트가 아니라 **손님 브라우저의 설정**이라,
+        영어로 보는 손님에게도 한국어 경고가 떴다(실측). 저장소 전체에
+        `setCustomValidity` 가 **0건**이었다 — 한 번도 우리가 말한 적이 없다.
+     ㄴ) 5초 재제출 안내는 `localStorage` 만 보고 없으면 **영어**로 떨어졌다. 그런데
+        지금 화면의 언어를 아는 정본은 `document.documentElement.lang` 이다(A-402).
+     둘 다 「화면은 한국어인데 말은 영어」 계열이다(A-362~A-402 · A-492 · A-507). */
+  function archiFormLang() {
+    var l = (document.documentElement && document.documentElement.lang) || '';
+    if (l === 'ko' || l === 'en') return l;
+    try {
+      return localStorage.getItem('archinode-lang')
+          || localStorage.getItem('archinode-lang-auto') || 'en';
+    } catch (e) { return 'en'; }
+  }
+
+  var V_MSG = {
+    ko: {
+      valueMissing:      '필수 항목입니다.',
+      checkboxMissing:   '동의가 필요합니다.',
+      emailMismatch:     '이메일 주소를 @ 를 포함해 올바르게 입력해 주세요.',
+      urlMismatch:       '주소를 http:// 또는 https:// 로 시작하게 입력해 주세요.',
+      tooShort:          '조금 더 길게 입력해 주세요.',
+      tooLong:           '글자 수가 너무 많습니다.',
+      patternMismatch:   '형식이 맞지 않습니다.',
+      rangeUnderflow:    '더 큰 값을 넣어 주세요.',
+      rangeOverflow:     '더 작은 값을 넣어 주세요.',
+      stepMismatch:      '허용되지 않는 값입니다.',
+      badInput:          '입력한 값을 알아볼 수 없습니다.'
+    },
+    en: {
+      valueMissing:      'This field is required.',
+      checkboxMissing:   'Please tick this box to continue.',
+      emailMismatch:     'Enter a valid email address, including the @.',
+      urlMismatch:       'Enter an address starting with http:// or https://.',
+      tooShort:          'Please write a little more.',
+      tooLong:           'That is longer than allowed.',
+      patternMismatch:   'That format does not match.',
+      rangeUnderflow:    'Please enter a larger value.',
+      rangeOverflow:     'Please enter a smaller value.',
+      stepMismatch:      'That value is not allowed.',
+      badInput:          'That value could not be read.'
+    }
+  };
+
+  /* 어떤 말을 할지 고른다. 상태 하나만 받아 고르므로 **브라우저 없이 시험할 수 있다**
+     (`tools/test-form-messages.js` 가 이 함수를 떼어 내 돌린다). */
+  function archiPickMessage(v, type, lang) {
+    var m = V_MSG[lang] || V_MSG.en;
+    if (!v) return '';
+    if (v.valid) return '';
+    if (v.valueMissing)    return (type === 'checkbox' || type === 'radio') ? m.checkboxMissing : m.valueMissing;
+    if (v.typeMismatch)    return (type === 'url') ? m.urlMismatch : m.emailMismatch;
+    if (v.patternMismatch) return m.patternMismatch;
+    if (v.tooShort)        return m.tooShort;
+    if (v.tooLong)         return m.tooLong;
+    if (v.rangeUnderflow)  return m.rangeUnderflow;
+    if (v.rangeOverflow)   return m.rangeOverflow;
+    if (v.stepMismatch)    return m.stepMismatch;
+    if (v.badInput)        return m.badInput;
+    return m.valueMissing;      // 알 수 없는 상태 — 아무 말도 안 하느니 필수 안내를 한다
+  }
+  window.archiPickMessage = archiPickMessage;   // 시험과 다른 화면이 쓴다
+
+  function archiApplyMessage(el) {
+    if (!el || typeof el.setCustomValidity !== 'function' || !el.validity) return;
+    /* 먼저 비워야 **지금의 진짜 상태**가 보인다 — 비우지 않으면 한 번 틀린 칸이
+       고친 뒤에도 계속 틀린 것으로 남는다. */
+    el.setCustomValidity('');
+    if (el.validity.valid) return;
+    el.setCustomValidity(archiPickMessage(el.validity, (el.type || '').toLowerCase(), archiFormLang()));
+  }
+
+  document.addEventListener('invalid', function (e) { archiApplyMessage(e.target); }, true);
+  /* 고치는 순간 우리 말을 지운다 — 안 지우면 칸이 영영 틀린 채로 남는다 */
+  function clear(e) {
+    var el = e.target;
+    if (el && typeof el.setCustomValidity === 'function') el.setCustomValidity('');
+  }
+  document.addEventListener('input', clear, true);
+  document.addEventListener('change', clear, true);
+  /* 언어를 바꾸면 다음 경고부터 그 언어로 나온다 — 남아 있던 말은 지운다 */
+  document.addEventListener('archinode:lang', function () {
+    var list = document.querySelectorAll('input, select, textarea');
+    for (var i = 0; i < list.length; i++) {
+      if (typeof list[i].setCustomValidity === 'function') list[i].setCustomValidity('');
+    }
+  });
+
   var COOL = 5000; // 5초
   function tag(form){ return 'archi-form-locked-' + (form.id || form.action || 'anon'); }
 
   function showThrottleNotice(remainMs){
     var existing = document.getElementById('archiFormThrottleNotice');
     if (existing) existing.remove();
-    var lang = 'en';
-    try { lang = localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en'; } catch(e) {}
+    /* A-517: 전에는 `localStorage` 만 보고 없으면 영어로 떨어졌다. 지금 화면의
+       언어를 아는 정본은 `document.documentElement.lang` 이다(A-402). */
+    var lang = archiFormLang();
     var seconds = Math.max(1, Math.ceil(remainMs / 1000));
     var msg = (lang === 'ko')
       ? ('방금 제출했습니다. ' + seconds + '초 후 다시 시도해 주세요.')

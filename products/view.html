@@ -1232,6 +1232,9 @@ window.addEventListener('scroll', () => { header.classList.toggle('scrolled', wi
 <script src="../cookie-consent.js?v=20260630" defer></script>
 <script src="../analytics-loader.js?v=20260630" defer></script>
 <script src="../sentry-loader.js?v=20260630" defer></script>
+<!-- A-517: 이 쪽에도 견적·자료 요청 폼이 있는데 이 파일만 빠져 있었다 —
+     5초 재제출 막음도, 손님 언어로 말하는 경고도 여기에는 안 왔다. -->
+<script src="../form-throttle.js?v=20261113a" defer></script>
 <!-- SCROLL TO TOP — A-458(2026-11-11): A-451 에서 네 페이지에 넣었는데 **더 긴 페이지들을
      빠뜨렸다.** 매거진 기사 131편은 이 사이트에서 가장 긴 문서들이고, 제품 상세 ·
      for-brands · list-your-brand 도 넣은 네 곳보다 길다. (브론즈 28차 11번)
