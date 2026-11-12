@@ -2236,7 +2236,7 @@ function inbox_open(id) {
     for (var i = 0; i < allowed.length; i++) { var m = INBOX_STATUSES[allowed[i]]; opts += '<option value="' + allowed[i] + '"' + (allowed[i] === it.status ? ' selected' : '') + ' ' + inbox_attr(m.en, m.ko) + '>' + inbox_esc(inbox_t(m.en, m.ko)) + '</option>'; }
     var dd = function (en, ko, val) { return '<dt ' + inbox_attr(en, ko) + '>' + inbox_esc(inbox_t(en, ko)) + '</dt><dd>' + inbox_esc(val || '-') + '</dd>'; };
     var hist = Array.isArray(it.history) ? it.history.slice().reverse() : [], histHtml = '';
-    for (var h = 0; h < hist.length; h++) { var e = hist[h] || {}; histHtml += '<li>' + inbox_statusBadge(e.status) + ' <small>' + inbox_esc(inbox_fmtDate(e.at)) + ' · ' + inbox_esc(e.byRole || '-') + '</small>' + (e.note ? '<div>' + inbox_esc(e.note) + '</div>' : '') + '</li>'; }
+    for (var h = 0; h < hist.length; h++) { var e = hist[h] || {}; histHtml += '<li>' + inbox_statusBadge(e.status) + ' <small>' + inbox_esc(inbox_fmtDate(e.at)) + ' · ' + inbox_esc(e.byRole === 'admin' ? 'ARCHINODE' : (e.by || e.byRole || '-')) + '</small>' + (e.note ? '<div>' + inbox_esc(e.note) + '</div>' : '') + '</li>'; }
     document.getElementById('inboxModalContent').innerHTML = '<h2>' + inbox_esc(it.name || '-') + ' ' + inbox_typeBadge(it.type) + ' ' + inbox_statusBadge(it.status) + '</h2>'
         + '<dl class="inbox-dl">' + dd('Company', '회사', it.company) + dd('Email', '이메일', it.email) + dd('Phone', '전화', it.phone) + dd('Industry', '업종', it.industry)
         + dd('Product', '제품', it.productName) + dd('Received', '접수', inbox_fmtDate(it.createdAt)) + dd('Assigned', '배정', inbox_fmtDate(it.assignedAt)) + dd('Message', '본문', it.message) + '</dl>'

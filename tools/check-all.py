@@ -77,6 +77,8 @@ CHECKS = [
      'A-477 — 공개 정보(브랜드명·날짜)에서 유도되지 않는지 · Math.random 이 아닌 crypto 인지'),
     ('담당자 개인정보 분리',  'py',   'tools/check-brand-contact.py',
      'A-480 — 공개 brands 문서에 담당자 이름·이메일·전화가 되돌아오거나, 병합 없이 읽어 화면이 조용히 비는지'),
+    ('리드 내부기록 분리',    'py',   'tools/check-lead-internal.py',
+     'A-481 — 어드민 메모·어드민 이메일이 배정된 브랜드가 읽는 리드 문서로 되돌아오는지 · history 축소 금지'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

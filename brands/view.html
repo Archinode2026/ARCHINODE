@@ -971,7 +971,7 @@ async function submitRfq(e) {
             message: message,
             source: 'brand-page',
             userId: (auth.currentUser ? auth.currentUser.uid : ''),
-            adminNote: '',
+            // A-481: adminNote 는 leads/{id}/internal/admin 으로 — 배정된 브랜드가 리드 문서를 통째로 읽는다
             brandNote: '',
             hp: '',
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),

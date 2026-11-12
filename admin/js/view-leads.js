@@ -374,13 +374,15 @@ function lead_saveManual() {
     if (problems.length) { lead_showErr('lfErr', problems.join('\n')); return; }
     lead_showErr('lfErr', '');
     var by = auth.currentUser.email || '';
-    var entry = { status: 'new', by: by, byRole: 'admin', at: new Date().toISOString(), note: 'manual entry' };
+    var at0 = new Date().toISOString();
+    var entry = { status: 'new', byRole: 'admin', at: at0 };                                  // A-481 문서용(뼈대)
+    var privEntry0 = { status: 'new', by: by, at: at0, note: 'manual entry' };                // internal/admin 용
     var doc = {
         type: data.type, status: 'new',
         brandId: '', brandName: '',                       // 배정은 별도 update (create 는 규칙상 'new' 만)
         productId: data.productId, productName: data.productName,
         name: data.name, company: data.company, email: data.email, phone: data.phone, industry: data.industry, message: data.message,
-        source: 'admin-manual', userId: '', adminNote: '', brandNote: '',
+        source: 'admin-manual', userId: '', brandNote: '',   // A-481: adminNote 는 internal/admin 에
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         assignedAt: null,
@@ -391,6 +393,10 @@ function lead_saveManual() {
     if (btn) btn.disabled = true;
     db.collection('leads').add(doc).then(function (ref) {
         lead_state.saving = false;
+        // A-481: 어드민 이메일이 든 이력은 서브컬렉션으로. 실패해도 리드 등록 자체는 살린다
+        ref.collection('internal').doc('admin')
+           .set({ notes: [privEntry0] }, { merge: true })
+           .catch(function (e) { console.warn('[leads] internal/admin 기록 실패', e && e.code); });
         logAdmin({ action: 'lead.create', target: { col: 'leads', id: ref.id, label: lead_label(data) }, from: '', to: 'new', note: 'admin-manual · ' + data.type });
         showToast(t('Lead registered', '리드를 등록했습니다'), 'success');
         closeModal();
@@ -413,11 +419,37 @@ function lead_saveManual() {
 }
 
 // ── 상세 모달 — 연락처·본문·유형·출처 · 배정 · 상태 변경 + 메모 · adminNote · 이력 ──
-function lead_view(id) {
+/* A-481(2026-11-12): 어드민 메모와 어드민이 남긴 상태 메모·어드민 이메일은
+   `leads/{id}/internal/admin` 으로 옮겼다. 배정된 브랜드는 리드 문서를 **통째로**
+   읽을 수 있어서(필드 단위 읽기가 없다) 전에는 그 둘이 그대로 넘어갔다.
+   여기서 한 번 읽어 `it._internal` 에 달아 둔다(문서에 저장되는 값이 아니다). */
+async function lead_view(id) {
     var it = lead_findItem(id);
     if (!it) return;
+    var internal = {};
+    var internalFailed = false;
+    try {
+        /* 못 열리는 모달을 만들지 않는다 — 8초 안에 못 읽으면 못 읽은 것으로 간다.
+           (A-475 와 같은 원칙: 성공 경로만 손질하면 실패 경로가 영원히 돈다.) */
+        var isnap = await Promise.race([
+            db.collection('leads').doc(id).collection('internal').doc('admin').get(),
+            new Promise(function (_, rj) { setTimeout(function () { rj(new Error('timeout')); }, 8000); })
+        ]);
+        if (isnap.exists) internal = isnap.data() || {};
+    } catch (e) {
+        console.warn('[leads] internal/admin 읽기 실패', (e && e.code) || (e && e.message));
+        internalFailed = true;
+    }
+    it._internal = internal;
+    it._internalFailed = internalFailed;
     var dd = function (en, ko, val) { return '<dt ' + tAttr(en, ko) + '>' + escapeHtml(t(en, ko)) + '</dt><dd>' + escapeHtml(val || '-') + '</dd>'; };
-    var hist = Array.isArray(it.history) ? it.history.slice().reverse() : [];   // 최신 위
+    /* 어드민 쪽 이력은 internal/admin.notes 에, 브랜드 쪽 이력은 문서의 history 에 있다.
+       어드민 화면은 둘을 합쳐 본다(브랜드 화면은 history 만 본다 — 그게 분리의 요점이다). */
+    var hist = (Array.isArray(it.history) ? it.history : [])
+        .filter(function (h) { return h && h.byRole !== 'admin'; })
+        .concat((Array.isArray(internal.notes) ? internal.notes : [])
+            .map(function (n) { return Object.assign({ byRole: 'admin' }, n); }))
+        .sort(function (a, b) { return String(b.at || '').localeCompare(String(a.at || '')); });
     var histHtml = '';
     for (var i = 0; i < hist.length; i++) {
         var h = hist[i] || {};
@@ -460,8 +492,15 @@ function lead_view(id) {
         // 어드민 메모
         + '<div class="adm-bar">'
         +   '<label ' + tAttr('Admin note', '어드민 메모') + '>' + escapeHtml(t('Admin note', '어드민 메모')) + '</label>'
-        +   '<textarea id="ldAdminNote" rows="2" maxlength="1000">' + escapeHtml(it.adminNote || '') + '</textarea>'
-        +   '<button type="button" class="act-btn act-view" id="ldNoteBtn" ' + tAttr('Save note', '메모 저장') + '>' + escapeHtml(t('Save note', '메모 저장')) + '</button>'
+        +   '<textarea id="ldAdminNote" rows="2" maxlength="1000"' + (internalFailed ? ' readonly' : '') + '>'
+        +     escapeHtml(internalFailed ? '' : (internal.adminNote || '')) + '</textarea>'
+        +   (internalFailed
+               ? '<small class="adm-err-inline" style="color:#991b1b;">'
+                 + escapeHtml(t('Could not read the admin note — not editable now (saving would erase it).',
+                                '어드민 메모를 읽지 못했습니다 — 지금은 수정할 수 없습니다(저장하면 지워집니다).'))
+                 + '</small>'
+               : '')
+        +   '<button type="button" class="act-btn act-view" id="ldNoteBtn"' + (internalFailed ? ' disabled' : '') + ' ' + tAttr('Save note', '메모 저장') + '>' + escapeHtml(t('Save note', '메모 저장')) + '</button>'
         + '</div>'
         + '<div class="adm-err" id="ldErr"></div>'
         + '<div class="adm-hist-head" ' + tAttr('History', '이력') + '>' + escapeHtml(t('History', '이력')) + '</div>'
@@ -482,18 +521,26 @@ function lead_assignTo(item, brandId, onDone) {
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) { showToast(t('Sign in required', '로그인 필요'), 'error'); return; }
     lead_showErr('ldErr', '');
     var by = auth.currentUser.email || '';
-    var entry = { status: 'assigned', by: by, byRole: 'admin', at: new Date().toISOString(), note: 'assigned to ' + brand.name };
+    var at = new Date().toISOString();
+    // A-481: 문서에는 **뼈대만**(브랜드도 읽는다) · 어드민 이메일과 메모는 internal/admin 에
+    var entry = { status: 'assigned', byRole: 'admin', at: at };
+    var privEntry = { status: 'assigned', by: by, at: at, note: 'assigned to ' + brand.name };
     var btn = document.getElementById('ldAssignBtn');
     lead_state.saving = true;
     if (btn) btn.disabled = true;
-    db.collection('leads').doc(item.id).update({
+    var lref = db.collection('leads').doc(item.id);
+    var batch = db.batch();
+    batch.update(lref, {
         brandId: brand.id,
         brandName: brand.name,
         assignedAt: firebase.firestore.FieldValue.serverTimestamp(),
         status: 'assigned',
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         history: firebase.firestore.FieldValue.arrayUnion(entry)
-    }).then(function () {
+    });
+    batch.set(lref.collection('internal').doc('admin'),
+        { notes: firebase.firestore.FieldValue.arrayUnion(privEntry) }, { merge: true });
+    batch.commit().then(function () {
         lead_state.saving = false;
         logAdmin({ action: 'lead.assign', target: { col: 'leads', id: item.id, label: lead_label(item) }, from: item.brandName || '', to: brand.name, note: String(item.status || '') + ' → assigned' });
         // 로컬 반영 (다시 읽지 않는다)
@@ -570,19 +617,28 @@ function lead_saveStatus(it) {
     if (status === it.status && !note) { showToast(t('Nothing changed', '바뀐 것이 없습니다')); return; }
     lead_showErr('ldErr', '');
     var by = auth.currentUser.email || '';
-    var entry = { status: status, by: by, byRole: 'admin', at: new Date().toISOString(), note: note };
+    var at = new Date().toISOString();
+    // A-481: 메모 본문과 어드민 이메일은 internal/admin 에만 — 배정된 브랜드가 문서를 통째로 읽는다
+    var entry = { status: status, byRole: 'admin', at: at };
+    var privEntry = { status: status, by: by, at: at, note: note };
     var btn = document.getElementById('ldStatusBtn');
     lead_state.saving = true;
     if (btn) btn.disabled = true;
-    db.collection('leads').doc(it.id).update({
+    var sref = db.collection('leads').doc(it.id);
+    var sbatch = db.batch();
+    sbatch.update(sref, {
         status: status,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         history: firebase.firestore.FieldValue.arrayUnion(entry)
-    }).then(function () {
+    });
+    sbatch.set(sref.collection('internal').doc('admin'),
+        { notes: firebase.firestore.FieldValue.arrayUnion(privEntry) }, { merge: true });
+    sbatch.commit().then(function () {
         lead_state.saving = false;
         logAdmin({ action: 'lead.status', target: { col: 'leads', id: it.id, label: lead_label(it) }, from: it.status || '', to: status, note: note });
         it.status = status; it.updatedAt = new Date();
         it.history = (Array.isArray(it.history) ? it.history : []).concat([entry]);
+        if (it._internal) it._internal.notes = (Array.isArray(it._internal.notes) ? it._internal.notes : []).concat([privEntry]);
         showToast(t('Status saved', '상태를 저장했습니다'), 'success');
         leads_draw();
         lead_view(it.id);   // 갱신된 상태·이력으로 다시 그림 (확인창 없음)
@@ -599,19 +655,31 @@ function lead_saveStatus(it) {
 function lead_saveNote(it) {
     if (lead_state.saving) return;
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) { showToast(t('Sign in required', '로그인 필요'), 'error'); return; }
+    if (it._internalFailed) {   // 읽지 못한 값을 빈 문자열로 덮어쓰지 않는다
+        showToast(t('Could not read the admin note — reopen this lead.', '어드민 메모를 읽지 못했습니다 — 리드를 다시 열어 주세요'), 'error');
+        return;
+    }
     var note = lead_val('ldAdminNote');
-    if (note === String(it.adminNote || '')) { showToast(t('Nothing changed', '바뀐 것이 없습니다')); return; }
+    var prev = (it._internal && it._internal.adminNote) || '';
+    if (note === String(prev)) { showToast(t('Nothing changed', '바뀐 것이 없습니다')); return; }
     lead_showErr('ldErr', '');
     var btn = document.getElementById('ldNoteBtn');
     lead_state.saving = true;
     if (btn) btn.disabled = true;
-    db.collection('leads').doc(it.id).update({
+    // A-481: 어드민 메모는 리드 문서가 아니라 internal/admin 에 — 한 묶음으로 쓴다
+    var nref = db.collection('leads').doc(it.id);
+    var nbatch = db.batch();
+    nbatch.set(nref.collection('internal').doc('admin'), {
         adminNote: note,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(function () {
+        adminNoteBy: (auth.currentUser && auth.currentUser.email) || '',
+        adminNoteAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    nbatch.update(nref, { updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    nbatch.commit().then(function () {
         lead_state.saving = false;
         if (btn) btn.disabled = false;
-        it.adminNote = note; it.updatedAt = new Date();
+        if (!it._internal) it._internal = {};
+        it._internal.adminNote = note; it.updatedAt = new Date();
         showToast(t('Note saved', '메모를 저장했습니다'), 'success');
     }).catch(function (err) {
         lead_state.saving = false;

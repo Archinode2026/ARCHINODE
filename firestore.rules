@@ -268,9 +268,22 @@ service cloud.firestore {
                     || (isApprovedBrand(resource.data.brandId)
                         && resource.data.status in ['assigned','contacted','closed']
                         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','brandNote','history','updatedAt'])
-                        && request.resource.data.status in ['assigned','contacted','closed']);
+                        && request.resource.data.status in ['assigned','contacted','closed']
+                        // A-481: history 는 **줄어들 수 없다**. 전에는 키만 봤으므로 브랜드가
+                        //   history: [] 로 감사 기록을 전부 지울 수 있었다(arrayUnion 은 통과한다).
+                        && (!('history' in resource.data)
+                            || (request.resource.data.history is list
+                                && request.resource.data.history.size() >= resource.data.history.size())));
       // 삭제: 어드민만
       allow delete: if isAdmin();
+    }
+
+    /* A-481(2026-11-12): 어드민 메모(adminNote)와 어드민이 남긴 상태 메모·어드민 이메일을
+       여기로 옮겼다. 배정된 브랜드는 위 규칙으로 리드 문서를 **통째로** 읽을 수 있고
+       Firestore 에는 필드 단위 읽기가 없다 — 그래서 「화면에 안 그린다」로는 가려지지 않았다.
+       문서의 history[] 에는 이제 어드민 쪽 뼈대만 남는다(status·at·byRole). */
+    match /leads/{leadId}/internal/{docId} {
+      allow read, write: if isAdmin();
     }
 
     // ────────────────────────────────────────────────────────────────────
