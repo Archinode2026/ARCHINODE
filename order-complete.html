@@ -338,6 +338,15 @@
   </div>
 </header>
 
+<!-- A-512: 이 페이지에는 검색 **단추만 있고 열 가리개가 없었다.** 다른 쪽과 같게 둔다. -->
+<div class="search-overlay" id="searchOverlay">
+  <button type="button" class="search-close" onclick="toggleSearch()" aria-label="Close search" data-en-aria-label="Close search" data-ko-aria-label="검색 닫기" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;line-height:1;padding:0;font-family:inherit;">&times;</button>
+  <div class="search-box">
+    <input type="text" placeholder="Search brands, products, categories..." data-en-placeholder="Search brands, products, categories..." data-ko-placeholder="브랜드, 제품, 카테고리 검색..." aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색">
+    <button aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-arrow-right"></i></button>
+  </div>
+</div>
+
 <!-- ══════════════════════════════════════════════════════════════════
      결제 완료 안내 — A-501(2026-11-12)
 
@@ -449,7 +458,58 @@
   </div>
 </footer>
 
+<script src="search.js?v=20261106a"></script>
 <script src="lang.js?v=20261106a"></script>
+<script>
+/* ── A-512(2026-11-13): 이 페이지의 머리글 단추 셋(`toggleSearch`·`toggleCatMenu`·
+   `toggleMobile`)은 **어디에도 정의돼 있지 않았다.** 다른 243쪽은 페이지마다
+   인라인으로 들고 있는데 이 쪽만 빠졌다 — A-501 로 내가 새로 만들면서 머리글만
+   복사하고 손잡이를 안 가져왔다.
+   눌러도 **오류도 안 나고 아무 일도 안 일어난다**: 브론즈 철칙 6 의 그 모양이다.
+   없는 요소를 만나도 던지지 않도록 전부 확인하고 쓴다. */
+function toggleSearch() {
+  var o = document.getElementById('searchOverlay');
+  if (!o) return;
+  o.classList.toggle('active');
+  if (o.classList.contains('active')) {
+    var i = o.querySelector('input');
+    if (i) try { i.focus(); } catch (e) {}
+  }
+}
+function toggleCatMenu() {
+  var m = document.getElementById('catMenu');
+  if (m) m.classList.toggle('active');
+}
+function toggleMobile() {
+  var n = document.getElementById('mainNav');
+  if (n) n.classList.toggle('active');
+}
+document.addEventListener('click', function (e) {
+  var dd = document.querySelector('.nav-dropdown');
+  var m = document.getElementById('catMenu');
+  if (dd && m && !dd.contains(e.target)) m.classList.remove('active');
+});
+/* A-098/A-100 과 같은 약속 — Esc 한 번으로 열린 것을 닫고 초점을 되돌린다 */
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  var o = document.getElementById('searchOverlay');
+  if (o && o.classList.contains('active')) {
+    o.classList.remove('active');
+    var t = document.querySelector('.search-toggle');
+    if (t) try { t.focus(); } catch (err) {}
+    return;
+  }
+  var n = document.getElementById('mainNav');
+  if (n && n.classList.contains('active')) {
+    n.classList.remove('active');
+    var mb = document.querySelector('.mobile-toggle');
+    if (mb) try { mb.focus(); } catch (err) {}
+    return;
+  }
+  var m = document.getElementById('catMenu');
+  if (m && m.classList.contains('active')) m.classList.remove('active');
+});
+</script>
 <script src="auth-ui.js"></script>
 <script src="cookie-consent.js?v=20260630" defer></script>
 
