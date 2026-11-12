@@ -343,11 +343,40 @@ service cloud.firestore {
     // 사이트 폼이 create만 함. Extension이 문서 감지 후 이메일 발송.
     // ────────────────────────────────────────────────────────────────────
     match /mail/{docId} {
-      // 생성: 누구나 (사이트 폼 제출 시). Firebase Extension가 발송용으로 소비.
-      // 필드 최소 검증: to, message.subject, message.text
-      allow create: if request.resource.data.to is string
-                    && request.resource.data.message.subject is string
-                    && request.resource.data.message.subject.size() < 200;
+      /* ★★ A-477(2026-11-12, 브론즈 30차 ①): 전에는 생성 조건이 **셋뿐**이었다 —
+         `to is string` · `message.subject is string` · `subject.size() < 200`.
+         인증도, 허니팟도, **수신자 제한도, 본문 제한도 없었다.**
+         Trigger Email 확장은 **검증된 archinodekr.com 도메인**으로 발송한다.
+         즉 누구나 Firestore 에 문서 하나를 넣어 **ARCHINODE 이름으로 임의 주소에
+         임의 내용의 메일을 무제한 보낼 수 있었다** — 피싱에 그대로 쓰이고,
+         도메인 평판(SPF·DKIM)이 타면 정작 우리 알림 메일이 스팸으로 떨어진다.
+
+         이제 세 갈래만 허용한다.
+           ㄱ. 어드민 — 누구에게나(답장·자격증명 발송). 토큰의 서명된 email 클레임.
+           ㄴ. 비로그인·로그인 누구든 — **운영자 주소로만**. 공개 폼 6곳이
+               전부 `office@archinode.org` 고정이라 이걸로 충분하다(전수 확인).
+           ㄷ. 로그인한 본인 — **자기 주소로만**. 입점 신청의 접수 확인 메일
+               한 자리다. 그래서 `list-your-brand.html` 의 `signOut()` 을
+               메일 쓰기 **뒤로** 옮겼다(A-477).
+         본문 상한도 함께 둔다 — 전에는 `message.text` 검증이 **0개**여서
+         1MiB 문서를 무한히 만들 수 있었다. */
+      function mailShapeOk() {
+        return request.resource.data.to is string
+               && request.resource.data.to.size() < 200
+               && request.resource.data.message.subject is string
+               && request.resource.data.message.subject.size() < 200
+               && (!('text' in request.resource.data.message)
+                   || (request.resource.data.message.text is string
+                       && request.resource.data.message.text.size() < 20000))
+               && (!('html' in request.resource.data.message)
+                   || (request.resource.data.message.html is string
+                       && request.resource.data.message.html.size() < 20000));
+      }
+      allow create: if isAdmin()
+                    || (mailShapeOk()
+                        && request.resource.data.to == 'office@archinode.org')
+                    || (isSignedIn() && mailShapeOk()
+                        && request.resource.data.to == request.auth.token.email);
       // 읽기/수정/삭제: 어드민만
       allow read, update, delete: if isAdmin();
     }

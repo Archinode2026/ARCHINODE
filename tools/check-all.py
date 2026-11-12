@@ -73,6 +73,8 @@ CHECKS = [
      'A-475 — window.auth 로 보면 멀쩡한 화면에서 거짓 실패를 띄운다(const 는 window 속성이 아니다) · 12화면이 싣는지'),
     ('사이트맵 모순',        'py',   'tools/check-sitemap.py',
      'A-476 — noindex 페이지·view.html 라우터가 섞였나 · 색인 가능한 페이지가 빠졌나 · 중복'),
+    ('임시 비밀번호',        'node', 'tools/test-temp-password.js',
+     'A-477 — 공개 정보(브랜드명·날짜)에서 유도되지 않는지 · Math.random 이 아닌 crypto 인지'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)
