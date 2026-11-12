@@ -53,6 +53,82 @@
     }
     const base = getBasePath();
 
+    /* ── A-506(2026-11-13): 전에는 `limit(24)` 로 끊고 **그 사실을 말하지 않았다**.
+       69개 카테고리 페이지 전부가 그랬다. 브랜드가 25번째 제품을 올리고 승인까지
+       받아도 그 제품은 어느 화면에도 나타나지 않는다 — 오류가 아니라 **아무 일도
+       일어나지 않는** 꼴이라, 올린 사람도 보는 사람도 빠진 줄을 모른다.
+       한 개를 더 불러(`PAGE + 1`) 다음 쪽이 있는지 알아내고, 있으면 「더 보기」를
+       띄운다. 넘쳐 온 한 개는 그리지 않는다 — 있다는 신호로만 쓴다. */
+    const PAGE = 24;
+    let lastDoc = null;      // 다음 쪽의 시작점
+    let shown = 0;           // 지금까지 그린 개수
+    let gridEl = null;       // 카드가 들어가는 자리(이어 붙인다)
+    let moreWrap = null;
+
+    function cardHtml(p) {
+        // A-471: 꽂기 전에 전부 이스케이프. 주소는 스킴까지 본다.
+        const pSlug = escapeHtml(p.slug || '');
+        const pName = escapeHtml(p.name || '');
+        const pBrandName = escapeHtml(p.brandName || '');
+        const pMaterials = escapeHtml(p.materials || '');
+        const pImageUrl = escapeHtml(safeUrl(p.imageUrl));
+        return `
+                <a href="${base}products/view.html?id=${pSlug}" class="cp-card">
+                    <div class="cp-thumb">
+                        ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
+                    </div>
+                    <div class="cp-body">
+                        <div class="cp-brand">${pBrandName}</div>
+                        <div class="cp-name">${pName}</div>
+                        ${pMaterials ? `<div class="cp-mat">${pMaterials}</div>` : ''}
+                    </div>
+                </a>`;
+    }
+
+    function paintMore(hasMore) {
+        if (!moreWrap) return;
+        moreWrap.style.display = hasMore ? 'block' : 'none';
+        const btn = moreWrap.querySelector('.cp-more-btn');
+        const note = moreWrap.querySelector('.cp-more-note');
+        if (note) {
+            const ko = shown + '개를 보고 있습니다';
+            const en = 'Showing ' + shown + ' products';
+            note.setAttribute('data-ko', ko);
+            note.setAttribute('data-en', en);
+            note.textContent = (document.documentElement.lang === 'ko') ? ko : en;
+        }
+        if (btn) btn.disabled = false;
+    }
+
+    function baseQuery() {
+        let q = db.collection('products')
+            .where('status', '==', 'approved')
+            .where('category', '==', category);
+        if (subcategory) q = q.where('subcategory', '==', subcategory);
+        return q.orderBy('createdAt', 'desc');
+    }
+
+    async function loadMore(btn) {
+        if (btn) btn.disabled = true;
+        try {
+            const snap = await baseQuery().startAfter(lastDoc).limit(PAGE + 1).get();
+            const docs = snap.docs || [];
+            const hasMore = docs.length > PAGE;
+            const page = docs.slice(0, PAGE);
+            if (page.length) lastDoc = page[page.length - 1];
+            let add = '';
+            page.forEach(d => { add += cardHtml(d.data()); });
+            if (gridEl) gridEl.insertAdjacentHTML('beforeend', add);
+            shown += page.length;
+            paintMore(hasMore);
+            if (window.applyLang) window.applyLang();
+        } catch (err) {
+            /* 실패를 삼키지 않는다 — 단추를 되살려 다시 누를 수 있게 한다 */
+            console.error('category products load more failed:', err);
+            if (btn) btn.disabled = false;
+        }
+    }
+
     async function loadProducts() {
         if (typeof db === 'undefined') {
             console.warn('Firebase not loaded yet, retrying...');
@@ -69,7 +145,7 @@
                 query = query.where('subcategory', '==', subcategory);
             }
 
-            const snap = await query.orderBy('createdAt', 'desc').limit(24).get();
+            const snap = await query.orderBy('createdAt', 'desc').limit(PAGE + 1).get();
 
             if (snap.empty) {
                 container.innerHTML = `
@@ -82,31 +158,26 @@
                 return;
             }
 
+            const docs = snap.docs || [];
+            const hasMore = docs.length > PAGE;
+            const page = docs.slice(0, PAGE);
+            lastDoc = page.length ? page[page.length - 1] : null;
+            shown = page.length;
+
             let html = '<div class="cp-grid">';
-
-            snap.forEach(doc => {
-                const p = doc.data();
-                // A-471: 꽂기 전에 전부 이스케이프. 주소는 스킴까지 본다.
-                const pSlug = escapeHtml(p.slug || '');
-                const pName = escapeHtml(p.name || '');
-                const pBrandName = escapeHtml(p.brandName || '');
-                const pMaterials = escapeHtml(p.materials || '');
-                const pImageUrl = escapeHtml(safeUrl(p.imageUrl));
-                html += `
-                <a href="${base}products/view.html?id=${pSlug}" class="cp-card">
-                    <div class="cp-thumb">
-                        ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
-                    </div>
-                    <div class="cp-body">
-                        <div class="cp-brand">${pBrandName}</div>
-                        <div class="cp-name">${pName}</div>
-                        ${pMaterials ? `<div class="cp-mat">${pMaterials}</div>` : ''}
-                    </div>
-                </a>`;
-            });
-
+            page.forEach(doc => { html += cardHtml(doc.data()); });
             html += '</div>';
+            html += `
+                <div class="cp-more" style="display:none;text-align:center;margin-top:32px;">
+                    <button type="button" class="cp-more-btn pill-btn" data-en="Load more products" data-ko="제품 더 보기">Load more products</button>
+                    <p class="cp-more-note" style="font-size:0.8rem;opacity:0.7;margin:12px 0 0;"></p>
+                </div>`;
             container.innerHTML = html;
+            gridEl = container.querySelector('.cp-grid');
+            moreWrap = container.querySelector('.cp-more');
+            const moreBtn = moreWrap && moreWrap.querySelector('.cp-more-btn');
+            if (moreBtn) moreBtn.addEventListener('click', () => loadMore(moreBtn));
+            paintMore(hasMore);
             if (window.applyLang) window.applyLang();   // A-062: 비동기로 끼워넣는 조각이라 언어 재적용 필요
 
         } catch (err) {
