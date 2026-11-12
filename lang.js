@@ -65,33 +65,26 @@
     return availableLangs[0] || 'ko';
   }
 
-  // IP 기반 국가 감지 → 자동 언어 적용
-  // 한국 IP → ko, 외국 IP → en. 사용자가 명시적으로 토글한 선택('archinode-lang')은 항상 우선.
+  /* A-499(2026-11-12, 승리님 결정): IP 기반 국가 감지를 **없앴다.**
+
+     전에는 첫 방문자마다 `fetch('https://api.country.is/')` 로 **접속 IP 가 제3자에게**
+     나갔다 — 개인정보 처리방침에는 그런 이전이 적혀 있지 않았다(2026-11-12 실측에서 나왔다).
+     고지를 더하는 길도 있었지만, **A-359 이후 이 호출은 보정 역할만 한다**:
+     언어는 ㄱ)사용자가 고른 값 ㄴ)이미 캐시된 자동값 ㄷ)**브라우저 언어** 순으로 정해지고,
+     브라우저 언어는 네트워크를 기다리지 않는다. 한국어 브라우저는 그대로 한국어로 열린다.
+
+     그래서 얻는 것보다 고지할 것이 큰 호출이라 **끈다**:
+       · 내보낼 개인정보가 하나 줄어든다(IP)
+       · 첫 화면이 서드파티 왕복을 기다리지 않는다
+       · 사내 방화벽·광고 차단기가 막던 경로가 아예 없어진다
+     (되살릴 일이 생기면 처리방침의 국외이전 표에 country.is 를 먼저 올려야 한다.
+      `_headers` 의 connect-src 에서도 함께 뺐다.) */
   function detectCountryAndApply() {
-    try {
-      if (localStorage.getItem('archinode-lang')) return;
-    } catch(e){ return; }
-    if (availableLangs.length < 2) return;
-    fetch('https://api.country.is/', { method: 'GET', cache: 'no-store' })
-      .then(function(r) { return r.ok ? r.json() : null; })
-      .then(function(data) {
-        if (!data || !data.country) return;
-        var autoLang = (data.country === 'KR') ? 'ko' : 'en';
-        if (availableLangs.indexOf(autoLang) === -1) return;
-        try { localStorage.setItem('archinode-lang-auto', autoLang); } catch(e){}
-        if (currentLang !== autoLang) {
-          currentLang = autoLang;
-          applyLanguage(autoLang);
-          updateLangButton(autoLang);
-          broadcastLang(autoLang);       // A-259
-        }
-      })
-      .catch(function(e){
-        /* A-359: 조용히 삼키면 「왜 언어가 안 바뀌나」를 알 수 없다.
-           이제는 브라우저 언어로 이미 정해져 있으니 치명적이진 않지만,
-           막혔다는 사실은 남겨 둔다. */
-        console.warn('[lang] 국가 감지에 실패했습니다 — 브라우저 언어로 진행합니다:', e && e.message);
-      });
+    /* 남겨 둔 이유: 호출하는 자리가 아래 DOMContentLoaded 안에 있다. 함수를 지우면
+       그 줄도 같이 지워야 하는데, 「이 자리는 일부러 비워 둔 것」을 남기는 편이 낫다. */
+    var cached = null;
+    try { cached = localStorage.getItem('archinode-lang-auto'); } catch (e) {}
+    if (cached) return;   // 예전 방문에서 저장된 값은 그대로 쓴다(pickInitialLang 2순위)
   }
 
   document.addEventListener('DOMContentLoaded', function() {
