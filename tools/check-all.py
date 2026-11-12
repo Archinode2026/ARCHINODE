@@ -83,6 +83,8 @@ CHECKS = [
      'A-482 — 카운터가 내 목록의 변화에 묶여 있는지(규칙의 getAfter + 클라이언트의 한 묶음 쓰기)'),
     ('자료 파일 분리',       'py',   'tools/check-product-files.py',
      'A-483 — 카탈로그·BIM·3D 의 다운로드 URL 이 공개 제품 문서로 돌아오는지 · Storage 경로 훑기'),
+    ('업로드 형식 통제',      'py',   'tools/check-upload-types.py',
+     'A-484 — 인증서는 PDF·사진만 · 자료 파일은 다운로드 강제(제품 사진에는 붙지 않게)'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

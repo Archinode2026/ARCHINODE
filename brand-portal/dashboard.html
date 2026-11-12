@@ -601,7 +601,7 @@ h1, h2, .section-card h2 {
             </div>
             <div class="field">
                 <label for="certFile" data-en="Certificate File (PDF or image)" data-ko="인증서 파일 (PDF 또는 이미지)">Certificate File (PDF or image)</label>
-                <input type="file" id="certFile" accept="application/pdf,image/*">
+                <input type="file" id="certFile" accept="application/pdf,image/jpeg,image/png,image/webp">
             </div>
             <button type="button" class="btn btn-secondary" id="addCertBtn"><i class="fas fa-plus"></i> <span data-en="Add Certification" data-ko="인증서 추가">Add Certification</span></button>
         </div>
@@ -1320,6 +1320,17 @@ document.getElementById('addCertBtn').addEventListener('click', async () => {
     const file = document.getElementById('certFile').files[0];
     if (!name) { alert('Certification name is required'); return; }
     if (!file) { alert('Please choose a certificate file'); return; }
+    /* A-484: 인증서는 공개 브랜드 페이지에 배지로 **그대로 열린다**(brands/view.html).
+       그래서 PDF·사진만 받는다(SVG 는 스크립트가 돌아 제외). storage.rules 의
+       isCertFile() 이 같은 조건으로 한 번 더 막지만, 거부 메시지가 사람이 읽을 수
+       없는 말이라 여기서 먼저 알려 준다. */
+    const CERT_OK = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    if (CERT_OK.indexOf(String(file.type || '').split(';')[0].trim()) === -1) {
+        alert(document.documentElement.lang !== 'en'
+            ? '인증서는 PDF 또는 사진(JPG·PNG·WebP)만 올릴 수 있습니다.'
+            : 'Certificates must be a PDF or an image (JPG, PNG, WebP).');
+        return;
+    }
 
     const btn = document.getElementById('addCertBtn');
     btn.disabled = true;
@@ -1838,7 +1849,15 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     async function uploadFile(file, folder) {
         if (!file) return '';
         const ref = storage.ref(`${folder}/${currentUser.uid}/${Date.now()}_${file.name}`);
-        await ref.put(file);
+        /* A-484(2026-11-12): 자료 파일(카탈로그·BIM·3D)은 **다운로드로 고정**한다.
+           이 파일들의 토큰 URL 은 승인된 신청자에게 ARCHINODE 이름의 메일로 간다.
+           형식 검사만 두면 `contentType` 은 클라이언트가 보내는 값이라 속일 수 있고,
+           속인 HTML 이 firebasestorage.googleapis.com 에서 그대로 렌더됐다.
+           attachment 를 붙이면 **무엇을 올리든 브라우저가 렌더하지 않는다.**
+           storage.rules 의 isAttachment() 가 이걸 **요구**하므로 빼면 업로드가 거부된다.
+           제품 사진(`products`)에는 붙이지 않는다 — 그건 페이지에 그려져야 한다. */
+        const meta = folder === 'products-specs' ? { contentDisposition: 'attachment' } : undefined;
+        await ref.put(file, meta);
         return await ref.getDownloadURL();
     }
 

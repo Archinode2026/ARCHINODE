@@ -22,7 +22,13 @@ rules_version = '2';
        파일 이름을 Date.now() 로 만들기 때문에 남의 파일을 덮어쓸 걱정은 없지만,
        경로를 손으로 바꿔 넣는 것은 막아야 한다.
      · 읽기는 공개. 브랜드 로고·제품 사진·기사 이미지는 비로그인 방문자에게 보여야 한다.
-       (주소를 아는 사람만 볼 수 있다 — 다운로드 URL 에 토큰이 붙는다.)
+       ※ A-483(2026-11-12) 정정 — 원래 여기에 「주소를 아는 사람만 볼 수 있다」고 적혀
+         있었다. **사실이 아니다.** `allow read` 는 **목록(list)까지** 허용하므로
+         `listAll()` 로 경로를 통째로 훑을 수 있다. 공개로 두어도 되는 것은
+         「훑어가도 괜찮은 것」뿐이다(로고·제품 사진·기사 이미지).
+       ※ 토큰 URL(getDownloadURL)은 **규칙을 타지 않는다** — 토큰 자체가 권한이다.
+         그래서 ㄱ) 공개 문서에 토큰 URL 을 두면 파일을 공개한 것과 같고
+         ㄴ) 반대로 여기를 닫아도 이미 나간 링크는 그대로 열린다.
      · 용량·형식은 규칙에서도 한 번 더 막는다. 화면 쪽 검사는 우회할 수 있다.
      · **지우기는 따로 적는다.** Storage 규칙에서 delete 는 `write` 에 포함되는데,
        지울 때는 `request.resource` 가 **null** 이라 contentType·size 검사가 통과할 수 없다.
@@ -57,6 +63,28 @@ service firebase.storage {
     function underFileLimit() {
       return request.resource.size < 50 * 1024 * 1024;
     }
+    /* A-484(2026-11-12): 전에는 자료·인증서 업로드가 **형식을 전혀 보지 않았다**
+       (50MB 아래면 `.html` 도 올라갔다). 올린 파일은 토큰 URL 로 손님에게 열리므로,
+       브랜드가 올린 HTML 이 `firebasestorage.googleapis.com` 에서 그대로 렌더됐다 —
+       ARCHINODE 이름으로 간 메일(자료)과 공개 브랜드 페이지의 인증서 배지가 그 입구였다.
+
+       ★ `contentType` 은 **클라이언트가 보내는 값**이라 거짓말할 수 있다. 그것만으로는
+         울타리가 못 되므로 두 겹으로 나눈다:
+           · 인증서  — 공개 배지로 **그대로 보여야** 하므로 형식을 좁게 묶는다(PDF·사진).
+                      SVG 는 스크립트가 돌아서 뺀다.
+           · 자료파일 — 브라우저에서 볼 일이 없으므로 **다운로드를 강제**한다
+                      (contentDisposition: attachment). 형식을 속여도 렌더되지 않는다.
+                      그 위에 위험 형식을 한 번 더 막는다. */
+    function isCertFile() {
+      return request.resource.contentType.matches('(application/pdf|image/(jpeg|png|webp))(;.*)?');
+    }
+    function isAttachment() {
+      return request.resource.contentDisposition.matches('(?i)attachment.*');
+    }
+    function notRenderable() {
+      return !request.resource.contentType
+               .matches('(?i)(text/html|application/xhtml\\+xml|image/svg\\+xml|(text|application)/(x-)?javascript).*');
+    }
 
     // ── 기사 이미지 (brand-portal/article-editor.js) ──
     match /articles/{uid}/{allPaths=**} {
@@ -81,15 +109,23 @@ service firebase.storage {
          이미 발송된 7일 링크는 그대로 열린다 — 막는 것은 **경로 훑기**다. */
     match /products-specs/{uid}/{allPaths=**} {
       allow read: if isOwner(uid) || isAdmin();
-      allow create, update: if (isOwner(uid) && underFileLimit()) || isAdmin();
+      // A-484: 다운로드 강제(브라우저가 렌더하지 않는다) + 위험 형식 차단
+      allow create, update: if (isOwner(uid) && underFileLimit()
+                                && isAttachment() && notRenderable())
+                            || isAdmin();
       allow delete: if isOwner(uid) || isAdmin();
     }
 
-    // ── 인증서 (brand-portal/dashboard.html) ──
-    //    KC·KS 같은 서류다. 공개 페이지에 걸지 않으므로 읽기도 본인과 어드민만.
+    /* ── 인증서 (brand-portal/dashboard.html) ──
+       KC·KS 같은 서류다.
+       ※ A-484 정정 — 원래 「공개 페이지에 걸지 않으므로」라고 적혀 있었다. **사실이 아니다.**
+         `brands/view.html` 이 인증서 배지를 `target="_blank"` 링크로 공개 브랜드 페이지에
+         건다(`cert.fileUrl` — 토큰 URL 이라 아래 read 규칙과 무관하게 열린다).
+         즉 여기 올라온 것은 **승인 절차 없이 바로 손님에게 열린다**. 그래서 형식을 묶는다. */
     match /certifications/{uid}/{allPaths=**} {
       allow read: if isOwner(uid) || isAdmin();
-      allow create, update: if (isOwner(uid) && underFileLimit()) || isAdmin();
+      // A-484: 공개 배지로 열리는 파일이다. 그대로 보여야 하므로 PDF·사진만.
+      allow create, update: if (isOwner(uid) && isCertFile() && underFileLimit()) || isAdmin();
       allow delete: if isOwner(uid) || isAdmin();
     }
 
