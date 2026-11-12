@@ -759,6 +759,19 @@ function archinodeWithTimeout(promise, ms) {
 // ── 폼 제출 처리 ──
 const form = document.getElementById('brandForm');
 const errorDiv = document.getElementById('formError');
+
+/* A-492(2026-11-12, 브론즈 30차 ⑮): 이 양식의 오류 안내 **일곱 개가 영어로만** 나왔다.
+   손님의 대부분은 한국어로 본다 — 제출이 막힌 순간 읽을 수 없는 문장만 남는다.
+   ★ 단순히 삼항으로 고르면 안 된다(A-222): 이 문장들은 `lang.js` 가
+   `documentElement.lang` 을 세우기 **전후** 어느 때든 심길 수 있고, 손님이 나중에
+   한/영 토글을 누를 수도 있다. `data-en`/`data-ko` 를 함께 달아야 다시 칠해진다. */
+function lybSay(en, ko) {
+    if (!errorDiv) return;
+    errorDiv.setAttribute('data-en', en);
+    errorDiv.setAttribute('data-ko', ko);
+    errorDiv.textContent = (document.documentElement.lang !== 'en' ? ko : en);
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+}
 const submitBtn = document.getElementById('submitBtn');
 
 form.addEventListener('submit', async function(e) {
@@ -774,7 +787,7 @@ form.addEventListener('submit', async function(e) {
     const selectedCats = document.querySelectorAll('input[name="category"]:checked');
     if (selectedCats.length === 0) {
         errorDiv.style.display = 'block';
-        errorDiv.textContent = 'Please select at least one category.';
+        lybSay('Please select at least one category.', '카테고리를 하나 이상 선택해 주세요.');
         submitBtn.disabled = false;
         window.setLangText && window.setLangText(submitBtn, "Submit Application", "신청서 제출");
         return;
@@ -954,18 +967,24 @@ form.addEventListener('submit', async function(e) {
 
         if (error.message === 'ARCHINODE_CAPTCHA_FAILED') {
             // A-004: reCAPTCHA v3 검증 실패(낮은 점수/오류) — 재시도 유도, 구체적 사유는 밝히지 않음(봇 회피 방지)
-            errorDiv.textContent = 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.';
+            lybSay('We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.',
+                   '이 제출을 확인하지 못했습니다. 다시 시도해 주시고, 계속 안 되면 office@archinode.org 로 알려 주세요.');
         } else if (error.message === 'ARCHINODE_TIMEOUT') {
             // A-010: 오프라인/연결 불안정 전용 안내 — 일반 오류와 구분해 재시도를 유도
-            errorDiv.textContent = 'Your connection seems slow or offline. Please check your network and try again. If you already received a confirmation, you don\'t need to resubmit.';
+            lybSay('Your connection seems slow or offline. Please check your network and try again. If you already received a confirmation, you don\'t need to submit again.',
+                   '연결이 느리거나 끊어진 것 같습니다. 네트워크를 확인하고 다시 시도해 주세요. 이미 접수 확인 메일을 받으셨다면 다시 제출하지 않으셔도 됩니다.');
         } else if (error.code === 'auth/email-already-in-use') {
-            errorDiv.textContent = 'This email is already registered. If you already have an account, please log in at the Brand Portal.';
+            lybSay('This email is already registered. If you already have an account, please log in at the Brand Portal.',
+                   '이미 가입된 이메일입니다. 계정이 있으시면 브랜드 포털에서 로그인해 주세요.');
         } else if (error.code === 'auth/invalid-email') {
-            errorDiv.textContent = 'Please enter a valid email address.';
+            lybSay('Please enter a valid email address.', '올바른 이메일 주소를 입력해 주세요.');
         } else if (error.code === 'auth/weak-password') {
-            errorDiv.textContent = 'Password is too weak. Please try again.';
+            lybSay('Password is too weak. Please try again.', '비밀번호가 너무 약합니다. 다시 입력해 주세요.');
         } else {
-            errorDiv.textContent = 'An error occurred: ' + error.message;
+            /* 뒤에 붙는 error.message 는 Firebase 가 주는 영문이다 — 그건 그대로 둔다
+               (번역하면 검색이 안 된다). 앞 문장만 손님의 말로 바꾼다. */
+            lybSay('Something went wrong: ' + error.message,
+                   '문제가 생겼습니다: ' + error.message);
         }
     }
 });

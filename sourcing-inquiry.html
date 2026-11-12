@@ -322,6 +322,15 @@ function archinodeWithTimeout(promise, ms) {
   ]);
 }
 
+/* A-492(2026-11-12, 브론즈 30차 ⑮): 제출 오류 안내가 영어로만 나왔다.
+   data-en/data-ko 를 함께 달아 한·영 토글에 따라 다시 칠해지게 한다(A-222). */
+function rfqSay(el, en, ko) {
+    if (!el) return;
+    el.setAttribute('data-en', en);
+    el.setAttribute('data-ko', ko);
+    el.textContent = (document.documentElement.lang !== 'en' ? ko : en);
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+}
 async function submitSourcing(e) {
   e.preventDefault();
   if (document.getElementById('src_hp').value.trim() !== '') return false;
@@ -389,11 +398,15 @@ async function submitSourcing(e) {
   } catch (err) {
     console.error('Sourcing inquiry error:', err);
     // A-333: 구체적 사유는 밝히지 않는다(봇 회피 방지) — A-004 가 폼 3곳에 쓴 문장 그대로.
-    errorMsg.textContent = (err.message === 'ARCHINODE_CAPTCHA_FAILED')
-      ? 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.'
-      : (err.message === 'ARCHINODE_TIMEOUT')
-      ? 'Your connection seems slow or offline. Please check your network and try again.'
-      : 'Something went wrong. Please try again.';
+    if (err.message === 'ARCHINODE_CAPTCHA_FAILED') {
+      rfqSay(errorMsg, 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.',
+                       '이 제출을 확인하지 못했습니다. 다시 시도해 주시고, 계속 안 되면 office@archinode.org 로 알려 주세요.');
+    } else if (err.message === 'ARCHINODE_TIMEOUT') {
+      rfqSay(errorMsg, 'Your connection seems slow or offline. Please check your network and try again.',
+                       '연결이 느리거나 끊어진 것 같습니다. 네트워크를 확인하고 다시 시도해 주세요.');
+    } else {
+      rfqSay(errorMsg, 'Something went wrong. Please try again.', '문제가 생겼습니다. 다시 시도해 주세요.');
+    }
     errorMsg.style.display = 'block';
   }
   btn.disabled = false;

@@ -87,6 +87,8 @@ CHECKS = [
      'A-484 — 인증서는 PDF·사진만 · 자료 파일은 다운로드 강제(제품 사진에는 붙지 않게)'),
     ('공개 쓰기 울타리',      'py',   'tools/check-public-write-limits.py',
      'A-485~488 — 공개 폼의 키 목록·길이 상한(규칙과 폼 대조) · 없는 필드 읽기 · 기본 confirm · 검색 주소'),
+    ('안내문 이중언어',      'py',   'tools/check-bilingual-messages.py',
+     'A-492 — 공개 페이지의 손님용 안내가 영어로만 심기는지(data-en/data-ko 를 함께 다는지)'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

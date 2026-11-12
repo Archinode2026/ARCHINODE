@@ -987,7 +987,7 @@ async function submitRfq(e) {
         document.getElementById('rfqSuccessWrap').style.display = 'block';
     } catch (err) {
         console.error('Inquiry submit error:', err);
-        errorMsg.textContent = 'Something went wrong. Please try again.';
+        rfqSay(errorMsg, 'Something went wrong. Please try again.', '문제가 생겼습니다. 다시 시도해 주세요.');
         errorMsg.style.display = 'block';
     }
     btn.disabled = false;
@@ -1033,6 +1033,15 @@ function updateBrandLikeUI() {
    **열두 번** 떴는데 화면에 하나도 안 나왔다(콘솔에만 남았다).
    A-082 에서 뉴스레터 안내를 같은 이유로 `alert` → 화면 안내문으로 바꿨는데
    **이 두 곳은 남아 있었다.** 단추 옆에 말풍선으로 띄운다. */
+/* A-492(2026-11-12, 브론즈 30차 ⑮): 제출 오류 안내가 영어로만 나왔다.
+   data-en/data-ko 를 함께 달아 한·영 토글에 따라 다시 칠해지게 한다(A-222). */
+function rfqSay(el, en, ko) {
+    if (!el) return;
+    el.setAttribute('data-en', en);
+    el.setAttribute('data-ko', ko);
+    el.textContent = (document.documentElement.lang !== 'en' ? ko : en);
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+}
 function likeNote(msg, isErr, link) {
     /* 단추 id 가 화면마다 다르다 — products 는 `likeBtn`, brands 는 `brandLikeBtn`.
        ★ 처음엔 `likeBtn` 만 찾게 썼다가 brands 쪽에서 또 아무것도 안 보일 뻔했다.
