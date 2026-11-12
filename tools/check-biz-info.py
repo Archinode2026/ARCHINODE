@@ -39,6 +39,10 @@ ORG         = '안양시 동안구청'
 NAME        = '비비들리바이브'
 ADDR        = '흥안대로 528'
 EMAIL       = 'office@archinode.org'
+# A-518(2026-11-13): 제13조제1항의 마지막 칸. 신고증에 없어 A-503 때는 비워 뒀고,
+# 승리님이 알려 주셔서 채웠다. 국내 꼴과 국제 꼴 둘 다 쓰므로 숫자만 견준다.
+TEL_KO      = '070-8602-1319'
+TEL_EN      = '+82 70 8602 1319'
 
 # 푸터 블록을 두지 않는 자리 — 관리자·로그인·포털(손님이 물건을 사는 길목이 아니다)
 EXEMPT_PREFIX = ('admin' + os.sep, 'auth' + os.sep, 'brand-portal' + os.sep)
@@ -81,6 +85,7 @@ def main() -> int:
             ('통신판매업신고번호', REPORT_NO),
             ('신고기관', ORG),
             ('주소', ADDR),
+            ('전화', TEL_KO),
             ('이메일', EMAIL),
         ) if needle not in s]
         if missing:
@@ -88,9 +93,10 @@ def main() -> int:
 
     # 2) 약관·처리방침 — 푸터 말고 본문에도 있어야 한다
     for rel, needles in (
-        ('privacy.html',    [(REPORT_NO, '제2조(회사 정보)')]),
-        ('terms.html',      [(REPORT_NO, '사업자 정보 상자'), (REPORT_EN, '영문 사업자 정보')]),
-        ('privacy-en.html', [(REPORT_EN, 'Article 2 (Company Information)')]),
+        ('privacy.html',    [(REPORT_NO, '제2조(회사 정보)'), (TEL_KO, '제2조의 전화번호')]),
+        ('terms.html',      [(REPORT_NO, '사업자 정보 상자'), (REPORT_EN, '영문 사업자 정보'),
+                             (TEL_KO, '한국어 전화번호'), (TEL_EN, '영문 전화번호')]),
+        ('privacy-en.html', [(REPORT_EN, 'Article 2 (Company Information)'), (TEL_EN, '영문 전화번호')]),
     ):
         p = os.path.join(ROOT, rel)
         if not os.path.exists(p):
@@ -99,7 +105,9 @@ def main() -> int:
         s = open(p, encoding='utf-8').read()
         for needle, where in needles:
             if needle not in s:
-                bad.append((rel, '%s 에 신고번호가 없다' % where))
+                # 무엇이 없는지 그대로 말한다 — 전에는 전화가 없어도 「신고번호가
+                # 없다」고 적었다(깨뜨리기에서 드러났다).
+                bad.append((rel, '%s 가 비어 있다 — 「%s」를 찾지 못했다' % (where, needle)))
 
     # 3) 결제 길목 — 돈을 내기 전에 파는 사람이 누구인지 보여야 한다
     dp = os.path.join(ROOT, 'digital-products.html')
@@ -111,7 +119,8 @@ def main() -> int:
             bad.append(('digital-products.html', 'dpOpenBuy 를 못 찾았다 — 함수 이름이 바뀌었나'))
         else:
             for label, needle in (('상호', NAME), ('사업자등록번호', BIZ_NO),
-                                  ('신고번호', REPORT_NO), ('주소', ADDR)):
+                                  ('신고번호', REPORT_NO), ('주소', ADDR),
+                                  ('전화(한국어)', TEL_KO), ('전화(영문)', TEL_EN)):
                 if needle not in buy:
                     bad.append(('digital-products.html', '구매창에 %s 가 없다' % label))
 
@@ -132,7 +141,8 @@ def main() -> int:
             print('  … 그리고 %d건 더' % (len(bad) - 40))
         return 1
 
-    print('사업자 신원 표시 — 페이지 %d개, 신고번호 한 가지(%s). 어긋남 없음' % (seen, REPORT_NO))
+    print('사업자 신원 표시 — 페이지 %d개, 신고번호 한 가지(%s) · 전화 %s. 어긋남 없음'
+          % (seen, REPORT_NO, TEL_KO))
     return 0
 
 
