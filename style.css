@@ -3880,3 +3880,22 @@ body .skip-link {
 body .skip-link:focus { left: 0; }
 body #main { scroll-margin-top: 90px; }
 body #main:focus { outline: none; }
+
+/* ── A-513(브론즈 35차 N35-2): 초점 고리가 **어두운 사진 위에서 묻혔다** ──────
+   브라우저 기본 고리는 검은 실선 하나다(실측 `solid 2.67px rgb(0,0,0)`).
+   밝은 바탕에서는 보이지만, 히어로 사진이나 어두운 띠 위의 단추에서는
+   거의 사라진다 — 키보드로 쓰는 사람은 **지금 어디 있는지 모른 채** 넘긴다.
+   A-456 에서 배운 것과 같다: 한 가지 빛깔로는 두 바탕을 다 감당하지 못한다.
+   그래서 **두 겹**으로 둔다 — 어두운 테두리 + 그 바깥의 밝은 후광.
+   어느 바탕에서도 둘 중 하나는 반드시 보인다.
+   `:focus-visible` 만 쓴다 — 마우스로 누를 때는 안 나온다. */
+:focus-visible {
+  outline: 3px solid #141414;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.92);
+  border-radius: 2px;
+}
+/* 건너뛰기 링크와 `#main` 은 제 처방이 따로 있다(위) — 후광이 끼어들지 않게 */
+body .skip-link:focus-visible,
+body #main:focus-visible { box-shadow: none; outline: none; }
+@media (prefers-reduced-motion: reduce) { :focus-visible { transition: none; } }

@@ -60,6 +60,10 @@ RULES = [
      r'\.announcement-bar a::after', 'announcement-bar'),
     ('「맨 위로」를 Netlify 배지 위로 (A-394)',
      r'\.scroll-top\s*\{[^}]*bottom\s*:\s*84px', 'scroll-top'),
+    # A-513: 초점 고리는 두 겹이어야 어두운 사진 위에서도 보인다. style.css 를
+    # 안 싣는 쪽은 브라우저 기본(검은 실선 하나)만 남아 그 자리가 다시 묻힌다.
+    ('초점 고리 두 겹 (A-513)',
+     r':focus-visible\s*\{[^}]*box-shadow', None),
 ]
 
 # 머리띠를 가졌다고 보는 표시
