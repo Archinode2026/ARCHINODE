@@ -22,15 +22,102 @@ EXCLUDE_DIRS = {"archi-diary", "node_modules", ".git", "sales", "docs", "silvia"
                 "admin", "auth", "brand-portal", "scripts", "downloads"}
 
 
+STRIP_TAGS = re.compile(r"<[^>]+>")
+# 속성값 안에 `>` 가 들어 있는 태그가 있다 — for-brands 의 히어로는
+# `data-en-html="… <em>Korea's USD 48B</em> …"` 이라 `[^>]*` 로는 **첫 `<em>` 에서
+# 잘린다**. 그러면 두 언어 값이 둘 다 안 잡히고 제목 폴백으로 떨어진다(실측).
+# 따옴표 안은 통째로 건너뛰는 꼴로 받는다.
+TAG_ATTRS = r'((?:"[^"]*"|\'[^\']*\'|[^>])*)'
+H1_RE = re.compile(r"<h1" + TAG_ATTRS + r">(.*?)</h1>", re.S)
+TITLE_RE = re.compile(r"<title" + TAG_ATTRS + r">")
+
+
+def _attr(attrs: str, name: str) -> str:
+    m = re.search(r'%s\s*=\s*"([^"]*)"' % re.escape(name), attrs)
+    if not m:
+        m = re.search(r"%s\s*=\s*'([^']*)'" % re.escape(name), attrs)
+    return m.group(1) if m else ""
+
+
+def h1_bilingual(html: str) -> tuple[str, str]:
+    """A-508: h1 에서 두 언어 이름을 뽑는다. 세 가지 모양을 전부 본다.
+
+    전에는 `data-en` **다음에** `data-ko` 가 오는 한 가지 모양만 봤다. 그래서
+      · 속성 차례가 뒤집힌 h1
+      · `data-en-html` 을 쓰는 h1 (for-brands 의 히어로)
+      · 토막 span 으로 갈라 쓴 h1 (list-your-brand: 「List Your Brand on」 +
+        ARCHINODE + 「에 브랜드를 등록하세요」)
+    셋이 전부 빠져나갔고, 그 쪽은 제목 폴백으로 떨어져 **두 언어 칸에 같은
+    영어가 들어갔다**(브론즈 34차 N34-8).
+    """
+    m = H1_RE.search(html)
+    if not m:
+        return "", ""
+    attrs, inner = m.group(1), m.group(2)
+    en = _attr(attrs, "data-en") or STRIP_TAGS.sub("", _attr(attrs, "data-en-html"))
+    ko = _attr(attrs, "data-ko") or STRIP_TAGS.sub("", _attr(attrs, "data-ko-html"))
+    if en and ko:
+        return en.strip(), ko.strip()
+    # 토막 span 을 이어 붙인다 — 속성이 있으면 그 언어 값을, 없으면 글자 그대로
+    pen = []
+    pko = []
+    pos = 0
+    found_attr = False
+    for sm in re.finditer(r"<span([^>]*)>(.*?)</span>", inner, re.S):
+        plain = STRIP_TAGS.sub("", inner[pos:sm.start()])
+        if plain.strip():
+            pen.append(plain)
+            pko.append(plain)
+        sa, stext = sm.group(1), STRIP_TAGS.sub("", sm.group(2))
+        sen = _attr(sa, "data-en")
+        sko = _attr(sa, "data-ko")
+        if sen or sko:
+            found_attr = True
+            pen.append(sen)
+            pko.append(sko)
+        else:
+            pen.append(stext)
+            pko.append(stext)
+        pos = sm.end()
+    tail = STRIP_TAGS.sub("", inner[pos:])
+    if tail.strip():
+        pen.append(tail)
+        pko.append(tail)
+    if found_attr:
+        a = re.sub(r"\s+", " ", "".join(pen)).strip()
+        b = re.sub(r"\s+", " ", "".join(pko)).strip()
+        if a and b:
+            return a, b
+    return "", ""
+
+
+def title_bilingual(html: str) -> tuple[str, str]:
+    """A-507 이 220쪽의 `<title>` 에 달아 둔 두 언어 값을 쓴다.
+
+    제목은 「이름 | 부모 | ARCHINODE」 꼴이라 **첫 토막**만 쓴다. 한국어 쪽이
+    「English — 한국어」로 적혀 있으면 영어 머리를 떼어 한국어만 남긴다 —
+    색인의 한국어 이름 칸에 영어가 섞이지 않게.
+    """
+    m = TITLE_RE.search(html)
+    if not m:
+        return "", ""
+    attrs = m.group(1)
+    en = html_mod.unescape(_attr(attrs, "data-en")).split("|")[0].strip()
+    ko = html_mod.unescape(_attr(attrs, "data-ko")).split("|")[0].strip()
+    if en and ko and ko.startswith(en + " — "):
+        ko = ko[len(en) + 3:].strip()
+    return en, ko
+
+
 def extract_title_desc(html: str) -> tuple[str, str, str, str]:
     """페이지에서 name_en, name_ko, desc_en, desc_ko 추출."""
-    # <title> or <h1> data-en/data-ko
-    name_en = ""
-    name_ko = ""
-    # h1 data-en/ko
-    m = re.search(r'<h1[^>]*data-en\s*=\s*["\']([^"\']+)["\'][^>]*data-ko\s*=\s*["\']([^"\']+)["\']', html)
-    if m:
-        name_en, name_ko = m.group(1), m.group(2)
+    name_en, name_ko = h1_bilingual(html)
+    if not (name_en and name_ko):
+        name_en, name_ko = title_bilingual(html)
+    if not (name_en and name_ko):
+        name_en = name_ko = ""
+    if name_en and name_ko:
+        pass
     else:
         # article-hero span.tag (매거진 글 전용)
         m = re.search(r'<h1[^>]*>([^<]+)</h1>', html)
@@ -94,6 +181,41 @@ def extract_title_desc(html: str) -> tuple[str, str, str, str]:
     return name_en, name_ko, desc_en, desc_ko
 
 
+# A-508(브론즈 34차 N34-2): 들어갈 페이지 목록을 **손으로 적어 두었더니** 그 목록이
+# 사이트맵보다 뒤처졌다 — `sourcing-inquiry`·`categories`·`terms`·`privacy`·
+# `brand-guide`·`submit-trend` 여섯 쪽이 색인에 아예 없었다. 손님이 「소싱 문의」를
+# 쳐도 안 나온다. 목록을 두 군데 적어 두면 갈린다(A-444·A-466·A-468 과 같은 실패).
+# 그래서 **사이트맵을 정본으로 읽는다** — 공개 페이지의 정의는 거기 하나다.
+_PAGE_URLS = None
+# 사이트맵에는 있지만 색인에서는 빼는 쪽과, 그 까닭
+PAGE_EXCLUDE = {
+    # 한 항목이 두 언어를 다 담으므로 영문 쌍둥이는 넣지 않는다(두 줄로 나온다)
+    "privacy-en.html",
+}
+
+
+def page_urls() -> set:
+    global _PAGE_URLS
+    if _PAGE_URLS is None:
+        sm = (ROOT / "sitemap.xml")
+        if not sm.exists():
+            raise SystemExit("sitemap.xml 이 없다 — 색인에 넣을 페이지 목록의 정본이다")
+        urls = re.findall(r"<loc>([^<]+)</loc>", sm.read_text(encoding="utf-8"))
+        out = set()
+        for u in urls:
+            rel = re.sub(r"^https?://[^/]+/", "", u).strip()
+            rel = rel or "index.html"
+            if "/" in rel:
+                continue                      # 카테고리·기사는 아래 갈래가 맡는다
+            if rel in PAGE_EXCLUDE:
+                continue
+            out.add(rel)
+        if len(out) < 10:
+            raise SystemExit("사이트맵에서 뿌리 페이지를 %d개만 읽었다 — 형식이 바뀌었나?" % len(out))
+        _PAGE_URLS = out
+    return _PAGE_URLS
+
+
 def process_file(path: Path, relpath: str) -> dict | None:
     """HTML 파일에서 색인 항목 생성."""
     try:
@@ -112,9 +234,7 @@ def process_file(path: Path, relpath: str) -> dict | None:
         typ = "article"
     elif relpath.startswith("trend-report/") and path.name != "view.html":
         typ = "trend-report"
-    elif path.name in ("index.html", "about.html", "for-brands.html", "brands.html",
-                        "magazine.html", "trend-report.html", "digital-products.html",
-                        "request-consultation.html", "contact.html", "list-your-brand.html"):
+    elif relpath.replace(os.sep, "/") in page_urls():
         typ = "page"
     else:
         return None
@@ -141,7 +261,13 @@ def process_file(path: Path, relpath: str) -> dict | None:
     }
 
 
-def main():
+def build_items(quiet: bool = False) -> list:
+    """A-508: 만드는 일과 쓰는 일을 가른다.
+
+    색인은 **만들어 두고 커밋하는 물건**이라, 페이지를 고치고 이 스크립트를
+    다시 돌리지 않으면 **조용히 묵는다**. 검사기가 같은 결과를 메모리에서
+    만들어 커밋된 파일과 견주려면 쓰기와 떨어져 있어야 한다.
+    """
     items = []
     for p in sorted(ROOT.rglob("*.html")):
         rel = p.relative_to(ROOT)
@@ -189,15 +315,25 @@ def main():
     if missing:
         raise SystemExit(
             "서브카테고리 %d개의 부모 카테고리를 찾지 못했다 — 경로 규약이 바뀌었나?" % missing)
-    print("부모를 채운 서브카테고리: %d개" % filled)
+    if not quiet:
+        print("부모를 채운 서브카테고리: %d개" % filled)
 
     # 정렬: type → url
     type_order = {"page": 0, "category": 1, "subcategory": 2, "brand": 3,
                   "article": 4, "trend-report": 5}
     items.sort(key=lambda x: (type_order.get(x["type"], 9), x["url"]))
+    return items
 
+
+def serialize(items: list) -> str:
+    """커밋된 파일과 **한 글자까지** 같아야 한다 — 검사기가 이걸로 견준다."""
+    return json.dumps(items, ensure_ascii=False, indent=2) + "\n"
+
+
+def main():
+    items = build_items()
     out = ROOT / "search-index.json"
-    out.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    out.write_text(serialize(items), encoding="utf-8")
 
     print(f"search-index.json 재생성 완료")
     print(f"  총 항목: {len(items)}")
