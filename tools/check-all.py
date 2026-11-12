@@ -85,6 +85,8 @@ CHECKS = [
      'A-483 — 카탈로그·BIM·3D 의 다운로드 URL 이 공개 제품 문서로 돌아오는지 · Storage 경로 훑기'),
     ('업로드 형식 통제',      'py',   'tools/check-upload-types.py',
      'A-484 — 인증서는 PDF·사진만 · 자료 파일은 다운로드 강제(제품 사진에는 붙지 않게)'),
+    ('공개 쓰기 울타리',      'py',   'tools/check-public-write-limits.py',
+     'A-485~488 — 공개 폼의 키 목록·길이 상한(규칙과 폼 대조) · 없는 필드 읽기 · 기본 confirm · 검색 주소'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

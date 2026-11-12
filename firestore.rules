@@ -49,6 +49,22 @@ service cloud.firestore {
     }
 
     // 허니팟 스팸 방지: 공개 폼의 숨겨진 'hp' 필드가 비어있어야 함(봇은 보통 모든 필드를 채움)
+    /* A-485: 공개 폼이 담는 칸들의 상한. 없으면 한 문서를 1MiB 까지 불릴 수 있다.
+       `get(키, '')` 로 보는 이유: 폼마다 담는 칸이 조금씩 다르다(예: category 는
+       소싱 폼에만 있다). 없는 칸을 상한으로 막으면 멀쩡한 폼이 거부된다. */
+    function leadFieldsWithinLimits() {
+      return request.resource.data.get('company', '').size() <= 200
+          && request.resource.data.get('phone', '').size() <= 50
+          && request.resource.data.get('industry', '').size() <= 100
+          && request.resource.data.get('category', '').size() <= 100
+          && request.resource.data.get('productName', '').size() <= 200
+          && request.resource.data.get('brandName', '').size() <= 200
+          && request.resource.data.get('brandNote', '').size() <= 1000
+          && request.resource.data.get('source', '').size() <= 50
+          && request.resource.data.get('userId', '').size() <= 128
+          && request.resource.data.get('brandId', '').size() <= 128
+          && request.resource.data.get('productId', '').size() <= 128;
+    }
     function passesHoneypot() {
       return !('hp' in request.resource.data) || request.resource.data.hp == '';
     }
@@ -114,7 +130,10 @@ service cloud.firestore {
     // ────────────────────────────────────────────────────────────────────
     match /brands/{brandId} {
       // 읽기: approved 문서는 누구나, 본인/어드민은 모든 상태 가능
-      allow read: if resource.data.status == 'approved'
+      /* A-486(2026-11-12): `resource.data.status` 를 그대로 읽으면 그 필드가 **없는**
+         문서 하나 때문에 규칙 평가가 오류가 되고, 목록 질의는 **전체가** 거부된다
+         (공개 카탈로그·검색이 통째로 죽는다). get(…, 기본값) 으로 바꾼다. */
+      allow read: if resource.data.get('status', '') == 'approved'
                   || isOwner(brandId)
                   || isAdmin();
 
@@ -187,8 +206,11 @@ service cloud.firestore {
 
     match /products/{productId} {
       // 읽기: approved는 누구나, 소유 브랜드/어드민은 모든 상태
-      allow read: if resource.data.status == 'approved'
-                  || (isSignedIn() && request.auth.uid == resource.data.brandId)
+      /* A-486(2026-11-12): `resource.data.status` 를 그대로 읽으면 그 필드가 **없는**
+         문서 하나 때문에 규칙 평가가 오류가 되고, 목록 질의는 **전체가** 거부된다
+         (공개 카탈로그·검색이 통째로 죽는다). get(…, 기본값) 으로 바꾼다. */
+      allow read: if resource.data.get('status', '') == 'approved'
+                  || (isSignedIn() && request.auth.uid == resource.data.get('brandId', ''))
                   || isAdmin();
 
       // 생성: 인증된 사용자가 본인 brandId로만, status는 'pending' 강제
@@ -225,8 +247,11 @@ service cloud.firestore {
     // ────────────────────────────────────────────────────────────────────
     match /articles/{articleId} {
       // 읽기: approved는 누구나, 소유 브랜드/어드민은 모든 상태
-      allow read: if resource.data.status == 'approved'
-                  || (isSignedIn() && request.auth.uid == resource.data.brandId)
+      /* A-486(2026-11-12): `resource.data.status` 를 그대로 읽으면 그 필드가 **없는**
+         문서 하나 때문에 규칙 평가가 오류가 되고, 목록 질의는 **전체가** 거부된다
+         (공개 카탈로그·검색이 통째로 죽는다). get(…, 기본값) 으로 바꾼다. */
+      allow read: if resource.data.get('status', '') == 'approved'
+                  || (isSignedIn() && request.auth.uid == resource.data.get('brandId', ''))
                   || isAdmin();
 
       // 생성: 인증된 사용자가 본인 brandId로만, status는 'pending'
@@ -276,12 +301,27 @@ service cloud.firestore {
     match /leads/{leadId} {
       // 생성: 누구나(4b 공개 폼 대비) — type·status=='new'·name·email·message·createdAt==request.time 검사
       //       (기존 조건 email·createdAt 에 type·status·name·message 를 더한 좁히기 — 4a 전에는 create 를 쓰는 곳이 없었다)
+      /* A-485(2026-11-12): 이 자리는 **누구나 쓸 수 있다**(공개 폼). 그런데 전에는
+         ㄱ) 담기는 **키를 세지 않았고** ㄴ) **길이 상한이 한 군데도 없었다**(폼에도
+         `maxlength` 가 없었다). 그래서 아무 이름의 칸을 끼워 넣을 수 있었고 —
+         `history` 를 지어내 **어드민이 쓴 것처럼** 보이게 하는 것이 그 예다 —
+         한 문서를 1MiB 가까이 불려 무한히 만들 수도 있었다(A-477 과 같은 모양).
+         키를 못 박고, 칸마다 상한을 두고, `history` 는 어드민만 담을 수 있게 한다. */
       allow create: if passesHoneypot()
+                    && request.resource.data.keys().hasOnly([
+                         'type','status','brandId','brandName','productId','productName',
+                         'name','company','email','phone','industry','category','message',
+                         'source','userId','brandNote','createdAt','updatedAt','assignedAt',
+                         'hp','history'])
+                    && (!('history' in request.resource.data) || isAdmin())
                     && request.resource.data.type in ['quote','brand-inquiry','dealer','sample-request','sourcing']
                     && request.resource.data.status == 'new'
-                    && request.resource.data.name is string && request.resource.data.name.size() > 0
-                    && request.resource.data.email is string && request.resource.data.email.size() > 5
-                    && request.resource.data.message is string
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() > 5 && request.resource.data.email.size() <= 254
+                    && request.resource.data.message is string && request.resource.data.message.size() <= 5000
+                    && leadFieldsWithinLimits()
                     && request.resource.data.createdAt == request.time;
       // 읽기: 어드민, 또는 배정된 브랜드 본인 — 브랜드는 배정된 건만(2026-09-12 블랙 지적: 위조 brandId·spam 되돌림 노출 차단)
       //       포털 조회는 where('brandId','==',uid).where('status','in',[...]) — 두 조건이 이 규칙과 정확히 같아야 list 판정이 통과한다
@@ -522,7 +562,24 @@ service cloud.firestore {
     match /bim-requests/{requestId} {
       // 생성: 로그인한 전문가 본인만, 동의 체크박스 2개 모두 true, status는 'pending' 강제,
       //       fileUrl·expiresAt은 아직 비어있어야(승인 전에 미리 채워 넣는 것 차단)
+      /* A-485: leads 와 같은 이유 — 키를 못 박고 길이 상한을 둔다.
+         이 자리도 로그인만 하면 누구나 쓴다(공개 제품 페이지의 자료 신청 폼). */
       allow create: if isSignedIn()
+                    && request.resource.data.keys().hasOnly([
+                         'requesterUid','name','company','title','email','phone',
+                         'projectName','projectType','projectTimeline','projectScale',
+                         'productId','productName','brandId','brandName','fileType',
+                         'status','agreedDataTerms','agreedThirdPartyShare',
+                         'fileUrl','expiresAt','createdAt','hp'])
+                    && request.resource.data.name.size() <= 100
+                    && request.resource.data.email.size() <= 254
+                    && request.resource.data.projectName.size() <= 200
+                    && request.resource.data.get('company', '').size() <= 200
+                    && request.resource.data.get('title', '').size() <= 100
+                    && request.resource.data.get('phone', '').size() <= 50
+                    && request.resource.data.get('projectType', '').size() <= 100
+                    && request.resource.data.get('projectTimeline', '').size() <= 100
+                    && request.resource.data.get('projectScale', '').size() <= 100
                     && request.resource.data.requesterUid == request.auth.uid
                     && request.resource.data.agreedDataTerms == true
                     && request.resource.data.agreedThirdPartyShare == true

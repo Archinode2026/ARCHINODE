@@ -335,9 +335,25 @@ function adm_drawSearch(q) {
     box.hidden = false;
 }
 // 결과 클릭 — page 는 그 페이지로, 그 외는 dashboard 해시로 화면 활성 + 상세 함수(전역 function 이름, 없으면 화면만)
+/* A-488(2026-11-12): `location.href = ds.href` 를 그대로 했다. 지금 `href` 는
+   ADMIN_MENUS 의 `target`(저장소에 박힌 상수)에서만 오므로 **오늘은 악용되지 않는다** —
+   전수로 세어 확인했다. 다만 이 자리는 「검색 결과의 값을 그대로 주소로 쓴다」는
+   모양이라, 다음 사람이 문서 필드에서 `href` 를 채우는 순간 `javascript:` 가 돈다.
+   그때 가서 알아채기 어려운 종류라 지금 막아 둔다(같은 출처의 상대 경로만 허용). */
+function adm_safeLocalHref(u) {
+    u = String(u || '');
+    if (!u) return '';
+    if (/^\s*[a-z][a-z0-9+.-]*:/i.test(u)) return '';   // 스킴이 붙은 것은 전부 거부
+    if (/^\s*\/\//.test(u)) return '';                  // //evil.example 도 거부
+    return u;
+}
 function adm_goResult(ds) {
     ds = ds || {};
-    if (ds.href) { location.href = ds.href; return; }
+    if (ds.href) {
+        var safe = adm_safeLocalHref(ds.href);
+        if (!safe) { try { console.warn('[adm] 거부된 주소', ds.href); } catch (e) {} return; }
+        location.href = safe; return;
+    }
     adm_hideSearch();
     if (!adm_isDashboard()) { location.href = 'dashboard.html#' + ds.menu; return; }
     if (location.hash === '#' + ds.menu) adm_route(); else location.hash = '#' + ds.menu;

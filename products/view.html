@@ -213,15 +213,15 @@
         </div>
         <div class="rfq-field">
           <label for="rfqName" data-en="Name" data-ko="이름">Name</label>
-          <input type="text" id="rfqName" required autocomplete="name">
+          <input type="text" id="rfqName" maxlength="100" required autocomplete="name">
         </div>
         <div class="rfq-field">
           <label for="rfqCompany" data-en="Company" data-ko="회사명">Company</label>
-          <input type="text" id="rfqCompany" autocomplete="organization">
+          <input type="text" id="rfqCompany" maxlength="200" autocomplete="organization">
         </div>
         <div class="rfq-field">
           <label for="rfqEmail" data-en="Email" data-ko="이메일">Email</label>
-          <input type="email" id="rfqEmail" required autocomplete="email">
+          <input type="email" id="rfqEmail" maxlength="254" required autocomplete="email">
         </div>
         <div class="rfq-field" id="rfqShippingField" style="display:none;">
           <label for="rfqShipping" data-en="Shipping Address" data-ko="배송지 주소">Shipping Address</label>
@@ -229,7 +229,7 @@
         </div>
         <div class="rfq-field">
           <label for="rfqMessage" id="rfqMessageLabel" data-en="Project / quantity / desired timeline" data-ko="프로젝트 · 수량 · 희망 납기">Project / quantity / desired timeline</label>
-          <textarea id="rfqMessage" required></textarea>
+          <textarea id="rfqMessage" maxlength="5000" required></textarea>
         </div>
         <button type="submit" class="rfq-submit" id="rfqSubmitBtn" data-en="Send Request" data-ko="요청 보내기">Send Request</button>
         <div class="rfq-error-msg" id="rfqErrorMsg"></div>
@@ -257,28 +257,28 @@
         </div>
         <div class="rfq-field">
           <label for="bimName" data-en="Name" data-ko="이름">Name</label>
-          <input type="text" id="bimName" required autocomplete="name">
+          <input type="text" id="bimName" maxlength="100" required autocomplete="name">
         </div>
         <div class="rfq-field">
           <label for="bimCompany" data-en="Company (firm / studio)" data-ko="소속(설계사무소/디자인스튜디오)">Company (firm / studio)</label>
-          <input type="text" id="bimCompany" required autocomplete="organization">
+          <input type="text" id="bimCompany" maxlength="200" required autocomplete="organization">
         </div>
         <div class="rfq-field">
           <label for="bimTitle" data-en="Title" data-ko="직함">Title</label>
-          <input type="text" id="bimTitle" autocomplete="organization-title">
+          <input type="text" id="bimTitle" maxlength="100" autocomplete="organization-title">
         </div>
         <div class="rfq-field">
           <label for="bimEmail" data-en="Work Email" data-ko="업무용 이메일">Work Email</label>
-          <input type="email" id="bimEmail" required autocomplete="email">
+          <input type="email" id="bimEmail" maxlength="254" required autocomplete="email">
         </div>
         <div class="rfq-field">
           <label for="bimPhone" data-en="Phone" data-ko="연락처">Phone</label>
-          <input type="tel" id="bimPhone" autocomplete="tel">
+          <input type="tel" id="bimPhone" maxlength="50" autocomplete="tel">
         </div>
         <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
         <div class="rfq-field">
           <label for="bimProjectName" data-en="Project Name (working title OK)" data-ko="프로젝트명(가칭 가능)">Project Name (working title OK)</label>
-          <input type="text" id="bimProjectName" required>
+          <input type="text" id="bimProjectName" maxlength="200" required>
         </div>
         <div class="rfq-field">
           <label for="bimProjectType" data-en="Project Type" data-ko="용도">Project Type</label>
@@ -846,10 +846,15 @@ let bimRequestedFileType = '';
 function openBimModal(fileType) {
     if (!auth.currentUser) {
         const lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
+        /* A-487: `confirm()` 이었다. 억제된 환경에서는 늘 false 라 **아무 일도 안 일어났다** —
+           자료 신청으로 가는 길이 조용히 막혔다. 화면 안내 + 진짜 링크로 바꾼다. */
         const msg = lang === 'en'
-            ? 'Sign in or create a free account to request CAD/BIM/catalog files. Go to sign up now?'
-            : '로그인 또는 무료 회원가입 후 CAD/BIM/카탈로그 파일을 신청할 수 있어요. 지금 가입하러 갈까요?';
-        if (confirm(msg)) window.location.href = '../auth/signup.html?type=member';
+            ? 'Sign in or create a free account to request CAD/BIM/catalog files.'
+            : '로그인 또는 무료 회원가입 후 CAD·BIM·카탈로그 파일을 신청할 수 있어요.';
+        likeNote(msg, false, {
+            href: '../auth/signup.html?type=member',
+            text: lang === 'en' ? 'Create a free account →' : '무료 회원가입 →'
+        });
         return;
     }
     bimRequestedFileType = fileType;
@@ -1056,7 +1061,7 @@ function updateLikeUI() {
    **열두 번** 떴는데 화면에 하나도 안 나왔다(콘솔에만 남았다).
    A-082 에서 뉴스레터 안내를 같은 이유로 `alert` → 화면 안내문으로 바꿨는데
    **이 두 곳은 남아 있었다.** 단추 옆에 말풍선으로 띄운다. */
-function likeNote(msg, isErr) {
+function likeNote(msg, isErr, link) {
     /* 단추 id 가 화면마다 다르다 — products 는 `likeBtn`, brands 는 `brandLikeBtn`.
        ★ 처음엔 `likeBtn` 만 찾게 썼다가 brands 쪽에서 또 아무것도 안 보일 뻔했다.
           **보이게 만드는 코드가 안 보이면 아무 소용이 없다.** */
@@ -1076,22 +1081,38 @@ function likeNote(msg, isErr) {
     box.style.color = isErr ? '#8a2b2b' : '#5d564c';
     box.style.border = '1px solid ' + (isErr ? '#e8c9c9' : '#e0d8c8');
     box.textContent = msg;
+    /* A-487(2026-11-12): `link` 를 받으면 안내문 뒤에 **진짜 링크**를 붙인다.
+       비로그인 안내를 `confirm()` 으로 띄우던 자리를 이걸로 바꿨다 —
+       `confirm` 이 억제된 환경에서는 늘 false 라 **눌러도 아무 일도 안 일어났다**
+       (A-440·A-302 와 같은 계열). 링크는 호출부가 **상수로** 주고, 여기서는
+       DOM 으로 붙인다(innerHTML 을 쓰지 않는다). */
+    if (link && link.href) {
+        box.appendChild(document.createTextNode(' '));
+        var a = document.createElement('a');
+        a.href = link.href;
+        a.textContent = link.text;
+        a.style.cssText = 'color:#7a5c32;text-decoration:underline;font-weight:500;white-space:nowrap;';
+        box.appendChild(a);
+    }
     try { box.scrollIntoView({ block: 'nearest' }); } catch (e) {}
 }
 
 async function toggleLike() {
     const user = auth.currentUser;
     if (!user) {
-        // 비로그인 → 로그인 안내
-        // A-116: 사이트 디자인·현재 언어에 맞는 확인창(기본 confirm/alert 대신)
+        /* 비로그인 → 로그인 안내.
+           A-487(2026-11-12): 바로 윗줄 주석은 「A-116: 사이트 디자인·현재 언어에 맞는
+           확인창(기본 confirm/alert 대신)」이었는데 **코드는 기본 `confirm` 이었다**.
+           주석이 바라는 바를 적어 둔 자리다 — 이제 코드가 그 말대로 한다. */
         var lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
         var msg = lang === 'en'
-            ? 'Log in to save this product. Go to the sign-in page?'
-            : '저장하려면 로그인이 필요합니다. 로그인 페이지로 이동할까요?';
-        if (confirm(msg)) {
-            // R-069: 로그인 뒤 이 제품 페이지로 돌아온다.
-            window.location.href = '../auth/login.html?next=' + encodeURIComponent(window.location.pathname + window.location.search);
-        }
+            ? 'Log in to save this product.'
+            : '저장하려면 로그인이 필요합니다.';
+        // R-069: 로그인 뒤 이 제품 페이지로 돌아온다.
+        likeNote(msg, false, {
+            href: '../auth/login.html?next=' + encodeURIComponent(window.location.pathname + window.location.search),
+            text: lang === 'en' ? 'Go to sign in →' : '로그인하러 가기 →'
+        });
         return;
     }
     if (!currentProductDocId) return;
