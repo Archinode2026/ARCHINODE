@@ -1797,40 +1797,18 @@
 </button>
 
 <script>
-/* ===== HERO SLIDER ===== */
-// Hero slider — 페이지에 .hero-slide 요소 있을 때만 작동 (null 안전)
-const slides = document.querySelectorAll('.hero-slide');
-const dots = document.querySelectorAll('.hero-dot');
-const heroEl = document.querySelector('.hero');
-if (slides.length > 0 && heroEl) {
-  const heroData = [
-    { tag: 'Europe meets Korea', title: 'Connecting Global<br>Architecture & Design', desc: 'Seamlessly connecting European design brands with the Korean market. Founding brands joining now.' },
-    { tag: 'Brand Directory', title: 'Every Brand,<br>One Platform', desc: 'From furniture to finishes, explore the world\'s leading design brands all in one place.' },
-    { tag: 'For Professionals', title: 'Designed for<br>Architects & Designers', desc: 'Find products, connect with brands, and source materials for your next project.' }
-  ];
-  let currentSlide = 0;
-  let slideInterval;
-  window.goSlide = function(n) {
-    if (!slides[currentSlide] || !slides[n]) return;
-    slides[currentSlide].classList.remove('active');
-    if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
-    currentSlide = n;
-    slides[currentSlide].classList.add('active');
-    if (dots[currentSlide]) dots[currentSlide].classList.add('active');
-    var tagEl = document.getElementById('heroTag');
-    var titleEl = document.getElementById('heroTitle');
-    var descEl = document.getElementById('heroDesc');
-    if (tagEl) tagEl.textContent = heroData[n].tag;
-    if (titleEl) titleEl.innerHTML = heroData[n].title;
-    if (descEl) descEl.textContent = heroData[n].desc;
-  };
-  function nextSlide() { window.goSlide((currentSlide + 1) % slides.length); }
-  function startSlider() { slideInterval = setInterval(nextSlide, 5000); }
-  function stopSlider() { clearInterval(slideInterval); }
-  startSlider();
-  heroEl.addEventListener('mouseenter', stopSlider);
-  heroEl.addEventListener('mouseleave', startSlider);
-}
+/* ===== HERO SLIDER — 이 쪽에는 없다 (A-516, 2026-11-13) =====
+   여기에는 홈의 히어로 슬라이더 코드가 **통째로 복사돼** 있었다. 그런데 이 쪽에는
+   `.hero-slide` 마크업이 **한 개도 없어서** 가드(`slides.length > 0`)에 걸려 한 번도
+   돌지 않았다 — **죽은 사본**이다.
+
+   죽어 있는 것보다 나쁜 것은 그 사본이 **고치기 전 판**이라는 점이다. 홈 쪽은
+   A-361 에서 고쳤다(히어로 글자가 한국어 화면에서 5초 뒤부터 영어로 바뀌던 결함 —
+   `heroData` 가 영어만 담고 있었다). 여기 사본은 **그 고침이 오지 않은 판**이라,
+   누군가 이 쪽에 히어로 마크업을 붙이는 순간 A-361 이 그대로 되살아난다.
+
+   사본을 고치는 대신 **지운다.** 히어로가 필요해지면 홈의 현행 코드를 가져오면 된다.
+   (「분기·사본이 갈려 하나만 적용된다」 — A-444·A-466·A-468·A-503 과 같은 자리) */
 
 /* ===== HEADER SCROLL ===== */
 const header = document.getElementById('header');
