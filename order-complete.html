@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://archinodekr.com/order-complete.html">
+<meta property="og:image" content="https://archinodekr.com/assets/og/archinode-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ARCHINODE — Bridging Architecture">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주문 접수 — ARCHINODE</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="ARCHINODE 디지털 상품 결제가 접수되었습니다.">
+<meta property="og:title" content="ARCHINODE Digital Products — Coming H2 2026">
+<meta property="og:description" content="Trend reports, CAD libraries, BIM families, spec sheets, market intelligence — curated for the Korean architecture &amp; design market.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://archinodekr.com/digital-products.html">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/vendor/fontawesome-6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<!--
+  ARCHINODE Digital Products page.
+  Firestore schema (Step 2-C에서 실제 구현 예정):
+  collection: digital-products
+    { id, slug, title, titleKo, category, description, descriptionKo,
+      price (USD), priceKrw, fileUrl, thumbnailUrl, previewImages[],
+      features[], pageCount, fileSize, contributingBrands[],
+      status ('draft'|'published'|'pre-order'), publishedAt, createdAt, salesCount }
+  collection: purchases
+    { productId, buyerEmail, buyerName, amount, currency, status, paymentMethod,
+      paymentId, downloadCount, downloadUrl (signed), downloadExpiresAt, createdAt }
+  결제 통합: 페이팔 비즈니스 계정 검증 완료 후 활성화 (Step 2-D).
+-->
+<style>
+.dp-hero {
+  background: linear-gradient(135deg, #332e27 0%, #332e27 100%);
+  color: #fff;
+  padding: 100px 0 60px;
+  text-align: center;
+  position: relative;
+}
+.dp-hero .badge-prelaunch {
+  display: inline-block;
+  background: rgba(160,124,74,0.15);
+  color: var(--navy-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(160,124,74,0.3);
+  margin-bottom: 22px;
+}
+.dp-hero h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+.dp-hero p {
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.7);
+  max-width: 680px;
+  margin: 0 auto 24px;
+  line-height: 1.65;
+}
+.dp-hero .price-range {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.5);
+  padding: 6px 16px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 3px;
+}
+
+.dp-intro {
+  padding: 56px 0;
+  background: #fafafa;
+}
+.dp-intro h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+.dp-intro p.lead {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.7;
+  max-width: 760px;
+  margin-bottom: 28px;
+}
+.dp-why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 768px) { .dp-why-grid { grid-template-columns: 1fr; } }
+.dp-why-card {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+}
+.dp-why-card i { font-size: 1.4rem; color: var(--accent-ink); margin-bottom: 12px; }
+.dp-why-card h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 8px; }
+.dp-why-card p { font-size: 0.85rem; color: #666; line-height: 1.55; }
+
+.dp-filters {
+  padding: 36px 0 20px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+.dp-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.dp-filter-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dp-filter-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+.dp-filter-btn.active { background: #332e27; color: #fff; border-color: #332e27; }
+
+.dp-products {
+  padding: 40px 0 80px;
+  background: #fff;
+}
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+.dp-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.25s;
+  display: flex;
+  flex-direction: column;
+}
+.dp-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+.dp-card-thumb {
+  width: 100%;
+  height: 200px;
+  background: #f4efe6;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.dp-card-thumb .dp-category-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 3px;
+}
+.dp-card-thumb .dp-price-tag {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: #fff;
+  color: #332e27;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.dp-card-body {
+  padding: 20px 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.dp-card-body h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #332e27;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+.dp-card-body .dp-card-desc {
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.55;
+  flex: 1;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dp-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.75rem;
+  color: var(--gray-700);
+  margin-bottom: 16px;
+}
+.dp-card-meta span i { color: var(--accent-ink); margin-right: 4px; }
+.dp-card-btn {
+  display: block;
+  width: 100%;
+  background: #332e27;
+  color: #fff;
+  text-align: center;
+  padding: 11px 0;
+  border-radius: 5px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+.dp-card-btn:hover { background: var(--accent-ink); }
+.dp-card-btn.disabled { background: #ccc; cursor: not-allowed; }
+
+.dp-notify {
+  padding: 56px 0;
+  background: #FAF6EC;
+  text-align: center;
+}
+.dp-notify h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+.dp-notify p {
+  font-size: 1rem;
+  color: #6b5837;
+  max-width: 560px;
+  margin: 0 auto 24px;
+  line-height: 1.6;
+}
+.dp-notify-form {
+  display: flex;
+  gap: 8px;
+  max-width: 480px;
+  margin: 0 auto;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.dp-notify-form input {
+  flex: 1;
+  min-width: 240px;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: #fff;
+}
+.dp-notify-form input:focus { outline: none; border-color: var(--accent); }
+.dp-notify-form button {
+  background: #332e27;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.dp-notify-form button:hover { background: var(--accent-ink); }
+.dp-notify-msg { font-size: 0.85rem; color: #6b5837; margin-top: 14px; display: none; }
+</style>
+</head>
+<body>
+
+<header class="header" id="header">
+  <div class="container">
+    <a href="index.html" class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">건축을 잇다</span></a>
+    <nav class="main-nav" id="mainNav">
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger" onclick="toggleCatMenu()" data-en="Categories" data-ko="카테고리">Categories <i class="fas fa-chevron-down"></i></button>
+        <div class="nav-dropdown-menu" id="catMenu">
+          <a href="categories/furniture.html"><span>Furniture</span><small>가구</small></a>
+          <a href="categories/bathroom.html"><span>Bathroom</span><small>욕실</small></a>
+          <a href="categories/outdoor.html"><span>Outdoor</span><small>아웃도어</small></a>
+          <a href="categories/lighting.html"><span>Lighting</span><small>조명</small></a>
+          <a href="categories/kitchen.html"><span>Kitchen</span><small>주방</small></a>
+          <a href="categories/office.html"><span>Office</span><small>오피스</small></a>
+          <a href="categories/finishes.html"><span>Finishes</span><small>마감재</small></a>
+          <a href="categories/wellness.html"><span>Wellness</span><small>웰니스</small></a>
+          <a href="categories/decor.html"><span>Decor</span><small>데코</small></a>
+          <a href="categories/construction.html"><span>Construction</span><small>건축자재</small></a>
+        </div>
+      </div>
+      <a href="brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a>
+      <a href="magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a>
+      <a href="about.html" data-en="About" data-ko="소개">About</a>
+      <a href="for-brands.html" data-lang-only="en" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
+      <a href="sourcing-inquiry.html" class="nav-cta" data-lang-only="ko" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
+      <a href="list-your-brand.html" class="nav-cta" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+    </nav>
+    <div class="header-actions">
+      <a href="auth/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
+      <button class="search-toggle" onclick="toggleSearch()" aria-label="Search"><i class="fas fa-search"></i></button>
+      <a href="auth/profile.html" aria-label="Saved"><i class="far fa-bookmark"></i></a>
+      <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
+      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     결제 완료 안내 — A-501(2026-11-12)
+
+     PayPal 결제 링크의 **Confirmation 탭 → Auto-return** 에 이 주소를 넣으면
+     결제를 마친 손님이 여기로 돌아옵니다:
+         https://archinodekr.com/order-complete.html
+     (Auto-return 은 링크마다 따로 겁니다 — 상품을 만들 때마다 넣어 주세요.)
+
+     ★ 이 페이지는 **결제를 확인하지 않습니다.** 주소만 알면 누구나 열 수 있으므로
+       「결제가 완료되었습니다」라고 단정하지 않습니다 — 「접수되었습니다, 확인 후
+       보내 드립니다」로 적습니다. 실제 확인은 PayPal 알림 메일로 합니다(수동).
+       자동으로 확인하려면 웹훅이 필요합니다(문서 7번).
+     ══════════════════════════════════════════════════════════════════ -->
+<section style="padding:90px 24px 70px;background:#faf8f4;">
+  <div class="container" style="max-width:640px;text-align:center;">
+    <i class="fas fa-circle-check" style="font-size:3rem;color:#7a5c32;margin-bottom:22px;"></i>
+    <h1 style="font-size:1.7rem;font-weight:800;color:#332e27;margin-bottom:14px;"
+        data-en="Thank you — your order is in" data-ko="주문이 접수되었습니다">주문이 접수되었습니다</h1>
+    <p style="font-size:1rem;line-height:1.8;color:#5d564c;margin-bottom:10px;"
+       data-en="We will check the payment and send the file to the email address you used, within one business day."
+       data-ko="결제를 확인한 뒤, 결제하신 이메일 주소로 영업일 기준 1일 이내에 파일을 보내 드립니다.">결제를 확인한 뒤, 결제하신 이메일 주소로 영업일 기준 1일 이내에 파일을 보내 드립니다.</p>
+    <p style="font-size:0.9rem;line-height:1.8;color:#5d564c;margin-bottom:30px;"
+       data-en="PayPal also sends you its own payment receipt. If the file has not arrived within one business day, write to us and we will sort it out."
+       data-ko="결제 영수증은 PayPal 이 따로 보내 드립니다. 영업일 1일이 지나도 파일이 오지 않으면 알려 주세요. 바로 처리해 드리겠습니다.">결제 영수증은 PayPal 이 따로 보내 드립니다. 영업일 1일이 지나도 파일이 오지 않으면 알려 주세요. 바로 처리해 드리겠습니다.</p>
+    <div style="background:#fff;border:1px solid #e8e2d6;border-radius:10px;padding:20px 22px;text-align:left;font-size:0.88rem;line-height:1.75;color:#5d564c;margin-bottom:30px;">
+      <strong style="color:#332e27;" data-en="Enquiries" data-ko="문의">문의</strong><br>
+      <a href="mailto:office@archinode.org" style="color:#7a5c32;">office@archinode.org</a>
+      <span data-en=" — please include the name on the payment." data-ko=" — 결제하신 분 성함을 함께 적어 주세요."> — 결제하신 분 성함을 함께 적어 주세요.</span>
+    </div>
+    <a href="digital-products.html" class="dp-card-btn" style="display:inline-block;width:auto;padding:12px 26px;text-decoration:none;"
+       data-en="Back to digital products" data-ko="디지털 상품으로 돌아가기">디지털 상품으로 돌아가기</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">Bridging Architecture</span></div>
+        <p data-en="The premier gateway for high-end European design brands entering Korea." data-ko="엄선된 해외 건축·디자인 브랜드와 한국 크리에이터를 위한 B2B 쇼케이스">The premier gateway for high-end European design brands entering Korea.</p>
+        <div class="footer-contact">
+          <!-- A-316: 소셜 아이콘 4개가 전부 href="#" 였다 → 문의 한 줄로 교체(승리님 결정).
+               계정이 생기면 이 자리에 다시 넣는다. -->
+          <a href="mailto:office@archinode.org" data-en="Brand listing &amp; partnership: office@archinode.org" data-ko="입점·제휴 문의 office@archinode.org">Brand listing &amp; partnership: office@archinode.org</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Categories" data-ko="카테고리">Categories</h4>
+        <ul>
+          <li><a href="categories/furniture.html" data-en="Furniture" data-ko="가구">Furniture</a></li>
+          <li><a href="categories/bathroom.html" data-en="Bathroom" data-ko="욕실">Bathroom</a></li>
+          <li><a href="categories/outdoor.html" data-en="Outdoor" data-ko="아웃도어">Outdoor</a></li>
+          <li><a href="categories/lighting.html" data-en="Lighting" data-ko="조명">Lighting</a></li>
+          <li><a href="categories/kitchen.html" data-en="Kitchen" data-ko="주방">Kitchen</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="More Categories" data-ko="더 많은 카테고리">More Categories</h4>
+        <ul>
+          <li><a href="categories/office.html" data-en="Office" data-ko="오피스">Office</a></li>
+          <li><a href="categories/finishes.html" data-en="Finishes" data-ko="마감재">Finishes</a></li>
+          <li><a href="categories/wellness.html" data-en="Wellness" data-ko="웰니스">Wellness</a></li>
+          <li><a href="categories/decor.html" data-en="Decor" data-ko="데코">Decor</a></li>
+          <li><a href="categories/construction.html" data-en="Construction" data-ko="건축자재">Construction</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Services" data-ko="서비스">Services</h4>
+        <ul>
+          <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
+          <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
+               이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
+          <li data-lang-only="en">
+            <details class="footer-more">
+              <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
+              <ul>
+                <li><a href="for-brands.html" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a></li>
+                <li><a href="list-your-brand.html" data-en="Brand Listing" data-ko="브랜드 입점">Brand Listing</a></li>
+                <li><a href="request-consultation.html" data-en="Consulting" data-ko="컨설팅">Consulting</a></li>
+                <li><a href="digital-products.html" data-en="Digital Products" data-ko="디지털 상품">Digital Products</a></li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-en="Company" data-ko="회사">Company</h4>
+        <ul>
+          <li><a href="about.html" data-en="About ARCHINODE" data-ko="ARCHINODE 소개">About ARCHINODE</a></li>
+          <li><a href="magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a></li>
+          <li><a href="trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a></li>
+          <li><a href="contact.html" data-en="Contact" data-ko="연락처">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business-info" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;margin-top:40px;margin-bottom:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
+      상호: 비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
+      주소: 경기도 안양시 동안구 흥안대로 528, 제7층 702-라58호(관양동, 타워 빌딩) &nbsp;|&nbsp; 이메일: office@archinode.org
+    </div>
+    <div class="footer-bottom">
+      <p data-en="&copy; 2026 ARCHINODE. All rights reserved." data-ko="&copy; 2026 ARCHINODE. 모든 권리 보유.">&copy; 2026 ARCHINODE. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="terms.html" data-en="Terms" data-ko="약관">Terms</a>
+        <a href="privacy.html" data-en="Privacy Policy" data-ko="개인정보 처리방침" data-en-href="privacy-en.html" data-ko-href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="lang.js?v=20261106a"></script>
+<script src="auth-ui.js"></script>
+<script src="cookie-consent.js?v=20260630" defer></script>
+
+</body>
+</html>

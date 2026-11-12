@@ -89,6 +89,8 @@ CHECKS = [
      'A-485~488 — 공개 폼의 키 목록·길이 상한(규칙과 폼 대조) · 없는 필드 읽기 · 기본 confirm · 검색 주소'),
     ('안내문 이중언어',      'py',   'tools/check-bilingual-messages.py',
      'A-492 — 공개 페이지의 손님용 안내가 영어로만 심기는지(data-en/data-ko 를 함께 다는지)'),
+    ('디지털 상품 구매',     'node', 'tools/test-digital-products.js',
+     'A-501 — 결제 주소가 PayPal 인지 · 상품 글 이스케이프 · 동의 전 결제 단추 잠김 · 복귀 페이지가 결제를 단정하지 않는지'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)
