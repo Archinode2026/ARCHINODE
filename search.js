@@ -211,6 +211,10 @@
     });
   }
 
+  /* 한 번에 보여 주는 줄 수. 12 는 가리개 높이에 맞춘 값이고, 넘치는 줄이
+     있다는 사실은 `renderResults` 가 아래에 적어 준다. */
+  var MAX_RESULTS = 12;
+
   // Search function
   function search(query) {
     if (!searchData || !query) return [];
@@ -295,7 +299,13 @@
 
     // Sort by score descending
     results.sort(function(a, b) { return b.score - a.score; });
-    return results.slice(0, 12); // Max 12 results
+    /* A-509: 전에는 **말 없이 12개에서 잘랐다.** 「bath」를 치면 12줄이 뜨는데
+       그게 전부인지 앞 12개인지 화면 어디에도 없었다 — 손님은 더 있는 줄 모르고
+       찾기를 그만둔다. 자른 줄 수를 배열에 달아 보내 화면이 말하게 한다.
+       (A-506 과 같은 결의 결함이다 — 끊었으면 끊었다고 말해야 한다.) */
+    var top = results.slice(0, MAX_RESULTS);
+    top.total = results.length;
+    return top;
   }
 
   // Get type label
@@ -381,6 +391,9 @@
     }
 
     var html = '';
+    /* 더 있는데 안 보여 주는 줄이 있으면 **그렇게 적는다**. 「없다」와
+       「여기까지만 보여 준다」는 손님에게 전혀 다른 말이다. */
+    var cut = (typeof results.total === 'number') ? (results.total - results.length) : 0;
     for (var i = 0; i < results.length; i++) {
       var r = results[i];
       var item = r.item;
@@ -422,6 +435,13 @@
         '</div>' +
         '<span class="search-result-type">' + getTypeLabel(item.type, lang) + '</span>' +
       '</a>';
+    }
+    if (cut > 0) {
+      html += '<div class="search-result-more">' +
+        esc(lang === 'ko'
+            ? ('전체 ' + results.total + '건 중 ' + results.length + '건을 보여 드립니다 — 더 좁혀서 검색해 보세요')
+            : ('Showing ' + results.length + ' of ' + results.total + ' results — try a more specific term')) +
+        '</div>';
     }
     resultsContainer.innerHTML = html;
   }

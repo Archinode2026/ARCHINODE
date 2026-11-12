@@ -154,6 +154,27 @@ async function runCategory(total) {
   const CP = fs.readFileSync(path.join(ROOT, 'category-products.js'), 'utf8');
   ok('카테고리 쪽에도 맨 limit(24) 가 없다', !/limit\(24\)/.test(strip(CP)));
 
+  // ── 6) 매거진 셈 — 보이는 것과 세는 것이 같은가 (A-509, 브론즈 34차 N34-7) ──
+  /* 그리드 밖에 추천 기사 카드가 한 장 더 있다. 그것을 안 세면 손님 눈에는
+     131장이 보이는데 문구는 「129개 중」이라고 말한다. */
+  const MG = fs.readFileSync(path.join(ROOT, 'magazine.html'), 'utf8');
+  const mstrip = MG.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, '');
+  ok('추천 카드를 센다', /\.featured-article \.featured-card/.test(mstrip));
+  ok('전체는 그리드 + 추천이다', /cards\.length \+ featured/.test(mstrip));
+  ok('보여 준 수에도 추천을 더한다', /shown \+ featured/.test(mstrip));
+  ok('맨 cards.length 로 세는 문구가 남아 있지 않다',
+     !/of ' \+ cards\.length \+ ' articles/.test(mstrip));
+  ok('추천 카드가 실제로 한 장 있다', (MG.match(/class="featured-card/g) || []).length === 1);
+
+  // ── 7) 검색 가리개 — 자른 사실을 말하는가 (A-509, 브론즈 34차 N34-3) ───────
+  const SJ = fs.readFileSync(path.join(ROOT, 'search.js'), 'utf8');
+  const sstrip = SJ.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/[^\n]*/gm, '');
+  ok('검색도 맨 12 로 자르지 않는다', !/slice\(0, 12\)/.test(sstrip));
+  ok('자른 줄 수를 함께 보낸다', /top\.total = results\.length/.test(sstrip));
+  ok('안내줄 자리가 있다', /search-result-more/.test(sstrip));
+  const CSS = fs.readFileSync(path.join(ROOT, 'style.css'), 'utf8');
+  ok('안내줄 처방이 style.css 에 있다', /\.search-result-more\s*\{/.test(CSS));
+
   console.log('\n목록 끊김 — 시험 ' + (pass + fail) + '개, 실패 ' + fail + '개');
   process.exit(fail ? 1 : 0);
 })();

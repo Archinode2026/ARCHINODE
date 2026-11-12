@@ -289,6 +289,27 @@ const BRANDS_REAL = [
   ok('「스팀룸」 두 줄이 욕실 / 웰니스 로 갈린다',
      /욕실/.test(r.text) && /웰니스/.test(r.text), r.text.slice(0, 90));
 
+  console.log('\n[8] A-509 — 12건에서 자른 사실을 말하는가');
+  /* 20개를 전부 「bath」에 걸리게 만들어, 화면이 12줄만 보여 주면서
+     **더 있다고 말하는지**를 본다. 전에는 말 없이 잘랐다. */
+  const MANY = [];
+  for (let i = 0; i < 20; i++) {
+    MANY.push({ type: 'subcategory', name_en: 'Bath Item ' + i, name_ko: '욕실 물건 ' + i,
+                desc_en: 'bath', desc_ko: '욕실', parent_en: 'Bathroom', parent_ko: '욕실',
+                url: 'categories/bathroom/item-' + i + '.html' });
+  }
+  r = await run({ htmlLang: 'ko', staticIndex: MANY, brands: [] }, 'bath');
+  ok('12줄만 보여 준다', r.count === 12, '실제 ' + r.count + '줄');
+  ok('더 있다는 사실을 적는다', /search-result-more/.test(r.html), r.text.slice(-90));
+  ok('전체 건수를 숫자로 말한다', /20/.test(r.text), r.text.slice(-90));
+  ok('한국어 화면에서는 한국어로 말한다', /전체 20건 중/.test(r.text), r.text.slice(-90));
+  r = await run({ htmlLang: 'en', staticIndex: MANY, brands: [] }, 'bath');
+  ok('영어 화면에서는 영어로 말한다', /Showing 12 of 20 results/.test(r.text), r.text.slice(-90));
+  /* 자르지 않았을 때 「더 있다」고 말하면 거짓말이다 */
+  r = await run({ htmlLang: 'ko', staticIndex: MANY.slice(0, 5), brands: [] }, 'bath');
+  ok('안 잘랐으면 그 줄을 안 띄운다', r.count === 5 && !/search-result-more/.test(r.html),
+     r.count + '줄, 안내줄 ' + (/search-result-more/.test(r.html) ? '있음' : '없음'));
+
   console.log('\n[7] 빈 쿼리·없는 말');
   r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: BRANDS_REAL }, 'zzzzqqqq');
   ok('없는 말을 치면 빈 상태 안내가 뜬다 (빈 화면이 아니다)', r.html.length > 0 && r.count === 0,
