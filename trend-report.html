@@ -363,7 +363,9 @@ fadeEls.forEach(el => fadeObserver.observe(el));
              ? a.publishedAt.toDate().toLocaleDateString(viewLang === 'ko' ? 'ko-KR' : 'en-US') : '';
     var tagHtml = a.tag ? '<span class="article-card-tag">' + esc(a.tag) + '</span>' : '';
     return '<a href="magazine/view.html?id=' + esc(id) + '" class="article-card">' +
-      '<div class="article-card-img"><img src="' + esc(img) + '" alt="' + esc(side.title) + '" loading="lazy">' + tagHtml + '</div>' +
+      /* A-514: 대체글이 바로 아래 `<h3>` 와 **글자까지 같았다** — 읽어 주는 도구가
+          제목을 두 번 말한다. 한 고리(`<a>`) 안에 이름이 이미 있으면 그림은 장식이다. */
+      '<div class="article-card-img"><img src="' + esc(img) + '" alt="" loading="lazy">' + tagHtml + '</div>' +
       '<div class="article-card-body"><h3>' + esc(side.title) + '</h3>' +
       '<p>' + esc((side.excerpt||'').substring(0,140)) + '</p>' +
       '<div class="article-card-date">' + esc(a.brandName||'') + (date ? ' · ' + date : '') + '</div>' +

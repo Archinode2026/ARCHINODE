@@ -712,7 +712,7 @@ function renderProduct(p, related) {
                         return `
                         <a href="view.html?id=${rSlug}" class="pp-rel-card">
                             <div class="pp-rel-card-img">
-                                ${rImageUrl ? `<img loading="lazy" src="${rImageUrl}" alt="${rName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
+                                ${rImageUrl ? `<img loading="lazy" src="${rImageUrl}" alt="">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                             </div>
                             <div class="pp-rel-card-body">
                                 <div class="pp-rel-card-brand">${rBrandName}</div>

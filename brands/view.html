@@ -726,7 +726,7 @@ function renderBrand(brand, products, articles) {
             return `
             <a href="../products/view.html?id=${pSlug}" class="product-card fade-in" style="text-decoration:none;color:inherit;">
                 <div class="product-card-image">
-                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
+                    ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                 </div>
                 <div class="product-card-content">
                     <span class="product-card-brand">${brandName}</span>
@@ -764,7 +764,7 @@ function renderBrand(brand, products, articles) {
                         ? a.publishedAt.toDate().toLocaleDateString(aViewLang === 'ko' ? 'ko-KR' : 'en-US') : '';
             return `
             <a href="../magazine/view.html?id=${escapeHtml(a.id)}" class="article-card fade-in">
-                <div class="article-card-img"><img loading="lazy" src="${aImg}" alt="${aTitle}">${aTag}</div>
+                <div class="article-card-img"><img loading="lazy" src="${aImg}" alt="">${aTag}</div>
                 <div class="article-card-body">
                     <h3>${aTitle}</h3>
                     <p>${aExcerpt}</p>

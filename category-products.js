@@ -85,7 +85,7 @@
         return `
                 <a href="${base}products/view.html?id=${pSlug}" class="cp-card">
                     <div class="cp-thumb">
-                        ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="${pName}">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
+                        ${pImageUrl ? `<img loading="lazy" src="${pImageUrl}" alt="">` : '<span class="noimg"><i class="fas fa-image" aria-hidden="true"></i><span data-en="Photo coming soon" data-ko="사진 준비 중">Photo coming soon</span></span>'}
                     </div>
                     <div class="cp-body">
                         <div class="cp-brand">${pBrandName}</div>

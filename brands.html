@@ -526,7 +526,7 @@ async function loadRegisteredBrands() {
             const initial = escapeHtml(brandInitial(b.brandName));
             const logo = safeUrl(b.logoUrl);
             const logoHtml = logo
-                ? `<img loading="lazy" src="${escapeHtml(logo)}" alt="${escapeHtml(b.brandName)}">`
+                ? `<img loading="lazy" src="${escapeHtml(logo)}" alt="">`
                 : initial;
             const link = b.slug ? `brands/view.html?id=${encodeURIComponent(b.slug)}` : '#';
 
