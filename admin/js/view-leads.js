@@ -153,15 +153,20 @@ function leads_loadBrands(force) {
     if (typeof db === 'undefined' || typeof auth === 'undefined' || !auth.currentUser) return;   // 로그인 전: leads_load 가 auth 를 기다린 뒤 다시 부른다
     lead_state.brandsLoading = true;
     db.collection('brands').where('status', '==', 'approved').get().then(function (snap) {
-        var list = [];
-        snap.forEach(function (d) {
-            var b = d.data() || {};
-            list.push({ id: d.id, name: String(b.brandName || ''), email: String(b.email || '') });
+        /* A-480(2026-11-12): email 은 공개 브랜드 문서에서 빼고
+           `brands/{id}/internal/contact` 로 옮겼다 — 병합해서 읽는다.
+           못 읽은 브랜드는 email 이 빈 문자열로 남고, 배정 메일 쪽이 이미
+           그 경우를 「메일 주소가 없습니다」로 말한다(이 파일 아래 lead_sendAssignMail). */
+        var metas = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data() || {}); });
+        return admMergeBrandContacts(metas).then(function (merged) {
+            var list = merged.map(function (b) {
+                return { id: b.id, name: String(b.brandName || ''), email: String(b.email || '') };
+            });
+            list.sort(function (a, b) { return a.name.localeCompare(b.name); });
+            lead_state.brands = list;
+            lead_state.brandsLoading = false;
+            leads_fillBrandFilter();
         });
-        list.sort(function (a, b) { return a.name.localeCompare(b.name); });
-        lead_state.brands = list;
-        lead_state.brandsLoading = false;
-        leads_fillBrandFilter();
     }).catch(function (err) {
         lead_state.brandsLoading = false;
         console.error('[leads] brands read failed', err);

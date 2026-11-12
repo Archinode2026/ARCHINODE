@@ -36,6 +36,16 @@
 [build.processing]
   skip_processing = true
 
+# ── 캐시 헤더 실측 (2026-11-12, A-480 작업 중) ──────────────────────────────
+# 라이브에서 fetch 로 재 보니 모든 자산이
+#   cache-control: public,max-age=0,must-revalidate  + ETag
+# 였다(search.js · category-products.js · admin/js/admin-core.js · style.css · about.html).
+# 즉 **브라우저는 매번 되묻고 바뀐 파일을 받는다** — HTML 에 붙은 `?v=` 는 관례일 뿐이고,
+# .js 를 고쳤을 때 `?v=` 를 올리지 않아도 돌아온 손님에게 옛 파일이 남지 않는다
+# (A-466 · A-468 · A-471~473 이 전부 `?v=` 를 안 올린 경우였는데 라이브는 멀쩡했다).
+# ★ `_headers` 에 .js/.css 의 max-age 를 길게 주거나 immutable 을 붙이는 순간 그 전제가
+#   깨진다 — 그때는 파일을 고칠 때마다 `?v=` 를 함께 올려야 한다. 둘은 한 쌍이다.
+
 [functions]
   directory = "netlify/functions"
 

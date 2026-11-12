@@ -30,15 +30,13 @@ firestore/
   // ── 기본 정보 (입점 신청 시 수집) ──
   brandName: "Fritz Hansen",           // 브랜드명 (수정 불가)
   slug: "fritz-hansen",                 // URL용 슬러그 (자동 생성, 소문자+하이픈)
-  email: "brand@fritzhansen.com",       // 담당자 이메일
-  contactName: "John Doe",             // 담당자 이름
-  position: "Marketing Director",       // 직책
-  phone: "+45-12345678",               // 전화번호
   country: "Denmark",                   // 본사 국가
   category: "Furniture",                // 대표 카테고리 (10개 중 택 1)
   website: "https://fritzhansen.com",   // 공식 홈페이지
   description: "...",                   // 브랜드 소개 (짧은)
-  referral: "Milan Design Week",        // 가입 경로
+  // ★ A-480(2026-11-12): 담당자 개인정보 8개(contactName · position · email ·
+  //   phone · referral · referralSource · agreedVendorTerms · agreedVendorTermsAt)는
+  //   여기 없다 — brands/{id}/internal/contact 로 옮겼다. 아래 1-2 참고.
 
   // ── 브랜드 페이지 편집 (브랜드 담당자가 대시보드에서 입력) ──
   tagline: "Designed for life",         // 태그라인/슬로건
@@ -88,6 +86,37 @@ firestore/
 **카테고리 허용 값:** Furniture, Bathroom, Outdoor, Lighting, Kitchen, Office, Finishes, Wellness, Decor, Construction
 
 ---
+
+### 1-2. brands/{id}/internal/contact (서브컬렉션) — 담당자 개인정보
+
+```javascript
+{
+  contactName: "John Doe",              // 담당자 이름
+  position: "Marketing Director",       // 직책
+  email: "brand@fritzhansen.com",       // 담당자 이메일
+  phone: "+45-12345678",                // 전화번호
+  referral: "Milan Design Week",        // 가입 경로
+  referralSource: "...",                // 유입 상세
+  agreedVendorTerms: true,              // 입점 약관 동의
+  agreedVendorTermsAt: Timestamp        // 동의 시각
+}
+```
+
+**왜 나뉘었나 (A-480):** 승인된 brands 문서는 규칙상 **문서 전체가 공개 읽기**다.
+화면에 안 그려도 `collection('brands').where('status','==','approved').get()` 한 번으로
+전 브랜드 담당자의 이름·이메일·전화가 수집됐다. Firestore 규칙에는 **필드 단위 읽기가 없어서**
+부분 공개가 불가능하다 — 그래서 항목을 옮기는 것이 유일한 수단이었다.
+
+**규칙:** `allow read, write: if isAdmin() || (isSignedIn() && request.auth.uid == brandId)`
+— 어드민과 그 브랜드 본인만.
+
+**쓰는 곳:** `list-your-brand.html`(입점 신청 시 본문서와 함께) ·
+`brand-portal/dashboard.html`(연락처 탭 저장, `set(…, {merge:true})`).
+
+**읽는 곳:** 전부 `admin/js/admin-core.js` 의 `admMergeBrandContact(brandId, obj)` /
+`admMergeBrandContacts(list)` 를 거친다(읽기 직후 한 번 병합 — 화면 코드는 전과 같이
+`b.email` 을 본다). 포털은 `loadBrandData` 안에서 직접 병합한다.
+`tools/check-brand-contact.py` 가 **병합 없이 읽는 자리**와 **본문서에 되쓰는 자리**를 잡는다.
 
 ## 2. products 컬렉션
 

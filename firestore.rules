@@ -134,7 +134,23 @@ service cloud.firestore {
     // 승인된 브랜드 2건에서 wool21wool@gmail.com과 내부 QA 메모가 공개로 읽힘). 이 서브컬렉션으로
     // 분리해 어드민만 읽고 쓸 수 있게 한다 — 공개 brands 문서에는 더 이상 이 필드들을 쓰지 않는다.
     match /brands/{brandId}/internal/{docId} {
+      /* ★★ A-480(2026-11-12, 브론즈 30차 ⑧): 승인된 브랜드 문서는 **문서 전체가
+         공개 읽기**다(`status == 'approved'`). 그래서 담당자 개인정보가 화면에는
+         하나도 안 그려지는데 Firestore 질의로는 **전량 수집**됐다 —
+         `contactName` · `position` · `email` · `phone` · `referral` ·
+         `referralSource` · `agreedVendorTermsAt`. 유럽 브랜드 담당자의 실명·직책·
+         직통 전화가 GDPR 대상 개인정보다. A-027 이 `statusReason`·`history` 를
+         이 서브컬렉션으로 뺀 바로 그 처방을 **본문 필드에는 적용하지 않았다.**
+         이제 `contact` 문서로 뺀다.
+
+         `moderation` 은 어드민만(검수 메모 — 브랜드가 보면 안 된다).
+         `contact` 는 **본인 브랜드와 어드민**이 읽고 쓴다 — 입점 신청이
+         자기 계정으로 만들고(그 시점에 로그인 상태다), 브랜드가 나중에
+         담당자 연락처를 고칠 수 있어야 한다. */
       allow read, write: if isAdmin();
+    }
+    match /brands/{brandId}/internal/contact {
+      allow read, write: if isAdmin() || (isSignedIn() && request.auth.uid == brandId);
     }
 
     // ────────────────────────────────────────────────────────────────────
@@ -399,11 +415,27 @@ service cloud.firestore {
     }
 
     // ────────────────────────────────────────────────────────────────────
-    // settings — 정책 값·사이트 정보 (2026-09-12, 개편 3단계). 개인정보 없음. 공개 페이지가 읽을 수 있게 read 공개.
+    // settings — 정책 값·사이트 정보 (2026-09-12, 개편 3단계).
     // 문서 1개 settings/config — docs/firestore-schema.md 8절. 쓰기는 어드민만(어드민 > 설정 화면).
+    //
+    // ★★ A-479(2026-11-12, 브론즈 30차 ⑦): 전에는 `allow read: if true` 였다.
+    //    주석은 「개인정보 없음. 공개 페이지가 읽을 수 있게 read 공개」라고 적었는데
+    //    **두 전제가 다 틀렸다.**
+    //    ㄱ. 이 문서에는 `adminNotice` 가 들어간다 — 설정 화면의 라벨이
+    //        「어드민 메모 (대시보드 상단 표시)」인 **자유 입력 textarea** 다
+    //        (admin/js/view-settings.js:65). `updatedBy` 로 어드민 이메일도 함께 쓴다.
+    //        자유 입력에 무엇이 들어갈지는 규칙이 보장할 수 없다 —
+    //        A-027(statusReason·history 가 공개 brands 문서에 있어 유출)과 같은 구조다.
+    //    ㄴ. **공개 페이지가 읽는 곳이 하나도 없다.** 전수로 셌다 —
+    //        `settings` 를 읽는 자리는 `admin/js/view-dashboard.js:56` 과
+    //        `admin/js/view-settings.js:166` **둘뿐**이고 둘 다 어드민 화면이다.
+    //        공개를 위해 열어 둔 문이었는데 그 쓰임이 끝내 생기지 않았다.
+    //    사업자 정보는 어차피 푸터 마크업에 박혀 있다(A-176, 231개 파일) —
+    //    공개로 읽어야 할 필요도 없다. 나중에 공개 페이지가 사이트 정보를 읽어야
+    //    하면 **공개용 문서를 따로** 두고 거기만 열어라. 이 문서는 닫는다.
     // ────────────────────────────────────────────────────────────────────
     match /settings/{docId} {
-      allow read: if true;
+      allow read: if isAdmin();
       allow write: if isAdmin();
     }
 

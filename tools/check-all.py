@@ -75,6 +75,8 @@ CHECKS = [
      'A-476 — noindex 페이지·view.html 라우터가 섞였나 · 색인 가능한 페이지가 빠졌나 · 중복'),
     ('임시 비밀번호',        'node', 'tools/test-temp-password.js',
      'A-477 — 공개 정보(브랜드명·날짜)에서 유도되지 않는지 · Math.random 이 아닌 crypto 인지'),
+    ('담당자 개인정보 분리',  'py',   'tools/check-brand-contact.py',
+     'A-480 — 공개 brands 문서에 담당자 이름·이메일·전화가 되돌아오거나, 병합 없이 읽어 화면이 조용히 비는지'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

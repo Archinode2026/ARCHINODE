@@ -33,13 +33,20 @@ const email = arg('--email', 'qa-bronze@archinodekr.com');
     const ref = db.collection('brands').doc(user.uid);
     if ((await ref.get()).exists) { console.log('[있음] brands 문서'); }
     else {
+      // A-480: 개인정보(이름/직함/이메일/전화/유입경로/약관동의)는 본문서가 아니라
+      // brands/{uid}/internal/contact 에만 둔다. 여기도 본문서에 섞어 쓰면
+      // tools/check-brand-contact.py 가 잡는다.
       await ref.set({
-        brandName: '[테스트-브론즈] QA Brand', slug: 'test-bronze-qa-brand', email, contactName: '[테스트-브론즈]', position: 'QA', phone: '010-0000-0001',
+        brandName: '[테스트-브론즈] QA Brand', slug: 'test-bronze-qa-brand',
         country: 'Korea', category: 'Furniture', website: 'https://archinodekr.com', description: '[테스트-브론즈] 자동 검수용 브랜드. 지우지 마세요 — 오픈 전 일괄 정리 대상.',
-        referral: 'QA', status: 'approved', statusReason: '[테스트-브론즈] 검증용 승인', createdAt: now, updatedAt: now,
+        status: 'approved', statusReason: '[테스트-브론즈] 검증용 승인', createdAt: now, updatedAt: now,
         history: [{ status: 'approved', by: 'make-qa-user.js', at: new Date().toISOString(), note: '[테스트-브론즈] 검증용 생성' }],
       });
-      console.log('[생성] brands/' + user.uid + ' (approved, [테스트-브론즈])');
+      await ref.collection('internal').doc('contact').set({
+        contactName: '[테스트-브론즈]', position: 'QA', email, phone: '010-0000-0001',
+        referral: 'QA', referralSource: 'QA', agreedVendorTerms: true, agreedVendorTermsAt: now,
+      });
+      console.log('[생성] brands/' + user.uid + ' (approved, [테스트-브론즈]) + internal/contact');
     }
   }
   if (has('--pro')) {

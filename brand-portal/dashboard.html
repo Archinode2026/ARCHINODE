@@ -1138,6 +1138,15 @@ async function loadBrandData(uid) {
             return;
         }
         brandData = doc.data();
+        /* ★ A-480(2026-11-12): 담당자 개인정보 8개는 공개 브랜드 문서에서 빼고
+           `brands/{uid}/internal/contact` 로 옮겼다(승인된 브랜드 문서는 문서
+           전체가 공개 읽기라, 화면에 안 그려도 질의로 전량 수집됐다).
+           이 화면은 전과 같이 `brandData.contactName` 을 보므로 여기서 병합한다.
+           못 읽으면 **조용히 비우지 않고** 연락처 칸만 빈 채로 두고 경고를 남긴다. */
+        try {
+            const cdoc = await db.collection('brands').doc(uid).collection('internal').doc('contact').get();
+            if (cdoc.exists) brandData = Object.assign({}, brandData, cdoc.data() || {});
+        } catch (e) { console.warn('[portal] 연락처 문서를 못 읽었다', e && e.code); }
         window.brandData = brandData;
         brandDataUid = uid;   // A-213 — 이 데이터가 '누구 것인지' 못 박는다
         populateDashboard();
@@ -1474,11 +1483,21 @@ document.getElementById('brandInfoForm').addEventListener('submit', async (e) =>
 document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (bpBlocked(e.currentTarget)) return;   // A-439
-    await db.collection('brands').doc(currentUser.uid).update({
-        contactName: document.getElementById('editContactName').value,
-        position: document.getElementById('editPosition').value,
-        phone: document.getElementById('editPhone').value,
-    });
+    /* A-480: 담당자 연락처는 `internal/contact` 에 쓴다. `set(merge)` 로 —
+       문서가 아직 없는 옛 브랜드도 이 저장으로 만들어진다. */
+    await db.collection('brands').doc(currentUser.uid)
+        .collection('internal').doc('contact').set({
+            contactName: document.getElementById('editContactName').value,
+            position: document.getElementById('editPosition').value,
+            phone: document.getElementById('editPhone').value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    // 화면이 들고 있는 사본도 맞춰 둔다 — 다시 읽지 않아도 같은 값이 보이게
+    if (brandData) {
+        brandData.contactName = document.getElementById('editContactName').value;
+        brandData.position = document.getElementById('editPosition').value;
+        brandData.phone = document.getElementById('editPhone').value;
+    }
     showSaveMsg('contactSaveMsg');
 });
 

@@ -368,7 +368,11 @@ async function approveRequest(id) {
     // 유럽 브랜드용 리드 통지 메일 (brands 컬렉션의 email 필드 사용)
     try {
       var brandSnap = await db.collection('brands').doc(d.brandId).get();
-      var brandEmail = brandSnap.exists ? brandSnap.data().email : null;
+      /* A-480(2026-11-12): email 은 brands/{id}/internal/contact 로 옮겼다 */
+      var brandMerged = brandSnap.exists
+        ? await admMergeBrandContact(brandSnap.id, brandSnap.data() || {})
+        : null;
+      var brandEmail = brandMerged ? (brandMerged.email || null) : null;
       if (brandEmail) {
         await db.collection('mail').add({
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각

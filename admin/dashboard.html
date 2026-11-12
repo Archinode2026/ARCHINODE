@@ -461,13 +461,18 @@ function brandActionButtons(b, docId) {
 // ── 브랜드 목록 ──
 async function loadBrands() {
     const snap = await db.collection('brands').orderBy('createdAt', 'desc').get();
-    admRegisterCache('brands', snap.docs.map(d => Object.assign({ id: d.id }, d.data())));   // 6단계 통합 검색 캐시 (admin-core.js)
+    /* A-480(2026-11-12): 담당자 개인정보 8개는 공개 브랜드 문서에서 빼고
+       `brands/{id}/internal/contact`(어드민 ∪ 본인)로 옮겼다. 표·통합검색·상세·
+       메일은 전과 같이 `b.contactName`·`b.email` 을 보므로, **읽기 직전 한 곳에서**
+       병합해 넘긴다(admin-core.js 의 admMergeBrandContacts). */
+    const rows = await admMergeBrandContacts(snap.docs.map(d => Object.assign({ id: d.id }, d.data())));
+    admRegisterCache('brands', rows);   // 6단계 통합 검색 캐시 (admin-core.js) — 병합된 것을 담는다
     const tbody = document.getElementById('brandsTable');
     tbody.innerHTML = '';
     let total = 0, pending = 0;
 
-    snap.forEach(doc => {
-        const b = doc.data();
+    rows.forEach(b => {
+        const doc = { id: b.id };
         total++;
         if (b.status === 'pending') pending++;
         tbody.innerHTML += `
@@ -547,7 +552,8 @@ async function updateBrand(docId, newStatus) {
         // 상태 변경 시 브랜드에게 이메일 알림 (approve/suspend/reject/restore)
         try {
             const brandDoc = await db.collection('brands').doc(docId).get();
-            const b = brandDoc.data();
+            // A-480: email 은 이제 internal/contact 에 있다 — 병합해서 본다
+            const b = await admMergeBrandContact(docId, brandDoc.data() || {});
             if (b && b.email) {
                 const statusText = {
                     approved:  'approved',
@@ -673,7 +679,10 @@ async function viewBrand(docId) {
         await loadAll();
         return;
     }
-    const b = doc.data();
+    // A-480: 연락처 6항목은 brands/{id}/internal/contact 로 옮겼다. 이 상세 모달은
+    // 전과 같이 b.contactName·b.email·b.phone·b.referral 을 보므로 읽기 직후 한 번 병합한다.
+    // (병합은 메인 문서를 먼저 깔고 contact로 덮으므로, 아직 마이그레이션 전인 문서도 그대로 보인다.)
+    const b = await admMergeBrandContact(docId, doc.data() || {});
 
     // A-027(2026-11-03): history[](어드민 이메일 포함, 영구 누적)만 공개 brands 문서에서 빼서
     // 어드민 전용 서브컬렉션 brands/{id}/internal/moderation 으로 분리했다. statusReason/
@@ -715,7 +724,7 @@ async function viewBrand(docId) {
         <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${escapeHtml(catText(b.category) || '-')}</div></div>
         <div class="detail-row"><div class="detail-label">Website</div><div class="detail-value"><a href="${escapeHtml(safeWebsite)}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.website || '-')}</a></div></div>
         <div class="detail-row"><div class="detail-label">Contact</div><div class="detail-value">${escapeHtml(b.contactName || '-')} (${escapeHtml(b.position || '-')})</div></div>
-        <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${escapeHtml(b.email)}</div></div>
+        <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${escapeHtml(b.email || '-')}</div></div>
         <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-value">${escapeHtml(b.phone || '-')}</div></div>
         <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(b.description || '-')}</div></div>
         <div class="detail-row"><div class="detail-label">Referral</div><div class="detail-value">${escapeHtml(b.referral || '-')}</div></div>

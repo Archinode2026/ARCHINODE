@@ -841,21 +841,36 @@ form.addEventListener('submit', async function(e) {
             category: Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value),
             productType: escapeHtml(document.getElementById('productType').value.trim()),
             description: escapeHtml(document.getElementById('description').value.trim()),
-            contactName: escapeHtml(document.getElementById('contactName').value.trim()),
-            position: escapeHtml(document.getElementById('position').value.trim()),
-            email: email,
-            phone: document.getElementById('phone').value.trim(),
-            referral: document.getElementById('referral').value,      // referral=수동 선택(드롭다운)
-            referralSource: getReferralSource(),  // referralSource=?ref= 자동 캡처
+            /* ★ A-480(2026-11-12): 담당자 개인정보 8개 필드는 **여기 쓰지 않는다.**
+               승인된 브랜드 문서는 문서 전체가 공개 읽기라, 화면에 안 그려도
+               Firestore 질의로 전량 수집됐다 — contactName · position · email ·
+               phone · referral · referralSource · agreedVendorTerms(At).
+               아래에서 `brands/{uid}/internal/contact` 에 따로 쓴다. */
             status: 'pending',       // pending → approved → rejected
-            agreedVendorTerms: true,                  // 약관 제9조(기술자료 제공·보증·면책) 동의
-            agreedVendorTermsAt: firebase.firestore.FieldValue.serverTimestamp(),
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             approvedAt: null,
             products: [],
             magazineArticles: [],
             hp: ''
         }), 15000);
+
+        /* A-480: 담당자 개인정보는 어드민 ∪ 본인만 읽는 서브컬렉션에 쓴다.
+           이 시점에 우리는 **그 브랜드로 로그인된 상태**다(계정을 바로 위에서
+           만들었다) — 규칙의 `request.auth.uid == brandId` 갈래로 들어간다.
+           실패하면 신청 자체를 실패로 돌린다: 담당자 연락처가 없으면 어드민이
+           연락할 길이 없고, 조용히 비는 것이 가장 나쁘다. */
+        await archinodeWithTimeout(
+            db.collection('brands').doc(uid).collection('internal').doc('contact').set({
+                contactName: escapeHtml(document.getElementById('contactName').value.trim()),
+                position: escapeHtml(document.getElementById('position').value.trim()),
+                email: email,
+                phone: document.getElementById('phone').value.trim(),
+                referral: document.getElementById('referral').value,      // referral=수동 선택(드롭다운)
+                referralSource: getReferralSource(),  // referralSource=?ref= 자동 캡처
+                agreedVendorTerms: true,                  // 약관 제9조(기술자료 제공·보증·면책) 동의
+                agreedVendorTermsAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }), 15000);
 
         // 4. 어드민 알림 (Firebase Extensions "Trigger Email")
         try {

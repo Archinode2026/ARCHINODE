@@ -117,6 +117,36 @@ function fmtDate(ts) {
 }
 
 // ── URL 가드 — http(s) 만 통과 (javascript: 차단, 검수관리 rvSafeUrl 과 같은 방식) ──
+/* ── A-480(2026-11-12, 브론즈 30차 ⑧): 브랜드 담당자 개인정보를 어디서 읽나 ──
+   승인된 브랜드 문서는 **문서 전체가 공개 읽기**다. 그래서 담당자 실명·직책·
+   전화·이메일·유입경로가 화면에는 하나도 안 그려지는데 Firestore 질의로는
+   전량 수집됐다. 그 일곱 필드를 `brands/{id}/internal/contact` (어드민 ∪ 본인)
+   로 뺐다.
+
+   읽는 쪽은 **필드 이름을 그대로** 쓴다 — 아래 두 함수로 병합해서 넘기면
+   표·검색·상세·메일이 전부 전과 같이 `b.contactName` · `b.email` 을 본다.
+   그래야 고칠 자리가 「읽기 직전」 한 곳으로 줄고, 이름이 같아 검사로 지킬 수 있다.
+   (`tools/check-brand-contact.py` 가 병합 없이 읽는 자리를 잡는다.) */
+var ADM_CONTACT_FIELDS = ['contactName', 'position', 'email', 'phone',
+                          'referral', 'referralSource', 'agreedVendorTerms', 'agreedVendorTermsAt'];
+
+// 한 브랜드의 연락처 문서를 읽어 객체에 병합한다. 없으면 그대로 돌려준다.
+async function admMergeBrandContact(brandId, obj) {
+    try {
+        var d = await db.collection('brands').doc(brandId).collection('internal').doc('contact').get();
+        if (d.exists) return Object.assign({}, obj, d.data() || {});
+    } catch (e) {
+        // 권한·네트워크로 못 읽으면 **조용히 비우지 않고** 원본을 그대로 쓴다.
+        console.warn('[brand contact] 못 읽음', brandId, e && e.code);
+    }
+    return obj;
+}
+
+// 목록 전체에 병합한다. 브랜드 수가 적어 병렬로 한 번에 읽는다.
+async function admMergeBrandContacts(list) {
+    return await Promise.all(list.map(function (b) { return admMergeBrandContact(b.id, b); }));
+}
+
 function safeUrl(u) {
     return (u && /^https?:\/\//i.test(String(u))) ? String(u) : '';
 }
