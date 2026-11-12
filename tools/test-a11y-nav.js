@@ -155,6 +155,47 @@ ok('가리개가 열려 있으면 초점을 뺏지 않는다', doc.activeElement
      '빠진 쪽 ' + missing.length + (missing.length ? ' — ' + missing.slice(0, 3).join(', ') : ''));
 })();
 
+// ── 6-2) 한 쪽에 제목(h1)은 하나여야 한다 (A-515, 브론즈 35차 N35-4 곁가지) ──
+/* `brands/view.html`·`products/view.html` 은 화면 밖에 숨긴 자리표시 h1 을 두고
+   자료가 오면 진짜 h1 을 **더** 그렸다 — 읽어 주는 도구에게는 제목이 두 번 들린다.
+   진짜가 선 뒤에 자리표시를 치운다. 코드가 그리는 쪽은 눈으로 셀 수 없으므로
+   **치우는 코드가 있는지**로 본다. */
+(function () {
+  const SKIP = ['node_modules', '.git', '__pycache__', 'archi-diary', 'docs', 'sales',
+                'silvia', 'scripts', 'tools', 'downloads', 'assets', 'admin',
+                'brand-portal', 'auth'];
+  /* 라우터·껍데기라 정적 h1 이 0인 쪽 — 코드가 본문과 함께 그린다 */
+  const EXEMPT = ['magazine/view.html', 'trend-report/view.html'];
+  const out = [];
+  (function walk(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.isDirectory()) { if (!SKIP.includes(e.name)) walk(path.join(dir, e.name)); }
+      else if (e.name.endsWith('.html')) out.push(path.join(dir, e.name));
+    }
+  })(ROOT);
+  let seen = 0; const wrong = [];
+  for (const f of out) {
+    const rel = path.relative(ROOT, f).split(path.sep).join('/');
+    if (EXEMPT.includes(rel)) continue;
+    let t = fs.readFileSync(f, 'utf8')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<script[\s\S]*?<\/script>/g, '');
+    const n = (t.match(/<h1\b/g) || []).length;
+    seen++;
+    if (n !== 1) wrong.push(rel + '(' + n + ')');
+  }
+  ok('공개 쪽을 200쪽 넘게 봤다(허수 방지)', seen > 200, seen + '쪽');
+  ok('공개 쪽마다 정적 h1 이 하나다', wrong.length === 0, wrong.slice(0, 5).join(', '));
+  for (const f of ['brands/view.html', 'products/view.html']) {
+    const t = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    ok(f + ' 의 자리표시에 손잡이가 있다', /id="srTitle"/.test(t));
+    ok(f + ' 이 진짜 제목이 선 뒤 자리표시를 치운다',
+       /getElementById\('srTitle'\)/.test(t) && /removeChild\(ph\)/.test(t));
+    ok(f + ' 은 진짜 제목이 없으면 자리표시를 그대로 둔다',
+       /contentDiv\.querySelector\('h1'\)/.test(t));
+  }
+})();
+
 // ── 7) 초점 고리가 두 겹인가 (A-513, 브론즈 35차 N35-2) ────────────────
 /* 브라우저 기본은 검은 실선 하나뿐이라 어두운 사진 위에서 묻힌다.
    한 가지 빛깔로는 두 바탕을 다 감당하지 못한다(A-456 의 교훈). */

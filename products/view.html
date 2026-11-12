@@ -191,7 +191,7 @@
 <!-- LOADING STATE -->
 <div class="pp-loading" id="loadingState">
   <!-- A-080: SEO/스크린리더용 정적 h1(JS 실행 전에도 페이지에 h1이 존재하도록) — 로드 완료 시 replaced -->
-  <h1 style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;" data-en="Product on ARCHINODE" data-ko="ARCHINODE 제품 상세">Product on ARCHINODE</h1>
+  <h1 id="srTitle" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;" data-en="Product on ARCHINODE" data-ko="ARCHINODE 제품 상세">Product on ARCHINODE</h1>
   <div class="spinner"></div>
   <p data-en="Loading product..." data-ko="제품 로딩 중...">Loading product...</p>
 </div>
@@ -776,6 +776,15 @@ function renderProduct(p, related) {
     </div>
 
     ${relatedHtml}`;
+
+    /* A-515: 이 쪽에는 `<h1>` 이 **둘**이었다 — 화면 밖에 숨겨 둔 자리표시 하나와
+       위에서 방금 그린 진짜 하나. 읽어 주는 도구에게는 제목이 두 번 들린다.
+       진짜가 선 뒤에야 자리표시를 치운다(안 그려졌으면 그대로 둔다 — 제목이
+       하나도 없는 쪽이 둘인 쪽보다 나쁘다). */
+    (function () {
+        var ph = document.getElementById('srTitle');
+        if (ph && ph.parentNode && contentDiv.querySelector('h1')) ph.parentNode.removeChild(ph);
+    })();
 
     loadingDiv.style.display = 'none';
     contentDiv.style.display = 'block';
