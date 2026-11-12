@@ -322,7 +322,8 @@ async function approveRequest(id) {
   try {
     var productSnap = await db.collection('products').doc(d.productId).get();
     if (!productSnap.exists) { showToast('제품 문서를 찾을 수 없습니다.', 'error'); return; }
-    var product = productSnap.data();
+    // A-483: 자료 파일 URL 은 products/{id}/internal/files 에 있다 — 병합해서 본다
+    var product = await admMergeProductFiles(d.productId, productSnap.data() || {});
     var fieldMap = { catalog: 'catalogPdf', bim: 'bimFile', model3d: 'model3d' };
     var fileUrl = product[fieldMap[d.fileType]] || '';
     if (!fileUrl) { showToast('해당 파일 필드가 제품에 없습니다 (' + d.fileType + ').', 'error'); return; }

@@ -81,6 +81,8 @@ CHECKS = [
      'A-481 — 어드민 메모·어드민 이메일이 배정된 브랜드가 읽는 리드 문서로 되돌아오는지 · history 축소 금지'),
     ('좋아요 카운터',        'py',   'tools/check-like-toggle.py',
      'A-482 — 카운터가 내 목록의 변화에 묶여 있는지(규칙의 getAfter + 클라이언트의 한 묶음 쓰기)'),
+    ('자료 파일 분리',       'py',   'tools/check-product-files.py',
+     'A-483 — 카탈로그·BIM·3D 의 다운로드 URL 이 공개 제품 문서로 돌아오는지 · Storage 경로 훑기'),
 ]
 
 # Playwright 가 있어야 도는 것들 — 없으면 건너뛴다(실패가 아니다)

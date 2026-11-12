@@ -543,9 +543,15 @@ function renderProduct(p, related) {
     const pLeadTime = escapeHtml(p.leadTime || '');
     const pDescription = escapeHtml(p.description || '');
     const pImageUrl = escapeHtml(safeUrl(p.imageUrl));   // A-473 — 스킴까지
-    const pCatalogPdf = escapeHtml(p.catalogPdf || '');
-    const pBimFile = escapeHtml(p.bimFile || '');
-    const pModel3d = escapeHtml(p.model3d || '');
+    /* A-483(2026-11-12): 전에는 **다운로드 URL 자체**가 공개 제품 문서에 있었다
+       (`catalogPdf`·`bimFile`·`model3d`). 승인된 제품 문서는 문서 전체가 공개 읽기라,
+       「로그인 → 신청 → 어드민 승인 → 7일 링크」 절차가 **아무것도 막지 못했다** —
+       제품 JSON 한 번이면 URL 이 그대로 나왔다. URL 은 `internal/files` 로 옮겼고
+       이 페이지는 **있는지 여부**만 알면 된다(단추를 그릴지 말지).
+       옛 필드도 함께 보는 이유: 아직 옮기지 않은 제품도 단추가 떠야 한다. */
+    const pHasCatalog = !!(p.hasCatalogPdf || p.catalogPdf);
+    const pHasBim     = !!(p.hasBimFile    || p.bimFile);
+    const pHasModel3d = !!(p.hasModel3d    || p.model3d);
     /* A-473: 전에는 `escapeHtml` 만 걸고 **빈 원소를 안 걸렀다**. `images` 에
        빈 문자열이 섞이면 `src=""` 가 찍혀 브라우저가 **페이지 자신을 사진으로**
        불러왔다. 스킴까지 보고 쓸 수 있는 것만 남긴다. */
@@ -754,9 +760,9 @@ function renderProduct(p, related) {
                     <button type="button" class="btn btn-primary" onclick="openRfqModal('quote')"><i class="fas fa-file-invoice"></i> <span data-en="Request a Quote" data-ko="견적 요청">Request a Quote</span></button>
                     <button type="button" class="btn btn-secondary" onclick="openRfqModal('sample-request')"><i class="fas fa-box-open"></i> <span data-en="Request a Sample" data-ko="샘플 요청">Request a Sample</span></button>
                     <a href="../contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> <span data-en="Request Info" data-ko="문의하기">Request Info</span></a>
-                    ${pCatalogPdf ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('catalog')"><i class="fas fa-file-pdf"></i> <span data-en="PDF Catalog" data-ko="PDF 카탈로그">PDF Catalog</span></button>` : ''}
-                    ${pBimFile ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('bim')"><i class="fas fa-cube"></i> <span data-en="BIM File" data-ko="BIM 파일">BIM File</span></button>` : ''}
-                    ${pModel3d ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('model3d')"><i class="fas fa-vr-cardboard"></i> <span data-en="3D Model" data-ko="3D 모델">3D Model</span></button>` : ''}
+                    ${pHasCatalog ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('catalog')"><i class="fas fa-file-pdf"></i> <span data-en="PDF Catalog" data-ko="PDF 카탈로그">PDF Catalog</span></button>` : ''}
+                    ${pHasBim ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('bim')"><i class="fas fa-cube"></i> <span data-en="BIM File" data-ko="BIM 파일">BIM File</span></button>` : ''}
+                    ${pHasModel3d ? `<button type="button" class="btn btn-secondary" onclick="openBimModal('model3d')"><i class="fas fa-vr-cardboard"></i> <span data-en="3D Model" data-ko="3D 모델">3D Model</span></button>` : ''}
                 </div>
             </div>
         </div>

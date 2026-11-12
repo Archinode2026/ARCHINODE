@@ -169,6 +169,22 @@ service cloud.firestore {
     // products 컬렉션
     // 문서 ID = 자동 생성
     // ────────────────────────────────────────────────────────────────────
+    /* A-483(2026-11-12): 카탈로그·BIM·3D 파일의 **다운로드 URL** 자리.
+       전에는 공개 제품 문서(`catalogPdf`·`bimFile`·`model3d`)에 있었다. 승인된 제품 문서는
+       문서 전체가 공개 읽기라, 「로그인 → 신청 → 어드민 승인 → 7일 링크」 절차가
+       **아무것도 막지 못했다** — 제품 JSON 한 번에 URL 이 그대로 나왔다.
+       공개 문서에는 **있는지 여부**(hasCatalogPdf 등)만 두고 URL 은 여기 둔다.
+       쓰기에 getAfter 를 쓰는 이유: 제품 등록은 본문서와 이 문서를 **한 묶음**으로 쓰므로
+       그 순간 부모 문서가 아직 없다(get 은 null 이라 거부된다). */
+    match /products/{productId}/internal/{docId} {
+      allow read: if isAdmin()
+                  || (isSignedIn() && request.auth.uid ==
+                      get(/databases/$(database)/documents/products/$(productId)).data.brandId);
+      allow write: if isAdmin()
+                   || (isSignedIn() && request.auth.uid ==
+                       getAfter(/databases/$(database)/documents/products/$(productId)).data.brandId);
+    }
+
     match /products/{productId} {
       // 읽기: approved는 누구나, 소유 브랜드/어드민은 모든 상태
       allow read: if resource.data.status == 'approved'

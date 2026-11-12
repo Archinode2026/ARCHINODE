@@ -1883,17 +1883,49 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
             restoreBtn(); return;
         }
         const prev = cur.data();
+        /* ★ A-483(2026-11-12): 자료 파일(카탈로그·BIM·3D)의 **URL** 은 공개 제품 문서에서
+           빼고 `products/{id}/internal/files` 로 옮겼다. 공개 문서에는 **있는지 여부**만 둔다
+           (승인된 제품 문서는 문서 전체가 공개 읽기라, 신청·승인 절차가 아무것도 막지 못했다).
+           파일을 새로 고르지 않았으면 지금 올라가 있는 URL 을 그대로 써야 하므로,
+           옛 자리(본문서)와 새 자리(internal) 를 **둘 다** 본다 — 아직 안 옮긴 제품도 산다. */
+        let prevFiles = { catalogPdf: prev.catalogPdf || '', bimFile: prev.bimFile || '', model3d: prev.model3d || '' };
+        try {
+            const fsnap = await db.collection('products').doc(editing)
+                                  .collection('internal').doc('files').get();
+            if (fsnap.exists) prevFiles = Object.assign({}, prevFiles, fsnap.data() || {});
+        } catch (err) {
+            console.error('product files re-read failed:', err);
+            prodMsg(document.documentElement.lang !== 'en'
+                ? '자료 파일 정보를 다시 읽지 못했습니다. 잠시 후 다시 시도해 주세요.'
+                : 'Could not re-read the spec files. Please try again.', true);
+            restoreBtn(); return;
+        }
+        const newFiles = {
+            catalogPdf: catalogPdf || prevFiles.catalogPdf || '',
+            bimFile:    bimFile    || prevFiles.bimFile    || '',
+            model3d:    model3d    || prevFiles.model3d    || ''
+        };
+        const FVd = firebase.firestore.FieldValue;
         const updates = Object.assign({}, fields, {
             imageUrl: imageUrl || prev.imageUrl || '',
-            catalogPdf: catalogPdf || prev.catalogPdf || '',
-            bimFile: bimFile || prev.bimFile || '',
-            model3d: model3d || prev.model3d || '',
+            hasCatalogPdf: !!newFiles.catalogPdf,
+            hasBimFile:    !!newFiles.bimFile,
+            hasModel3d:    !!newFiles.model3d,
+            catalogPdf: FVd.delete(),   // 옛 자리를 비운다(공개 문서에 URL 을 남기지 않는다)
+            bimFile:    FVd.delete(),
+            model3d:    FVd.delete(),
             status: 'pending',          // 승리님 결정 — 고치면 다시 심사 대기
             reviewerNote: null,         // 옛 반려 사유를 들고 가지 않는다
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            updatedAt: FVd.serverTimestamp()
         });
         try {
-            await db.collection('products').doc(editing).update(updates);
+            // 본문서와 internal/files 를 **한 묶음**으로 — 둘이 갈리면 단추는 있고 파일은 없다
+            const ebatch = db.batch();
+            const eref = db.collection('products').doc(editing);
+            ebatch.update(eref, updates);
+            ebatch.set(eref.collection('internal').doc('files'),
+                       Object.assign({}, newFiles, { updatedAt: FVd.serverTimestamp() }), { merge: true });
+            await ebatch.commit();
         } catch (err) {
             console.error('product update failed:', err);
             /* 규칙이 거부하면 거의 언제나 **규칙이 아직 게시되지 않은** 경우다
@@ -1916,20 +1948,29 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
         return;
     }
 
-    // A-472: 등록 쪽도 **스냅샷**을 쓴다 — 업로드 뒤에 칸을 다시 읽지 않는다.
-    await db.collection('products').add(Object.assign({
+    /* A-472: 등록 쪽도 **스냅샷**을 쓴다 — 업로드 뒤에 칸을 다시 읽지 않는다.
+       A-483: 자료 파일 URL 은 internal/files 로. 본문서와 **한 묶음**으로 쓴다
+       (규칙이 쓰기에 getAfter 를 쓰는 이유 — 이 순간 부모 문서가 아직 없다). */
+    const nref = db.collection('products').doc();
+    const nbatch2 = db.batch();
+    nbatch2.set(nref, Object.assign({
         brandId: bpId.uid,            // A-213 — brandId·brandName·brandSlug 를 한 객체에서 함께
         brandName: bpId.brandName,
         brandSlug: bpId.brandSlug,
         slug: generateSlug(form.name),
         imageUrl: imageUrl,
         images: [],
-        catalogPdf: catalogPdf,
-        bimFile: bimFile,
-        model3d: model3d,
+        hasCatalogPdf: !!catalogPdf,
+        hasBimFile:    !!bimFile,
+        hasModel3d:    !!model3d,
         status: 'pending',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }, form));
+    nbatch2.set(nref.collection('internal').doc('files'), {
+        catalogPdf: catalogPdf, bimFile: bimFile, model3d: model3d,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await nbatch2.commit();
 
     restoreBtn();
     document.getElementById('productForm').style.display = 'none';

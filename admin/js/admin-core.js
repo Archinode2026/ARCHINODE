@@ -147,6 +147,25 @@ async function admMergeBrandContacts(list) {
     return await Promise.all(list.map(function (b) { return admMergeBrandContact(b.id, b); }));
 }
 
+/* A-483(2026-11-12): 카탈로그·BIM·3D 의 다운로드 URL 은 공개 제품 문서에서 빼고
+   `products/{id}/internal/files` 로 옮겼다(공개 문서에 두면 신청·승인 절차가 무의미했다).
+   어드민 화면들은 전과 같이 `p.bimFile` 을 보므로 읽기 직후 한 번 병합한다.
+   병합 순서는 **본문서 → internal 로 덮기** — 아직 옮기지 않은 제품도 그대로 보인다.
+   `tools/check-product-files.py` 가 병합 없이 읽는 자리와 공개 문서로 되쓰는 자리를 잡는다. */
+var ADM_PRODUCT_FILE_FIELDS = ['catalogPdf', 'bimFile', 'model3d'];
+async function admMergeProductFiles(productId, obj) {
+    var base = obj || {};
+    try {
+        var d = await db.collection('products').doc(productId)
+                        .collection('internal').doc('files').get();
+        if (!d.exists) return base;
+        return Object.assign({}, base, d.data() || {});
+    } catch (e) {
+        console.warn('[admin] products/' + productId + '/internal/files 읽기 실패', e && e.code);
+        return base;
+    }
+}
+
 function safeUrl(u) {
     return (u && /^https?:\/\//i.test(String(u))) ? String(u) : '';
 }

@@ -72,9 +72,15 @@ service firebase.storage {
       allow delete: if isOwner(uid) || isAdmin();
     }
 
-    // ── 제품 자료: 카탈로그 PDF · BIM · 3D 모델 ──
+    /* ── 제품 자료: 카탈로그 PDF · BIM · 3D 모델 ──
+       A-483(2026-11-12): `allow read: if true` 였다. read 는 **목록(list)까지** 허용하므로
+       `listAll('products-specs')` 로 전 브랜드의 자료 파일을 **훑어서 받아갈 수** 있었다 —
+       신청·승인 절차와 무관하게. 본인과 어드민만으로 닫는다.
+       ※ 승인된 신청자에게 메일로 가는 링크는 `getDownloadURL()` 의 **토큰 URL** 이고,
+         토큰 URL 은 이 규칙을 타지 않는다(토큰 자체가 권한이다). 그래서 여기를 닫아도
+         이미 발송된 7일 링크는 그대로 열린다 — 막는 것은 **경로 훑기**다. */
     match /products-specs/{uid}/{allPaths=**} {
-      allow read: if true;
+      allow read: if isOwner(uid) || isAdmin();
       allow create, update: if (isOwner(uid) && underFileLimit()) || isAdmin();
       allow delete: if isOwner(uid) || isAdmin();
     }

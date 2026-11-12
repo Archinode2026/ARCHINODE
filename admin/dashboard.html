@@ -827,7 +827,8 @@ async function viewProduct(docId) {
         await loadProducts();
         return;
     }
-    const p = doc.data();
+    // A-483: 자료 파일 URL 은 products/{id}/internal/files 에 있다 — 읽기 직후 한 번 병합
+    const p = await admMergeProductFiles(docId, doc.data() || {});
 
     // 갤러리: images[] 배열이 있으면 전부, 없으면 단일 썸네일(imageUrl)이라도 보여준다
     const gallery = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.imageUrl ? [p.imageUrl] : []);
