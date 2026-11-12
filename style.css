@@ -3405,6 +3405,12 @@ html[lang="ko"] .cp-name { word-break: keep-all; }
 .cp-empty { text-align: center; padding: clamp(44px, 5vw, 70px) 20px; color: var(--gray-700); }
 .cp-empty i { font-size: 2.4rem; margin-bottom: 16px; display: block; color: var(--ink-soft); }
 .cp-empty p { font-size: 0.92rem; line-height: 1.7; margin-bottom: 22px; }
+/* A-510: 손님이 지금 할 수 있는 일을 먼저, 입점 안내는 작게 뒤에 */
+.cp-empty-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: center; }
+.cp-empty-alt { font-size: 0.86rem; color: var(--ink-soft); text-decoration: underline; }
+.cp-empty-alt:hover { color: var(--accent-ink, var(--gray-700)); }
+.cp-empty .cp-empty-brand { font-size: 0.8rem; color: var(--ink-soft); margin: 26px 0 0; }
+.cp-empty .cp-empty-brand a { text-decoration: underline; color: inherit; }
 .cp-error { text-align: center; color: var(--gray-700); padding: 40px; font-size: 0.92rem; }
 @media (max-width: 1024px) { .cp-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 600px)  { .cp-grid { grid-template-columns: repeat(2, 1fr); } }

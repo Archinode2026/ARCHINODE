@@ -154,6 +154,23 @@ async function runCategory(total) {
   const CP = fs.readFileSync(path.join(ROOT, 'category-products.js'), 'utf8');
   ok('카테고리 쪽에도 맨 limit(24) 가 없다', !/limit\(24\)/.test(strip(CP)));
 
+  // ── 5-2) 빈 분류에서 **손님에게** 말하는가 (A-510, 브론즈 34차 N34-4) ──────
+  /* 69개 소분류 중 67개가 이 화면이다. 자재를 찾아 들어온 사람에게
+     「브랜드 입점」을 내밀면, 찾으러 온 사람에게 팔러 오라고 하는 꼴이다. */
+  c = await runCategory(0);
+  const EH = c.innerHTML;
+  ok('상품 0건이면 빈 자리 글이 선다', /class="cp-empty"/.test(EH));
+  ok('으뜸 단추는 소싱 문의다',
+     /class="pill-btn"[^>]*/.test(EH) && /sourcing-inquiry\.html" class="pill-btn"/.test(EH),
+     EH.slice(0, 200));
+  ok('으뜸 단추가 브랜드 입점이 아니다', !/list-your-brand\.html" class="pill-btn"/.test(EH));
+  ok('상위 분류로 가는 길을 준다', /categories\/furniture\.html/.test(EH), EH.slice(0, 300));
+  ok('입점 안내는 남기되 작게 뒤에 둔다',
+     /cp-empty-brand/.test(EH) && EH.indexOf('cp-empty-brand') > EH.indexOf('sourcing-inquiry'));
+  ok('빈 자리 글도 두 언어다', /data-en="[^"]+"/.test(EH) && /data-ko="[^"]+"/.test(EH));
+  ok('손님에게 말한다(등록하라는 말이 으뜸이 아니다)',
+     /찾으시는 자재/.test(EH) && !/브랜드 포털을 통해 제품을 등록/.test(EH));
+
   // ── 6) 매거진 셈 — 보이는 것과 세는 것이 같은가 (A-509, 브론즈 34차 N34-7) ──
   /* 그리드 밖에 추천 기사 카드가 한 장 더 있다. 그것을 안 세면 손님 눈에는
      131장이 보이는데 문구는 「129개 중」이라고 말한다. */

@@ -53,6 +53,16 @@
     }
     const base = getBasePath();
 
+    /* 상위 분류 주소 — 경로에서 읽는다(`categories/<대>/<소>.html`).
+       소분류 페이지가 아니면 빈 값을 돌려주고, 그때는 링크를 안 만든다. */
+    function parentUrl() {
+        const parts = window.location.pathname.split('/').filter(x => !!x);
+        if (parts.length < 3) return '';
+        const parent = parts[parts.length - 2];
+        if (!/^[a-z0-9-]+$/.test(parent) || parent === 'categories') return '';
+        return base + 'categories/' + parent + '.html';
+    }
+
     /* ── A-506(2026-11-13): 전에는 `limit(24)` 로 끊고 **그 사실을 말하지 않았다**.
        69개 카테고리 페이지 전부가 그랬다. 브랜드가 25번째 제품을 올리고 승인까지
        받아도 그 제품은 어느 화면에도 나타나지 않는다 — 오류가 아니라 **아무 일도
@@ -148,11 +158,21 @@
             const snap = await query.orderBy('createdAt', 'desc').limit(PAGE + 1).get();
 
             if (snap.empty) {
+                /* ── A-510(브론즈 34차 N34-4): 이 자리는 **손님에게 브랜드 이야기를
+                   하고 있었다.** 69개 소분류 중 67개가 이 화면인데, 자재를 찾아 들어온
+                   건축가·디자이너에게 「브랜드 포털을 통해 제품을 등록할 수 있습니다」와
+                   「브랜드 입점」 단추를 내밀었다. 찾으러 온 사람에게 팔러 오라고 한 셈이다.
+                   먼저 **손님이 지금 할 수 있는 일**을 준다 — 소싱 문의와 상위 분류 둘러보기.
+                   입점 안내는 작은 글씨로 맨 아래 남긴다(브랜드가 들어올 수도 있으니). */
                 container.innerHTML = `
                 <div class="cp-empty">
                     <i class="fas fa-box-open"></i>
-                    <p data-en="No products listed yet. Brands can register their products through the brand portal." data-ko="아직 등록된 제품이 없습니다. 브랜드 포털을 통해 제품을 등록할 수 있습니다.">No products listed yet. Brands can register their products through the brand portal.</p>
-                    <a href="${base}list-your-brand.html" class="pill-btn" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+                    <p data-en="No products listed in this subcategory yet. Tell us what you are looking for and we will ask European brands directly." data-ko="이 분류에는 아직 등록된 제품이 없습니다. 찾으시는 자재를 알려 주시면 유럽 브랜드에 직접 확인해 드립니다.">No products listed in this subcategory yet. Tell us what you are looking for and we will ask European brands directly.</p>
+                    <div class="cp-empty-actions">
+                        <a href="${base}sourcing-inquiry.html" class="pill-btn" data-en="Send a sourcing inquiry" data-ko="소싱 문의 남기기">Send a sourcing inquiry</a>
+                        ${parentUrl() ? `<a href="${parentUrl()}" class="cp-empty-alt" data-en="Browse the whole category" data-ko="상위 분류 전체 둘러보기">Browse the whole category</a>` : ''}
+                    </div>
+                    <p class="cp-empty-brand" data-en="Are you a brand? See how listing works." data-ko="브랜드이신가요? 입점 절차를 확인하세요."><a href="${base}list-your-brand.html" data-en="Brand listing" data-ko="브랜드 입점">Brand listing</a></p>
                 </div>`;
                 if (window.applyLang) window.applyLang();   // A-062: 비동기로 끼워넣는 조각이라 언어 재적용 필요
                 return;
