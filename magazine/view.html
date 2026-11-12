@@ -222,7 +222,7 @@ const contentDiv = document.getElementById('articleContent');
 const loadingDiv = document.getElementById('loadingState');
 
 async function loadArticle() {
-    if (!articleKey) { showError('기사를 찾을 수 없습니다', 'URL에 기사 ID가 없습니다.'); return; }
+    if (!articleKey) { showError('Article not found', '기사를 찾을 수 없습니다', 'The address has no article ID.', 'URL에 기사 ID가 없습니다.'); return; }
 
     try {
         /* A-291: 전에는 slug 로만 찾았는데 사이트의 기사 링크는 전부 docId 다
@@ -252,10 +252,10 @@ async function loadArticle() {
             if (!snap.empty) docSnap = snap.docs[0];
         }
 
-        if (!docSnap) { showError('기사를 찾을 수 없습니다', '요청하신 기사가 존재하지 않거나 아직 검토 중입니다.'); return; }
+        if (!docSnap) { showError('Article not found', '기사를 찾을 수 없습니다', 'That article does not exist, or it is still under review.', '요청하신 기사가 존재하지 않거나 아직 검토 중입니다.'); return; }
 
         const article = docSnap.data();
-        if (article.status !== 'approved') { showError('기사를 찾을 수 없습니다', '요청하신 기사가 존재하지 않거나 아직 검토 중입니다.'); return; }
+        if (article.status !== 'approved') { showError('Article not found', '기사를 찾을 수 없습니다', 'That article does not exist, or it is still under review.', '요청하신 기사가 존재하지 않거나 아직 검토 중입니다.'); return; }
         window.__article = article;   // A-259: 언어가 바뀌면 이걸로 다시 그린다
         // A-259: 창 제목과 공유 미리보기도 보는 언어를 따른다.
         window.__applyArticleMeta = function() {
@@ -306,7 +306,7 @@ async function loadArticle() {
         });
     } catch (err) {
         console.error('Error loading article:', err);
-        showError('오류가 발생했습니다', '기사를 불러오는 중 문제가 발생했습니다.');
+        showError('Something went wrong', '오류가 발생했습니다', 'We could not load this article.', '기사를 불러오는 중 문제가 발생했습니다.');
     }
 }
 
@@ -431,10 +431,15 @@ function renderArticle(a) {
     contentDiv.style.display = 'block';
 }
 
-function showError(title, msg) {
+/* A-494(2026-11-12, 브론즈 32차 ③): 「찾을 수 없습니다」 안내가 한국어로 박혀 있었다 —
+   영어로 보는 손님에게도 한글만 나온다(A-492 의 거울상). 두 언어로 심고 토글을 따라오게 한다. */
+function errAttr(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+function errPick(en, ko) { return document.documentElement.lang !== 'en' ? ko : en; }
+function showError(titleEn, titleKo, msgEn, msgKo) {
     loadingDiv.style.display = 'none';
     contentDiv.style.display = 'block';
-    contentDiv.innerHTML = `<div class="ma-error"><i class="fas fa-newspaper"></i><h2>${title}</h2><p>${msg}</p><a href="../magazine.html"><i class="fas fa-arrow-left"></i> <span data-en="Magazine" data-ko="매거진">매거진</span></a></div>`;
+    contentDiv.innerHTML = `<div class="ma-error"><i class="fas fa-newspaper"></i><h2 data-en="${errAttr(titleEn)}" data-ko="${errAttr(titleKo)}">${errPick(titleEn, titleKo)}</h2><p data-en="${errAttr(msgEn)}" data-ko="${errAttr(msgKo)}">${errPick(msgEn, msgKo)}</p><a href="../magazine.html"><i class="fas fa-arrow-left"></i> <span data-en="Magazine" data-ko="매거진">매거진</span></a></div>`;
+    if (window.applyLang) window.applyLang();
 }
 
 loadArticle();

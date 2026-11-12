@@ -563,6 +563,18 @@ document.querySelectorAll('.tab').forEach(tab => {
     });
 });
 
+/* 성공 문구는 앞에 아이콘이 붙는다 — 아이콘은 두고 글자만 두 언어로 단다.
+   (data-en/data-ko 는 lang.js 가 textContent 로 덮으므로 **글자 칸을 따로** 둔다.) */
+function pwSayKeepIcon(box, en, ko) {
+    if (!box) return;
+    var sp = document.createElement('span');
+    sp.setAttribute('data-en', en);
+    sp.setAttribute('data-ko', ko);
+    sp.textContent = (document.documentElement.lang !== 'en' ? ko : en);
+    box.appendChild(sp);
+    if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+}
+
 // ── 프로필 저장 ──
 document.getElementById('profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -585,18 +597,28 @@ document.getElementById('passwordForm').addEventListener('submit', async (e) => 
     const pw = document.getElementById('newPassword').value;
     const confirm = document.getElementById('confirmPassword').value;
     const msg = document.getElementById('pwSaveMsg');
-    if (pw !== confirm) { msg.textContent = '비밀번호가 일치하지 않습니다'; msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
-    if (pw.length < 6) { msg.textContent = '6자 이상 입력해주세요'; msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
+    /* A-494(2026-11-12): 이 네 문장이 **한국어로만** 심겼다 — 영어로 보는 회원에게도
+       한글만 나온다(A-492 의 거울상). data-en/data-ko 를 함께 달아 토글을 따라오게 한다. */
+    const pwSay = function (en, ko) {
+        if (!msg) return;
+        msg.setAttribute('data-en', en);
+        msg.setAttribute('data-ko', ko);
+        msg.textContent = (document.documentElement.lang !== 'en' ? ko : en);
+        if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+    };
+    if (pw !== confirm) { pwSay('The two passwords do not match.', '비밀번호가 일치하지 않습니다'); msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
+    if (pw.length < 6) { pwSay('Please use at least 6 characters.', '6자 이상 입력해주세요'); msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
     try {
         await currentUser.updatePassword(pw);
-        msg.innerHTML = '<i class="fas fa-check"></i> 비밀번호가 변경되었습니다!';
+        msg.innerHTML = '<i class="fas fa-check"></i> ';
+        pwSayKeepIcon(msg, 'Your password has been changed.', '비밀번호가 변경되었습니다!');
         msg.style.color = '#15803d';
         msg.classList.add('show');
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
         setTimeout(() => msg.classList.remove('show'), 3000);
     } catch (err) {
-        msg.textContent = '다시 로그인 후 시도해주세요.';
+        pwSay('Please sign in again and retry.', '다시 로그인 후 시도해주세요.');
         msg.style.color = '#b91c1c';
         msg.classList.add('show');
     }

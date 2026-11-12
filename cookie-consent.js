@@ -51,13 +51,23 @@
              (isKo ? ko : en) + '</' + (tag || 'span') + '>';
     }
     var LINK = 'class="cc-inline" style="color:#c9a36a;text-decoration:underline;"';
+    /* 분석 도구가 실제로 켜져 있나. 못 보면(로더가 안 실린 페이지) **꺼진 것으로 본다** —
+       모르면서 「쓴다」고 말하지 않는다. */
+    var ccAnalyticsOn = !!(window.__archinodeAnalytics && window.__archinodeAnalytics.enabled);
     wrap.innerHTML =
       '<div style="display:flex;flex-direction:column;gap:12px;">' +
         bi('We use cookies', '쿠키 사용에 대한 안내', 'h3',
            'style="font-size:0.95rem;font-weight:700;margin:0;color:#c9a36a;"') +
         '<p style="font-size:0.82rem;line-height:1.5;margin:0;color:#ccc;">' +
-          bi('ARCHINODE uses necessary cookies for the site to work and analytics cookies to improve it. See our ',
-             'ARCHINODE는 사이트 작동에 필요한 쿠키와 사용 분석용 쿠키를 사용합니다. ') +
+          /* A-496(2026-11-12, 브론즈 32차 ①): 전에는 언제나 「분석용 쿠키를 사용합니다」라고
+             말했다. 그런데 분석 도구가 아직 꽂혀 있지 않아 **아무것도 로드되지 않는다** —
+             A-448 과 같은 종류의 거짓말이다(그때는 없는 「설정」 화면을 약속했다).
+             analytics-loader.js 가 밝히는 상태를 보고 말을 고른다. */
+          (ccAnalyticsOn
+            ? bi('ARCHINODE uses necessary cookies for the site to work and analytics cookies to improve it. See our ',
+                 'ARCHINODE는 사이트 작동에 필요한 쿠키와 사용 분석용 쿠키를 사용합니다. ')
+            : bi('ARCHINODE currently uses only the cookies needed for the site to work. If we add analytics cookies later, the choice you make here applies to them. See our ',
+                 'ARCHINODE는 현재 사이트 작동에 필요한 쿠키만 사용합니다. 나중에 분석용 쿠키를 추가하면 여기서 하신 선택이 그대로 적용됩니다. ')) +
           '<a href="/privacy.html" ' + LINK + ' data-en="Privacy Policy" data-ko="개인정보 처리방침">' +
             (isKo ? '개인정보 처리방침' : 'Privacy Policy') + '</a>' +
           bi('. Choose your preference below.', '을 확인하시고 선택해주세요.') +

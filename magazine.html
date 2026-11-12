@@ -1637,13 +1637,20 @@
   var countLabel = document.getElementById('loadMoreCount');
   var shown = 0;
 
+  /* A-495(2026-11-12, 브론즈 32차 ④): 이 문구는 **그릴 때의 언어로 굳었다.**
+     영어로 열면 「129개 중 24개 표시 중」이 뜨고, 한↔영을 아무리 눌러도 안 바뀌었다
+     (「더 보기」를 눌러 다시 그려야 비로소 영어가 됐다).
+     `lang.js` 가 쏘는 `archinode:lang` 을 듣고 다시 칠한다 — 그리고 그릴 때
+     `data-en`/`data-ko` 도 함께 달아, 이 신호를 놓쳐도 `applyLang()` 이 고칠 수 있게 한다. */
   function updateCountLabel() {
     if (!countLabel) return;
-    var lang = (document.documentElement.lang === 'en') ? 'en' : 'ko';
-    countLabel.textContent = (lang === 'en')
-      ? ('Showing ' + shown + ' of ' + cards.length + ' articles')
-      : (cards.length + '개 중 ' + shown + '개 표시 중');
+    var en = 'Showing ' + shown + ' of ' + cards.length + ' articles';
+    var ko = cards.length + '개 중 ' + shown + '개 표시 중';
+    countLabel.setAttribute('data-en', en);
+    countLabel.setAttribute('data-ko', ko);
+    countLabel.textContent = (document.documentElement.lang === 'en') ? en : ko;
   }
+  document.addEventListener('archinode:lang', updateCountLabel);
 
   function reveal() {
     var next = Math.min(shown + PAGE_SIZE, cards.length);

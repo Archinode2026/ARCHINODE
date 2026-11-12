@@ -6,6 +6,13 @@
 (function(){
   var GA_ID = null; // TODO: GA4 Measurement ID 여기 넣기 (예: 'G-XXXXXXXXXX')
 
+  /* A-496(2026-11-12, 브론즈 32차 ①): 쿠키 배너는 「분석용 쿠키를 사용합니다」라고
+     말하는데 **GA_ID 가 없어서 아무것도 로드되지 않았다**(브론즈 실측: 「모두 수락」
+     뒤에도 gtag undefined, googletagmanager 요청 0건). 손님에게 사실이 아닌 고지를
+     한 셈이다. 그래서 「켜져 있는지」를 한 곳에서 밝히고 배너가 그걸 보고 말하게 한다 —
+     여기에 ID 를 넣는 순간 배너 문구도 저절로 따라온다(두 군데를 맞출 일이 없다). */
+  window.__archinodeAnalytics = { enabled: !!GA_ID };
+
   function loadGA(){
     if (!GA_ID) return;
     if (window.__gaLoaded) return;

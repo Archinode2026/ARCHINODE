@@ -21,10 +21,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKIP_DIRS = {'node_modules', '.git', 'admin', 'tools', 'scripts', 'docs', 'backup',
              'brand-portal', '옛사본-2026-04', 'archi-diary', 'sales', 'silvia'}
 HANGUL = re.compile(r'[가-힣]')
+LATIN = re.compile(r'[A-Za-z]{3}')
 ASSIGN = re.compile(r"\.(?:textContent|innerText)\s*=\s*\(?\s*'([^']{15,})'")
 HELPERS = ['lybSay(', 'rpSay(', 'rfqSay(']
 errors = []
 found = []
+found_ko = []
 
 
 def strip_comments(s):
@@ -42,17 +44,26 @@ for base, dirs, files in os.walk(ROOT):
         src = strip_comments(io.open(p, encoding='utf-8', errors='replace').read())
         for m in ASSIGN.finditer(src):
             txt = m.group(1)
+            line = src[:m.start()].count('\n') + 1
+            if HANGUL.search(txt) and not LATIN.search(txt):
+                # A-494: 거울상 — **한국어로만** 심는 자리도 똑같이 잘못이다.
+                # 영어로 보는 손님에게 한글만 나온다(브론즈 32차가 404 안내에서 찾았다).
+                if len(txt) >= 8:
+                    found_ko.append((rel, line, txt[:80]))
+                continue
             if HANGUL.search(txt):
-                continue                      # 한국어가 들어 있으면 이중언어 처리된 것
+                continue                      # 두 언어가 섞여 있으면 이중언어 처리로 본다
             if '{' in txt or '}' in txt or txt.startswith('.'):
                 continue                      # CSS·선택자 문자열
             if not re.search(r'[A-Za-z]{3}.*\s.*[A-Za-z]', txt):
                 continue                      # 문장이 아니다(값·코드)
-            line = src[:m.start()].count('\n') + 1
             found.append((rel, line, txt[:80]))
 
 for rel, line, txt in found:
     errors.append('[영어만] %s:%d — 손님용 안내가 영어로만 심긴다\n        %s' % (rel, line, txt))
+for rel, line, txt in found_ko:
+    errors.append('[한국어만] %s:%d — 손님용 안내가 한국어로만 심긴다(영어로 보는 손님에게 한글만 나온다)'
+                  '\n        %s' % (rel, line, txt))
 
 # 빈 검사 방지 — 도우미가 실제로 쓰이고 있어야 한다
 used = 0
@@ -76,4 +87,4 @@ if errors:
     for e in errors:
         print('  x ' + e)
     sys.exit(1)
-print('공개 페이지 안내문 이중언어 검사 통과 — 도우미 호출 %d곳, 영어만 남은 문장 0건' % used)
+print('공개 페이지 안내문 이중언어 검사 통과 — 도우미 호출 %d곳, 한쪽 언어로만 남은 문장 0건' % used)

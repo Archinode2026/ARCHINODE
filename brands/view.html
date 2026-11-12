@@ -502,7 +502,7 @@ const loadingDiv = document.getElementById('loadingState');
 // ── 브랜드 데이터 로드 ──
 async function loadBrand() {
     if (!brandSlug) {
-        showError('브랜드를 찾을 수 없습니다', 'URL에 브랜드 ID가 없습니다.');
+        showError('Brand not found', '브랜드를 찾을 수 없습니다', 'The address has no brand ID.', 'URL에 브랜드 ID가 없습니다.');
         return;
     }
 
@@ -515,7 +515,7 @@ async function loadBrand() {
             .get();
 
         if (snapshot.empty) {
-            showError('브랜드를 찾을 수 없습니다', '요청하신 브랜드 페이지가 존재하지 않습니다.');
+            showError('Brand not found', '브랜드를 찾을 수 없습니다', 'That brand page does not exist.', '요청하신 브랜드 페이지가 존재하지 않습니다.');
             return;
         }
 
@@ -527,7 +527,7 @@ async function loadBrand() {
 
         // 승인되지 않은 브랜드 체크
         if (brand.status !== 'approved') {
-            showError('아직 검토 중인 브랜드입니다', '이 브랜드는 현재 ARCHINODE 팀의 검토를 기다리고 있습니다. 승인 후 페이지가 공개됩니다.');
+            showError('This brand is still under review', '아직 검토 중인 브랜드입니다', 'The ARCHINODE team is reviewing this brand. The page goes live once it is approved.', '이 브랜드는 현재 ARCHINODE 팀의 검토를 기다리고 있습니다. 승인 후 페이지가 공개됩니다.');
             return;
         }
 
@@ -618,7 +618,7 @@ async function loadBrand() {
 
     } catch (error) {
         console.error('Error loading brand:', error);
-        showError('오류가 발생했습니다', '브랜드 정보를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        showError('Something went wrong', '오류가 발생했습니다', 'We could not load this brand. Please try again in a moment.', '브랜드 정보를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
 }
 
@@ -910,12 +910,26 @@ function renderBrand(brand, products, articles) {
 }
 
 // ── 에러 표시 ──
-function showError(title, message) {
+/* A-494(2026-11-12, 브론즈 32차 ③): 「찾을 수 없습니다」 안내가 **한국어로 박혀** 있었다.
+   영어로 보는 손님에게도 한글만 나온다 — A-492 의 거울상이다(그쪽은 영어만 나왔다).
+   제목·본문을 두 언어로 심고 `data-en`/`data-ko` 를 달아 토글을 따라오게 한다.
+   ★ 덧붙여 A-494(브론즈 32차 ②): 이 경로에서는 **빵부스러기가 「불러오는 중...」에
+   영원히 남아** 있었다(본문은 「찾을 수 없습니다」인데 위에는 로딩 문구). 같이 고친다. */
+function errAttr(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+function errPick(en, ko) { return document.documentElement.lang !== 'en' ? ko : en; }
+function showError(titleEn, titleKo, msgEn, msgKo) {
+    /* 빵부스러기도 함께 바꾼다 — 안 그러면 본문은 「없습니다」인데 위는 「불러오는 중...」이다. */
+    var bcErr = document.getElementById('breadcrumbName');
+    if (bcErr) {
+        bcErr.setAttribute('data-en', 'Not found');
+        bcErr.setAttribute('data-ko', '찾을 수 없음');
+        bcErr.textContent = errPick('Not found', '찾을 수 없음');
+    }
     contentDiv.innerHTML = `
     <div class="bp-error">
         <i class="fas fa-building"></i>
-        <h2>${title}</h2>
-        <p>${message}</p>
+        <h2 data-en="${errAttr(titleEn)}" data-ko="${errAttr(titleKo)}">${errPick(titleEn, titleKo)}</h2>
+        <p data-en="${errAttr(msgEn)}" data-ko="${errAttr(msgKo)}">${errPick(msgEn, msgKo)}</p>
         <a href="../brands.html"><i class="fas fa-arrow-left"></i> &nbsp;<span data-en="All Brands" data-ko="전체 브랜드">All Brands</span></a>
     </div>`;
     if (window.applyLang) window.applyLang();
