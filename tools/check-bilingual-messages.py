@@ -65,6 +65,24 @@ for rel, line, txt in found_ko:
     errors.append('[한국어만] %s:%d — 손님용 안내가 한국어로만 심긴다(영어로 보는 손님에게 한글만 나온다)'
                   '\n        %s' % (rel, line, txt))
 
+# ── 마크다운이 data-* 속성에 들어가지 않았는지 ────────────────────────────
+#   `lang.js` 는 data-en/data-ko 를 **textContent 로** 꽂는다. 그래서 속성 안에
+#   `**굵게**` 를 적으면 별표가 **그대로 화면에 보인다**. 주석이나 문서에서 쓰던
+#   버릇이 그대로 넘어오기 쉬운 자리다(A-502 에서 실제로 났다).
+MD_ATTR = re.compile(r'data-(?:en|ko)="[^"]*\*\*[^"]*"')
+for base, dirs, files in os.walk(ROOT):
+    dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith('.')]
+    for f in sorted(files):
+        if not f.endswith(('.html', '.js')):
+            continue
+        rel = os.path.relpath(os.path.join(base, f), ROOT).replace('\\', '/')
+        src = io.open(os.path.join(base, f), encoding='utf-8', errors='replace').read()
+        for m in MD_ATTR.finditer(src):
+            line = src[:m.start()].count('\n') + 1
+            errors.append('[마크다운] %s:%d — data-* 속성에 `**` 가 들어 있다. '
+                          'lang.js 가 글자 그대로 꽂으므로 별표가 화면에 보인다\n        %s'
+                          % (rel, line, m.group(0)[:90]))
+
 # 빈 검사 방지 — 도우미가 실제로 쓰이고 있어야 한다
 used = 0
 for rel in ['list-your-brand.html', 'auth/reset-password.html', 'brands/view.html',
