@@ -121,9 +121,13 @@ function makeEnv(opts) {
     },
     firebase: {},
     db: {
-      collection() {
+      /* A-511: 전에는 **컬렉션 이름을 안 보고** 늘 brands 를 돌려줬다.
+         제품 색인이 생긴 뒤로는 그러면 제품 자리에 브랜드가 들어가
+         시험이 거짓으로 통과한다. 이름대로 돌려준다. */
+      collection(name) {
+        const rows = (name === 'products') ? (opts.products || []) : brands;
         return { where() { return { get() {
-          return Promise.resolve({ forEach(cb) { brands.forEach(b => cb({ data: () => b })); } });
+          return Promise.resolve({ forEach(cb) { rows.forEach(b => cb({ data: () => b })); } });
         } }; } };
       }
     }
@@ -288,6 +292,67 @@ const BRANDS_REAL = [
   r = await run({ htmlLang: 'ko', staticIndex: real, brands: BRANDS_REAL }, '스팀룸');
   ok('「스팀룸」 두 줄이 욕실 / 웰니스 로 갈린다',
      /욕실/.test(r.text) && /웰니스/.test(r.text), r.text.slice(0, 90));
+
+  console.log('\n[10] A-511 — 검색창에 적힌 약속과 실제가 같은가');
+  /* 검색창 글은 **230벌로 복사돼** 있다(A-444·A-466·A-468 과 같은 자리).
+     그리고 그 글은 「디자이너」를 찾아 준다고 말했는데 그런 항목은 색인에
+     아예 없다 — 지킬 수 없는 약속이다. 약속한 것만 적혔는지, 230벌이 한 글자로
+     같은지 본다. */
+  {
+    const glob = (dir, out) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (e.isDirectory()) {
+          if (['node_modules', '.git', '__pycache__'].includes(e.name)) continue;
+          glob(path.join(dir, e.name), out);
+        } else if (e.name.endsWith('.html')) out.push(path.join(dir, e.name));
+      }
+      return out;
+    };
+    const kos = new Set(), ens = new Set();
+    let files = 0;
+    for (const f of glob(ROOT, [])) {
+      const t = fs.readFileSync(f, 'utf8');
+      const mk = t.match(/data-ko-placeholder="([^"]*(?:검색|Search)[^"]*)"/g) || [];
+      const me = t.match(/data-en-placeholder="([^"]*(?:검색|Search)[^"]*)"/g) || [];
+      mk.forEach(x => kos.add(x));
+      me.forEach(x => ens.add(x));
+      if (mk.length || me.length) files++;
+    }
+    ok('검색창 글을 가진 페이지가 200쪽 넘는다(허수 방지)', files > 200, files + '쪽');
+    ok('한국어 검색창 글이 한 가지다', kos.size === 1, [...kos].join(' / ').slice(0, 140));
+    ok('영어 검색창 글이 한 가지다', ens.size === 1, [...ens].join(' / ').slice(0, 140));
+    const all = [...kos, ...ens].join(' ');
+    ok('찾아 주지 못하는 것을 약속하지 않는다(디자이너)', !/designer|디자이너/i.test(all), all.slice(0, 140));
+    const SJ2 = fs.readFileSync(path.join(ROOT, 'search.js'), 'utf8');
+    ok('약속한 제품을 실제로 읽는다', /collection\('products'\)/.test(SJ2));
+    ok('약속한 브랜드를 실제로 읽는다', /collection\('brands'\)/.test(SJ2));
+  }
+
+  console.log('\n[9] A-511 — 제품도 찾아지는가');
+  /* 검색창은 늘 「브랜드, **제품**, 디자이너 검색」이라고 적혀 있었는데
+     제품을 보는 코드가 **아예 없었다**. 없어서 0건이 아니라 안 봐서 0건이었다. */
+  const PRODUCTS = [
+    { name: 'Thermroof Panel', slug: 'thermroof-panel', brandName: 'AGM',
+      status: 'approved', category: 'Construction', materials: 'aluminium' },
+    { name: 'Oak Dining Table', slug: 'oak-dining-table', brandName: 'Nordic Nest',
+      status: 'approved', category: 'Furniture', materials: 'oak' },
+    { name: '이름만 있고 slug 가 없는 제품', brandName: 'X', status: 'approved' }
+  ];
+  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: [], products: PRODUCTS }, 'thermroof');
+  ok('제품 이름으로 찾아진다', r.count === 1, r.count + '건 — ' + r.text.slice(0, 70));
+  ok('제품 결과에 Product 라벨이 붙는다', /Product/.test(r.text), r.text.slice(0, 90));
+  ok('제품 주소는 제품 상세로 간다', /products\/view\.html\?id=thermroof-panel/.test(r.html));
+  ok('부제에 브랜드 이름이 보인다', /AGM/.test(r.text), r.text.slice(0, 90));
+  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: [], products: PRODUCTS }, 'oak');
+  ok('자재(materials)로도 찾아진다', r.count >= 1, r.count + '건');
+  r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: [], products: PRODUCTS }, 'thermroof');
+  ok('한국어 화면에서는 「제품」이라고 적는다', /제품/.test(r.text), r.text.slice(0, 90));
+  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: [], products: PRODUCTS }, 'slug');
+  ok('slug 없는 제품은 색인에 안 넣는다(눌러도 갈 곳이 없다)',
+     !/이름만 있고/.test(r.text), r.text.slice(0, 80));
+  /* 제품을 읽다 실패해도 나머지 검색은 살아 있어야 한다 */
+  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: BRANDS_REAL, products: [] }, 'bathroom');
+  ok('제품이 0건이어도 다른 결과는 나온다', r.count >= 1, r.count + '건');
 
   console.log('\n[8] A-509 — 12건에서 자른 사실을 말하는가');
   /* 20개를 전부 「bath」에 걸리게 만들어, 화면이 12줄만 보여 주면서

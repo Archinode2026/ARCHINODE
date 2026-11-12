@@ -9,6 +9,8 @@
   var isLoaded = false;
   var brandIndex = null; // Firestore 승인 브랜드 목록 캐시 (A-072: 정적 search-index.json엔 brand 타입이 없음)
   var brandIndexLoading = false;
+  var productIndex = null;        // A-511: Firestore 승인 제품 목록 캐시
+  var productIndexLoading = false;
   var badItemWarned = false;
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -204,10 +206,59 @@
     });
   }
 
-  // Load both the static index and the live brand index, then run callback once.
+  /* ── A-511(브론즈 34차 N34-1): 검색창은 「브랜드, **제품**, 디자이너 검색」이라고
+     적혀 있었는데 **제품은 한 번도 찾아진 적이 없다.** 정적 색인에는 제품이 없고
+     (카테고리·소분류·기사·페이지뿐), 라이브로 읽는 것은 브랜드뿐이었다.
+     「E5 Product」를 쳐도 0건이 나온다 — 없어서가 아니라 **보지 않아서**다.
+     브랜드와 같은 방식으로 승인된 제품을 읽는다. */
+  function loadProductIndex(callback) {
+    if (productIndex !== null) { callback(); return; }
+    if (productIndexLoading) { setTimeout(function() { callback(); }, 300); return; }
+    if (typeof firebase === 'undefined' || typeof db === 'undefined') {
+      productIndex = [];
+      callback();
+      return;
+    }
+    productIndexLoading = true;
+    db.collection('products').where('status', '==', 'approved').get().then(function(snapshot) {
+      var list = [];
+      snapshot.forEach(function(doc) {
+        var p = doc.data();
+        if (!p.name || !p.slug) return;
+        list.push({
+          type: 'product',
+          /* 제품 이름은 브랜드가 한 가지로 적는다 — 두 언어 판이 없다.
+             없는 번역을 지어내지 않고 같은 이름을 양쪽에 둔다. */
+          name_en: text(p.name),
+          name_ko: text(p.name),
+          desc_en: text(p.materials),
+          desc_ko: text(p.materials),
+          /* 부제로 브랜드 이름을 보여 준다 — 같은 이름의 제품이 여럿일 때
+             어느 브랜드 것인지가 손님이 묻는 첫 질문이다(A-449 와 같은 까닭). */
+          parent_en: text(p.brandName),
+          parent_ko: text(p.brandName),
+          country: '',
+          category: text(p.category, ', '),
+          url: 'products/view.html?id=' + encodeURIComponent(text(p.slug))
+        });
+      });
+      productIndex = list;
+      productIndexLoading = false;
+      callback();
+    }).catch(function(err) {
+      console.warn('Failed to load product index:', err);
+      productIndex = [];
+      productIndexLoading = false;
+      callback();
+    });
+  }
+
+  // Load the static index and the live brand/product indexes, then run callback once.
   function loadAllIndexes(callback) {
     loadSearchIndex(function() {
-      loadBrandIndex(callback);
+      loadBrandIndex(function() {
+        loadProductIndex(callback);
+      });
     });
   }
 
@@ -223,7 +274,7 @@
 
     var results = [];
     var basePath = getBasePath();
-    var combined = searchData.concat(brandIndex || []);
+    var combined = searchData.concat(brandIndex || []).concat(productIndex || []);
 
     for (var i = 0; i < combined.length; i++) {
       // A-397: 항목 하나 때문에 검색 전체가 멈추던 것을 막는다. lc() 로 이미
@@ -314,6 +365,7 @@
       category: { en: 'Category', ko: '카테고리' },
       subcategory: { en: 'Subcategory', ko: '서브카테고리' },
       brand: { en: 'Brand', ko: '브랜드' },
+      product: { en: 'Product', ko: '제품' },
       // A-349(2026-11-06): A-348 이 *.html 만 쓸어서 이 파일이 통째로 비껴갔다.
       // 헤더·푸터는 「Korean Articles」인데 검색 결과 라벨만 「Magazine」이면 한 화면에서 이름이 갈린다.
       magazine: { en: 'Korean Articles', ko: '매거진' },
@@ -331,6 +383,7 @@
       category: 'fas fa-th-large',
       subcategory: 'fas fa-tag',
       brand: 'fas fa-building',
+      product: 'fas fa-cube',
       magazine: 'fas fa-newspaper',
       article: 'fas fa-newspaper',
       'trend-report': 'fas fa-chart-line',
@@ -384,7 +437,7 @@
           '</div>';
       } else {
         resultsContainer.innerHTML = '<div class="search-hint">' +
-          (lang === 'ko' ? '브랜드, 카테고리, 매거진을 검색하세요' : 'Search brands, categories, Korean articles') +
+          (lang === 'ko' ? '브랜드, 제품, 카테고리, 매거진을 검색하세요' : 'Search brands, products, categories, articles') +
           '</div>';
       }
       return;
@@ -402,6 +455,16 @@
 
       if (item.type === 'subcategory') {
         sub = (lang === 'ko' ? item.parent_ko : item.parent_en) || '';
+      } else if (item.type === 'product') {
+        /* 브랜드 이름 + 분류. 분류는 보는 언어로 — A-442 가 브랜드 결과에서
+           고친 그 자리와 같은 약속이다. */
+        var pBrand = (lang === 'ko' ? item.parent_ko : item.parent_en) || '';
+        var pCatSrc = lang === 'ko' ? catKo(item.category) : item.category;
+        var pCat = text(pCatSrc, ' · ').split(',')
+                     .map(function (x) { return x.trim(); })
+                     .filter(function (x) { return !!x; })
+                     .join(' · ');
+        sub = [pBrand, pCat].filter(function (x) { return !!x; }).join(' · ');
       } else if (item.type === 'brand') {
         /* A-442(2026-11-10, 2차): 찾는 것만 고치고 **보이는 것을 안 고쳤다.**
            한국어 화면에서도 부제가 `Albania · Bathroom, Finishes` 로 영문이었다 —
