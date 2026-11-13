@@ -177,5 +177,51 @@ ok('5초 안내가 맨 en 으로 떨어지지 않는다', !/var lang = 'en';/.te
   ok('영어로 꽉 참을 말한다', /Limit reached/.test(fmMsg(el(100, 100))), fmMsg(el(100, 100)));
 }
 
+// ── 8) A-521 — 받는 그 자리에서 알리고 동의를 받는가 ───────────────────
+/* 푸터의 처리방침 링크만으로는 「수집 시 고지」가 되지 않는다. 이름·연락처를
+   받는 폼 셋에는 **동의 칸**, 이메일만 받는 뉴스레터에는 **안내와 링크**만 —
+   승리님 결정(「폼마다 다르게」)이 그대로 서 있는지 본다. */
+{
+  const WITH_BOX = [
+    ['contact.html', 'agreePrivacyContact'],
+    ['sourcing-inquiry.html', 'agreePrivacySourcing'],
+    ['request-consultation.html', 'agreePrivacyConsult'],
+  ];
+  for (const [f, id] of WITH_BOX) {
+    const t = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const i = t.indexOf('class="form-consent"');
+    ok(f + ' 에 수집 고지 칸이 있다', i >= 0);
+    const blk = t.slice(i, t.indexOf('</div>', t.indexOf('form-consent-note', i)) + 6);
+    ok(f + ' 의 동의는 필수다', new RegExp('id="' + id + '"[^>]*\\brequired\\b').test(blk), blk.slice(0, 120));
+    ok(f + ' 에 수집 항목이 있다', /수집 항목:/.test(blk));
+    ok(f + ' 에 수집 목적이 있다', /수집 목적:/.test(blk));
+    ok(f + ' 에 보유 기간과 근거가 있다', /보유 기간:/.test(blk) && /전자상거래법 시행령 제6조/.test(blk));
+    ok(f + ' 에 처리방침 링크가 폼 안에 있다', /href="privacy\.html"/.test(blk));
+    ok(f + ' 의 처리방침 링크가 언어를 따른다',
+       /data-en-href="privacy-en\.html"/.test(blk) && /data-ko-href="privacy\.html"/.test(blk));
+    ok(f + ' 에 동의 거부권을 적는다', /동의하지 않으실 수 있으나/.test(blk));
+    ok(f + ' 의 필수 표시가 있다', /class="req-mark"/.test(blk));
+    // 두 언어 짝 — data-en 이 있으면 data-ko 도 있고, 영어 칸에 한글이 없어야 한다
+    const ens = blk.match(/data-en="([^"]*)"/g) || [];
+    const kos = blk.match(/data-ko="([^"]*)"/g) || [];
+    ok(f + ' 고지 칸의 두 언어 수가 같다', ens.length === kos.length, ens.length + ' vs ' + kos.length);
+    ok(f + ' 고지 칸의 영어에 한글이 없다', !ens.some(x => /[가-힣]/.test(x)),
+       (ens.find(x => /[가-힣]/.test(x)) || '').slice(0, 50));
+  }
+
+  for (const f of ['index.html', 'magazine.html', 'trend-report.html']) {
+    const t = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const i = t.indexOf('class="newsletter-form');
+    const after = t.slice(i, i + 2600);
+    ok(f + ' 뉴스레터에 안내가 있다', /newsletter-consent/.test(after));
+    ok(f + ' 뉴스레터에 처리방침 링크가 있다', /href="privacy\.html"/.test(after));
+    ok(f + ' 뉴스레터는 체크박스를 쓰지 않는다(결정대로)',
+       !/class="form-consent"/.test(after) && !/agreePrivacy/.test(after));
+  }
+  const css3 = fs.readFileSync(path.join(ROOT, 'style.css'), 'utf8');
+  ok('수집 고지 칸 처방이 있다', /\.form-consent\s*\{/.test(css3));
+  ok('뉴스레터 안내 처방이 있다', /\.newsletter-consent\s*\{/.test(css3));
+}
+
 console.log('\n폼 경고 말 — 시험 ' + (pass + fail) + '개, 실패 ' + fail + '개');
 process.exit(fail ? 1 : 0);

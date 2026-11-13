@@ -388,6 +388,26 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
           </label>
         </div>
 
+        <!-- A-521: 받는 **그 자리에서** 알리고 동의를 받는다(개인정보보호법 제15조·제22조).
+             푸터의 처리방침 링크만으로는 「수집 시 고지」가 되지 않는다.
+             보유 기간 3년의 근거는 전자상거래법 시행령 제6조(소비자 불만·분쟁처리 기록). -->
+        <div class="form-consent">
+          <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
+          <ul>
+            <li data-en="What we collect: company, contact name, email, phone, website, country, category, request, timing, budget" data-ko="수집 항목: 회사명, 담당자 이름, 이메일, 전화번호, 웹사이트, 국가, 관심 분야, 요청 내용, 희망 시기, 예산">수집 항목: 회사명, 담당자 이름, 이메일, 전화번호, 웹사이트, 국가, 관심 분야, 요청 내용, 희망 시기, 예산</li>
+            <li data-en="Why: to receive your consultation request and run the consultation" data-ko="수집 목적: 자문 요청 접수와 상담 진행">수집 목적: 자문 요청 접수와 상담 진행</li>
+            <li data-en="How long: 3 years after the request is closed (E-Commerce Act Enforcement Decree, Art. 6)" data-ko="보유 기간: 요청 처리 완료 후 3년 (전자상거래법 시행령 제6조)">보유 기간: 요청 처리 완료 후 3년 (전자상거래법 시행령 제6조)</li>
+          </ul>
+          <label class="form-consent-agree">
+            <input type="checkbox" id="agreePrivacyConsult" required>
+            <span>
+              <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
+              <span data-en="I agree to the collection and use of my personal data as described above." data-ko="위 내용에 동의합니다.">위 내용에 동의합니다.</span>
+              <a href="privacy.html" data-en-href="privacy-en.html" data-ko-href="privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a>
+            </span>
+          </label>
+          <p class="form-consent-note" data-en="You may decline, but we then cannot accept your request." data-ko="동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.</p>
+        </div>
         <button type="submit" class="submit-btn" id="submitBtn" data-en="Send Request" data-ko="요청 보내기">Send Request</button>
 
       </form>

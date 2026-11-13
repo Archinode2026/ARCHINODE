@@ -167,6 +167,26 @@
             <textarea id="contactMessage" name="message" required rows="5" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;resize:vertical;"></textarea>
           </div>
           <input type="hidden" name="_next" value="https://archinodekr.com/contact.html?sent=1">
+          <!-- A-521: 받는 **그 자리에서** 알리고 동의를 받는다(개인정보보호법 제15조·제22조).
+               푸터의 처리방침 링크만으로는 「수집 시 고지」가 되지 않는다.
+               보유 기간 3년의 근거는 전자상거래법 시행령 제6조(소비자 불만·분쟁처리 기록). -->
+          <div class="form-consent">
+            <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
+            <ul>
+              <li data-en="What we collect: name, email, subject, message" data-ko="수집 항목: 이름, 이메일, 제목, 문의 내용">수집 항목: 이름, 이메일, 제목, 문의 내용</li>
+              <li data-en="Why: to receive and answer your enquiry" data-ko="수집 목적: 문의 접수와 답변">수집 목적: 문의 접수와 답변</li>
+              <li data-en="How long: 3 years after the enquiry is closed (E-Commerce Act Enforcement Decree, Art. 6)" data-ko="보유 기간: 문의 처리 완료 후 3년 (전자상거래법 시행령 제6조)">보유 기간: 문의 처리 완료 후 3년 (전자상거래법 시행령 제6조)</li>
+            </ul>
+            <label class="form-consent-agree">
+              <input type="checkbox" id="agreePrivacyContact" required>
+              <span>
+                <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
+                <span data-en="I agree to the collection and use of my personal data as described above." data-ko="위 내용에 동의합니다.">위 내용에 동의합니다.</span>
+                <a href="privacy.html" data-en-href="privacy-en.html" data-ko-href="privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a>
+              </span>
+            </label>
+            <p class="form-consent-note" data-en="You may decline, but we then cannot accept your request." data-ko="동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.</p>
+          </div>
           <button type="submit" style="padding:14px 32px;background:#332e27;color:#fff;border:none;border-radius:999px;font-size:1rem;cursor:pointer;font-family:inherit;align-self:flex-start;" data-en="Send Message" data-ko="보내기">Send Message <i class="fas fa-arrow-right"></i></button>
           <!-- Formspree 연동: form ID xgodynvd, office@archinode.org 수신 -->
         </form>
