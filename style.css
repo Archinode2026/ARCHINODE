@@ -3411,6 +3411,14 @@ html[lang="ko"] .cp-name { word-break: keep-all; }
 .cp-empty-alt:hover { color: var(--accent-ink, var(--gray-700)); }
 .cp-empty .cp-empty-brand { font-size: 0.8rem; color: var(--ink-soft); margin: 26px 0 0; }
 .cp-empty .cp-empty-brand a { text-decoration: underline; color: inherit; }
+
+/* A-520: 「필수인데 그렇게 안 보이던」 체크박스에 붙는 표시.
+   별표는 글자 옆에 붙어야 뜻이 사는데 체크박스는 글이 길어서 앞에 둔다. */
+.req-mark { color: #b3261e; font-weight: 700; font-size: 0.82rem; margin-right: 4px; white-space: nowrap; }
+
+/* A-520: 글자 수 한도 안내. 한도의 80% 를 넘겨야 나타나므로 평소에는 비어 있다. */
+.fm-count { font-size: 0.76rem; color: var(--ink-soft, #6b6358); margin-top: 6px; line-height: 1.5; }
+.fm-count.full { color: #b3261e; font-weight: 600; }
 .cp-error { text-align: center; color: var(--gray-700); padding: 40px; font-size: 0.92rem; }
 @media (max-width: 1024px) { .cp-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 600px)  { .cp-grid { grid-template-columns: repeat(2, 1fr); } }

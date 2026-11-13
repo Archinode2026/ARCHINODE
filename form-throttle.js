@@ -100,6 +100,81 @@
     }
   });
 
+  /* ── A-520(브론즈 36차 N36-3): 글자 수 한도가 **말 없이 잘랐다** ──────────
+     소싱 문의 이름 칸에 150자를 넣으면 100자만 남고, 자문 신청 회사명은 132자가
+     120자가 된다. 화면은 아무 말도 안 한다 — 손님은 **자기가 적은 것이 잘린 줄
+     모른 채** 보낸다. A-506·A-509 와 같은 결이다: 끊었으면 끊었다고 말해야 한다.
+
+     `maxlength` 가 달린 칸을 찾아, 한도에 가까워지면 남은 글자 수를 보여 주고,
+     붙여넣기가 실제로 잘리면 그 사실을 말한다. 칸마다 손보지 않고 한 자리에 둔다. */
+  var NEAR = 0.8;          // 한도의 80% 를 넘으면 세어 보여 준다
+
+  function fmLang() { return archiFormLang(); }
+  function fmMsg(el) {
+    var max = parseInt(el.getAttribute('maxlength'), 10);
+    var len = (el.value || '').length;
+    var left = max - len;
+    return (fmLang() === 'ko')
+      ? (left > 0 ? (len + ' / ' + max + '자') : (max + '자까지 입력할 수 있습니다 (꽉 찼습니다)'))
+      : (left > 0 ? (len + ' / ' + max) : ('Limit reached — ' + max + ' characters max'));
+  }
+  function fmCounter(el, make) {
+    var id = 'fmCount-' + (el.id || el.name || '');
+    var box = el.parentNode && el.parentNode.querySelector('.fm-count');
+    if (!box && make) {
+      box = document.createElement('div');
+      box.className = 'fm-count';
+      box.id = id;
+      box.setAttribute('aria-live', 'polite');
+      if (el.parentNode) el.parentNode.appendChild(box);
+      /* 읽어 주는 도구가 이 칸과 묶어 읽도록 — 숫자만 떠 있으면 무엇의 숫자인지 모른다 */
+      try { el.setAttribute('aria-describedby', ((el.getAttribute('aria-describedby') || '') + ' ' + id).trim()); } catch (e) {}
+    }
+    return box;
+  }
+  function fmPaint(el) {
+    var max = parseInt(el.getAttribute('maxlength'), 10);
+    if (!max || max < 1) return;
+    var len = (el.value || '').length;
+    if (len < Math.floor(max * NEAR)) {
+      var had = el.parentNode && el.parentNode.querySelector('.fm-count');
+      if (had) had.textContent = '';
+      return;
+    }
+    var box = fmCounter(el, true);
+    if (box) { box.textContent = fmMsg(el); box.classList.toggle('full', len >= max); }
+  }
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (el && el.getAttribute && el.getAttribute('maxlength')) fmPaint(el);
+  }, true);
+  /* 붙여넣기는 한 번에 넘친다 — 잘린 글자 수를 **그 자리에서** 말한다 */
+  document.addEventListener('paste', function (e) {
+    var el = e.target;
+    if (!el || !el.getAttribute || !el.getAttribute('maxlength')) return;
+    var max = parseInt(el.getAttribute('maxlength'), 10);
+    if (!max) return;
+    var before = (el.value || '').length;
+    var add = 0;
+    try { add = ((e.clipboardData || window.clipboardData).getData('text') || '').length; } catch (err) { return; }
+    var sel = Math.abs((el.selectionEnd || 0) - (el.selectionStart || 0));
+    var cut = (before - sel + add) - max;
+    if (cut <= 0) return;
+    setTimeout(function () {
+      var box = fmCounter(el, true);
+      if (!box) return;
+      box.textContent = (fmLang() === 'ko')
+        ? (max + '자까지만 들어갑니다 — 붙여넣은 글에서 ' + cut + '자가 잘렸습니다.')
+        : ('Only ' + max + ' characters fit — ' + cut + ' characters were cut from what you pasted.');
+      box.classList.add('full');
+    }, 0);
+  }, true);
+  /* 언어가 바뀌면 떠 있는 숫자도 그 언어로 */
+  document.addEventListener('archinode:lang', function () {
+    var list = document.querySelectorAll('[maxlength]');
+    for (var i = 0; i < list.length; i++) fmPaint(list[i]);
+  });
+
   var COOL = 5000; // 5초
   function tag(form){ return 'archi-form-locked-' + (form.id || form.action || 'anon'); }
 

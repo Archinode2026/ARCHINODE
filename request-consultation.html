@@ -346,7 +346,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <div class="form-group">
           <label for="category" data-en="Consultation Category" data-ko="자문 카테고리">Consultation Category <span class="req">*</span></label>
           <select id="category" required>
-            <option value="">— Select —</option>
+            <option value="" data-en="— Select —" data-ko="— 선택 —">— Select —</option>
             <option value="market-entry">Korean Market Entry — 한국 시장 진출</option>
             <option value="partnership-match">Partnership Match — 브랜드 파트너십 매칭</option>
             <option value="material-sourcing">Material Sourcing — 자재 소싱</option>
@@ -368,7 +368,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
           <div class="form-group">
             <label for="budget" data-en="Budget Range" data-ko="예산 범위">Budget Range <span class="hint" data-en="for scope alignment" data-ko="작업 범위 조율용">for scope alignment</span></label>
             <select id="budget">
-              <option value="">— Select —</option>
+              <option value="" data-en="— Select —" data-ko="— 선택 —">— Select —</option>
               <!-- A-498: `value` 는 **저장되는 열쇠**다(consultations 문서의 budget).
                    이미 저장된 신청서의 뜻이 바뀌지 않게 값은 그대로 두고 **보이는 글자만** 유로로 바꾼다.
                    어드민의 BUDGET_LABEL 도 같이 고쳤다 — 한쪽만 고치면 화면마다 다른 값이 보인다. -->
@@ -383,6 +383,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <div class="form-group" style="margin-top:24px;">
           <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;color:var(--gray-700);">
             <input type="checkbox" id="agreeContact" required style="width:22px;height:22px;margin-top:4px;flex-shrink:0;cursor:pointer;">
+            <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
             <span data-en="I agree to be contacted by ARCHINODE regarding this consultation request. My information will not be shared with third parties without my consent." data-ko="이 자문 요청과 관련하여 ARCHINODE의 연락을 수신하는 데 동의합니다. 본인 동의 없이 제3자에게 정보가 공유되지 않습니다.">I agree to be contacted by ARCHINODE regarding this consultation request. My information will not be shared with third parties without my consent.</span>
           </label>
         </div>

@@ -308,7 +308,7 @@
                 <div class="form-group">
                     <label for="country" data-en="Country " data-ko="국가 "><span class="req">*</span></label>
                     <select id="country" name="country" required autocomplete="country-name">
-                        <option value="" disabled selected>Select country</option>
+                        <option value="" disabled selected data-en="Select country" data-ko="국가 선택">Select country</option>
                         <option value="Afghanistan">Afghanistan</option>
                         <option value="Albania">Albania</option>
                         <option value="Algeria">Algeria</option>
@@ -431,7 +431,7 @@
                      한국어 손님도 오는데, 바로 위 「(해당하는 항목을 모두 선택하세요)」는 한국어인데
                      정작 고를 항목이 영어였다. 한국어 이름은 카테고리 페이지의 두 언어 h1 이 정본이고
                      tools/check-category-labels.py 가 그 정본과 맞춰 본다. (브론즈 28차 8번) -->
-                <div class="category-grid" id="categoryGrid" role="group" aria-label="Category">
+                <div class="category-grid" id="categoryGrid" role="group" aria-label="Category" data-en-aria-label="Category" data-ko-aria-label="카테고리">
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Bathroom"><span data-en="Bathroom" data-ko="욕실">Bathroom</span></label>
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Construction"><span data-en="Construction" data-ko="건축자재">Construction</span></label>
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Decor"><span data-en="Decor" data-ko="데코">Decor</span></label>
@@ -487,19 +487,20 @@
             <div class="form-group">
                 <label data-en="How did you hear about ARCHINODE?" data-ko="ARCHINODE를 어떻게 알게 되셨나요?"></label>
                 <select id="referral">
-                    <option value="">Select</option>
-                    <option value="Search Engine">Search Engine (Google, Naver)</option>
-                    <option value="Social Media">Social Media</option>
-                    <option value="Industry Event">Industry Event / Exhibition</option>
-                    <option value="Referral">Referral / Word of Mouth</option>
-                    <option value="Email">Email Invitation</option>
-                    <option value="Other">Other</option>
+                    <option value="" data-en="Select" data-ko="선택">Select</option>
+                    <option value="Search Engine" data-en="Search Engine (Google, Naver)" data-ko="검색엔진 (구글·네이버)">Search Engine (Google, Naver)</option>
+                    <option value="Social Media" data-en="Social Media" data-ko="소셜 미디어">Social Media</option>
+                    <option value="Industry Event" data-en="Industry Event / Exhibition" data-ko="업계 행사·전시회">Industry Event / Exhibition</option>
+                    <option value="Referral" data-en="Referral / Word of Mouth" data-ko="소개·입소문">Referral / Word of Mouth</option>
+                    <option value="Email" data-en="Email Invitation" data-ko="이메일 초대">Email Invitation</option>
+                    <option value="Other" data-en="Other" data-ko="기타">Other</option>
                 </select>
             </div>
 
             <div class="vendor-terms-box" style="margin-top:28px;padding:18px 20px;background:#faf9f7;border:1px solid #e5e0d8;border-radius:6px;">
                 <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.85rem;line-height:1.6;color:#332e27;">
                     <input type="checkbox" id="agreeVendorTerms" required style="margin-top:3px;width:16px;height:16px;flex-shrink:0;cursor:pointer;">
+                    <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
                     <span data-en="I have read and agree to Article 9 (Brand Partner's Technical Data, Warranty and Indemnification) of the Terms of Service — covering CAD/BIM/catalog data I submit, the license I grant ARCHINODE to share it with verified Korean professionals, and my responsibility for its accuracy and third-party rights." data-ko="서비스 약관 제9조(브랜드 파트너의 기술자료 제공 및 보증·면책)를 읽고 동의합니다 — 제가 제출하는 CAD/BIM/카탈로그 자료, ARCHINODE가 이를 인증된 한국 전문가에게 제공할 수 있는 라이선스, 그리고 자료의 정확성 및 제3자 권리에 대한 제 책임을 포함합니다.">I have read and agree to Article 9 (Brand Partner's Technical Data, Warranty and Indemnification) of the Terms of Service — covering CAD/BIM/catalog data I submit, the license I grant ARCHINODE to share it with verified Korean professionals, and my responsibility for its accuracy and third-party rights.</span>
                 </label>
                 <details style="margin-top:10px;margin-left:26px;">

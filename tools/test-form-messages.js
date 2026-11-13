@@ -102,5 +102,80 @@ ok('5초 안내가 맨 en 으로 떨어지지 않는다', !/var lang = 'en';/.te
      missing.slice(0, 5).join(', '));
 })();
 
+// ── 5) A-520 — 필수인데 그렇게 안 보이던 칸 ───────────────────────────
+/* 자문 신청은 필수 7칸인데 표시는 6개, 입점 신청은 6칸인데 5개였다.
+   빠진 둘은 **동의 체크박스**다 — 눌러야 보내지는데 눌러야 하는 줄 모른다. */
+{
+  const pairs = [
+    ['request-consultation.html', 'agreeContact'],
+    ['list-your-brand.html', 'agreeVendorTerms'],
+  ];
+  for (const [f, id] of pairs) {
+    const t = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const i = t.indexOf('id="' + id + '"');
+    ok(f + ' 에 ' + id + ' 가 있다', i >= 0);
+    const near = t.slice(i, i + 400);
+    ok(id + ' 에 필수 표시가 붙었다', /class="req-mark"/.test(near), near.slice(0, 80));
+    ok(id + ' 의 필수 표시가 두 언어다',
+       /data-en="\(required\)"/.test(near) && /data-ko="\(필수\)"/.test(near));
+  }
+  const css = fs.readFileSync(path.join(ROOT, 'style.css'), 'utf8');
+  ok('필수 표시 처방이 style.css 에 있다', /\.req-mark\s*\{/.test(css));
+}
+
+// ── 6) A-520 — 한국어 화면에 영어로 굳어 있던 고르기 칸 ────────────────
+/* 나라 이름 106개는 **일부러 둔다** — 가입 폼의 나라 목록은 영문 표기가
+   국제 관례이고, 106개를 옮겨 적는 것은 번역이 아니라 창작에 가깝다.
+   우리가 쓴 UI 글자(「선택」·「국가 선택」·유입 경로)만 본다. */
+{
+  const CHECK = [
+    ['list-your-brand.html', 'Select country', '국가 선택'],
+    ['list-your-brand.html', 'Search Engine (Google, Naver)', '검색엔진 (구글·네이버)'],
+    ['list-your-brand.html', 'Referral / Word of Mouth', '소개·입소문'],
+    ['request-consultation.html', '— Select —', '— 선택 —'],
+  ];
+  for (const [f, en, ko] of CHECK) {
+    const t = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    ok(f + ' 「' + en.slice(0, 18) + '」 에 한국어가 붙었다',
+       t.includes('data-ko="' + ko + '"'), '없음');
+  }
+  const lyb = fs.readFileSync(path.join(ROOT, 'list-your-brand.html'), 'utf8');
+  ok('카테고리 묶음 이름표가 두 언어다', /data-ko-aria-label="카테고리"/.test(lyb));
+  const refl = lyb.slice(lyb.indexOf('<select id="referral">'), lyb.indexOf('</select>', lyb.indexOf('<select id="referral">')));
+  const opts = (refl.match(/<option/g) || []).length;
+  const koed = (refl.match(/data-ko="/g) || []).length;
+  ok('유입 경로 7칸 전부 두 언어다', opts === 7 && koed === 7, opts + '칸 중 ' + koed + '칸');
+}
+
+// ── 7) A-520 — 글자 수가 말 없이 잘리지 않는가 ─────────────────────────
+{
+  const code = SRC.replace(/\/\*[\s\S]*?\*\//g, '');
+  ok('한도 가까워지면 세어 보여 준다', /function fmPaint/.test(code));
+  ok('붙여넣기로 잘리면 그 자리에서 말한다', /addEventListener\('paste'/.test(code));
+  ok('잘린 글자 수를 센다', /\(before - sel \+ add\) - max/.test(code));
+  ok('읽어 주는 도구에 바뀜을 알린다', /aria-live/.test(code));
+  ok('숫자를 그 칸과 묶어 읽게 한다', /aria-describedby/.test(code));
+  ok('언어가 바뀌면 숫자도 그 언어로', /\[maxlength\]/.test(code));
+  const css2 = fs.readFileSync(path.join(ROOT, 'style.css'), 'utf8');
+  ok('글자 수 안내 처방이 있다', /\.fm-count\s*\{/.test(css2));
+
+  /* 말 고르는 함수만 떼어 내 돌린다 */
+  const grab2 = (sig, end) => { const i = SRC.indexOf(sig); const j = SRC.indexOf(end, i) + end.length; return SRC.slice(i, j); };
+  /* 'use strict' 안의 eval 은 **제 스코프**에 함수를 만든다 — 바깥에서 그냥 못 부른다.
+     끝에 한 줄을 붙여 밖으로 꺼낸다(디지털 상품 시험에서 쓴 것과 같은 수). */
+  /* fmMsg 는 fmLang 을 부르고, fmLang 은 archiFormLang 을 부른다 — 셋을 함께 꺼내고
+     맨 밑의 언어 판정만 시험이 갈아 끼운다. */
+  globalThis.archiFormLang = () => 'ko';
+  eval(grab2('function fmLang', '}') + '\n' + grab2('function fmMsg', '\n  }')
+       + '\n;globalThis.__fm2 = { fmMsg };');
+  const { fmMsg } = globalThis.__fm2;
+  const el = (len, max) => ({ value: 'x'.repeat(len), getAttribute: () => String(max) });
+  ok('한국어로 남은 수를 센다', /\/ 100자$/.test(fmMsg(el(90, 100))), fmMsg(el(90, 100)));
+  ok('꽉 차면 꽉 찼다고 말한다', /꽉 찼습니다/.test(fmMsg(el(100, 100))), fmMsg(el(100, 100)));
+  globalThis.archiFormLang = () => 'en';
+  ok('영어로도 센다', fmMsg(el(90, 100)) === '90 / 100', fmMsg(el(90, 100)));
+  ok('영어로 꽉 참을 말한다', /Limit reached/.test(fmMsg(el(100, 100))), fmMsg(el(100, 100)));
+}
+
 console.log('\n폼 경고 말 — 시험 ' + (pass + fail) + '개, 실패 ' + fail + '개');
 process.exit(fail ? 1 : 0);
