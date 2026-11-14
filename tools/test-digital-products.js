@@ -193,11 +193,16 @@ ok('분쟁 처리에 외부 조정 창구를 적는다', /1372/.test(SRC) && /�
 
 /* 구매창 — 지급 시기 · 기술적 사항 · 약관 링크 */
 ok('구매창이 지급 시기를 말한다', /분할·후불 결제는 없습니다/.test(DP_BUY));
-ok('구매창이 여는 데 필요한 것을 보여 준다', /p\.requires/.test(DP_BUY));
+ok('구매창이 여는 데 필요한 것을 보여 준다', /dpPick\(p\.requiresEn, p\.requiresKo\)/.test(DP_BUY));
 ok('구매창에 약관 링크가 있다', /href="terms\.html"/.test(DP_BUY));
 ok('동의 문구가 어느 조항인지 가리킨다', /제10조·제11조/.test(DP_BUY));
 ok('영문 동의 문구도 조항을 가리킨다', /Articles 10-11 of our Terms/.test(DP_BUY));
-ok('상품 틀에 기술적 사항 칸이 있다', /requires:/.test(SRC));
+ok('상품 틀에 기술적 사항 칸이 있다', /requiresKo:/.test(SRC));
+/* A-524: 처음에는 `requires` 한 칸이었다. 영어로 보는 손님에게 한국어가 그대로 나왔다. */
+ok('기술적 사항도 두 언어다(A-524)',
+   /requiresEn:/.test(SRC) && /requiresKo:/.test(SRC));
+ok('한 언어짜리 requires 칸이 남아 있지 않다(A-524)',
+   !/[^a-zA-Z]requires\s*:/.test(SRC.replace(/requiresEn\s*:/g,'').replace(/requiresKo\s*:/g,'')));
 /* 조항이 들어갔으니 「아직 없습니다」 주석이 남아 있으면 안 된다 */
 ok('약관에 조항이 없다는 묵은 주석이 사라졌다',
    !/terms\.html` 에는 아직 청약철회·환불 조항이/.test(SRC));

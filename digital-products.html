@@ -665,7 +665,10 @@ function toggleMobile() { const n = document.getElementById('mainNav'); if (n) n
      descKo:    '한 문단. 무엇이고 누구를 위한 자료인지.',
      format:    'PDF · 24p',                 // 형식·분량. 화면에 그대로 나옵니다
      previewUrl:'/previews/market-2026-q1.pdf', // ★ 필수. 없으면 구매 단추가 안 생깁니다
-     requires:  'PDF 뷰어면 됩니다',          // 여는 데 필요한 것. CAD·BIM 은 프로그램·최소 버전을 적으세요
+                                             //   맛보기는 previews/ 에 둡니다.
+                                             //   어떤 꼴인지는 previews/sample-preview.pdf 참고
+     requiresEn:'Any PDF reader',             // 여는 데 필요한 것 — 다른 칸처럼 **두 언어**로 적으세요
+     requiresKo:'PDF 뷰어면 됩니다',          //   CAD·BIM 은 프로그램 이름과 최소 버전을 적습니다
                                              //   (전자상거래법 제13조제2항의 「기술적 사항」)
      paypalUrl: 'https://www.paypal.com/ncp/payment/XXXXXXXX' }
 
@@ -805,8 +808,11 @@ function dpOpenBuy(id) {
     +   '<p style="margin:8px 0 0;" data-en="You pay now, in full, on PayPal. There is no instalment or deferred payment."'
     +     ' data-ko="대금은 지금 PayPal 에서 전액 결제됩니다. 분할·후불 결제는 없습니다.">'
     +     dpEsc(dpPick('You pay now, in full, on PayPal. There is no instalment or deferred payment.', '대금은 지금 PayPal 에서 전액 결제됩니다. 분할·후불 결제는 없습니다.')) + '</p>'
-    +   (p.requires
-          ? '<p style="margin:8px 0 0;"><strong>' + dpEsc(dpPick('To open it: ', '여는 데 필요한 것: ')) + '</strong>' + dpEsc(p.requires) + '</p>'
+    /* A-524: 처음에는 `requires` 한 칸이었다 — 영어로 보는 손님에게 한국어가 그대로
+       나왔다(라이브에서 13자 측정). 이름·설명이 두 언어인데 이 칸만 아니었다. */
+    +   (dpPick(p.requiresEn, p.requiresKo)
+          ? '<p style="margin:8px 0 0;"><strong>' + dpEsc(dpPick('To open it: ', '여는 데 필요한 것: ')) + '</strong>'
+            + dpEsc(dpPick(p.requiresEn, p.requiresKo)) + '</p>'
           : '')
     + '</div>'
     /* 결제로 넘어가기 전에 **파는 사람이 누구인지** 한 번 더 보여 준다.
