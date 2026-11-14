@@ -55,7 +55,7 @@ const { dpEsc, dpPayUrl, dpPreviewUrl, dpPick, dpRenderProducts, DP_PRODUCTS } =
 // ── 1) 결제 주소 검사 ──────────────────────────────────────────────────
 [['https://www.paypal.com/ncp/payment/ABC', true],
  ['https://paypal.com/ncp/payment/ABC', true],
- ['https://paypal.me/archinode/29', true],
+ ['https://paypal.me/archinode/29', false],    // A-527: 안내가 paypal.com 이라 적는다
  ['http://www.paypal.com/ncp/payment/ABC', false],   // https 아님
  ['https://evil.example/paypal.com/x', false],       // 호스트가 다르다
  ['https://paypal.com.evil.example/x', false],
@@ -129,6 +129,30 @@ ok('동의 전에는 결제 단추가 잠겨 있다', /id="dpGo"[^>]*disabled/.t
 ok('기본 confirm/alert 을 쓰지 않는다',
    !/(?<![\w.])(confirm|alert)\s*\(/.test(SRC.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')));
 ok('복귀 페이지가 있다', fs.existsSync(path.join(ROOT, 'order-complete.html')));
+
+/* A-528 — 맛보기 주소는 **모양**만 보고 받아 왔다. 파일이 실제로 응답하는지는
+   아무도 보지 않았다. 그러면 「사기 전에 맛보기 열어 보기」가 404 를 띄우는데
+   그 옆의 구매 단추는 멀쩡히 살아 있다. 전자상거래법 제17조제2항제5호가
+   말하는 「시험 사용 상품 등의 제공」이 실제로는 빠진 채 파는 셈이라,
+   적어 둔 청약철회 제한이 서지 않는다(A-522 가 세운 전제가 무너진다).
+   브라우저에서는 미리 확인할 수 없으니 **올리기 전에 여기서** 본다. */
+const PRODUCTS_SRC = grab('var DP_PRODUCTS = [', '];')
+  .replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+const previewPaths = [];
+PRODUCTS_SRC.replace(/previewUrl\s*:\s*'([^']*)'/g, (m, u) => { previewPaths.push(u); return m; });
+let localPreviews = 0;
+previewPaths.forEach(u => {
+  if (!/^\//.test(u)) return;                 // 밖에 있는 주소는 여기서 못 본다
+  localPreviews++;
+  ok('맛보기 파일이 실제로 있다: ' + u,
+     fs.existsSync(path.join(ROOT, u.replace(/^\//, '').split('?')[0])),
+     '저장소에 없다 — 올리면 손님이 404 를 본다');
+});
+ok('맛보기 주소를 세는 자리가 살아 있다(허수 방지)',
+   previewPaths.length === 0 || localPreviews > 0 || previewPaths.every(u => !/^\//.test(u)));
+/* 예시 파일은 늘 있어야 한다 — 상품 틀 주석이 이것을 가리킨다 */
+ok('맛보기 예시 파일이 있다(A-524)',
+   fs.existsSync(path.join(ROOT, 'previews', 'sample-preview.pdf')));
 const OC = fs.readFileSync(path.join(ROOT, 'order-complete.html'), 'utf8');
 ok('복귀 페이지는 검색에서 뺀다(noindex)', /noindex/.test(OC));
 /* 주석은 빼고 본다 — 「이렇게 쓰지 마라」고 적어 둔 주석에 시험이 걸린다(A-492 때와 같은 함정) */

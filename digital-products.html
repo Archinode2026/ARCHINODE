@@ -595,7 +595,13 @@
         </ul>
       </div>
     </div>
-    <div class="footer-business-info" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;margin-top:40px;margin-bottom:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
+    <div class="footer-business-info"
+      data-en-html='Business name: VIVIDELIVIBE (ARCHINODE) &nbsp;|&nbsp; CEO: Seungri Park &nbsp;|&nbsp; Business Registration No.: 640-03-02879<br>
+      Mail-Order Business Report No.: 2026-Anyang Dongan-0318 (Anyang-si Dongan-gu Office) &nbsp;|&nbsp; Phone: +82 70 8602 1319<br>
+      Address: 528 Heungan-daero, Dongan-gu, Anyang-si, Gyeonggi-do, 7F Unit 702-Ra58 &nbsp;|&nbsp; Email: office@archinode.org'
+      data-ko-html='상호: 비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
+      통신판매업신고번호: 제2026-안양동안-0318호 (신고기관: 안양시 동안구청) &nbsp;|&nbsp; 전화: 070-8602-1319<br>
+      주소: 경기도 안양시 동안구 흥안대로 528, 제7층 702-라58호(관양동, 타워 빌딩) &nbsp;|&nbsp; 이메일: office@archinode.org' style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;margin-top:40px;margin-bottom:20px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.8;">
       상호: 비비들리바이브 (VIVIDELIVIBE) &nbsp;|&nbsp; 대표: 박승리 &nbsp;|&nbsp; 사업자등록번호: 640-03-02879<br>
       통신판매업신고번호: 제2026-안양동안-0318호 (신고기관: 안양시 동안구청) &nbsp;|&nbsp; 전화: 070-8602-1319<br>
       주소: 경기도 안양시 동안구 흥안대로 528, 제7층 702-라58호(관양동, 타워 빌딩) &nbsp;|&nbsp; 이메일: office@archinode.org
@@ -705,10 +711,14 @@ function dpEsc(t) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 /* PayPal 주소만 받는다. 오타·다른 주소면 **버튼을 안 만든다** — 엉뚱한 곳으로
-   손님을 보내느니 버튼이 없는 편이 낫다. */
+   손님을 보내느니 버튼이 없는 편이 낫다.
+   A-527: paypal.me 를 받고 있었다. 그런데 구매창은 손님에게 「주소창이
+   paypal.com 인지 확인하세요」라고 적는다. 둘이 어긋나면, 가르친 확인 습관이
+   바로 그 자리에서 무너진다. 물건을 파는 길목이므로 상거래용 결제만 받는다.
+   paypal.me 를 쓰시려면 여기와 아래 안내 문구를 **함께** 고쳐야 한다. */
 function dpPayUrl(u) {
   u = String(u || '');
-  return /^https:\/\/(www\.)?(paypal\.com|paypal\.me)\//i.test(u) ? u : '';
+  return /^https:\/\/(www\.)?paypal\.com\//i.test(u) ? u : '';
 }
 /* 미리보기(시험 사용 수단) 주소. 우리가 책임지는 곳만 받는다 — 남의 주소를
    미리보기라고 걸어 두면 그 내용이 바뀌어도 우리는 모른다. */
