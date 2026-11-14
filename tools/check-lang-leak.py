@@ -17,8 +17,19 @@
 
 무엇을 보는가
 -------------
-공개 페이지의 **눈에 보이는 글** 중 한글이 든 것이, 언어를 바꿀 길을 가지고
-있는지 본다. 다음 중 하나면 덮인 것으로 친다.
+둘을 본다.
+
+(가) 공개 페이지의 **눈에 보이는 글** 중 한글이 든 것이, 언어를 바꿀 길을 가지고
+있는지.
+
+(나) 손님에게 **읽히는 속성** — aria-label·title·placeholder — 이 한 언어로만
+박혀 있지 않은지. 2026-11-14 에 세어 보니 aria-label 806개가 영어뿐이었다.
+눈으로 보면 「가구」인데 화면 낭독기는 "Furniture" 라고 읽던 자리다. 언어 규약
+검사는 **짝이 한쪽만** 있을 때만 보므로(data-en-aria-label 만 있고 ko 가 없는
+경우), data-* 가 **아예 없는** 평범한 속성은 아무도 보지 않았다. 글에서 겪은
+것과 똑같은 틈이 속성에도 있었다.
+
+(가)에서는 다음 중 하나면 덮인 것으로 친다. 다음 중 하나면 덮인 것으로 친다.
   · 자기나 조상에 data-ko / data-ko-html 이 있다 (lang.js 가 다시 칠한다)
   · data-lang-only 가 붙어 있다 (그 언어에서만 보인다)
   · 내비 드롭다운 안이다 (영문 이름과 한글 이름을 **함께** 보여 주는 자리)
@@ -133,6 +144,15 @@ class Scan(HTMLParser):
                           self.stack[-1][0] if self.stack else '?', t))
 
 
+# 손님에게 읽히는 속성. alt 는 뺀다 — 빈 alt 가 맞는 자리가 많고(링크 안에
+# 제목 글자가 이미 있을 때), 매거진 기사의 한국어 alt 는 한국어가 맞다.
+# 그 둘은 사람이 보고 판단할 일이지 기계가 셀 일이 아니다.
+SPOKEN_ATTRS = ('aria-label', 'title', 'placeholder')
+
+# 번역할 것이 없는 값 — 예시 주소·이메일처럼 언어가 없는 글자
+ATTR_OK = re.compile(r'^(https?://|[\w.+-]+@|\+?[\d\s()-]+$|[\s\W\d]*$)')
+
+
 def strip_comments(s):
     """주석을 **줄 수를 지키며** 지운다. 그냥 지우면 줄 번호가 밀려 검사가
     엉뚱한 자리를 가리킨다(A-531 과 같은 부류의 실수)."""
@@ -153,6 +173,29 @@ def pages():
             yield rel, os.path.join(dp, f)
 
 
+def spoken_attr_leaks(raw):
+    """(나) 한 언어로만 박힌 속성을 찾는다. data-en-<속성> 과 data-ko-<속성> 이
+    **둘 다** 있으면 덮인 것이다."""
+    out = []
+    body = strip_comments(raw)
+    body = re.sub(r'<script\b.*?</script>', lambda m: '\n' * m.group(0).count('\n'),
+                  body, flags=re.S)
+    for m in re.finditer(r'<[a-zA-Z][^>]*>', body):
+        t = m.group(0)
+        for a in SPOKEN_ATTRS:
+            am = re.search(r'(?<![-\w])%s="([^"]*)"' % a, t)
+            if not am:
+                continue
+            v = am.group(1).strip()
+            if not v or ATTR_OK.match(v):
+                continue
+            if ('data-en-%s=' % a) in t and ('data-ko-%s=' % a) in t:
+                continue
+            line = body[:m.start()].count('\n') + 1
+            out.append((line, a, v))
+    return out
+
+
 def main() -> int:
     bad = []
     seen = 0
@@ -161,9 +204,13 @@ def main() -> int:
 
     for rel, path in pages():
         seen += 1
+        raw = open(path, encoding='utf-8').read()
+        for line, a, v in spoken_attr_leaks(raw):
+            bad.append((rel, line, '%s="%s" 가 한 언어뿐이다 — 낭독기가 그대로 읽는다'
+                        % (a, v[:34])))
         p = Scan()
         try:
-            p.feed(strip_comments(open(path, encoding='utf-8').read()))
+            p.feed(strip_comments(raw))
         except Exception as e:
             bad.append((rel, 0, '읽지 못했다: %s' % e))
             continue
@@ -199,10 +246,12 @@ def main() -> int:
         print()
         print('  영어로 보는 손님에게는 이 글이 읽히지 않는다.')
         print('  data-en/data-ko 를 달거나, 그 언어에서만 보일 자리면 data-lang-only 를 달아라.')
+        print('  속성이면 data-en-<속성> 과 data-ko-<속성> 을 **둘 다** 달아라.')
         print('  번역하면 안 되는 말이면 tools/check-lang-leak.py 의 EXCEPT 에 **이유와 함께** 적어라.')
         return 1
 
-    print('한국어가 새는 자리 — 페이지 %d개, 예외 %d건. 어긋남 없음' % (seen, len(EXCEPT)))
+    print('한국어가 새는 자리 — 페이지 %d개(글과 속성), 예외 %d건. 어긋남 없음'
+          % (seen, len(EXCEPT)))
     return 0
 
 

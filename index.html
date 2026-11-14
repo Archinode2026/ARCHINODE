@@ -830,10 +830,10 @@ input, select, textarea { font-family: inherit; }
     </nav>
     <div class="header-actions">
       <a href="auth/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
-      <button class="search-toggle" onclick="toggleSearch()" aria-label="Search"><i class="fas fa-search"></i></button>
-      <a href="auth/profile.html" aria-label="Saved"><i class="far fa-bookmark"></i></a>
+      <button class="search-toggle" onclick="toggleSearch()" aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-search"></i></button>
+      <a href="auth/profile.html" aria-label="Saved" data-en-aria-label="Saved" data-ko-aria-label="저장 목록"><i class="far fa-bookmark"></i></a>
       <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
-      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu" data-en-aria-label="Menu" data-ko-aria-label="메뉴"><i class="fas fa-bars"></i></button>
     </div>
   </div>
 </header>
@@ -868,9 +868,9 @@ input, select, textarea { font-family: inherit; }
     </div>
   </div>
   <div class="hero-dots">
-    <button type="button" class="hero-dot active" onclick="goSlide(0)" aria-label="Slide 1"></button>
-    <button type="button" class="hero-dot" onclick="goSlide(1)" aria-label="Slide 2"></button>
-    <button type="button" class="hero-dot" onclick="goSlide(2)" aria-label="Slide 3"></button>
+    <button type="button" class="hero-dot active" onclick="goSlide(0)" aria-label="Slide 1" data-en-aria-label="Slide 1" data-ko-aria-label="슬라이드 1"></button>
+    <button type="button" class="hero-dot" onclick="goSlide(1)" aria-label="Slide 2" data-en-aria-label="Slide 2" data-ko-aria-label="슬라이드 2"></button>
+    <button type="button" class="hero-dot" onclick="goSlide(2)" aria-label="Slide 3" data-en-aria-label="Slide 3" data-ko-aria-label="슬라이드 3"></button>
     <button type="button" class="hero-pause-btn" id="heroPauseBtn" onclick="toggleHeroPause()" aria-label="Pause slideshow" data-en-aria-label="Pause slideshow" data-ko-aria-label="슬라이드 일시정지"><i class="fas fa-pause"></i></button>
   </div>
 </section>
@@ -880,7 +880,7 @@ input, select, textarea { font-family: inherit; }
   <div class="container">
     <div class="cat-rail">
       <button type="button" class="cat-rail-btn" data-dir="-1" aria-label="이전 카테고리" data-en-aria-label="Previous categories" data-ko-aria-label="이전 카테고리"><i class="fas fa-chevron-left"></i></button>
-      <nav class="cat-circles" aria-label="Categories">
+      <nav class="cat-circles" aria-label="Categories" data-en-aria-label="Categories" data-ko-aria-label="카테고리">
       <a href="categories/furniture.html" class="cat-circle fade-in">
         <span class="cat-circle-img"><img loading="lazy" src="assets/photos/photo-1555041469-a586c61ea9bc-240.jpg" alt=""></span>
         <span class="cat-circle-label" data-en="Furniture" data-ko="가구">Furniture</span>
@@ -1034,64 +1034,64 @@ input, select, textarea { font-family: inherit; }
   <!-- 실제 제품이 등록되면 이 타일들을 제품 카드로 교체한다.
        지금은 사진만 둔다 — 없는 브랜드·제품명을 지어넣지 않기 위해서. -->
   <div class="cat-grid">
-    <a href="categories/furniture.html" class="cat-card fade-in" aria-label="Furniture">
+    <a href="categories/furniture.html" class="cat-card fade-in" aria-label="Furniture" data-en-aria-label="Furniture" data-ko-aria-label="가구">
       <img loading="lazy" src="assets/photos/photo-1586023492125-27b2c045efd7-600.jpg" alt="">
     </a>
-    <a href="categories/bathroom.html" class="cat-card fade-in" aria-label="Bathroom">
+    <a href="categories/bathroom.html" class="cat-card fade-in" aria-label="Bathroom" data-en-aria-label="Bathroom" data-ko-aria-label="욕실">
       <img loading="lazy" src="assets/photos/photo-1567538096630-e0c55bd6374c-600.jpg" alt="">
     </a>
-    <a href="categories/outdoor.html" class="cat-card fade-in" aria-label="Outdoor">
+    <a href="categories/outdoor.html" class="cat-card fade-in" aria-label="Outdoor" data-en-aria-label="Outdoor" data-ko-aria-label="아웃도어">
       <img loading="lazy" src="assets/photos/photo-1540932239986-30128078f3c5-600.jpg" alt="">
     </a>
-    <a href="categories/lighting.html" class="cat-card fade-in" aria-label="Lighting">
+    <a href="categories/lighting.html" class="cat-card fade-in" aria-label="Lighting" data-en-aria-label="Lighting" data-ko-aria-label="조명">
       <img loading="lazy" src="assets/photos/photo-1532372320572-cda25653a26d-600.jpg" alt="">
     </a>
-    <a href="categories/kitchen.html" class="cat-card fade-in" aria-label="Kitchen">
+    <a href="categories/kitchen.html" class="cat-card fade-in" aria-label="Kitchen" data-en-aria-label="Kitchen" data-ko-aria-label="주방">
       <img loading="lazy" src="assets/photos/photo-1524758631624-e2822e304c36-600.jpg" alt="">
     </a>
-    <a href="categories/office.html" class="cat-card fade-in" aria-label="Office">
+    <a href="categories/office.html" class="cat-card fade-in" aria-label="Office" data-en-aria-label="Office" data-ko-aria-label="오피스">
       <img loading="lazy" src="assets/photos/photo-1565538810643-b5bdb714032a-600.jpg" alt="">
     </a>
-    <a href="categories/finishes.html" class="cat-card fade-in" aria-label="Finishes">
+    <a href="categories/finishes.html" class="cat-card fade-in" aria-label="Finishes" data-en-aria-label="Finishes" data-ko-aria-label="마감재">
       <img loading="lazy" src="assets/photos/photo-1584622650111-993a426fbf0a-600.jpg" alt="">
     </a>
-    <a href="categories/wellness.html" class="cat-card fade-in" aria-label="Wellness">
+    <a href="categories/wellness.html" class="cat-card fade-in" aria-label="Wellness" data-en-aria-label="Wellness" data-ko-aria-label="웰니스">
       <img loading="lazy" src="assets/photos/photo-1581539250439-c96689b516dd-600.jpg" alt="">
     </a>
-    <a href="categories/decor.html" class="cat-card fade-in" aria-label="Decor">
+    <a href="categories/decor.html" class="cat-card fade-in" aria-label="Decor" data-en-aria-label="Decor" data-ko-aria-label="데코">
       <img loading="lazy" src="assets/photos/photo-1534430480872-3498386e7856-600.jpg" alt="">
     </a>
-    <a href="categories/construction.html" class="cat-card fade-in" aria-label="Construction">
+    <a href="categories/construction.html" class="cat-card fade-in" aria-label="Construction" data-en-aria-label="Construction" data-ko-aria-label="건축자재">
       <img loading="lazy" src="assets/photos/photo-1538485399081-7191377e8241-600.jpg" alt="">
     </a>
-    <a href="categories/furniture.html" class="cat-card fade-in" aria-label="Furniture">
+    <a href="categories/furniture.html" class="cat-card fade-in" aria-label="Furniture" data-en-aria-label="Furniture" data-ko-aria-label="가구">
       <img loading="lazy" src="assets/photos/photo-1505693416388-ac5ce068fe85-600.jpg" alt="">
     </a>
-    <a href="categories/bathroom.html" class="cat-card fade-in" aria-label="Bathroom">
+    <a href="categories/bathroom.html" class="cat-card fade-in" aria-label="Bathroom" data-en-aria-label="Bathroom" data-ko-aria-label="욕실">
       <img loading="lazy" src="assets/photos/photo-1571902943202-507ec2618e8f-600.jpg" alt="">
     </a>
-    <a href="categories/outdoor.html" class="cat-card fade-in" aria-label="Outdoor">
+    <a href="categories/outdoor.html" class="cat-card fade-in" aria-label="Outdoor" data-en-aria-label="Outdoor" data-ko-aria-label="아웃도어">
       <img loading="lazy" src="assets/photos/photo-1586105251261-72a756497a11-600.jpg" alt="">
     </a>
-    <a href="categories/lighting.html" class="cat-card fade-in" aria-label="Lighting">
+    <a href="categories/lighting.html" class="cat-card fade-in" aria-label="Lighting" data-en-aria-label="Lighting" data-ko-aria-label="조명">
       <img loading="lazy" src="assets/photos/photo-1591405351990-4726e331f141-600.jpg" alt="">
     </a>
-    <a href="categories/kitchen.html" class="cat-card fade-in" aria-label="Kitchen">
+    <a href="categories/kitchen.html" class="cat-card fade-in" aria-label="Kitchen" data-en-aria-label="Kitchen" data-ko-aria-label="주방">
       <img loading="lazy" src="assets/photos/photo-1593062096033-9a26b09da705-600.jpg" alt="">
     </a>
-    <a href="categories/office.html" class="cat-card fade-in" aria-label="Office">
+    <a href="categories/office.html" class="cat-card fade-in" aria-label="Office" data-en-aria-label="Office" data-ko-aria-label="오피스">
       <img loading="lazy" src="assets/photos/photo-1616594039964-ae9021a400a0-600.jpg" alt="">
     </a>
-    <a href="categories/finishes.html" class="cat-card fade-in" aria-label="Finishes">
+    <a href="categories/finishes.html" class="cat-card fade-in" aria-label="Finishes" data-en-aria-label="Finishes" data-ko-aria-label="마감재">
       <img loading="lazy" src="assets/photos/photo-1604014237800-1c9102c219da-600.jpg" alt="">
     </a>
-    <a href="categories/wellness.html" class="cat-card fade-in" aria-label="Wellness">
+    <a href="categories/wellness.html" class="cat-card fade-in" aria-label="Wellness" data-en-aria-label="Wellness" data-ko-aria-label="웰니스">
       <img loading="lazy" src="assets/photos/photo-1620626011761-996317b8d101-600.jpg" alt="">
     </a>
-    <a href="categories/decor.html" class="cat-card fade-in" aria-label="Decor">
+    <a href="categories/decor.html" class="cat-card fade-in" aria-label="Decor" data-en-aria-label="Decor" data-ko-aria-label="데코">
       <img loading="lazy" src="assets/photos/photo-1605276373954-0c4a0dac5b12-600.jpg" alt="">
     </a>
-    <a href="categories/construction.html" class="cat-card fade-in" aria-label="Construction">
+    <a href="categories/construction.html" class="cat-card fade-in" aria-label="Construction" data-en-aria-label="Construction" data-ko-aria-label="건축자재">
       <img loading="lazy" src="assets/photos/photo-1611273426858-450d8e3c9fce-600.jpg" alt="">
     </a>
   </div>
@@ -1382,7 +1382,7 @@ input, select, textarea { font-family: inherit; }
 </script>
 
 <!-- SCROLL TO TOP -->
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Top">
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>
 </button>
 
