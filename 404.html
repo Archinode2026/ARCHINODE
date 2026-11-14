@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <link rel="canonical" href="https://archinodekr.com/404.html">
-<base href="/">
+<!-- A-550(브론즈 39차): 여기 `<base href="/">` 가 있었다. 어느 깊이에서 404 가
+     떠도 링크가 살게 하려는 장치였는데, 같은 규칙이 `#main` 까지 `/` + `#main`
+     으로 바꿔 버렸다. 404 쪽이 실제로 뜨는 주소는 `/404.html` 이 아니라 손님이
+     잘못 들어온 그 주소라서, **거의 모든 경우에 「본문으로 건너뛰기」가 홈으로
+     나갔다** — 키보드·낭독기 손님이 404 안내문을 못 읽고 자리를 잃었다.
+     링크를 전부 뿌리 기준(`/...`)으로 적어 `<base>` 없이도 같은 효과를 낸다. -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Page Not Found — 404 | ARCHINODE</title>
 <meta name="description" content="The page you're looking for doesn't exist.">
@@ -15,54 +20,54 @@
 <meta property="og:image:alt" content="ARCHINODE — Bridging Architecture">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/vendor/fontawesome-6.5.1/css/all.min.css">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/assets/vendor/fontawesome-6.5.1/css/all.min.css">
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <a class="skip-link" href="#main" data-en="Skip to content" data-ko="본문으로 건너뛰기">Skip to content</a>
 <!-- ANNOUNCEMENT BAR -->
 <div class="announcement-bar" data-lang-only="en">
-  <span data-en="Brand Listing —">Brand Listing —</span> <strong data-en="First 3 Months Free">First 3 Months Free</strong> &nbsp;|&nbsp; <span data-en="List your brand and start reaching Korean specifiers.">List your brand and start reaching Korean specifiers.</span> <a href="for-brands.html"><span data-en="Learn more →">Learn more &rarr;</span></a>
+  <span data-en="Brand Listing —">Brand Listing —</span> <strong data-en="First 3 Months Free">First 3 Months Free</strong> &nbsp;|&nbsp; <span data-en="List your brand and start reaching Korean specifiers.">List your brand and start reaching Korean specifiers.</span> <a href="/for-brands.html"><span data-en="Learn more →">Learn more &rarr;</span></a>
 </div>
 <!-- HEADER -->
 <header class="header" id="header">
   <div class="container">
-    <a href="index.html" class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">건축을 잇다</span></a>
+    <a href="/index.html" class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">건축을 잇다</span></a>
     <nav class="main-nav" id="mainNav">
       <div class="nav-dropdown">
         <button class="nav-dropdown-trigger" onclick="toggleCatMenu()" data-en="Categories" data-ko="카테고리">Categories <i class="fas fa-chevron-down"></i></button>
         <div class="nav-dropdown-menu" id="catMenu">
-            <a href="categories/furniture.html"><span>Furniture</span><small>가구</small></a>
-            <a href="categories/bathroom.html"><span>Bathroom</span><small>욕실</small></a>
-            <a href="categories/outdoor.html"><span>Outdoor</span><small>아웃도어</small></a>
-            <a href="categories/lighting.html"><span>Lighting</span><small>조명</small></a>
-            <a href="categories/kitchen.html"><span>Kitchen</span><small>주방</small></a>
-            <a href="categories/office.html"><span>Office</span><small>오피스</small></a>
-            <a href="categories/finishes.html"><span>Finishes</span><small>마감재</small></a>
-            <a href="categories/wellness.html"><span>Wellness</span><small>웰니스</small></a>
-            <a href="categories/decor.html"><span>Decor</span><small>데코</small></a>
-            <a href="categories/construction.html"><span>Construction</span><small>건축자재</small></a>
+            <a href="/categories/furniture.html"><span>Furniture</span><small>가구</small></a>
+            <a href="/categories/bathroom.html"><span>Bathroom</span><small>욕실</small></a>
+            <a href="/categories/outdoor.html"><span>Outdoor</span><small>아웃도어</small></a>
+            <a href="/categories/lighting.html"><span>Lighting</span><small>조명</small></a>
+            <a href="/categories/kitchen.html"><span>Kitchen</span><small>주방</small></a>
+            <a href="/categories/office.html"><span>Office</span><small>오피스</small></a>
+            <a href="/categories/finishes.html"><span>Finishes</span><small>마감재</small></a>
+            <a href="/categories/wellness.html"><span>Wellness</span><small>웰니스</small></a>
+            <a href="/categories/decor.html"><span>Decor</span><small>데코</small></a>
+            <a href="/categories/construction.html"><span>Construction</span><small>건축자재</small></a>
         </div>
       </div>
-      <a href="brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
-      <a href="trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a>
-      <a href="magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a>
-      <a href="about.html" data-en="About" data-ko="소개">About</a>
-      <a href="for-brands.html" data-lang-only="en" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
-      <a href="sourcing-inquiry.html" class="nav-cta" data-lang-only="ko" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
-      <a href="list-your-brand.html" class="nav-cta" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+      <a href="/brands.html" data-en="Brands" data-ko="브랜드">Brands</a>
+      <a href="/trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a>
+      <a href="/magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a>
+      <a href="/about.html" data-en="About" data-ko="소개">About</a>
+      <a href="/for-brands.html" data-lang-only="en" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
+      <a href="/sourcing-inquiry.html" class="nav-cta" data-lang-only="ko" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
+      <a href="/list-your-brand.html" class="nav-cta" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
     </nav>
     <div class="header-actions">
-      <a href="auth/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
+      <a href="/auth/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
       <button class="search-toggle" onclick="toggleSearch()" aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-search"></i></button>
-      <a href="auth/profile.html" aria-label="Saved" data-en-aria-label="Saved" data-ko-aria-label="저장 목록"><i class="far fa-bookmark"></i></a>
+      <a href="/auth/profile.html" aria-label="Saved" data-en-aria-label="Saved" data-ko-aria-label="저장 목록"><i class="far fa-bookmark"></i></a>
       <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
       <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu" data-en-aria-label="Menu" data-ko-aria-label="메뉴"><i class="fas fa-bars"></i></button>
     </div>
@@ -85,9 +90,9 @@
     <h1 style="font-size:1.8rem;margin-bottom:12px;" data-en="Page Not Found" data-ko="페이지를 찾을 수 없습니다">Page Not Found</h1>
     <p style="color:#5d564c;margin-bottom:30px;max-width:400px;" data-en="Sorry, the page you're looking for doesn't exist or has been moved." data-ko="죄송합니다. 찾으신 페이지가 존재하지 않거나 이동되었습니다.">Sorry, the page you're looking for doesn't exist or has been moved.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <a href="index.html" style="padding:12px 28px;background:#332e27;color:#fff;border-radius:4px;font-size:0.9rem;" data-en="Go Home" data-ko="홈으로 돌아가기">Go Home</a>
-      <a href="brands.html" style="padding:12px 28px;background:#f4efe6;color:#332e27;border-radius:4px;font-size:0.9rem;" data-en="Browse Brands" data-ko="브랜드 둘러보기">Browse Brands</a>
-      <a href="contact.html" style="padding:12px 28px;background:#f4efe6;color:#332e27;border-radius:4px;font-size:0.9rem;" data-en="Contact Us" data-ko="문의하기">Contact Us</a>
+      <a href="/index.html" style="padding:12px 28px;background:#332e27;color:#fff;border-radius:4px;font-size:0.9rem;" data-en="Go Home" data-ko="홈으로 돌아가기">Go Home</a>
+      <a href="/brands.html" style="padding:12px 28px;background:#f4efe6;color:#332e27;border-radius:4px;font-size:0.9rem;" data-en="Browse Brands" data-ko="브랜드 둘러보기">Browse Brands</a>
+      <a href="/contact.html" style="padding:12px 28px;background:#f4efe6;color:#332e27;border-radius:4px;font-size:0.9rem;" data-en="Contact Us" data-ko="문의하기">Contact Us</a>
     </div>
   </div>
 </section>
@@ -107,37 +112,37 @@
       <div class="footer-col">
         <h2 class="footer-col-title" data-en="Categories" data-ko="카테고리">Categories</h2>
         <ul>
-          <li><a href="categories/furniture.html" data-en="Furniture" data-ko="가구">Furniture</a></li>
-          <li><a href="categories/bathroom.html" data-en="Bathroom" data-ko="욕실">Bathroom</a></li>
-          <li><a href="categories/outdoor.html" data-en="Outdoor" data-ko="아웃도어">Outdoor</a></li>
-          <li><a href="categories/lighting.html" data-en="Lighting" data-ko="조명">Lighting</a></li>
-          <li><a href="categories/kitchen.html" data-en="Kitchen" data-ko="주방">Kitchen</a></li>
+          <li><a href="/categories/furniture.html" data-en="Furniture" data-ko="가구">Furniture</a></li>
+          <li><a href="/categories/bathroom.html" data-en="Bathroom" data-ko="욕실">Bathroom</a></li>
+          <li><a href="/categories/outdoor.html" data-en="Outdoor" data-ko="아웃도어">Outdoor</a></li>
+          <li><a href="/categories/lighting.html" data-en="Lighting" data-ko="조명">Lighting</a></li>
+          <li><a href="/categories/kitchen.html" data-en="Kitchen" data-ko="주방">Kitchen</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h2 class="footer-col-title" data-en="More Categories" data-ko="더 많은 카테고리">More Categories</h2>
         <ul>
-          <li><a href="categories/office.html" data-en="Office" data-ko="오피스">Office</a></li>
-          <li><a href="categories/finishes.html" data-en="Finishes" data-ko="마감재">Finishes</a></li>
-          <li><a href="categories/wellness.html" data-en="Wellness" data-ko="웰니스">Wellness</a></li>
-          <li><a href="categories/decor.html" data-en="Decor" data-ko="데코">Decor</a></li>
-          <li><a href="categories/construction.html" data-en="Construction" data-ko="건축자재">Construction</a></li>
+          <li><a href="/categories/office.html" data-en="Office" data-ko="오피스">Office</a></li>
+          <li><a href="/categories/finishes.html" data-en="Finishes" data-ko="마감재">Finishes</a></li>
+          <li><a href="/categories/wellness.html" data-en="Wellness" data-ko="웰니스">Wellness</a></li>
+          <li><a href="/categories/decor.html" data-en="Decor" data-ko="데코">Decor</a></li>
+          <li><a href="/categories/construction.html" data-en="Construction" data-ko="건축자재">Construction</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h2 class="footer-col-title" data-en="Services" data-ko="서비스">Services</h2>
         <ul>
-          <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
+          <li><a href="/sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
           <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
                이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
           <li data-lang-only="en">
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
               <ul>
-                <li><a href="for-brands.html" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a></li>
-                <li><a href="list-your-brand.html" data-en="Brand Listing" data-ko="브랜드 입점">Brand Listing</a></li>
-                <li><a href="request-consultation.html" data-en="Consulting" data-ko="컨설팅">Consulting</a></li>
-                <li><a href="digital-products.html" data-en="Digital Products" data-ko="디지털 상품">Digital Products</a></li>
+                <li><a href="/for-brands.html" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a></li>
+                <li><a href="/list-your-brand.html" data-en="Brand Listing" data-ko="브랜드 입점">Brand Listing</a></li>
+                <li><a href="/request-consultation.html" data-en="Consulting" data-ko="컨설팅">Consulting</a></li>
+                <li><a href="/digital-products.html" data-en="Digital Products" data-ko="디지털 상품">Digital Products</a></li>
               </ul>
             </details>
           </li>
@@ -146,10 +151,10 @@
       <div class="footer-col">
         <h2 class="footer-col-title" data-en="Company" data-ko="회사">Company</h2>
         <ul>
-          <li><a href="about.html" data-en="About ARCHINODE" data-ko="ARCHINODE 소개">About ARCHINODE</a></li>
-          <li><a href="magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a></li>
-          <li><a href="trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a></li>
-          <li><a href="contact.html" data-en="Contact" data-ko="연락처">Contact</a></li>
+          <li><a href="/about.html" data-en="About ARCHINODE" data-ko="ARCHINODE 소개">About ARCHINODE</a></li>
+          <li><a href="/magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a></li>
+          <li><a href="/trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a></li>
+          <li><a href="/contact.html" data-en="Contact" data-ko="연락처">Contact</a></li>
         </ul>
       </div>
     </div>
@@ -167,8 +172,8 @@
     <div class="footer-bottom">
       <p data-en="&copy; 2026 ARCHINODE. All rights reserved." data-ko="&copy; 2026 ARCHINODE. 모든 권리 보유.">&copy; 2026 ARCHINODE. All rights reserved.</p>
       <div class="footer-bottom-links">
-        <a href="terms.html" data-en="Terms" data-ko="약관">Terms</a>
-        <a href="privacy.html" data-en="Privacy Policy" data-ko="개인정보 처리방침" data-en-href="privacy-en.html" data-ko-href="privacy.html">Privacy Policy</a>
+        <a href="/terms.html" data-en="Terms" data-ko="약관">Terms</a>
+        <a href="/privacy.html" data-en="Privacy Policy" data-ko="개인정보 처리방침" data-en-href="/privacy-en.html" data-ko-href="/privacy.html">Privacy Policy</a>
       </div>
     </div>
   </div>
@@ -225,18 +230,18 @@ const fadeObs = new IntersectionObserver(entries => {
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 fadeEls.forEach(el => fadeObs.observe(el));
 </script>
-<script src="search.js?v=20261106a"></script>
-<script src="lang.js?v=20261106a"></script>
-<script src="a11y-nav.js?v=20261113a"></script>
+<script src="/search.js?v=20261106a"></script>
+<script src="/lang.js?v=20261106a"></script>
+<script src="/a11y-nav.js?v=20261113a"></script>
 <!-- 2026-11-03 A-047 확장(R-019 전수 점검): auth-ui.js 가 있어도 Firebase SDK 가 없어
      typeof auth === "undefined" 로 조용히 종료 → 로그인해도 헤더가 비로그인 그대로였다. -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="auth-ui.js"></script>
-<script src="cookie-consent.js?v=20260630" defer></script>
-<script src="analytics-loader.js?v=20260630" defer></script>
-<script src="sentry-loader.js?v=20260630" defer></script>
+<script src="/firebase-config.js"></script>
+<script src="/auth-ui.js"></script>
+<script src="/cookie-consent.js?v=20260630" defer></script>
+<script src="/analytics-loader.js?v=20260630" defer></script>
+<script src="/sentry-loader.js?v=20260630" defer></script>
 </body>
 </html>

@@ -23,7 +23,11 @@
   4. 고지에 수집 항목·목적·보유 기간 세 가지가 다 있다
   5. 고지가 **두 언어**다(영어로 보는 손님에게도 읽혀야 한다, A-526)
   6. 거부할 권리를 적어 두었다
-  7. 개인정보 처리방침으로 가는 링크가 있고, 영어에서는 영문판으로 간다
+  7. 개인정보 처리방침으로 가는 링크가 있고, 영어에서는 영문판으로 가며,
+     **그 주소가 실제로 있는 파일을 가리킨다**. A-547(브론즈 39차): 글자만 보던
+     이 검사가 통과하는 동안 서브폴더 쪽의 링크 셋이 404 였다 — 손님이 무엇에
+     동의하는지 보려고 누르는 바로 그 링크였다. 같은 파일 푸터의 ../privacy.html
+     은 멀쩡해서 눈으로는 티가 안 났다.
 그리고 동의 사실을 남기는지 — 저장하는 폼은 문서에, Formspree 로 보내는
 폼은 체크박스의 `name` 으로.
 
@@ -128,12 +132,29 @@ def main() -> int:
             # ⑥ 거부할 권리
             if 'form-consent-note' not in blk:
                 bad.append((rel, cid, '거부할 권리 안내가 없다'))
-            # ⑦ 처리방침 링크 — 영어에서는 영문판으로
+            # ⑦ 처리방침 링크 — 영어에서는 영문판으로, 그리고 **실제로 있는 곳**으로
             if 'privacy.html' not in blk:
                 bad.append((rel, cid, '고지에 개인정보 처리방침 링크가 없다'))
             elif 'privacy-en.html' not in blk:
                 bad.append((rel, cid, '영어 화면에서도 한국어 처리방침으로 간다 — '
                                       'data-en-href 가 없다'))
+            else:
+                base = os.path.dirname(rel)
+                for attr in ('href', 'data-en-href', 'data-ko-href'):
+                    for m in re.finditer(r'\b%s="([^"]*)"' % re.escape(attr), blk):
+                        url = m.group(1)
+                        if url.startswith(('http://', 'https://', '#', 'mailto:', 'tel:')):
+                            continue
+                        # <base href="/"> 를 쓰는 쪽은 뿌리에서 푼다
+                        if '<base' in s and re.search(r'<base[^>]*href="/"', s):
+                            target = url.lstrip('/')
+                        else:
+                            target = os.path.normpath(os.path.join(base, url))
+                        if not os.path.exists(os.path.join(ROOT, target.replace('/', os.sep))):
+                            bad.append((rel, cid,
+                                        '%s="%s" 가 없는 곳을 가리킨다 — 동의하기 전에 '
+                                        '무엇에 동의하는지 보려는 손님이 404 를 맞는다'
+                                        % (attr, url)))
 
         # ⑧ 동의한 사실을 남기는가
         if how == 'formspree':

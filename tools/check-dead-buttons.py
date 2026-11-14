@@ -98,7 +98,13 @@ def main() -> int:
                     s = ms.group(1).split('?')[0]
                     if s.startswith('http://') or s.startswith('https://') or s.startswith('//'):
                         continue           # 남의 코드 — 우리가 보증할 수 없다
-                    have |= defs_in_file(os.path.normpath(os.path.join(dirpath, s)))
+                    # A-550: 뿌리 기준 경로(`/lang.js`)를 풀 줄 몰라, 그렇게 적은
+                    #   쪽에서는 외부 스크립트를 **못 읽고** 그 안의 함수를 전부
+                    #   「없다」고 불렀다. 404.html 을 뿌리 기준으로 바꾸자 드러났다.
+                    if s.startswith('/'):
+                        have |= defs_in_file(os.path.join(ROOT, s.lstrip('/').replace('/', os.sep)))
+                    else:
+                        have |= defs_in_file(os.path.normpath(os.path.join(dirpath, s)))
                 else:
                     if 'json' in attrs.lower():
                         continue

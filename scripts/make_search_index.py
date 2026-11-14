@@ -32,6 +32,20 @@ H1_RE = re.compile(r"<h1" + TAG_ATTRS + r">(.*?)</h1>", re.S)
 TITLE_RE = re.compile(r"<title" + TAG_ATTRS + r">")
 
 
+# A-548(브론즈 39차): 속성값을 `["\']([^"\']+)["\']` 로 읽고 있었다. 이 문자
+# 클래스는 **두 따옴표를 다 제외**하므로, 쌍따옴표로 감싼 속성 안의 아포스트로피
+# 에서 값이 끊긴다. 이 사이트는 제품명·전시명·정책명을 홑따옴표로 감싸는 표기를
+# 즐겨 써서(`'10분 도시'`, `'써모루프'`, `'해방의 건축가들'`) 색인 14개가 문장
+# 중간에서 잘려 있었다. 잘린 뒤의 고유명사는 **검색되지 않는다** — 기사가 있는데
+# 손님에게는 없는 것이 된다. 여는 따옴표를 붙잡아 같은 따옴표로 닫는다.
+_HANGUL = re.compile(r'[가-힣]')
+
+
+def _q(name):
+    """같은 따옴표로 여닫는 속성값을 읽는 조각. name 으로 결과를 꺼낸다."""
+    return r'(?P<q_%s>["\'])(?P<%s>(?:(?!(?P=q_%s)).)*)(?P=q_%s)' % (name, name, name, name)
+
+
 def _attr(attrs: str, name: str) -> str:
     m = re.search(r'%s\s*=\s*"([^"]*)"' % re.escape(name), attrs)
     if not m:
@@ -137,23 +151,34 @@ def extract_title_desc(html: str) -> tuple[str, str, str, str]:
     # 메타 description
     desc_en = ""
     desc_ko = ""
-    m = re.search(r'<meta[^>]*name\s*=\s*["\']description["\'][^>]*content\s*=\s*["\']([^"\']+)["\']', html)
+    m = re.search(r'<meta[^>]*name\s*=\s*["\']description["\'][^>]*content\s*=\s*' + _q('v'), html)
     if m:
-        desc_ko = m.group(1).strip()
+        desc_ko = m.group('v').strip()
         desc_en = desc_ko
 
     # subtitle / lead / og:description 폴백
     if not desc_en:
-        m = re.search(r'<meta[^>]*property\s*=\s*["\']og:description["\'][^>]*content\s*=\s*["\']([^"\']+)["\']', html)
+        m = re.search(r'<meta[^>]*property\s*=\s*["\']og:description["\'][^>]*content\s*=\s*' + _q('v'), html)
         if m:
-            desc_ko = m.group(1).strip()
+            desc_ko = m.group('v').strip()
             desc_en = desc_ko
 
     # data-en/data-ko subtitle
-    m = re.search(r'<p[^>]*class="[^"]*(?:subtitle|lead)[^"]*"[^>]*data-en\s*=\s*["\']([^"\']+)["\'][^>]*data-ko\s*=\s*["\']([^"\']+)["\']', html)
+    m = re.search(r'<p[^>]*class="[^"]*(?:subtitle|lead)[^"]*"[^>]*data-en\s*=\s*'
+                  + _q('en') + r'[^>]*data-ko\s*=\s*' + _q('ko'), html)
     if m:
-        desc_en = m.group(1).strip()
-        desc_ko = m.group(2).strip()
+        desc_en = m.group('en').strip()
+        desc_ko = m.group('ko').strip()
+
+    # A-549(브론즈 39차): 위 메타 갈래는 `desc_ko = desc_en` 으로 **한 값을 두 언어에
+    # 똑같이** 넣는다. 그 갈래에 남은 쪽은 한국어 칸에 영어가 들어갔고, 한국어로
+    # 검색하면 안 나왔다 — 헤더 단추 이름이 「브랜드 입점」인데 그 낱말로
+    # list-your-brand.html 이 안 나오던 것이 그 때문이다. 한국어가 한 글자도 없으면
+    # 쪽에서 가장 긴 data-ko 문장을 가져다 쓴다. 지어내지 않고 쪽에 적힌 말을 쓴다.
+    if desc_ko and not _HANGUL.search(desc_ko):
+        cands = [v for v in re.findall(r'data-ko="([^"]{20,200})"', html) if _HANGUL.search(v)]
+        if cands:
+            desc_ko = max(cands, key=len).strip()
 
     # ── A-401(2026-11-09): 히어로 설명문을 두 언어로 가져온다 ──────────────────
     # 위의 메타 description 갈래는 **한 값을 두 언어에 똑같이 넣는다**
@@ -170,13 +195,13 @@ def extract_title_desc(html: str) -> tuple[str, str, str, str]:
     # 맞고, 영어 화면에서도 「Korean Articles」라고 이름부터 알리고 있다(A-348).
     # `data-en-html` 도 받는다 — 홈의 히어로 제목이 `<h1 data-en-html="Launch Korea.<br>...">`
     # 라서 `data-en` 만 보면 안 걸렸다.
-    h1m = re.search(r'<h1[^>]*data-en(?:-html)?\s*=\s*["\'][^"\']+["\'][^>]*>', html)
+    h1m = re.search(r'<h1[^>]*data-en(?:-html)?\s*=\s*' + _q('h') + r'[^>]*>', html)
     if h1m:
         window = html[h1m.end():h1m.end() + 1500]
-        pm = re.search(r'<p[^>]*data-en\s*=\s*["\']([^"\']{20,})["\'][^>]*data-ko\s*=\s*["\']([^"\']{10,})["\']', window)
-        if pm:
-            desc_en = pm.group(1).strip()
-            desc_ko = pm.group(2).strip()
+        pm = re.search(r'<p[^>]*data-en\s*=\s*' + _q('en') + r'[^>]*data-ko\s*=\s*' + _q('ko'), window)
+        if pm and len(pm.group('en')) >= 20 and len(pm.group('ko')) >= 10:
+            desc_en = pm.group('en').strip()
+            desc_ko = pm.group('ko').strip()
 
     return name_en, name_ko, desc_en, desc_ko
 

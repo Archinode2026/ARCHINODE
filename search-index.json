@@ -12,7 +12,7 @@
     "name_en": "Brand Guide — Getting Started",
     "name_ko": "Brand Guide — Getting Started",
     "desc_en": "ARCHINODE Brand Onboarding Guide — What to do after your listing is approved. For European brands entering the Korean market.",
-    "desc_ko": "ARCHINODE Brand Onboarding Guide — What to do after your listing is approved. For European brands entering the Korean market.",
+    "desc_ko": "엄선된 해외 건축·디자인 브랜드와 한국 크리에이터를 위한 B2B 쇼케이스",
     "url": "brand-guide.html"
   },
   {
@@ -35,8 +35,8 @@
     "type": "page",
     "name_en": "Contact",
     "name_ko": "문의",
-    "desc_en": "ARCHINODE에 문의하세요. 브랜드 입점, 딜러십, 파트너십 관련 문의를 환영합니다.",
-    "desc_ko": "ARCHINODE에 문의하세요. 브랜드 입점, 딜러십, 파트너십 관련 문의를 환영합니다.",
+    "desc_en": "We'd love to hear from you.",
+    "desc_ko": "언제든 연락주세요.",
     "url": "contact.html"
   },
   {
@@ -68,7 +68,7 @@
     "name_en": "List Your Brand on ARCHINODE",
     "name_ko": "ARCHINODE에 브랜드를 등록하세요",
     "desc_en": "Register your architecture or design brand on ARCHINODE to access the Korean market. First 3 months free, with automatic brand page creation.",
-    "desc_ko": "Register your architecture or design brand on ARCHINODE to access the Korean market. First 3 months free, with automatic brand page creation.",
+    "desc_ko": "서비스 약관 제9조(브랜드 파트너의 기술자료 제공 및 보증·면책)를 읽고 동의합니다 — 제가 제출하는 CAD/BIM/카탈로그 자료, ARCHINODE가 이를 인증된 한국 전문가에게 제공할 수 있는 라이선스, 그리고 자료의 정확성 및 제3자 권리에 대한 제 책임을 포함합니다.",
     "url": "list-your-brand.html"
   },
   {
@@ -99,7 +99,7 @@
     "type": "page",
     "name_en": "Sourcing Inquiry",
     "name_ko": "자재 소싱 문의",
-    "desc_en": "Tell us what you need — we",
+    "desc_en": "Tell us what you need — we'll match you with the right European brand.",
     "desc_ko": "필요한 내용을 알려주시면 맞는 유럽 브랜드를 찾아 연결해 드려요.",
     "url": "sourcing-inquiry.html"
   },
@@ -115,8 +115,8 @@
     "type": "page",
     "name_en": "Terms of Service",
     "name_ko": "이용약관",
-    "desc_en": "Last updated: November 13, 2026",
-    "desc_ko": "최종 수정일: 2026년 11월 13일",
+    "desc_en": "ARCHINODE 서비스 이용약관",
+    "desc_ko": "ARCHINODE 서비스 이용약관",
     "url": "terms.html"
   },
   {
@@ -910,7 +910,7 @@
     "name_en": "AGM's Thermroof — Korea's New Roofing Bet, and Whether It Will Hold Up",
     "name_ko": "에이지엠 써모루프 — 한국 지붕재의 신소재 도전, 정말로 답이 될까",
     "desc_en": "At 2026 Korea Build Week, AGM unveiled Thermroof — an aluminum-galvalume hybrid sheet with fluoropolymer coating, sold as the lightweight, high-insulation roof Korean single-family and rural buildings have been waiting for. The pitch is good. The Korean roof market is, on closer reading, harder than the pitch admits.",
-    "desc_ko": "2026 코리아빌드위크에서 에이지엠은 신제품 지붕재",
+    "desc_ko": "2026 코리아빌드위크에서 에이지엠은 신제품 지붕재 '써모루프'를 공개했다. 알루미늄·갈바륨 하이브리드 강판 위 불소수지 코팅, 한국 단독주택과 농촌 건물이 기다려 온 경량·고단열 지붕재로 포지셔닝됐다. 피치는 좋다. 더 자세히 읽으면, 한국 지붕 시장은 피치가 인정한 것보다 더 까다롭다.",
     "url": "magazine/agm-thermroof-roofing-material-2026.html"
   },
   {
@@ -1237,8 +1237,8 @@
     "type": "article",
     "name_en": "A Timber Arena Rises on the Han",
     "name_ko": "한강에 목조 경기장이 선다",
-    "desc_en": "July 2026. On the Han River waterfront near Gwangnaru Station, Seoul is preparing to build something the country has never had: a multipurpose international sports arena with a hybrid timber structure. Chosen through open competition, the winning scheme by Gawa Architects, Architects ISAEK and DD Architects proposes a rare thing for a large Korean building — a circular arena framed largely in wood. A 199.9 billion won project, breaking ground in April 2028 and completing in August 2031. Beneath the headline sits a bigger question: why wood, and why now?",
-    "desc_ko": "2026년 7월, 광진구 광나루역 인근 한강변에 국내에 없던 건물이 들어설 준비를 하고 있다. 하이브리드 목구조로 지어지는 다목적 국제경기장이다. 공모를 거쳐 ㈜가와종합건축사사무소·건축사사무소 이색·디디건축사사무소가 공동으로 당선됐고, 당선작은 국내 대형 건축물에서는 보기 드문 목구조 원형 경기장을 제안했다. 총사업비 1,999억 원, 2028년 4월 착공, 2031년 8월 준공. 헤드라인 뒤에는 더 큰 질문이 있다. 왜 나무인가, 그리고 왜 지금인가.",
+    "desc_en": "Korea's first hybrid timber international arena at Gwangnaru — a 199.9 billion won project completing in 2031.",
+    "desc_ko": "광나루 복합체육시설, 국내 첫 하이브리드 목구조 국제경기장 — 1,999억 규모, 2031년 준공.",
     "url": "magazine/gwangnaru-hybrid-timber-arena-2026.html"
   },
   {
@@ -1277,7 +1277,7 @@
     "type": "article",
     "name_en": "The Curves Heatherwick Drew Over Yeouido",
     "name_ko": "헤더윅이 여의도에 그린 곡선",
-    "desc_en": "Daekyo Apartment reconstruction — what changes when a global star architect enters Korea",
+    "desc_en": "Daekyo Apartment reconstruction — what changes when a global star architect enters Korea's ordinary residential market.",
     "desc_ko": "대교아파트 재건축 — 글로벌 거장이 한국 일반 주거 시장에 들어왔을 때 무엇이 바뀌는가.",
     "url": "magazine/heatherwick-yeouido-daekyo-2026.html"
   },
@@ -1526,15 +1526,15 @@
     "name_en": "A Building That Stores Carbon, but No Timber to Build It",
     "name_ko": "탄소를 저장하는 건물, 그러나 목재가 없다",
     "desc_en": "Public demand for wood architecture is rising, yet Korea's domestic timber industry stays thin. The gap the 2026 Korea Wood Architecture Awards quietly exposes.",
-    "desc_ko": "공공 목조건축 수요는 커지는데 국산 목재 산업기반은 취약하다 —",
+    "desc_ko": "공공 목조건축 수요는 커지는데 국산 목재 산업기반은 취약하다 — '2026 대한민국목조건축대전'이 드러낸 빈틈",
     "url": "magazine/mass-timber-carbon-neutral-supply-gap-2026.html"
   },
   {
     "type": "article",
     "name_en": "The Architecture That Independence Built",
     "name_ko": "독립이 지은 건축",
-    "desc_en": "On July 5, 2026, the Museum of Modern Art in New York opens",
-    "desc_ko": "2026년 7월 5일, 뉴욕 현대미술관(MoMA)에서",
+    "desc_en": "MoMA's 'Architects of Liberation' reads West African modernism as the built language of new nations — and asks who gets to author a place.",
+    "desc_ko": "MoMA '해방의 건축가들'전 — 서아프리카 모더니즘을 신생 국가의 건축 언어로 읽고, 누가 장소의 '작가'가 되는가를 묻는다.",
     "url": "magazine/moma-architects-of-liberation-western-africa-2026.html"
   },
   {
@@ -1566,7 +1566,7 @@
     "name_en": "Parking Robots Are Coming Home — How July's Deregulation Will Reshape the Korean Apartment Garage",
     "name_ko": "주차로봇이 아파트로 들어온다 — 7월 규제 완화가 바꿀 한국 주차장의 미래",
     "desc_en": "MOLIT will amend the housing construction regulation in July 2026, removing the rule that classifies parking robots as mechanical parking equipment and bans them from apartment complexes. HL D&I Halla, HL Robotics, and Junglim Architecture are already redesigning the basement.",
-    "desc_ko": "국토교통부가 2026년 7월",
+    "desc_ko": "국토교통부가 2026년 7월 '주택건설기준 등에 관한 규칙'을 개정한다. 주차로봇을 기계식 주차장치로 묶어 공동주택 도입을 막던 조항이 풀린다. HL디앤아이한라·HL로보틱스·정림건축은 이미 지하층 도면을 다시 그리고 있다.",
     "url": "magazine/parking-robot-deregulation-july-2026.html"
   },
   {
@@ -1574,7 +1574,7 @@
     "name_en": "The Wall and Door a Pet Redesigned",
     "name_ko": "반려동물이 바꾼 벽과 문",
     "desc_en": "Scratch-proof wallpaper and auto sliding doors are moving from niche add-on to new-apartment standard. The home is being re-specced around who else lives in it.",
-    "desc_ko": "스크래치 방지 벽지와 자동 중문이 틈새 옵션에서 신축 아파트 기본으로 옮겨간다. 집이",
+    "desc_ko": "스크래치 방지 벽지와 자동 중문이 틈새 옵션에서 신축 아파트 기본으로 옮겨간다. 집이 '함께 사는 존재'를 기준으로 다시 설계되고 있다.",
     "url": "magazine/pet-durable-wallpaper-auto-door-interior-2026.html"
   },
   {
@@ -1685,8 +1685,8 @@
     "type": "article",
     "name_en": "The Museum That Crossed Its Own Wall",
     "name_ko": "미술관이 담을 넘었다",
-    "desc_en": "In late July 2026 Seoul announced the winners of the 44th Seoul Architecture Award. The top completed-works prize did not go to a spectacular landmark but to a neighborhood museum that opens itself to the street. That choice is itself an argument about what public architecture in Korea should now be.",
-    "desc_ko": "2026년 7월 말, 서울시는 제44회 서울특별시 건축상 수상작을 발표했다. 완공 부문 대상은 화려한 랜드마크가 아니라, 거리를 향해 스스로를 열어 놓은 동네 미술관에 돌아갔다. 이 선택 자체가 지금 한국의 공공건축이 무엇이어야 하는가에 대한 하나의 주장이다.",
+    "desc_en": "The 44th Seoul Architecture Award crowned SeMA Seoseoul by Kim Chan-joong — a public building that lowered its own threshold. Who is public architecture for?",
+    "desc_ko": "완공부문 대상 '서울시립 서서울미술관'(김찬중·더시스템랩)이 던진 질문 — 공공건축은 누구의 것인가",
     "url": "magazine/seoul-architecture-award-44th-seosoul-museum-2026.html"
   },
   {
@@ -1717,7 +1717,7 @@
     "type": "article",
     "name_en": "The Award That Asks Only One Thing",
     "name_ko": "단 하나만 묻는 디자인 상",
-    "desc_en": "The Seoul Design Award 2026 closes entries — the world",
+    "desc_en": "The Seoul Design Award 2026 closes entries — the world's only public award devoted to sustainable daily life, now with a designboom prize.",
     "desc_ko": "서울디자인어워드 2026 접수 마감 — 지속가능한 일상만 다루는 세계 유일의 공공 디자인 어워드, designboom 특별상까지.",
     "url": "magazine/seoul-design-award-2026-sustainable-impact.html"
   },
@@ -1765,8 +1765,8 @@
     "type": "article",
     "name_en": "The Neighborhood Where the Car Disappeared",
     "name_ko": "차가 사라진 동네",
-    "desc_en": "UNStudio and Hyundai Development Company are turning a 405,000 m² industrial site in northeast Seoul into a car-free",
-    "desc_ko": "UNStudio와 현대산업개발이 서울 동북부 40만5천㎡ 산업부지를 차 없는",
+    "desc_en": "UNStudio and Hyundai Development Company are turning a 405,000 m² industrial site in northeast Seoul into a car-free '10-minute city.' What is SeoulOne really testing?",
+    "desc_ko": "UNStudio와 현대산업개발이 서울 동북부 40만5천㎡ 산업부지를 차 없는 '10분 도시'로 바꾼다. 서울원이 진짜로 시험하는 것은 무엇인가.",
     "url": "magazine/seoulone-unstudio-10-minute-car-free-city-2026.html"
   },
   {
@@ -1845,7 +1845,7 @@
     "type": "article",
     "name_en": "The Five People Who Build Time",
     "name_ko": "시간을 짓는 다섯 사람",
-    "desc_en": "Architectural Record names Seoul",
+    "desc_en": "Architectural Record names Seoul's Studio Heech to Design Vanguard 2026 — a studio that treats making, not the finished form, as the work itself.",
     "desc_ko": "아키텍처럴 레코드가 2026 디자인 뱅가드에 서울의 스튜디오 히치를 선정했다. 완성된 형태가 아니라 만들어지는 과정을 작업으로 보는 팀이다.",
     "url": "magazine/studio-heech-design-vanguard-2026.html"
   },
@@ -1941,8 +1941,8 @@
     "type": "trend-report",
     "name_en": "살로네 델 모빌 2026 — 도심 속 온실의 귀환",
     "name_ko": "살로네 델 모빌 2026 — 도심 속 온실의 귀환",
-    "desc_en": "2026 밀라노 살로네 델 모빌 현장 리포트.",
-    "desc_ko": "2026 밀라노 살로네 델 모빌 현장 리포트.",
+    "desc_en": "2026 밀라노 살로네 델 모빌 현장 리포트. 'Urban Greenhouse'의 의미, 한국 건축가·디자이너에게 닿는 적용 인사이트. ARCHINODE 편집부 × 실비아 반돈(밀라노 오피스).",
+    "desc_ko": "2026 밀라노 살로네 델 모빌 현장 리포트. 'Urban Greenhouse'의 의미, 한국 건축가·디자이너에게 닿는 적용 인사이트. ARCHINODE 편집부 × 실비아 반돈(밀라노 오피스).",
     "url": "trend-report/salone-del-mobile-2026-trends.html"
   }
 ]
