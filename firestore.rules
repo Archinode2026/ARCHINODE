@@ -317,17 +317,18 @@ service cloud.firestore {
                          'name','company','email','phone','industry','category','message',
                          'source','userId','brandNote','createdAt','updatedAt','assignedAt',
                          'hp','history','shippingAddress','notifyPending',
-                         // A-536(1단계): 동의한 사실을 남기는 칸. 키 목록이 닫혀
-                         //   있어서(A-485) 더하지 않으면 폼이 통째로 거부된다.
-                         //   아직 **요구하지는 않는다** — 규칙이 먼저 올라가고
-                         //   화면이 나중에 퍼지는 사이 접수가 끊기면 안 된다.
-                         //   화면이 라이브에 퍼진 것을 확인한 뒤 2단계에서 요구로 바꾼다.
+                         // A-536: 동의한 사실을 남기는 칸. 키 목록이 닫혀 있어서(A-485)
+                         //   더하지 않으면 폼이 통째로 거부된다.
                          'privacyConsent','consentAt'])
-                    // 담겼다면 참이어야 하고, 시각은 지어낼 수 없다
-                    && (!('privacyConsent' in request.resource.data)
-                        || request.resource.data.privacyConsent == true)
-                    && (!('consentAt' in request.resource.data)
-                        || request.resource.data.consentAt == request.time)
+                    /* A-541(2단계): 이제 **요구한다**. 화면이 라이브에 퍼진 것을
+                       확인한 뒤 조였다(1단계는 받아만 줬다).
+                       어드민은 뺀다 — 전화·전시회에서 받은 리드를 손으로 넣는 길이
+                       있고(source: 'admin-manual'), 거기에는 웹 폼 동의가 있을 수
+                       없다. 그 동의는 어드민이 오프라인에서 받고 책임진다.
+                       시각은 지어낼 수 없게 request.time 으로 못 박는다. */
+                    && (isAdmin()
+                        || (request.resource.data.privacyConsent == true
+                            && request.resource.data.consentAt == request.time))
                     && (!('history' in request.resource.data) || isAdmin())
                     // A-490: 알림이 안 들어간 표시. 문자열을 담아 1MiB 로 불리지 못하게 bool 로 못 박는다
                     && (!('notifyPending' in request.resource.data)
@@ -426,12 +427,11 @@ service cloud.firestore {
                          'companyName','contactName','email','phone','website',
                          'country','category','description','timing','budget',
                          'status','reviewerNote','triageNote','reviewedAt','hp','createdAt',
-                         // A-536(1단계): 아직 요구하지 않는다. 위 leads 와 같은 이유.
                          'privacyConsent','consentAt'])
-                    && (!('privacyConsent' in request.resource.data)
-                        || request.resource.data.privacyConsent == true)
-                    && (!('consentAt' in request.resource.data)
-                        || request.resource.data.consentAt == request.time)
+                    // A-541(2단계): leads 와 같은 이유로 요구한다. 어드민은 뺀다.
+                    && (isAdmin()
+                        || (request.resource.data.privacyConsent == true
+                            && request.resource.data.consentAt == request.time))
                     && request.resource.data.companyName.size() <= 200
                     && request.resource.data.contactName.size() <= 100
                     && request.resource.data.email.size() <= 254
