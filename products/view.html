@@ -231,6 +231,26 @@
           <label for="rfqMessage" id="rfqMessageLabel" data-en="Project / quantity / desired timeline" data-ko="프로젝트 · 수량 · 희망 납기">Project / quantity / desired timeline</label>
           <textarea id="rfqMessage" maxlength="5000" required></textarea>
         </div>
+        <!-- A-537(브론즈 38차 7번): 이 폼은 개인정보를 받으면서 **고지도 동의도
+             없었다**. 처리방침 제3조가 이 수집을 스스로 적어 두고 있는데
+             받는 자리에는 아무 말이 없었다. A-521 과 같은 뼈대를 둔다. -->
+        <div class="form-consent">
+          <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
+          <ul>
+            <li data-en="What we collect: name, company, email, shipping address (sample requests only), enquiry" data-ko="수집 항목: 이름, 회사명, 이메일, 배송지(샘플 요청 시), 문의 내용">수집 항목: 이름, 회사명, 이메일, 배송지(샘플 요청 시), 문의 내용</li>
+            <li data-en="Why: to receive and answer your quote or sample request" data-ko="수집 목적: 견적·샘플 요청 접수와 답변">수집 목적: 견적·샘플 요청 접수와 답변</li>
+            <li data-en="How long: 3 years after the enquiry is closed (E-Commerce Act Enforcement Decree, Art. 6)" data-ko="보유 기간: 문의 처리 완료 후 3년 (전자상거래법 시행령 제6조)">보유 기간: 문의 처리 완료 후 3년 (전자상거래법 시행령 제6조)</li>
+          </ul>
+          <label class="form-consent-agree">
+            <input type="checkbox" id="agreePrivacyRfqProduct" required>
+            <span>
+              <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
+              <span data-en="I agree to the collection and use of my personal data as described above." data-ko="위 내용에 동의합니다.">위 내용에 동의합니다.</span>
+              <a href="privacy.html" data-en-href="privacy-en.html" data-ko-href="privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a>
+            </span>
+          </label>
+          <p class="form-consent-note" data-en="You may decline, but we then cannot accept your request." data-ko="동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.</p>
+        </div>
         <button type="submit" class="rfq-submit" id="rfqSubmitBtn" data-en="Send Request" data-ko="요청 보내기">Send Request</button>
         <div class="rfq-error-msg" id="rfqErrorMsg"></div>
       </form>
@@ -311,6 +331,26 @@
             <summary data-en="Read the disclosure" data-ko="제공 내역 보기" style="cursor:pointer;color:#6b6459;"></summary>
             <p data-en="Recipient: the product's manufacturer (Vendor). Purpose: BIM approval, technical/quote discussion, sample and technical support. Items: name, company, title, work email, phone, project overview. Retention: until the project discussion concludes (or as required by law)." data-ko="제공받는 자: 해당 제품의 해외 공식 제조사(Vendor). 제공 목적: BIM 데이터 승인, 기술 사양 및 견적 협의, 공식 샘플 및 기술 지원 제공. 제공 항목: 성명, 회사명, 직함, 업무용 이메일, 연락처, 프로젝트 개요. 보유 및 이용 기간: 프로젝트 상담 및 협의 완료 시까지(또는 관계 법령에 따른 보존 기간)." style="white-space:pre-line;"></p>
           </details>
+        </div>
+        <!-- A-537: 제3자 제공 동의(bimAgreeShare)는 있었지만 **수집·이용 동의**가
+             없었다. 둘은 다른 동의다 — 제조사에 넘기는 것에 동의했다고
+             우리가 받아 두는 것에 동의한 것이 아니다. -->
+        <div class="form-consent">
+          <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
+          <ul>
+            <li data-en="What we collect: name, company, title, email, phone, project details" data-ko="수집 항목: 성명, 회사명, 직함, 이메일, 연락처, 프로젝트 정보">수집 항목: 성명, 회사명, 직함, 이메일, 연락처, 프로젝트 정보</li>
+            <li data-en="Why: to review and fulfil your technical-data request" data-ko="수집 목적: 기술자료 신청 검토와 제공">수집 목적: 기술자료 신청 검토와 제공</li>
+            <li data-en="How long: 3 years after the enquiry is closed (E-Commerce Act Enforcement Decree, Art. 6)" data-ko="보유 기간: 문의 처리 완료 후 3년 (전자상거래법 시행령 제6조)">보유 기간: 문의 처리 완료 후 3년 (전자상거래법 시행령 제6조)</li>
+          </ul>
+          <label class="form-consent-agree">
+            <input type="checkbox" id="agreePrivacyBim" required>
+            <span>
+              <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
+              <span data-en="I agree to the collection and use of my personal data as described above." data-ko="위 내용에 동의합니다.">위 내용에 동의합니다.</span>
+              <a href="privacy.html" data-en-href="privacy-en.html" data-ko-href="privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a>
+            </span>
+          </label>
+          <p class="form-consent-note" data-en="You may decline, but we then cannot accept your request." data-ko="동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.</p>
         </div>
         <button type="submit" class="rfq-submit" id="bimSubmitBtn" data-en="Submit Request" data-ko="신청서 제출">Submit Request</button>
         <div class="rfq-error-msg" id="bimErrorMsg"></div>
@@ -912,6 +952,17 @@ async function submitBimRequest(e) {
 
     const agreeData = document.getElementById('bimAgreeData').checked;
     const agreeShare = document.getElementById('bimAgreeShare').checked;
+    /* A-537: 제3자 제공 동의는 보고 있었지만 **수집·이용 동의**는 보지 않았다.
+       제조사에 넘기는 것에 동의했다고 우리가 받아 두는 것에 동의한 것이 아니다. */
+    const agreePrivacyBim = document.getElementById('agreePrivacyBim');
+    if (agreePrivacyBim && !agreePrivacyBim.checked) {
+        errorMsg.textContent = (document.documentElement.lang === 'en')
+            ? 'Please agree to the collection and use of your personal data.'
+            : '개인정보 수집·이용에 동의해 주세요.';
+        errorMsg.style.display = 'block';
+        agreePrivacyBim.focus();
+        return false;
+    }
     const lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
     if (!agreeData || !agreeShare) {
         errorMsg.textContent = lang === 'en'
@@ -1013,6 +1064,19 @@ async function submitRfq(e) {
     const shipping = document.getElementById('rfqShipping').value.trim();
     const message = document.getElementById('rfqMessage').value.trim();
 
+    /* A-537: 동의를 `required` 하나에만 기대지 않는다. 속성이 없어지면 동의 없는
+       개인정보가 그대로 접수된다. */
+    const agreedPrivacy = document.getElementById('agreePrivacyRfqProduct');
+    if (agreedPrivacy && !agreedPrivacy.checked) {
+        errorMsg.textContent = (document.documentElement.lang === 'en')
+            ? 'Please agree to the collection and use of your personal data.'
+            : '개인정보 수집·이용에 동의해 주세요.';
+        errorMsg.style.display = 'block';
+        btn.disabled = false;
+        agreedPrivacy.focus();
+        return false;
+    }
+
     try {
         const data = {
             type: rfqType,
@@ -1028,6 +1092,9 @@ async function submitRfq(e) {
             industry: '',
             message: message,
             source: 'product-page',
+            // A-537: 동의한 사실을 남긴다. 받아 놓고 버리면 나중에 증명할 수 없다.
+            privacyConsent: true,
+            consentAt: firebase.firestore.FieldValue.serverTimestamp(),
             userId: (auth.currentUser ? auth.currentUser.uid : ''),
             // A-481: adminNote 는 leads/{id}/internal/admin 으로 — 배정된 브랜드가 리드 문서를 통째로 읽는다
             brandNote: '',

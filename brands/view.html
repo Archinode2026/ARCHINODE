@@ -369,6 +369,26 @@
           <label for="rfqMessage" data-en="What are you looking for?" data-ko="어떤 것을 찾고 계신가요?">What are you looking for?</label>
           <textarea id="rfqMessage" maxlength="5000" required></textarea>
         </div>
+        <!-- A-537(브론즈 38차 7번): 이 폼은 개인정보를 받으면서 **고지도 동의도
+             없었다**. 처리방침 제3조가 이 수집을 스스로 적어 두고 있는데
+             받는 자리에는 아무 말이 없었다. A-521 과 같은 뼈대를 둔다. -->
+        <div class="form-consent">
+          <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
+          <ul>
+            <li data-en="What we collect: name, company, email, enquiry" data-ko="수집 항목: 이름, 회사명, 이메일, 문의 내용">수집 항목: 이름, 회사명, 이메일, 문의 내용</li>
+            <li data-en="Why: to receive and answer your enquiry to this brand" data-ko="수집 목적: 브랜드 문의 접수와 답변">수집 목적: 브랜드 문의 접수와 답변</li>
+            <li data-en="How long: 3 years after the enquiry is closed (E-Commerce Act Enforcement Decree, Art. 6)" data-ko="보유 기간: 문의 처리 완료 후 3년 (전자상거래법 시행령 제6조)">보유 기간: 문의 처리 완료 후 3년 (전자상거래법 시행령 제6조)</li>
+          </ul>
+          <label class="form-consent-agree">
+            <input type="checkbox" id="agreePrivacyRfqBrand" required>
+            <span>
+              <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
+              <span data-en="I agree to the collection and use of my personal data as described above." data-ko="위 내용에 동의합니다.">위 내용에 동의합니다.</span>
+              <a href="privacy.html" data-en-href="privacy-en.html" data-ko-href="privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a>
+            </span>
+          </label>
+          <p class="form-consent-note" data-en="You may decline, but we then cannot accept your request." data-ko="동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.</p>
+        </div>
         <button type="submit" class="rfq-submit" id="rfqSubmitBtn" data-en="Send Inquiry" data-ko="문의 보내기">Send Inquiry</button>
         <div class="rfq-error-msg" id="rfqErrorMsg"></div>
       </form>
@@ -984,6 +1004,18 @@ async function submitRfq(e) {
     const email = document.getElementById('rfqEmail').value.trim();
     const message = document.getElementById('rfqMessage').value.trim();
 
+    /* A-537: 동의를 `required` 하나에만 기대지 않는다. 속성이 없어지면 동의 없는
+       개인정보가 그대로 접수된다. */
+    const agreedPrivacy = document.getElementById('agreePrivacyRfqBrand');
+    if (agreedPrivacy && !agreedPrivacy.checked) {
+        rfqSay(errorMsg, 'Please agree to the collection and use of your personal data.',
+               '개인정보 수집·이용에 동의해 주세요.');
+        errorMsg.style.display = 'block';
+        btn.disabled = false;
+        agreedPrivacy.focus();
+        return false;
+    }
+
     try {
         // A-263: 접수 알림. leads 에 넣은 것과 같은 모양을 그대로 넘긴다.
         const leadDoc = {
@@ -1000,6 +1032,9 @@ async function submitRfq(e) {
             industry: '',
             message: message,
             source: 'brand-page',
+            // A-537: 동의한 사실을 남긴다. 받아 놓고 버리면 나중에 증명할 수 없다.
+            privacyConsent: true,
+            consentAt: firebase.firestore.FieldValue.serverTimestamp(),
             userId: (auth.currentUser ? auth.currentUser.uid : ''),
             // A-481: adminNote 는 leads/{id}/internal/admin 으로 — 배정된 브랜드가 리드 문서를 통째로 읽는다
             brandNote: '',

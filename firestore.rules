@@ -316,7 +316,18 @@ service cloud.firestore {
                          'type','status','brandId','brandName','productId','productName',
                          'name','company','email','phone','industry','category','message',
                          'source','userId','brandNote','createdAt','updatedAt','assignedAt',
-                         'hp','history','shippingAddress','notifyPending'])
+                         'hp','history','shippingAddress','notifyPending',
+                         // A-536(1단계): 동의한 사실을 남기는 칸. 키 목록이 닫혀
+                         //   있어서(A-485) 더하지 않으면 폼이 통째로 거부된다.
+                         //   아직 **요구하지는 않는다** — 규칙이 먼저 올라가고
+                         //   화면이 나중에 퍼지는 사이 접수가 끊기면 안 된다.
+                         //   화면이 라이브에 퍼진 것을 확인한 뒤 2단계에서 요구로 바꾼다.
+                         'privacyConsent','consentAt'])
+                    // 담겼다면 참이어야 하고, 시각은 지어낼 수 없다
+                    && (!('privacyConsent' in request.resource.data)
+                        || request.resource.data.privacyConsent == true)
+                    && (!('consentAt' in request.resource.data)
+                        || request.resource.data.consentAt == request.time)
                     && (!('history' in request.resource.data) || isAdmin())
                     // A-490: 알림이 안 들어간 표시. 문자열을 담아 1MiB 로 불리지 못하게 bool 로 못 박는다
                     && (!('notifyPending' in request.resource.data)
@@ -404,8 +415,36 @@ service cloud.firestore {
     //       reviewedAt, createdAt
     // ────────────────────────────────────────────────────────────────────
     match /consultations/{consultId} {
+      /* A-536(2026-11-14, 브론즈 38차): A-485 는 leads 만 조였다. 이쪽도 **누구나
+         쓸 수 있는데** ㄱ) 담기는 키를 세지 않았고 ㄴ) 길이 상한이 description
+         말고는 없었다. 아무 이름의 칸을 끼워 넣을 수 있었고, 한 문서를 1MiB 가까이
+         불려 무한히 만들 수도 있었다 — leads 에서 막은 것과 같은 구멍이 여기 남아
+         있었다. 키를 못 박고 칸마다 상한을 둔다. */
       // 생성: 누구나 (방문자 폼 제출). 필수 필드 검증 + status 'pending' 강제
       allow create: if passesHoneypot()
+                    && request.resource.data.keys().hasOnly([
+                         'companyName','contactName','email','phone','website',
+                         'country','category','description','timing','budget',
+                         'status','reviewerNote','triageNote','reviewedAt','hp','createdAt',
+                         // A-536(1단계): 아직 요구하지 않는다. 위 leads 와 같은 이유.
+                         'privacyConsent','consentAt'])
+                    && (!('privacyConsent' in request.resource.data)
+                        || request.resource.data.privacyConsent == true)
+                    && (!('consentAt' in request.resource.data)
+                        || request.resource.data.consentAt == request.time)
+                    && request.resource.data.companyName.size() <= 200
+                    && request.resource.data.contactName.size() <= 100
+                    && request.resource.data.email.size() <= 254
+                    && (!('phone' in request.resource.data)
+                        || request.resource.data.phone.size() <= 50)   // leads 와 같은 값
+                    && (!('website' in request.resource.data)
+                        || request.resource.data.website.size() <= 300)
+                    && request.resource.data.country.size() <= 100
+                    && request.resource.data.description.size() <= 5000
+                    && (!('timing' in request.resource.data)
+                        || request.resource.data.timing.size() <= 200)
+                    && (!('budget' in request.resource.data)
+                        || request.resource.data.budget.size() <= 100)
                     && request.resource.data.companyName is string
                     && request.resource.data.contactName is string
                     && request.resource.data.email is string

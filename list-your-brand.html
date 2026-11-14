@@ -525,6 +525,26 @@
             </div>
 
             <div class="form-submit">
+                <!-- A-537(브론즈 38차 7번): 전화번호까지 받으면서 고지도 동의도
+                     없었다. 처리방침 제3조가 「브랜드 입점 신청 시」를 스스로
+                     적어 둔 바로 그 자리다. -->
+                <div class="form-consent">
+                  <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
+                  <ul>
+                    <li data-en="What we collect: brand name, website, category, product type, description, contact name, position, email, phone" data-ko="수집 항목: 브랜드명, 웹사이트, 카테고리, 제품 유형, 브랜드 소개, 담당자 이름, 직책, 이메일, 전화번호">수집 항목: 브랜드명, 웹사이트, 카테고리, 제품 유형, 브랜드 소개, 담당자 이름, 직책, 이메일, 전화번호</li>
+                    <li data-en="Why: to review your listing application and manage your brand account" data-ko="수집 목적: 입점 신청 심사와 브랜드 계정 관리">수집 목적: 입점 신청 심사와 브랜드 계정 관리</li>
+                    <li data-en="How long: Until the account is closed, then 3 years (E-Commerce Act Enforcement Decree, Art. 6)" data-ko="보유 기간: 계정 해지 시까지, 해지 후 3년 (전자상거래법 시행령 제6조)">보유 기간: 계정 해지 시까지, 해지 후 3년 (전자상거래법 시행령 제6조)</li>
+                  </ul>
+                  <label class="form-consent-agree">
+                    <input type="checkbox" id="agreePrivacyLyb" required>
+                    <span>
+                      <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
+                      <span data-en="I agree to the collection and use of my personal data as described above." data-ko="위 내용에 동의합니다.">위 내용에 동의합니다.</span>
+                      <a href="privacy.html" data-en-href="privacy-en.html" data-ko-href="privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a>
+                    </span>
+                  </label>
+                  <p class="form-consent-note" data-en="You may decline, but we then cannot accept your request." data-ko="동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.</p>
+                </div>
                 <button type="submit" id="submitBtn" data-en="Submit Application" data-ko="신청서 제출">Submit Application</button>
             </div>
             <p class="form-note"><span data-en="By submitting, you agree to our " data-ko="제출함으로써 당사의 "></span><a href="terms.html" data-en="Terms of Service" data-ko="이용약관"></a><span data-en=" and " data-ko=" 및 "></span><a href="privacy.html" data-en="Privacy Policy" data-ko="개인정보 처리방침" data-en-href="privacy-en.html" data-ko-href="privacy.html"></a><span data-en="." data-ko="에 동의합니다."></span></p>
@@ -784,6 +804,16 @@ function lybSay(en, ko) {
 const submitBtn = document.getElementById('submitBtn');
 
 form.addEventListener('submit', async function(e) {
+    /* A-537: 이 폼은 전화번호까지 받으면서 고지도 동의도 없었다. `required` 하나에
+       기대지 않도록 여기서 한 번 더 본다. */
+    var agreePrivacyLyb = document.getElementById('agreePrivacyLyb');
+    if (agreePrivacyLyb && !agreePrivacyLyb.checked) {
+        e.preventDefault();
+        lybSay('Please agree to the collection and use of your personal data.',
+               '개인정보 수집·이용에 동의해 주세요.');
+        agreePrivacyLyb.focus();
+        return false;
+    }
     e.preventDefault();
     // 봇 스팸 방지: 허니팟 필드(실사용자에게는 안 보임)가 채워져 있으면 조용히 중단
     if (document.getElementById('hp_website').value.trim() !== '') {
@@ -891,6 +921,9 @@ form.addEventListener('submit', async function(e) {
                 referralSource: getReferralSource(),  // referralSource=?ref= 자동 캡처
                 agreedVendorTerms: true,                  // 약관 제9조(기술자료 제공·보증·면책) 동의
                 agreedVendorTermsAt: firebase.firestore.FieldValue.serverTimestamp(),
+                // A-537: 개인정보 수집·이용 동의. 약관 동의와는 다른 동의다.
+                privacyConsent: true,
+                privacyConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             }), 15000);
 

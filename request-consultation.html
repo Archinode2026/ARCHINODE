@@ -317,29 +317,29 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
           </div>
           <div class="form-group">
             <label for="contactName" data-en="Your Name" data-ko="담당자">Your Name <span class="req">*</span></label>
-            <input type="text" id="contactName" required>
+            <input type="text" id="contactName" maxlength="100" required>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="email" data-en="Email" data-ko="이메일">Email <span class="req">*</span></label>
-            <input type="email" id="email" required>
+            <input type="email" id="email" maxlength="254" required>
           </div>
           <div class="form-group">
             <label for="phone" data-en="Phone" data-ko="연락처">Phone <span class="hint" data-en="optional" data-ko="선택">optional</span></label>
-            <input type="tel" id="phone">
+            <input type="tel" id="phone" maxlength="50">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="website" data-en="Company Website" data-ko="회사 웹사이트">Company Website <span class="hint" data-en="optional" data-ko="선택">optional</span></label>
-            <input type="url" id="website" placeholder="https://...">
+            <input type="url" id="website" maxlength="300" placeholder="https://...">
           </div>
           <div class="form-group">
             <label for="country" data-en="Country" data-ko="국가">Country <span class="req">*</span></label>
-            <input type="text" id="country" required placeholder="e.g. Italy / Germany / Korea" data-en-placeholder="e.g. Italy / Germany / Korea" data-ko-placeholder="예: 이탈리아 / 독일 / 한국">
+            <input type="text" id="country" maxlength="100" required placeholder="e.g. Italy / Germany / Korea" data-en-placeholder="e.g. Italy / Germany / Korea" data-ko-placeholder="예: 이탈리아 / 독일 / 한국">
           </div>
         </div>
 
@@ -356,14 +356,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
         <div class="form-group">
           <label for="description" data-en="What do you need help with?" data-ko="어떤 부분에 자문이 필요하신가요?">What do you need help with? <span class="req">*</span> <span class="hint" data-en="100 characters minimum — context helps us prepare" data-ko="100자 이상 — 사전 준비를 위해 필요">100 characters minimum — context helps us prepare</span></label>
-          <textarea id="description" required placeholder="Brief on your situation, goal, and what you've tried so far. The more specific, the better we can prepare for the session." data-en-placeholder="Brief on your situation, goal, and what you've tried so far. The more specific, the better we can prepare for the session." data-ko-placeholder="현재 상황, 목표, 지금까지 시도한 것. 구체적일수록 사전 준비가 더 정확해집니다."></textarea>
+          <textarea id="description" maxlength="5000" required placeholder="Brief on your situation, goal, and what you've tried so far. The more specific, the better we can prepare for the session." data-en-placeholder="Brief on your situation, goal, and what you've tried so far. The more specific, the better we can prepare for the session." data-ko-placeholder="현재 상황, 목표, 지금까지 시도한 것. 구체적일수록 사전 준비가 더 정확해집니다."></textarea>
           <div class="char-count" id="descCount">0/100</div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="timing" data-en="Preferred Meeting Time" data-ko="미팅 희망 시기">Preferred Meeting Time <span class="hint" data-en="optional" data-ko="선택">optional</span></label>
-            <input type="text" id="timing" placeholder="e.g. Next week / Within 2 weeks / Flexible" data-en-placeholder="e.g. Next week / Within 2 weeks / Flexible" data-ko-placeholder="예: 다음 주 / 2주 내 / 유동적">
+            <input type="text" id="timing" maxlength="200" placeholder="e.g. Next week / Within 2 weeks / Flexible" data-en-placeholder="e.g. Next week / Within 2 weeks / Flexible" data-ko-placeholder="예: 다음 주 / 2주 내 / 유동적">
           </div>
           <div class="form-group">
             <label for="budget" data-en="Budget Range" data-ko="예산 범위">Budget Range <span class="hint" data-en="for scope alignment" data-ko="작업 범위 조율용">for scope alignment</span></label>
@@ -554,6 +554,18 @@ function archinodeWithTimeout(promise, ms) {
     ]);
 }
 
+/* A-538: 언어 판정은 A-517 의 정본(archiFormLang)을 쓴다 — 네 자리가 저마다
+   localStorage 만 보고 있었다. 저장소를 못 쓰는 환경(차단·시크릿)에서는
+   한국어 손님에게 영어가 나간다. */
+function rcLang() {
+  if (typeof archiFormLang === 'function') return archiFormLang();
+  var l = document.documentElement.lang;
+  if (l) return l;
+  try { return localStorage.getItem('archinode-lang')
+           || localStorage.getItem('archinode-lang-auto') || 'en'; }
+  catch (e) { return 'en'; }
+}
+
 async function submitConsult(e) {
   e.preventDefault();
   // 봇 스팸 방지: 허니팟 필드가 채워져 있으면 조용히 중단
@@ -575,16 +587,30 @@ async function submitConsult(e) {
   const timing = document.getElementById('timing').value.trim();
   const budget = document.getElementById('budget').value;
   const agreeContact = document.getElementById('agreeContact').checked;
+  const agreePrivacy = document.getElementById('agreePrivacyConsult');
+
+  /* A-535: 이 함수는 agreeContact 만 읽고 **개인정보 동의 칸은 한 번도 읽지
+     않았다**. 둘은 다른 동의다. */
+  if (agreePrivacy && !agreePrivacy.checked) {
+    errorDiv.textContent = rcLang() === 'ko'
+      ? '개인정보 수집·이용에 동의해 주세요.'
+      : 'Please agree to the collection and use of your personal data.';
+    errorDiv.style.display = 'block';
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    submitBtn.disabled = false;
+    agreePrivacy.focus();
+    return false;
+  }
 
   if (!agreeContact) {
-    var curLang1 = (function(){ try { return localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en'; } catch(e) { return 'en'; } })();
+    var curLang1 = rcLang();
     errorDiv.textContent = curLang1 === 'ko' ? '제출하려면 연락처 수집 동의에 체크해 주세요.' : 'Please confirm the contact consent to submit.';
     errorDiv.style.display = 'block';
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return false;
   }
   if (description.length < 100) {
-    var curLang2 = (function(){ try { return localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en'; } catch(e) { return 'en'; } })();
+    var curLang2 = rcLang();
     errorDiv.textContent = curLang2 === 'ko' ? '충분히 준비할 수 있도록 상황 설명을 100자 이상 적어 주세요.' : 'Please provide at least 100 characters in the description so we can prepare properly.';
     errorDiv.style.display = 'block';
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -592,7 +618,7 @@ async function submitConsult(e) {
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = (function(){ try { return (localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en') === 'ko' ? '제출 중...' : 'Submitting...'; } catch(e) { return 'Submitting...'; } })();
+  submitBtn.textContent = (rcLang() === 'ko' ? '제출 중...' : 'Submitting...');
 
   try {
     // A-004(2026-11-03): reCAPTCHA v3 — 토큰 발급 + 서버(Netlify Function)에서 검증, 낮은 점수면 중단
@@ -624,6 +650,9 @@ async function submitConsult(e) {
       timing: escapeHtml(timing),
       budget: budget,
       status: 'pending',
+      // A-535: 동의한 사실을 남긴다
+      privacyConsent: true,
+      consentAt: firebase.firestore.FieldValue.serverTimestamp(),
       reviewerNote: null,
       triageNote: null,
       reviewedAt: null,
@@ -671,7 +700,7 @@ async function submitConsult(e) {
     errorDiv.style.display = 'block';
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     submitBtn.disabled = false;
-    submitBtn.textContent = (function(){ try { return (localStorage.getItem('archinode-lang') || localStorage.getItem('archinode-lang-auto') || 'en') === 'ko' ? '요청 보내기' : 'Send Request'; } catch(e) { return 'Send Request'; } })();
+    submitBtn.textContent = (rcLang() === 'ko' ? '요청 보내기' : 'Send Request');
   }
   return false;
 }
