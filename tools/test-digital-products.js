@@ -202,5 +202,21 @@ ok('상품 틀에 기술적 사항 칸이 있다', /requires:/.test(SRC));
 ok('약관에 조항이 없다는 묵은 주석이 사라졌다',
    !/terms\.html` 에는 아직 청약철회·환불 조항이/.test(SRC));
 
+// ── 9) A-523 — 시행 7일 전 공지가 두 언어로 서 있는가 ──────────────────
+/* 제4조제2항이 요구하는 공지다. 상단 띠는 `data-lang-only="en"` 이라 한국어
+   손님에게 안 보이므로, 약관과 구매 길목 **양쪽에** 붙였다. */
+for (const [f, src] of [['terms.html', TERMS], ['digital-products.html', SRC]]) {
+  ok(f + ' 에 개정 공지가 있다', /class="terms-amend-notice"/.test(src));
+  ok(f + ' 공지가 시행일을 적는다', /2026년 11월 20일/.test(src));
+  ok(f + ' 공지가 7일 전 공지임을 밝힌다', /제4조제2항에 따라 시행 7일 전 공지/.test(src));
+  ok(f + ' 공지가 바뀐 조항을 짚는다', /제10조\(청약철회 등\)/.test(src));
+  ok(f + ' 공지가 거부할 자유를 알린다', /시행일 전에 서비스 이용을 중단/.test(src));
+  ok(f + ' 공지가 두 언어다',
+     /data-en-html='<strong>Notice of amendment/.test(src) && /data-ko-html='<strong>약관 개정 공지/.test(src));
+  ok(f + ' 영문 공지에 한글이 없다',
+     !/[가-힣]/.test((src.match(/data-en-html='([^']*)'/) || ['',''])[1]));
+}
+ok('약관 최종 수정일이 개정일과 같다', /최종 수정일: 2026년 11월 13일/.test(TERMS));
+
 console.log('\n디지털 상품 — 시험 ' + (pass + fail) + '개, 실패 ' + fail + '개');
 process.exit(fail ? 1 : 0);
