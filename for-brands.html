@@ -109,13 +109,15 @@ a { text-decoration: none; color: inherit; }
     gap: 32px;
     text-align: center;
 }
-.fb-stat h3 {
+/* A-542: 머리글 단계가 비어 읽히던 자리. 태그만 한 단계 올리고 생김새는
+   그대로 둔다 — 옛 선택자를 지우지 않고 새 태그를 **함께** 적는다. */
+.fb-stat h3, .fb-stat h2 {
     font-size: 2.4rem;
     font-weight: 800;
     color: #332e27;
     line-height: 1;
 }
-.fb-stat h3 span { color: var(--accent-ink); }
+.fb-stat h3 span, .fb-stat h2 span { color: var(--accent-ink); }
 .fb-stat p {
     font-size: 0.85rem;
     color: #666;
@@ -303,7 +305,7 @@ a { text-decoration: none; color: inherit; }
     margin-top: 3px;
     flex-shrink: 0;
 }
-.fb-showcase-item h4 {
+.fb-showcase-item h4, .fb-showcase-item h3 {
     font-size: 0.95rem;
     font-weight: 700;
     color: #332e27;
@@ -531,11 +533,11 @@ a { text-decoration: none; color: inherit; }
 <section class="fb-stats">
     <div class="fb-stats-inner">
         <div class="fb-stat">
-            <h3>USD 48<span>B</span></h3>
+            <h2>USD 48<span>B</span></h2>
             <p data-en="Korean interior &amp; design market size (2026)" data-ko="한국 인테리어·디자인 시장 규모 (2026)">Korean interior &amp; design market size (2026)</p>
         </div>
         <div class="fb-stat">
-            <h3>12<span>%</span></h3>
+            <h2>12<span>%</span></h2>
             <p data-en="Premium segment annual growth rate" data-ko="프리미엄 부문 연간 성장률">Premium segment annual growth rate</p>
         </div>
         <!-- A-498(2026-11-12, 브론즈 33차 N33-1 · 승리님 결정): 이 칸은 큰 글씨로 「0%」에
@@ -545,11 +547,11 @@ a { text-decoration: none; color: inherit; }
              승리님 결정: 「첫 3개월 무료, 그다음 월 10 EUR」로 통일. 숫자를 그대로 적는다.
              (data-ko 도 없었다 — 옆 칸들은 다 있다. 함께 단다.) -->
         <div class="fb-stat">
-            <h3>EUR 10<span>/mo</span></h3>
+            <h2>EUR 10<span>/mo</span></h2>
             <p data-en="Listing fee after the first three months — one plan, no upsell" data-ko="첫 3개월 뒤 입점비 — 요금제 하나, 추가 요금 없음">Listing fee after the first three months — one plan, no upsell</p>
         </div>
         <div class="fb-stat">
-            <h3>10</h3>
+            <h2>10</h2>
             <p data-en="Product categories covering full architectural scope" data-ko="건축 전 범위를 아우르는 제품 카테고리">Product categories covering full architectural scope</p>
         </div>
     </div>
@@ -660,42 +662,42 @@ a { text-decoration: none; color: inherit; }
         <div class="fb-showcase-item">
             <i class="fas fa-palette"></i>
             <div>
-                <h4 data-en="Visual-First Brand Pages" data-ko="비주얼 중심 브랜드 페이지">Visual-First Brand Pages</h4>
+                <h3 data-en="Visual-First Brand Pages" data-ko="비주얼 중심 브랜드 페이지">Visual-First Brand Pages</h3>
                 <p data-en="Hero imagery, curated product galleries, and brand-consistent design that reflects your visual identity." data-ko="히어로 이미지, 큐레이션된 제품 갤러리, 브랜드 비주얼 아이덴티티에 맞는 디자인.">Hero imagery, curated product galleries, and brand-consistent design that reflects your visual identity.</p>
             </div>
         </div>
         <div class="fb-showcase-item">
             <i class="fas fa-cogs"></i>
             <div>
-                <h4 data-en="Technical Specifications" data-ko="기술 사양">Technical Specifications</h4>
+                <h3 data-en="Technical Specifications" data-ko="기술 사양">Technical Specifications</h3>
                 <p data-en="Detailed product specs — dimensions, materials, finishes, certifications — the way EU brands like to present products." data-ko="치수 · 소재 · 마감 · 인증 등 상세 사양 — 유럽 브랜드가 선호하는 프레젠테이션 방식.">Detailed product specs — dimensions, materials, finishes, certifications — the way EU brands like to present products.</p>
             </div>
         </div>
         <div class="fb-showcase-item">
             <i class="fas fa-language"></i>
             <div>
-                <h4 data-en="Bilingual Content" data-ko="이중 언어 콘텐츠">Bilingual Content</h4>
+                <h3 data-en="Bilingual Content" data-ko="이중 언어 콘텐츠">Bilingual Content</h3>
                 <p data-en="All brand content is presented in both English and Korean, making it accessible to both international teams and local professionals." data-ko="모든 브랜드 콘텐츠를 영어 · 한국어로 제공하여 글로벌 팀과 한국 전문가 양쪽이 접근 가능합니다.">All brand content is presented in both English and Korean, making it accessible to both international teams and local professionals.</p>
             </div>
         </div>
         <div class="fb-showcase-item">
             <i class="fas fa-search"></i>
             <div>
-                <h4 data-en="SEO Optimized for Korea" data-ko="한국 SEO 최적화">SEO Optimized for Korea</h4>
+                <h3 data-en="SEO Optimized for Korea" data-ko="한국 SEO 최적화">SEO Optimized for Korea</h3>
                 <p data-en="Optimized for Naver (Korea's #1 search engine) and Google Korea, ensuring your brand appears in relevant local searches." data-ko="네이버(한국 1위 검색엔진) · 구글 한국 최적화로 관련 현지 검색에서 브랜드가 노출됩니다.">Optimized for Naver (Korea's #1 search engine) and Google Korea, ensuring your brand appears in relevant local searches.</p>
             </div>
         </div>
         <div class="fb-showcase-item">
             <i class="fas fa-project-diagram"></i>
             <div>
-                <h4 data-en="Project References" data-ko="프로젝트 레퍼런스">Project References</h4>
+                <h3 data-en="Project References" data-ko="프로젝트 레퍼런스">Project References</h3>
                 <p data-en="Showcase real Korean projects where your products are installed, building credibility with local professionals." data-ko="제품이 실제로 사용된 한국 프로젝트를 노출하여 현지 전문가에게 신뢰도를 구축합니다.">Showcase real Korean projects where your products are installed, building credibility with local professionals.</p>
             </div>
         </div>
         <div class="fb-showcase-item">
             <i class="fas fa-download"></i>
             <div>
-                <h4 data-en="Download Center" data-ko="다운로드 센터">Download Center</h4>
+                <h3 data-en="Download Center" data-ko="다운로드 센터">Download Center</h3>
                 <p data-en="Catalogs, CAD files, BIM objects, and technical documents — all accessible to Korean architects and specifiers." data-ko="카탈로그 · CAD 파일 · BIM 오브젝트 · 기술 문서 — 한국 건축가 · 스펙라이터가 모두 접근 가능합니다.">Catalogs, CAD files, BIM objects, and technical documents — all accessible to Korean architects and specifiers.</p>
             </div>
         </div>
@@ -847,7 +849,7 @@ a { text-decoration: none; color: inherit; }
         </div>
       </div>
       <div class="footer-col">
-        <h4 data-en="Categories" data-ko="카테고리">Categories</h4>
+        <h2 class="footer-col-title" data-en="Categories" data-ko="카테고리">Categories</h2>
         <ul>
           <li><a href="categories/furniture.html" data-en="Furniture" data-ko="가구">Furniture</a></li>
           <li><a href="categories/bathroom.html" data-en="Bathroom" data-ko="욕실">Bathroom</a></li>
@@ -857,7 +859,7 @@ a { text-decoration: none; color: inherit; }
         </ul>
       </div>
       <div class="footer-col">
-        <h4 data-en="More Categories" data-ko="더 많은 카테고리">More Categories</h4>
+        <h2 class="footer-col-title" data-en="More Categories" data-ko="더 많은 카테고리">More Categories</h2>
         <ul>
           <li><a href="categories/office.html" data-en="Office" data-ko="오피스">Office</a></li>
           <li><a href="categories/finishes.html" data-en="Finishes" data-ko="마감재">Finishes</a></li>
@@ -867,7 +869,7 @@ a { text-decoration: none; color: inherit; }
         </ul>
       </div>
       <div class="footer-col">
-        <h4 data-en="Services" data-ko="서비스">Services</h4>
+        <h2 class="footer-col-title" data-en="Services" data-ko="서비스">Services</h2>
         <ul>
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
           <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
@@ -886,7 +888,7 @@ a { text-decoration: none; color: inherit; }
         </ul>
       </div>
       <div class="footer-col">
-        <h4 data-en="Company" data-ko="회사">Company</h4>
+        <h2 class="footer-col-title" data-en="Company" data-ko="회사">Company</h2>
         <ul>
           <li><a href="about.html" data-en="About ARCHINODE" data-ko="ARCHINODE 소개">About ARCHINODE</a></li>
           <li><a href="magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a></li>

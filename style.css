@@ -807,13 +807,20 @@ html[lang="ko"] [data-lang-only="en"] { display: none !important; }
   transition: all 0.3s;
 }
 .footer-social a:hover { border-color: var(--white); color: var(--white); }
-.footer-col h4 {
+/* A-542: 푸터 칸 제목이 h4 였다. 본문이 h2 로 끝나므로 화면 낭독기에는
+   h2 다음에 h4 가 와서 **한 단계가 빈 것처럼** 읽혔다(98쪽). 뼈대를 따라
+   훑는 손님은 그 자리에서 길을 잃는다. 태그를 h2 로 올리고 생김새는 이
+   클래스로 그대로 둔다 — 라이브에서 계산된 값과 상자 크기가 바뀌지 않는 것을
+   확인하고 바꿨다. margin 과 line-height 를 못 박는 것은 h2 의 기본값이
+   새어 들어오지 않게 하려는 것이다. */
+.footer-col h2.footer-col-title {
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--gray-400);
-  margin-bottom: 24px;
+  margin: 0 0 24px;
+  line-height: inherit;
 }
 .footer-col ul li { margin-bottom: 12px; }
 .footer-col ul li a {
@@ -2592,7 +2599,7 @@ input, select, textarea, option { color: var(--black); }
 
 /* 제목은 세리프, 본문·UI 는 산세리프 — 건축 매거진의 기본 문법 */
 .display, .section-title, .hero h1, .cta-listing h2, .photo-band h2,
-.art h3, .lead-story h3, .svc h4, .brand-card h4, .logo, .cat-en {
+.art h3, .lead-story h3, .svc h4, .svc h3, .brand-card h4, .logo, .cat-en {
   font-family: 'Lora', 'Noto Serif KR', Georgia, serif;
   font-weight: 500;
   letter-spacing: -0.012em;
@@ -2762,11 +2769,12 @@ body .footer {
 }
 body .footer a { color: rgba(237,242,247,.78); }
 body .footer a:hover { color: var(--navy-gold); }
-body .footer h4 {
+body .footer h2.footer-col-title {
   font-family: 'Inter','Noto Sans KR',sans-serif;
   font-size: 0.67rem; font-weight: 500; letter-spacing: 0.22em;
   text-transform: uppercase; color: rgba(237,242,247,.56);
-  margin-bottom: 22px;
+  margin: 0 0 22px;
+  line-height: inherit;
 }
 body .footer .footer-grid {
   border-bottom: 1px solid rgba(237,242,247,.10);
@@ -3161,7 +3169,9 @@ body.home .service-item {
 }
 body.home .service-item:first-child { border-left: none; padding-left: 0; }
 body.home .service-item i { font-size: 1.1rem; color: var(--accent); margin-bottom: 20px; display: block; }
-body.home .service-item h4 {
+/* A-542: 머리글 단계가 비어 읽히던 자리. 태그만 한 단계 올리고 생김새는
+   그대로 둔다 — 옛 선택자를 지우지 않고 새 태그를 **함께** 적는다. */
+body.home .service-item h4, body.home .service-item h3 {
   font-family: 'Lora','Noto Serif KR',Georgia,serif; font-weight: 500;
   font-size: 1.04rem; margin: 0 0 11px; color: var(--black);
 }
