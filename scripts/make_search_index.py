@@ -39,6 +39,8 @@ TITLE_RE = re.compile(r"<title" + TAG_ATTRS + r">")
 # 중간에서 잘려 있었다. 잘린 뒤의 고유명사는 **검색되지 않는다** — 기사가 있는데
 # 손님에게는 없는 것이 된다. 여는 따옴표를 붙잡아 같은 따옴표로 닫는다.
 _HANGUL = re.compile(r'[가-힣]')
+# 설명으로 올라오면 안 되는 글 — 동의·약관 문장은 쪽 소개가 아니다
+_CONSENT = re.compile(r'동의|약관|제\d+조|개인정보')
 
 
 def _q(name):
@@ -171,14 +173,28 @@ def extract_title_desc(html: str) -> tuple[str, str, str, str]:
         desc_ko = m.group('ko').strip()
 
     # A-549(브론즈 39차): 위 메타 갈래는 `desc_ko = desc_en` 으로 **한 값을 두 언어에
-    # 똑같이** 넣는다. 그 갈래에 남은 쪽은 한국어 칸에 영어가 들어갔고, 한국어로
-    # 검색하면 안 나왔다 — 헤더 단추 이름이 「브랜드 입점」인데 그 낱말로
-    # list-your-brand.html 이 안 나오던 것이 그 때문이다. 한국어가 한 글자도 없으면
-    # 쪽에서 가장 긴 data-ko 문장을 가져다 쓴다. 지어내지 않고 쪽에 적힌 말을 쓴다.
+    # 똑같이** 넣는다. 그 갈래에 남은 쪽은 한국어 칸에 영어가 들어갔고, 한국어
+    # 결과 카드에 영어 설명이 떴다. 한국어가 한 글자도 없으면 쪽에서 가져온다.
+    #
+    # A-553: 처음에는 「가장 긴 data-ko」를 골랐는데, 그러면 **약관 동의 문장**처럼
+    #   길기만 한 글이 설명으로 올라온다(list-your-brand 에서 실제로 그랬다).
+    #   설명은 머리글 **바로 아래 문단**이 맞다 — 쪽이 스스로를 소개하는 자리다.
+    #   거기서 못 찾으면 그때 가장 긴 문장으로 떨어지되, 동의·약관 글은 거른다.
     if desc_ko and not _HANGUL.search(desc_ko):
-        cands = [v for v in re.findall(r'data-ko="([^"]{20,200})"', html) if _HANGUL.search(v)]
-        if cands:
-            desc_ko = max(cands, key=len).strip()
+        picked = ""
+        hm = re.search(r'</h1>', html)
+        if hm:
+            window = html[hm.end():hm.end() + 1200]
+            pm = re.search(r'<p[^>]*data-ko="([^"]{20,300})"', window)
+            if pm and _HANGUL.search(pm.group(1)):
+                picked = pm.group(1)
+        if not picked:
+            cands = [v for v in re.findall(r'data-ko="([^"]{20,200})"', html)
+                     if _HANGUL.search(v) and not _CONSENT.search(v)]
+            if cands:
+                picked = max(cands, key=len)
+        if picked:
+            desc_ko = picked.strip()
 
     # ── A-401(2026-11-09): 히어로 설명문을 두 언어로 가져온다 ──────────────────
     # 위의 메타 description 갈래는 **한 값을 두 언어에 똑같이 넣는다**

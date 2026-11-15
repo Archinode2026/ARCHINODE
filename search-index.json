@@ -66,9 +66,9 @@
   {
     "type": "page",
     "name_en": "List Your Brand on ARCHINODE",
-    "name_ko": "ARCHINODE에 브랜드를 등록하세요",
+    "name_ko": "ARCHINODE 브랜드 입점 신청",
     "desc_en": "Register your architecture or design brand on ARCHINODE to access the Korean market. First 3 months free, with automatic brand page creation.",
-    "desc_ko": "서비스 약관 제9조(브랜드 파트너의 기술자료 제공 및 보증·면책)를 읽고 동의합니다 — 제가 제출하는 CAD/BIM/카탈로그 자료, ARCHINODE가 이를 인증된 한국 전문가에게 제공할 수 있는 라이선스, 그리고 자료의 정확성 및 제3자 권리에 대한 제 책임을 포함합니다.",
+    "desc_ko": "아래 입점 신청서를 작성하시면 브랜드 페이지, 로그인 포털, 한국 건축가·디자이너 접근권을 받으실 수 있습니다.",
     "url": "list-your-brand.html"
   },
   {
