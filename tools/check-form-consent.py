@@ -57,6 +57,10 @@ FORMS = [
     ('products/view.html',         'agreePrivacyRfqProduct', 'doc'),
     ('products/view.html',         'agreePrivacyBim',        'doc'),
     ('list-your-brand.html',       'agreePrivacyLyb',        'doc'),
+    # A-568: 전문가 회원가입. 이름·이메일·회사명·직함·업종·전화번호를 받으면서
+    #   고지도 동의도 없었다. 이 명부에 `auth/` 가 한 번도 오른 적이 없어서
+    #   이 검사가 통과하는 동안 그 자리는 비어 있었다.
+    ('auth/signup.html',           'agreePrivacySignup',     'doc'),
 ]
 
 # 고지에 반드시 있어야 하는 세 가지 (라벨, 한국어 꼴, 영어 꼴)

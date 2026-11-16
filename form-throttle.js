@@ -75,6 +75,19 @@
   }
   window.archiPickMessage = archiPickMessage;   // 시험과 다른 화면이 쓴다
 
+  /* A-567 — 안내를 자리에 심는다.
+     인증 쪽 아홉 곳이 「…습니다. / …」처럼 **두 언어를 한 줄에 붙여** 두고 있었다.
+     실패하는 순간에 두 언어가 한꺼번에 뜨고, 손님이 언어를 바꿔도 그 줄만 안 바뀐다
+     (A-529 와 같은 꼴). data-en/data-ko 를 **함께** 달아 두면 lang.js 가 나중에
+     다시 칠한다 — 삼항으로 고르기만 하면 이미 박힌 글자는 그대로 남는다(A-222). */
+  function archiSay(el, en, ko) {
+    if (!el) return;
+    el.setAttribute('data-en', en);
+    el.setAttribute('data-ko', ko);
+    el.textContent = archiFormLang() === 'en' ? en : ko;
+  }
+  window.archiSay = archiSay;
+
   function archiApplyMessage(el) {
     if (!el || typeof el.setCustomValidity !== 'function' || !el.validity) return;
     /* 먼저 비워야 **지금의 진짜 상태**가 보인다 — 비우지 않으면 한 번 틀린 칸이

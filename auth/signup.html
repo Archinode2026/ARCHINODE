@@ -268,6 +268,30 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
                 </div>
             </div>
 
+            <!-- A-568: 이 폼은 이름·이메일·회사명·직함·업종·전화번호를 받으면서
+                 **수집 고지도 동의도 없었다**. 바로 아래 약관 동의가 있었지만 그것은
+                 이용약관에 대한 동의이고, **개인정보 수집·이용 동의는 다른 동의**다
+                 (A-537 의 기술자료 신청에서 겪은 것과 같다). 처리방침 제3조가
+                 「전문가 회원가입 시」를 스스로 적어 둔 바로 그 자리다.
+                 이 쪽은 하위 폴더라 처리방침 링크는 ../ 로 간다(A-547). -->
+            <div class="form-consent">
+              <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
+              <ul>
+                <li data-en="What we collect: name, email, company, job title, industry, phone" data-ko="수집 항목: 이름, 이메일, 회사명, 직함, 업종, 전화번호">수집 항목: 이름, 이메일, 회사명, 직함, 업종, 전화번호</li>
+                <li data-en="Why: to create and run your professional member account" data-ko="수집 목적: 전문가 회원 계정 생성과 운영">수집 목적: 전문가 회원 계정 생성과 운영</li>
+                <li data-en="How long: until you ask us to delete the account; inactive accounts up to 3 years after last activity" data-ko="보유 기간: 계정 삭제를 요청하실 때까지 (비활성 계정은 마지막 활동 이후 최대 3년)">보유 기간: 계정 삭제를 요청하실 때까지 (비활성 계정은 마지막 활동 이후 최대 3년)</li>
+              </ul>
+              <label class="form-consent-agree">
+                <input type="checkbox" id="agreePrivacySignup" required>
+                <span>
+                  <strong class="req-mark" data-en="(required)" data-ko="(필수)">(필수)</strong>
+                  <span data-en="I agree to the collection and use of my personal data as described above." data-ko="위 내용에 동의합니다.">위 내용에 동의합니다.</span>
+                  <a href="../privacy.html" data-en-href="../privacy-en.html" data-ko-href="../privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a>
+                </span>
+              </label>
+              <p class="form-consent-note" data-en="You may decline, but we then cannot create your account." data-ko="동의하지 않으실 수 있으나, 그 경우 계정을 만들 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 계정을 만들 수 없습니다.</p>
+            </div>
+
             <div class="terms-check">
                 <input type="checkbox" id="signupTerms" required>
                 <label for="signupTerms">
@@ -396,6 +420,17 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     errorDiv.style.display = 'none';
     successDiv.style.display = 'none';
 
+    /* A-568: `required` 는 손님의 실수를 막는 장치이지 보증이 아니다. 속성 하나가
+       없어지면 동의 없는 개인정보가 그대로 접수된다. 보내기 직전에 다시 본다. */
+    const agreePrivacySignup = document.getElementById('agreePrivacySignup');
+    if (agreePrivacySignup && !agreePrivacySignup.checked) {
+        archiSay(errorDiv, 'Please agree to the collection and use of your personal data.',
+                           '개인정보 수집·이용에 동의해 주세요.');
+        errorDiv.style.display = 'block';
+        agreePrivacySignup.focus();
+        return;
+    }
+
     const name = document.getElementById('signupName').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
@@ -407,12 +442,12 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
 
     // 유효성 검사
     if (password !== passwordConfirm) {
-        errorDiv.textContent = '비밀번호가 일치하지 않습니다. / Passwords do not match.';
+        archiSay(errorDiv, 'Passwords do not match.', '비밀번호가 일치하지 않습니다.');
         errorDiv.style.display = 'block';
         return;
     }
     if (password.length < 6) {
-        errorDiv.textContent = '비밀번호는 6자 이상이어야 합니다. / Password must be at least 6 characters.';
+        archiSay(errorDiv, 'Password must be at least 6 characters.', '비밀번호는 6자 이상이어야 합니다.');
         errorDiv.style.display = 'block';
         return;
     }
@@ -437,13 +472,16 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
             industry: industry,
             phone: phone,
             role: 'professional',
+            // A-568: 동의한 사실을 남긴다. 받아 놓고 버리면 나중에 증명할 수 없다.
+            privacyConsent: true,
+            consentAt: firebase.firestore.FieldValue.serverTimestamp(),
             likedProducts: [],
             likedBrands: [],
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        successDiv.textContent = '계정이 생성되었습니다! 잠시 후 이동합니다... / Account created! Redirecting...';
+        archiSay(successDiv, 'Account created! Redirecting...', '계정이 생성되었습니다! 잠시 후 이동합니다...');
         successDiv.style.display = 'block';
 
         // 프로필 페이지로 이동
@@ -456,11 +494,11 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
         window.setLangText && window.setLangText(btn, "Create Account", "계정 만들기");
         errorDiv.style.display = 'block';
         if (error.code === 'auth/email-already-in-use') {
-            errorDiv.textContent = '이미 등록된 이메일입니다. 로그인해주세요. / Email already in use. Please log in.';
+            archiSay(errorDiv, 'Email already in use. Please log in.', '이미 등록된 이메일입니다. 로그인해 주세요.');
         } else if (error.code === 'auth/weak-password') {
-            errorDiv.textContent = '비밀번호가 너무 약합니다. / Password is too weak.';
+            archiSay(errorDiv, 'Password is too weak.', '비밀번호가 너무 약합니다.');
         } else if (error.code === 'auth/invalid-email') {
-            errorDiv.textContent = '유효하지 않은 이메일 주소입니다. / Invalid email address.';
+            archiSay(errorDiv, 'Invalid email address.', '유효하지 않은 이메일 주소입니다.');
         } else {
             errorDiv.textContent = error.message;
         }
