@@ -1320,15 +1320,15 @@ document.getElementById('addCertBtn').addEventListener('click', async () => {
     const name = document.getElementById('certName').value.trim();
     const issuer = document.getElementById('certIssuer').value.trim();
     const file = document.getElementById('certFile').files[0];
-    if (!name) { alert('Certification name is required'); return; }
-    if (!file) { alert('Please choose a certificate file'); return; }
+    if (!name) { pNote(pT('Certification name is required', '인증서 이름을 입력해 주세요.'), true); return; }
+    if (!file) { pNote(pT('Please choose a certificate file', '인증서 파일을 선택해 주세요.'), true); return; }
     /* A-484: 인증서는 공개 브랜드 페이지에 배지로 **그대로 열린다**(brands/view.html).
        그래서 PDF·사진만 받는다(SVG 는 스크립트가 돌아 제외). storage.rules 의
        isCertFile() 이 같은 조건으로 한 번 더 막지만, 거부 메시지가 사람이 읽을 수
        없는 말이라 여기서 먼저 알려 준다. */
     const CERT_OK = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
     if (CERT_OK.indexOf(String(file.type || '').split(';')[0].trim()) === -1) {
-        alert(document.documentElement.lang !== 'en'
+        pNote(document.documentElement.lang !== 'en'
             ? '인증서는 PDF 또는 사진(JPG·PNG·WebP)만 올릴 수 있습니다.'
             : 'Certificates must be a PDF or an image (JPG, PNG, WebP).');
         return;
@@ -1355,14 +1355,17 @@ document.getElementById('addCertBtn').addEventListener('click', async () => {
         document.getElementById('certFile').value = '';
     } catch (err) {
         console.error('Certification upload error:', err);
-        alert('Upload failed. Please try again.');
+        pNote(pT('Upload failed. Please try again.', '업로드에 실패했습니다. 다시 시도해 주세요.'), true);
     }
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-plus"></i> Add Certification';
 });
 
 async function deleteCertification(index) {
-    if (!confirm('Remove this certification?')) return;
+    // A-561: 차단되면 언제나 false 인 confirm() 대신. 두 언어로 묻는다.
+    if (!await pConfirm('Remove certification', '인증서 삭제',
+                        'Remove this certification?', '이 인증서를 삭제하시겠습니까?',
+                        'Remove', '삭제')) return;
     const updatedCerts = (brandData.certifications || []).filter((_, i) => i !== index);
     await db.collection('brands').doc(currentUser.uid).update({ certifications: updatedCerts });
     brandData.certifications = updatedCerts;
@@ -1521,8 +1524,8 @@ document.getElementById('passwordForm').addEventListener('submit', async (e) => 
     const pw = document.getElementById('newPassword').value;
     const confirm = document.getElementById('confirmPassword').value;
     const msg = document.getElementById('pwSaveMsg');
-    if (pw !== confirm) { msg.textContent = 'Passwords do not match'; msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
-    if (pw.length < 6) { msg.textContent = 'Min 6 characters'; msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
+    if (pw !== confirm) { msg.textContent = pT('Passwords do not match', '비밀번호가 서로 다릅니다.'); msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
+    if (pw.length < 6) { msg.textContent = pT('Min 6 characters', '비밀번호는 6자 이상이어야 합니다.'); msg.style.color = '#b91c1c'; msg.classList.add('show'); return; }
     try {
         await currentUser.updatePassword(pw);
         msg.innerHTML = '<i class="fas fa-check"></i> Password changed!';
@@ -1530,7 +1533,7 @@ document.getElementById('passwordForm').addEventListener('submit', async (e) => 
         msg.classList.add('show');
         setTimeout(() => msg.classList.remove('show'), 3000);
     } catch (err) {
-        msg.textContent = 'Please log out and log in again, then retry.';
+        msg.textContent = pT('Please log out and log in again, then retry.', '로그아웃 후 다시 로그인한 뒤 시도해 주세요.');
         msg.style.color = '#b91c1c';
         msg.classList.add('show');
     }
@@ -1759,7 +1762,7 @@ document.getElementById('prodImage').addEventListener('change', (e) => {
 // 제품 폼 안내 (A-216 — alert 대신). isErr 면 붉게.
 function prodMsg(text, isErr) {
     const el = document.getElementById('prodFormMsg');
-    if (!el) { if (text) alert(text); return; }       // 자리가 없으면 옛 방식으로
+    if (!el) { if (text) pNote(text, !!isErr); return; }       // A-564: 자리가 없으면 화면 안내로(옛날엔 alert 였다)
     el.textContent = text || '';
     el.style.color = isErr ? '#991b1b' : '#15803d';
     /* ★ A-472(브론즈 29차 ⑤): `#prodFormMsg` 는 `#productForm` **안**에 있어서
@@ -2528,6 +2531,7 @@ document.getElementById('noticeAllBtn').addEventListener('click', pn_openAll);
 document.getElementById('noticeClose').addEventListener('click', pn_close);
 document.getElementById('noticeModal').addEventListener('click', function (e) { if (e.target === e.currentTarget) pn_close(); });
 </script>
+<script src="portal-ui.js?v=20261116a"></script>
 <script src="article-editor.js?v=20261106a"></script>
 <script src="../form-throttle.js?v=20260630" defer></script>
 </body>

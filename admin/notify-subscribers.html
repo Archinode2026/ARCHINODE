@@ -237,8 +237,9 @@ document.getElementById('contentArea').addEventListener('click', function(e) {
   deleteSubscriber(btn.getAttribute('data-id'), btn.getAttribute('data-email'));
 });
 
-window.deleteSubscriber = function(id, email) {
-  if (!confirm('정말 ' + email + ' 를 목록에서 삭제하시겠습니까?')) return;
+window.deleteSubscriber = async function(id, email) {
+    // A-560: 기본 confirm() 은 대화상자가 차단되면 언제나 false 라 조용히 되돌아갔다.
+  if (!await admConfirm('구독자 삭제', email + ' 를 목록에서 삭제합니다.\n되돌릴 수 없습니다.', '삭제')) return;
   db.collection('digital-products-notify').doc(id).delete()
     .then(function() {
       logAdmin({ action: 'notify.status', target: { col: 'digital-products-notify', id: id, label: email || '' }, from: 'subscribed', to: 'deleted', note: '' });   // 2단계: 활동 로그

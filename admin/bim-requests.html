@@ -297,8 +297,9 @@ function closeDetailModal() {
   document.getElementById('detailModal').classList.remove('active');
 }
 
-function rejectRequest(id) {
-  if (!confirm('이 요청을 반려하시겠습니까?')) return;
+async function rejectRequest(id) {
+    // A-560: 기본 confirm() 은 대화상자가 차단되면 언제나 false 라 조용히 되돌아갔다.
+  if (!await admConfirm('요청 반려', '이 요청을 반려하시겠습니까?', '반려')) return;
   db.collection('bim-requests').doc(id).update({
     status: 'rejected',
     reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -317,7 +318,8 @@ function rejectRequest(id) {
 async function approveRequest(id) {
   var d = findDoc(id);
   if (!d) return;
-  if (!confirm(d.name + '님의 요청을 승인하시겠습니까? 7일간 유효한 다운로드 링크가 발송됩니다.')) return;
+    // A-560: 기본 confirm() 은 대화상자가 차단되면 언제나 false 라 조용히 되돌아갔다.
+  if (!await admConfirm('요청 승인', d.name + '님의 요청을 승인합니다.\n7일간 유효한 다운로드 링크가 발송됩니다.', '승인')) return;
 
   try {
     var productSnap = await db.collection('products').doc(d.productId).get();

@@ -18,8 +18,13 @@ import io, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 어드민·포털·도구는 뺀다(운영자 화면이고 t(en,ko) 관례가 따로 있다)
+# A-563(브론즈 40차): `brand-portal` 이 여기 빠져 있었다. 근거는 「운영자 화면이고
+#   t(en,ko) 관례가 따로 있다」였는데, 포털에서 그 관례는 **반만** 지켜졌다 —
+#   마크업은 전부 두 언어인데 자바스크립트가 심는 말만 영어였다(16곳). 포털을
+#   쓰는 사람은 운영자가 아니라 **브랜드 손님**이다. 예외를 거둔다.
+#   `admin` 은 남긴다 — 승리님 전용 화면이다.
 SKIP_DIRS = {'node_modules', '.git', 'admin', 'tools', 'scripts', 'docs', 'backup',
-             'brand-portal', '옛사본-2026-04', 'archi-diary', 'sales', 'silvia'}
+             '옛사본-2026-04', 'archi-diary', 'sales', 'silvia'}
 HANGUL = re.compile(r'[가-힣]')
 LATIN = re.compile(r'[A-Za-z]{3}')
 ASSIGN = re.compile(r"\.(?:textContent|innerText)\s*=\s*\(?\s*'([^']{15,})'")

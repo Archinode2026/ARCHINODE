@@ -64,6 +64,9 @@ function build() {
 
   doc = {
     readyState: 'complete', activeElement: null, _ls: {},
+    /* A-565: 가짜 DOM 에 body 가 없어, 뒤 쪽 잠금을 **재지 못했다**.
+       없는 것을 두고 통과시키면 그 동작은 검사 밖에 있는 것과 같다. */
+    body: { style: { overflow: '' } },
     getElementById(id) { return id === 'mainNav' ? nav : (id === 'main' ? main : null); },
     querySelector(sel) { return sel === '.mobile-toggle' ? toggle : null; },
     addEventListener(t, f) { (this._ls[t] = this._ls[t] || []).push(f); },
@@ -100,6 +103,11 @@ nav.classList.add('active');
 ok('열면 aria-expanded 가 true', toggle.getAttribute('aria-expanded') === 'true');
 ok('열면 대화상자가 된다', nav.getAttribute('role') === 'dialog' && nav.getAttribute('aria-modal') === 'true');
 ok('열면 초점이 메뉴 첫 항목으로 간다', doc.activeElement === links[0]);
+/* A-565: `aria-modal="true"` 라고 알리면 뒤 쪽은 없는 셈이어야 한다. Tab 은
+   이미 가두고 Esc 도 닫히는데 **뒤 쪽은 그대로 스크롤**됐다 — 알린 것과 사실이
+   달랐다. 여는 동안 잠그고, 닫을 때 **쪽이 정해 둔 값으로** 되돌리는지 본다. */
+ok('열면 뒤 쪽 스크롤이 잠긴다', doc.body.style.overflow === 'hidden',
+   '지금: ' + JSON.stringify(doc.body.style.overflow));
 
 // ── 3) Tab 이 메뉴 안에 갇히는가 ──────────────────────────────────────
 doc.activeElement = links[links.length - 1];
@@ -115,6 +123,8 @@ ok('단추에서 Shift+Tab 은 마지막 항목으로',
 nav.classList.remove('active');
 ok('닫으면 aria-expanded 가 false', toggle.getAttribute('aria-expanded') === 'false');
 ok('닫으면 대화상자 표지를 뗀다', nav.getAttribute('role') === null && nav.getAttribute('aria-modal') === null);
+ok('닫으면 뒤 쪽 스크롤이 풀린다', doc.body.style.overflow !== 'hidden',
+   '지금: ' + JSON.stringify(doc.body.style.overflow));
 ok('닫으면 초점이 여닫이 단추로 돌아온다', doc.activeElement === toggle);
 doc.activeElement = null;
 ok('닫힌 뒤 Tab 은 더 이상 가로채지 않는다', key(false) === false);

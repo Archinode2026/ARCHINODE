@@ -411,9 +411,11 @@
         .footer-column details.footer-more > summary:hover { color: #fff; }
         .footer-column details.footer-more > a { padding-left: 12px; border-left: 1px solid rgba(255,255,255,0.12); }
 
+        /* A-558: 푸터 맨 아래 법적 링크가 Netlify 배지에 덮이지 않게 — style.css 와 같은 값 */
         .footer-bottom {
             border-top: 1px solid #333;
             padding-top: 30px;
+            padding-bottom: 96px;
             display: flex;
             justify-content: space-between;
             align-items: center;

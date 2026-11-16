@@ -184,16 +184,35 @@ if bare:
 if rules_code.count("data.get('status', '')") < 3:
     errors.append("[읽기] get('status','') 를 쓰는 자리가 3곳 미만이다 — 탐지가 멈췄다")
 
-# ── 4) 공개 페이지의 기본 대화상자 (A-487) ─────────────────────────────────
-for rel in ['products/view.html', 'brands/view.html']:
+# ── 4) 기본 대화상자 (A-487 · A-560 · A-561) ──────────────────────────────
+# A-563(브론즈 40차): 여기 **파일 두 개가 손으로 박혀** 있었다. 그래서 어드민과
+#   브랜드 포털은 검사 밖이었고, 거기 기본 confirm() 이 **11곳** 남아 있었다.
+#   크롬이 대화상자를 차단하면 confirm() 은 언제나 false 라 조용히 되돌아간다 —
+#   A-302 · A-309 · A-487 · A-560 · A-561 로 같은 원인이 다섯 번 고쳐졌다.
+#   목록을 손으로 적는 대신 **손님과 운영자가 쓰는 쪽을 전부** 훑는다.
+def _dialog_targets():
+    out = []
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        dirnames[:] = [d for d in dirnames
+                       if d not in ('node_modules', '.git', '__pycache__', 'tools',
+                                    'scripts', 'docs', 'backup', 'archi-diary')]
+        for fn in sorted(filenames):
+            if fn.endswith('.html') or (fn.endswith('.js') and 'brand-portal' in dirpath):
+                out.append(os.path.relpath(os.path.join(dirpath, fn), ROOT).replace(os.sep, '/'))
+    return out
+
+for rel in _dialog_targets():
     code = strip_comments(io.open(os.path.join(ROOT, rel), encoding='utf-8').read())
     for fn in ['confirm', 'alert']:
         hits = re.findall(r'(?<![\w.])' + fn + r'\s*\(', code)
         if hits:
+            how = ('likeNote(…, link)' if rel in ('products/view.html', 'brands/view.html')
+                   else ('admConfirm()·admSay()' if rel.startswith('admin/')
+                         else 'pConfirm()·pNote()'))
             errors.append('[대화상자] %s 에 기본 %s() 가 %d곳 있다 — 억제되면 눌러도 '
-                          '아무 일도 안 일어난다. likeNote(…, link) 를 써라'
-                          % (rel, fn, len(hits)))
-    if 'likeNote(msg, isErr, link)' not in code:
+                          '아무 일도 안 일어난다. %s 를 써라'
+                          % (rel, fn, len(hits), how))
+    if rel in ('products/view.html', 'brands/view.html') and 'likeNote(msg, isErr, link)' not in code:
         errors.append('[대화상자] %s 의 likeNote 가 link 를 받지 않는다' % rel)
 
 # ── 5) 어드민 검색 결과 주소 (A-488) ───────────────────────────────────────

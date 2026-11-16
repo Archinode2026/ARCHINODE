@@ -455,16 +455,18 @@ document.getElementById('btnRevise').addEventListener('click', function() {
   if (!note) { showToast('수정 요청 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
   doAction('revision-requested', '수정 요청');
 });
-document.getElementById('btnReject').addEventListener('click', function() {
+document.getElementById('btnReject').addEventListener('click', async function() {
   var note = document.getElementById('inNote').value.trim();
   if (!note) { showToast('거절 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
-  if (!confirm('정말 거절하시겠습니까? 브랜드에게 거절 메일을 보내야 합니다.')) return;
+    // A-560: 기본 confirm() 은 대화상자가 차단되면 언제나 false 라 조용히 되돌아갔다.
+  if (!await admConfirm('원고 거절', '정말 거절하시겠습니까?\n브랜드에게 거절 메일을 보내야 합니다.', '거절')) return;
   doAction('rejected', '거절');
 });
-document.getElementById('btnApprove').addEventListener('click', function() {
+document.getElementById('btnApprove').addEventListener('click', async function() {
   var ko = document.getElementById('inKorean').value.trim();
   if (!ko) {
-    if (!confirm('한국어 번역이 비어 있습니다. 그래도 승인하시겠습니까? (trend-editor 에이전트가 게시 단계에서 번역 가능)')) return;
+      // A-560: 기본 confirm() 은 대화상자가 차단되면 언제나 false 라 조용히 되돌아갔다.
+  if (!await admConfirm('번역 없이 승인', '한국어 번역이 비어 있습니다. 그래도 승인하시겠습니까?\n(trend-editor 에이전트가 게시 단계에서 번역 가능)', '승인')) return;
   }
   doAction('approved', '게시 승인');
 });

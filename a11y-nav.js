@@ -77,12 +77,23 @@
       }
     }
 
+    var prevOverflow = '';
+
     function opened() {
       if (trapped) return;
       trapped = true;
       toggle.setAttribute('aria-expanded', 'true');
       nav.setAttribute('role', 'dialog');
       nav.setAttribute('aria-modal', 'true');
+      /* A-565(브론즈 40차): `aria-modal="true"` 라고 알리면서 **뒤 쪽은 그대로
+         스크롤**됐다. 읽어 주는 도구에는 「뒤는 없는 셈 치라」고 해 놓고 실제로는
+         살아 있었던 셈이다 — 알린 것과 사실이 달랐다. Tab 은 이미 가두고 있고
+         Esc 도 닫히니, 남은 한 가지를 맞춘다. 되돌릴 값을 적어 뒀다가 닫을 때
+         그대로 돌려준다(빈 문자열로 덮으면 쪽이 정한 값을 지운다). */
+      if (document.body) {
+        prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+      }
       var items = focusablesIn(nav);
       if (items.length) { try { items[0].focus(); } catch (e) {} }
       document.addEventListener('keydown', onKey, true);
@@ -94,6 +105,7 @@
       toggle.setAttribute('aria-expanded', 'false');
       nav.removeAttribute('role');
       nav.removeAttribute('aria-modal');
+      if (document.body) document.body.style.overflow = prevOverflow;   // A-565
       document.removeEventListener('keydown', onKey, true);
       /* 초점이 아직 메뉴 안에 있으면 단추로 돌려준다 — 메뉴가 사라진 자리에
          초점을 두고 가면 다음 Tab 이 어디로 갈지 아무도 모른다. */

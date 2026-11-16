@@ -455,3 +455,55 @@ function admAccessDenied(email) {
       + '</div>';
     document.body.appendChild(box);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   A-560(브론즈 40차): 이 함수는 `admin/articles.html` **안에만** 있었다.
+   그래서 나머지 쪽들은 기본 `confirm()` 을 그대로 썼다 — 크롬이 「추가
+   대화상자 차단」을 걸면 `confirm()` 은 **언제나 false** 라, `if (!confirm(..)) return;`
+   이 조용히 되돌아간다. 누른 사람은 눌렀다고 믿는데 아무 일도 안 일어난다.
+   A-302(대시보드 승인)·A-309(articles 4곳)·A-487(공개 3곳)이 **같은 원인으로
+   세 번** 고쳐졌고, A-302 에는 「승인이 활동 로그에 흔적조차 남지 않았다」는
+   실측이 적혀 있다. 네 번째를 막으려고 공용 자리로 올린다.
+   이 파일은 어드민 7쪽이 전부 싣는다.
+   ───────────────────────────────────────────────────────────────────────── */
+function admConfirm(title, message, okLabel) {
+  return new Promise(function (resolve) {
+    var wrap = document.createElement('div');
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-modal', 'true');
+    wrap.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(32,28,24,.45);'
+                       + 'display:flex;align-items:center;justify-content:center;padding:20px;';
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#fdfbf7;border-radius:10px;max-width:460px;width:100%;'
+                      + 'padding:26px 26px 22px;box-shadow:0 18px 50px rgba(0,0,0,.22);font-family:inherit;';
+    var h = document.createElement('h3');
+    h.textContent = title;
+    h.style.cssText = 'margin:0 0 10px;font-size:1.05rem;color:#332e27;';
+    var p = document.createElement('p');
+    p.textContent = message;
+    p.style.cssText = 'margin:0 0 20px;font-size:0.9rem;line-height:1.65;color:#5d564c;white-space:pre-line;';
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;';
+    var ok = document.createElement('button');
+    ok.type = 'button'; ok.className = 'act-btn act-approve'; ok.textContent = okLabel || t('Continue', '계속');
+    var no = document.createElement('button');
+    no.type = 'button'; no.className = 'act-btn'; no.textContent = t('Cancel', '취소');
+    no.style.cssText = 'background:#ede7dc;color:#403a30;';
+    row.appendChild(ok); row.appendChild(no);
+    box.appendChild(h); box.appendChild(p); box.appendChild(row);
+    wrap.appendChild(box);
+    document.body.appendChild(wrap);
+    ok.focus();
+
+    function done(v) {
+      document.removeEventListener('keydown', onKey, true);
+      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+      resolve(v);
+    }
+    function onKey(e) { if (e.key === 'Escape') { e.stopPropagation(); done(false); } }
+    document.addEventListener('keydown', onKey, true);
+    ok.onclick = function () { done(true); };
+    no.onclick = function () { done(false); };
+    wrap.onclick = function (e) { if (e.target === wrap) done(false); };
+  });
+}

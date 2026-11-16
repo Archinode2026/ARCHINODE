@@ -323,6 +323,20 @@ body .topbar .lang-switch-btn:hover {
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     gap: 4px;
   }
+  /* A-559(브론즈 40차): 메뉴 패널을 여는 햄버거는 A-286 에서 44px 로 올렸는데,
+     **열린 패널 안의 1차 링크들은 한 번도 세지 않았다**(29~37px). A-113·A-286·
+     A-353·A-393·A-460 이 다섯 번 44px 을 올리는 동안 이 자리만 빠졌다.
+     이 구간에서 `.main-nav` 는 평소 `display:none` 이라 **메뉴를 여는 것이 유일한
+     길**인데 그 안이 기준 미달이었다. 빗나간 탭이 빈 자리나 **옆 링크**로 갔다.
+     세로 목록이므로 줄 높이를 올리면 된다 — 가운데 정렬로 글자는 그대로 둔다.
+     드롭다운 안 카테고리 10개는 이미 통과하므로 직계 자식만 잡는다. */
+  .main-nav.active > a,
+  .main-nav.active > .nav-dropdown > .nav-dropdown-trigger {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
   .main-nav.active .nav-dropdown-menu {
     position: static;
     box-shadow: none;
@@ -829,8 +843,16 @@ html[lang="ko"] [data-lang-only="en"] { display: none !important; }
   transition: color 0.2s;
 }
 .footer-col ul li a:hover { color: var(--white); }
+/* A-558(브론즈 40차): 쪽 맨 아래의 「약관」·「개인정보 처리방침」이 Netlify
+   배지(고정, z-index 2147483645)에 **완전히 덮여** 있었다. 7점 중 6점이 배지에
+   막혔고, 폭 375px 과 1133px 에서 똑같았다. 이 둘은 쪽의 **마지막 내용**이라
+   더 스크롤할 수 없다 — 즉 영구히 배지 아래였다. 법으로 두게 한 링크가 닿지
+   않는 자리에 있었던 셈이다.
+   배지는 오른쪽 아래에 약 196x64 로 뜬다. 푸터 끝에 그보다 넉넉한 여백을 둬서
+   마지막 줄이 배지 위로 올라오게 한다. 배지를 가리거나 없애지 않는다 —
+   남의 iframe 이라 우리가 손댈 수 없고, 손대서도 안 된다. */
 .footer-bottom {
-  padding: 24px 0;
+  padding: 24px 0 96px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2800,7 +2822,9 @@ body .footer .footer-social a {
 }
 body .footer .footer-social a:hover { color: #fdfbf7; }
 /* 최하단 바 — 한 단 더 어둡게, 화면 끝까지 */
-body .footer .footer-bottom { position: relative; padding: 20px 0; }
+/* A-558: 위와 같은 이유. 이 규칙이 .footer-bottom 의 padding 을 덮어쓰므로
+   여기에도 같은 여백을 둔다 — 한쪽만 고치면 사본이 갈린다. */
+body .footer .footer-bottom { position: relative; padding: 20px 0 96px; }
 body .footer .footer-bottom::before {
   content: ''; position: absolute; top: 0; bottom: 0; left: -50vw; right: -50vw;
   background: var(--navy-deep); z-index: -1;

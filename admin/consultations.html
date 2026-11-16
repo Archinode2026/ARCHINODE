@@ -446,10 +446,11 @@ document.getElementById('btnTriage').addEventListener('click', function() {
   if (!triage) { showToast('Triage Note를 입력하세요.', 'error'); return; }
   doAction('triaged', { triageNote: triage });
 });
-document.getElementById('btnWritten').addEventListener('click', function() {
+document.getElementById('btnWritten').addEventListener('click', async function() {
   var note = document.getElementById('inNote').value.trim();
   if (!note) { showToast('Reviewer Note에 사전 답변 본문을 입력하세요.', 'error'); return; }
-  if (!confirm('사전 답변으로 처리하시겠습니까? (유료 미팅 없이 종료)')) return;
+    // A-560: 기본 confirm() 은 대화상자가 차단되면 언제나 false 라 조용히 되돌아갔다.
+  if (!await admConfirm('사전 답변 처리', '사전 답변으로 처리합니다.\n유료 미팅 없이 종료됩니다.', '처리')) return;
   doAction('completed', { reviewerNote: note, resolutionType: 'written-answer' });
 });
 document.getElementById('btnSchedule').addEventListener('click', function() {
@@ -462,10 +463,11 @@ document.getElementById('btnComplete').addEventListener('click', function() {
   var note = document.getElementById('inNote').value.trim();
   doAction('completed', { reviewerNote: note || null, resolutionType: 'meeting-completed' });
 });
-document.getElementById('btnReject').addEventListener('click', function() {
+document.getElementById('btnReject').addEventListener('click', async function() {
   var note = document.getElementById('inNote').value.trim();
   if (!note) { showToast('거절 사유를 Reviewer Note에 입력하세요.', 'error'); return; }
-  if (!confirm('정말 거절하시겠습니까?')) return;
+    // A-560: 기본 confirm() 은 대화상자가 차단되면 언제나 false 라 조용히 되돌아갔다.
+  if (!await admConfirm('요청 거절', '정말 거절하시겠습니까?', '거절')) return;
   doAction('rejected', { reviewerNote: note });
 });
 

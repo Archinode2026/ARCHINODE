@@ -38,10 +38,16 @@
         btn.title = act==='up'?'Move up':(act==='down'?'Move down':'Delete');
         btn.disabled = (act==='up'&&i===0) || (act==='down'&&i===blocks.length-1);
         btn.style.cssText = 'background:#f0f0f0;border:1px solid #ddd;border-radius:3px;padding:2px 10px;margin-left:4px;cursor:pointer;font-weight:700;'+(act==='del'?'color:#c00;':'');
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           if (act==='up') [blocks[i-1],blocks[i]]=[blocks[i],blocks[i-1]];
           else if (act==='down') [blocks[i+1],blocks[i]]=[blocks[i],blocks[i+1]];
-          else if (act==='del' && confirm('Delete this block?')) blocks.splice(i,1);
+          // A-561: 차단되면 언제나 false 인 confirm() 대신. 두 언어로 묻는다.
+          else if (act==='del') {
+            if (!await pConfirm('Delete block', '블록 삭제',
+                                'Delete this block?', '이 블록을 삭제하시겠습니까?',
+                                'Delete', '삭제')) return;
+            blocks.splice(i,1);
+          }
           render();
         });
         btnBox.appendChild(btn);
@@ -148,18 +154,18 @@
 
   async function handleImageFile(block, file, idx) {
     if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
-      alert('Only JPG, PNG, or WebP allowed'); return;
+      pNote(pT('Only JPG, PNG, or WebP allowed', 'JPG · PNG · WebP 만 올릴 수 있습니다.'), true); return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      alert('Image must be under 10MB before compression'); return;
+      pNote(pT('Image must be under 10MB before compression', '이미지는 압축 전 10MB 미만이어야 합니다.'), true); return;
     }
     block.uploading = true;
     render();
     try {
       const blob = await compressImage(file);
-      if (!blob) { alert('Failed to read image'); block.uploading = false; render(); return; }
+      if (!blob) { pNote(pT('Failed to read image', '이미지를 읽지 못했습니다.'), true); block.uploading = false; render(); return; }
       if (blob.size > 5 * 1024 * 1024) {
-        alert('Compressed image still exceeds 5MB. Try a smaller image.');
+        pNote(pT('Compressed image still exceeds 5MB. Try a smaller image.', '압축해도 5MB 를 넘습니다. 더 작은 이미지로 시도해 주세요.'), true);
         block.uploading = false; render(); return;
       }
       const ts = Date.now();
@@ -171,7 +177,7 @@
       render();
     } catch (e) {
       block.uploading = false;
-      alert('Upload failed: ' + e.message);
+      pNote(pT('Upload failed: ', '업로드 실패: ') + e.message, true);
       render();
     }
   }
@@ -320,9 +326,13 @@
       render();
     });
 
-    $('cancelArticle').addEventListener('click', () => {
+    $('cancelArticle').addEventListener('click', async () => {
       const hasContent = blocks.some(b => (b.type==='text'&&b.content&&b.content.trim()) || (b.type==='image'&&b.url));
-      if (hasContent && !confirm('Discard this article? Unsaved changes will be lost.')) return;
+      // A-561: 차단되면 언제나 false 인 confirm() 대신. 두 언어로 묻는다.
+      if (hasContent && !await pConfirm('Discard article', '작성 취소',
+              'Discard this article? Unsaved changes will be lost.',
+              '작성 중인 글을 버리시겠습니까? 저장하지 않은 내용이 사라집니다.',
+              'Discard', '버리기')) return;
       resetForm();
       $('articleForm').style.display = 'none';
       $('addArticleBtn').style.display = 'inline-block';
@@ -345,7 +355,7 @@
       msg.textContent = ''; msg.style.color = '';
 
       const btn = $('submitArticle');
-      btn.disabled = true; btn.textContent = 'Submitting...';
+      btn.disabled = true; btn.textContent = pT('Submitting...', '제출 중...');
 
       /* A-213 / R-031: brandId 는 실시간 currentUser.uid, brandName 은 페이지가 불러둔
          brandData 에서 왔다 — 수명이 다른 두 출처다. 계정이 바뀌는 틈에 제출하면
@@ -360,7 +370,7 @@
             ? bpIdentityMessage(bpId.reason)
             : 'The signed-in account changed. Please reload and resubmit.';
         msg.style.color = '#c00';
-        btn.disabled = false; btn.textContent = 'Submit for Review';
+        btn.disabled = false; btn.textContent = pT('Submit for Review', '검토 요청');
         return;
       }
 
@@ -407,7 +417,7 @@
           }), 10000);
         } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
 
-        msg.textContent = '✓ Submitted for review';
+        msg.textContent = pT('✓ Submitted for review', '✓ 검토 요청이 접수되었습니다');
         msg.style.color = '#0a0';
         resetForm();
         setTimeout(() => {
@@ -424,7 +434,7 @@
           : 'Submit failed: ' + e.message;
         msg.style.color = '#c00';
       } finally {
-        btn.disabled = false; btn.textContent = 'Submit for Review';
+        btn.disabled = false; btn.textContent = pT('Submit for Review', '검토 요청');
       }
     });
 
