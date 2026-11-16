@@ -342,12 +342,27 @@ async function approveRequest(id) {
 
     var downloadLink = 'https://archinodekr.com/products/bim-download.html?req=' + id;
 
+    /* A-573(브론즈 41차 ⑦): 이 메일이 try 없이 await 였다. 실패하면 위에서 이미
+       status 를 approved 로 바꾼 **뒤**인데 바깥 catch 로 떨어져 토스트는
+       「승인 실패」라고 했다. 어드민이 그 말을 믿고 다시 누르면 **같은 메일이
+       두 번** 간다(상태 검사가 없다). 승인과 알림은 따로 세고, 끝에 사실대로
+       적는다. */
+    var mailToRequester = false;
+    var mailToBrand = null;      // null = 보낼 브랜드 주소가 없었다
+    try {
     // 국내 신청자용 다운로드 안내 메일
     await db.collection('mail').add({
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
       to: d.email,
       message: {
-        subject: '[archinodekr] 요청하신 ' + (d.brandName || '') + ' - ' + (d.productName || '') + ' BIM 데이터가 승인되었습니다.',
+        /* A-572(브론즈 41차 ⑨): 이 메일이 **한국어 하나뿐**이었다. 그런데 신청
+           폼은 영어로도 제출된다(제품 쪽의 두 언어 전문). 영어로 신청한 손님은
+           다운로드 링크는 짐작해도 **「제3자 재배포 금지」를 읽을 수 없었다** —
+           라이선스 고지는 읽혀야 효력이 있다.
+           신청서에 언어를 담아 두지 않아 어느 쪽인지 알 길이 없으므로, 둘 다
+           보낸다. (나중에 신청 때 언어를 함께 담으면 한쪽만 보낼 수 있다.) */
+        subject: '[archinodekr] ' + (d.brandName || '') + ' - ' + (d.productName || '')
+                 + ' 기술 데이터 승인 / Technical data approved',
         text: [
           '안녕하세요, ' + (d.name || '') + ' ' + (d.title || '') + '님.',
           '유럽 프리미엄 건축 플랫폼 archinodekr입니다.',
@@ -363,10 +378,33 @@ async function approveRequest(id) {
           '3. 향후 샘플 요청, 상세 기술 사양 협의, 또는 견적(RFQ)이 필요하신 경우 본 메일로 회신 주시면 유럽 제조사 본사와 직접 연결해 드립니다.',
           '',
           '감사합니다.',
-          'archinodekr 운영팀 드림'
+          'archinodekr 운영팀 드림',
+          '',
+          '────────────────────────────────────────',
+          '',
+          'Dear ' + (d.name || '') + ' ' + (d.title || '') + ',',
+          'This is archinodekr.',
+          '',
+          'Your request to download the ' + (d.brandName || '') + ' - ' + (d.productName || '')
+            + ' technical data for [' + (d.projectName || '') + '] has been approved.',
+          '',
+          '■ Download link: ' + downloadLink,
+          '* The link is valid for 7 days from the date of this email.',
+          '',
+          '■ Terms of use:',
+          '1. This data may be used only for design review and spec-in on the project you named.',
+          '2. Redistribution to third parties, commercial reproduction, and reverse-engineering to make similar products are strictly prohibited under copyright law and the licence terms.',
+          '3. For samples, detailed specifications or a quote (RFQ), reply to this email and we will connect you directly with the European manufacturer.',
+          '',
+          'Kind regards,',
+          'The archinodekr team'
         ].join('\n')
       }
     });
+      mailToRequester = true;
+    } catch (reqMailErr) {
+      console.warn('[bim] 신청자 안내 메일 실패:', reqMailErr);
+    }
 
     // 유럽 브랜드용 리드 통지 메일 (brands 컬렉션의 email 필드 사용)
     try {
@@ -401,14 +439,26 @@ async function approveRequest(id) {
             ].join('\n')
           }
         });
+        mailToBrand = true;
       }
-    } catch (brandMailErr) { console.warn('Brand lead notification skipped:', brandMailErr); }
+    } catch (brandMailErr) {
+      mailToBrand = false;
+      console.warn('Brand lead notification skipped:', brandMailErr);
+    }
 
     if (typeof logAdmin === 'function') {
       logAdmin({ action: 'bim-request.approve', target: { col: 'bim-requests', id: id, label: d.name || '' }, from: 'pending', to: 'approved', note: d.productName || '' });
     }
 
-    showToast('승인 완료 — 메일 발송됨', 'success');
+    /* A-573: 전에는 무조건 「메일 발송됨」이라고 했다. 어드민이 그 말을 믿고
+       넘어가면 손님은 링크 없이 기다린다. 보낸 것만 보냈다고 적는다. */
+    if (mailToRequester && mailToBrand !== false) {
+      showToast('승인 완료 — 안내 메일을 큐에 넣었습니다', 'success');
+    } else if (mailToRequester) {
+      showToast('승인 완료 — 신청자 메일은 넣었으나 브랜드 통지는 실패했습니다', 'error');
+    } else {
+      showToast('승인은 되었으나 신청자 안내 메일을 넣지 못했습니다 — 수동으로 보내 주세요', 'error');
+    }
     loadRequests();
   } catch (err) {
     console.error(err);

@@ -39,16 +39,33 @@ def strip_comments(s):
 rules_code = strip_comments(rules)
 
 
-def create_clause(coll):
+def match_block(coll):
     m = re.search(r"match\s+/" + coll + r"/\{\w+\}\s*\{(.*?)\n    \}", rules_code, re.S)
-    if not m:
+    return m.group(1) if m else None
+
+
+def create_clause(coll):
+    """A-570: 전에는 `allow create:` 한 줄만 돌려줬다. 그래서 울타리를 **도우미
+    함수에 담아 둔** 자리(mail 의 mailKeysOk·mailShapeOk)는 「없다」고 읽혔다.
+    규칙을 어떻게 적었느냐가 아니라 **무엇을 막느냐**를 봐야 한다 — 같은 match
+    블록 안의 함수까지 함께 본다."""
+    blk = match_block(coll)
+    if blk is None:
         return None
-    c = re.search(r'allow create:(.*?);', m.group(1), re.S)
-    return c.group(1) if c else None
+    c = re.search(r'allow create:(.*?);', blk, re.S)
+    if not c:
+        return None
+    funcs = ''.join(m.group(0) for m in re.finditer(r'function\s+\w+\s*\(\)\s*\{.*?\n      \}', blk, re.S))
+    return c.group(1) + '\n' + funcs
 
 
 # ── 1) 규칙 ────────────────────────────────────────────────────────────────
-for coll, label in [('leads', '리드'), ('bim-requests', '자료 신청')]:
+# A-570(브론즈 41차 ④): 여기 컬렉션 **둘만** 적혀 있었다. 그래서 `mail` 과
+#   `consultations` 처럼 **비로그인도 쓸 수 있는** 자리가 검사 밖이었고,
+#   `mail` 에는 키 울타리가 없어 bcc·from·첨부를 끼워 넣을 수 있었다(A-569).
+#   누구나 쓸 수 있는 컬렉션은 전부 여기 적는다.
+for coll, label in [('leads', '리드'), ('bim-requests', '자료 신청'),
+                    ('mail', '메일 큐'), ('consultations', '자문 요청')]:
     cl = create_clause(coll)
     if cl is None:
         errors.append('[규칙] %s 의 create 조건을 못 찾았다 — 탐지가 멈췄다' % coll)
@@ -57,7 +74,7 @@ for coll, label in [('leads', '리드'), ('bim-requests', '자료 신청')]:
         if 'hasOnly' not in cl:
             errors.append('[규칙] %s(%s) create 에 키 목록(keys().hasOnly)이 없다 — '
                           '아무 칸이나 끼워 넣을 수 있다' % (coll, label))
-    if '.size() <=' not in cl:
+    if '.size() <=' not in cl and '.size() <' not in cl:   # A-570: `<` 도 상한이다
         errors.append('[규칙] %s(%s) create 에 길이 상한이 하나도 없다 — '
                       '한 문서를 1MiB 까지 불릴 수 있다' % (coll, label))
 

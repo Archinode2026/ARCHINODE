@@ -510,8 +510,25 @@ service cloud.firestore {
                메일 쓰기 **뒤로** 옮겼다(A-477).
          본문 상한도 함께 둔다 — 전에는 `message.text` 검증이 **0개**여서
          1MiB 문서를 무한히 만들 수 있었다. */
+      /* ★★ A-569(2026-11-16, 브론즈 41차 ④): A-477 은 **`to` 만** 묶고
+         **담기는 키는 세지 않았다**. Trigger Email 확장은 `to` 말고도
+         `cc`·`bcc`·`from`·`replyTo`·`headers`·`template`, 그리고
+         `message.attachments` 를 읽는다. 그래서 비로그인 손님이
+         `to: 'office@archinode.org'` 로 조건을 맞춰 놓고 `bcc` 에 남의 주소를,
+         `message.html` 에 임의 내용을 담으면 **ARCHINODE 이름으로 임의 주소에
+         임의 메일**이 나간다 — A-477 이 막으려던 바로 그 일이 옆문으로 열려
+         있었다. 첨부(`attachments.path`)는 URL·로컬 경로를 읽으므로 더 나쁘다.
+         키를 못 박는다. 지금 메일을 넣는 13곳은 전부 `to`·`message`·`createdAt`
+         셋만 쓰고, `message` 안은 `subject`·`text` 뿐이다(전수 확인).
+         시각도 지어낼 수 없게 request.time 으로 묶는다. */
+      function mailKeysOk() {
+        return request.resource.data.keys().hasOnly(['to', 'message', 'createdAt'])
+               && request.resource.data.message.keys().hasOnly(['subject', 'text', 'html'])
+               && request.resource.data.createdAt == request.time;
+      }
       function mailShapeOk() {
-        return request.resource.data.to is string
+        return mailKeysOk()
+               && request.resource.data.to is string
                && request.resource.data.to.size() < 200
                && request.resource.data.message.subject is string
                && request.resource.data.message.subject.size() < 200
@@ -522,7 +539,10 @@ service cloud.firestore {
                    || (request.resource.data.message.html is string
                        && request.resource.data.message.html.size() < 20000));
       }
-      allow create: if isAdmin()
+      /* A-569: 어드민 갈래에도 키 울타리를 건다. 어드민은 받는 사람을 고를 수
+         있어야 하지만(답장·자격증명), 담는 **칸**까지 자유로울 이유는 없다.
+         어드민 화면에 글이 끼어드는 날 그 틈이 그대로 메일이 된다. */
+      allow create: if (isAdmin() && mailKeysOk())
                     || (mailShapeOk()
                         && request.resource.data.to == 'office@archinode.org')
                     || (isSignedIn() && mailShapeOk()
