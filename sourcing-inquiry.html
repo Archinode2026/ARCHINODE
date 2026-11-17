@@ -29,7 +29,10 @@
 <!-- A-333(2026-11-06): reCAPTCHA v3 — R-086. 사이트 키는 공개돼도 안전하다(설계상 그렇게 쓰도록
      되어 있다). 비밀 키는 netlify/functions/recaptcha-verify.js 가 읽는 Netlify 환경변수
      RECAPTCHA_SECRET_KEY 에만 있고 파일에는 쓰지 않는다. A-004 가 폼 3곳에 넣은 것과 같은 패턴. -->
-<script src="https://www.google.com/recaptcha/api.js?render=6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po"></script>
+<!-- A-584(2026-11-17, 브론즈 42차 C+H): api.js 를 머리에서 바로 싣지 않는다.
+     폼에 처음 손이 닿을 때 recaptcha-lazy.js 가 싣는다(첫 화면에서 354.8KB 빠짐,
+     손대지 않은 손님에게는 localStorage `_grecaptcha` 도 안 생긴다). -->
+<script src="recaptcha-lazy.js?v=20261117" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main" data-en="Skip to content" data-ko="본문으로 건너뛰기">Skip to content</a>
@@ -391,7 +394,7 @@ async function submitSourcing(e) {
     // R-086: 이 폼만 보호가 없었다. leads 에 바로 쓰는 폼이라 봇이 돌면 무료 한도를 먹고
     //        리드 인박스에 쓰레기가 쌓인다.
     const captchaToken = await archinodeWithTimeout(
-      grecaptcha.execute('6Ld5wg0uAAAAADRptBbyguxgE-Y1V3u4mripU8Po', { action: 'sourcing_inquiry' }),
+      archiCaptcha('sourcing_inquiry'),
       15000
     );
     const captchaResp = await archinodeWithTimeout(
