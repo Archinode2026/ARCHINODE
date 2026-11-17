@@ -2537,7 +2537,7 @@ body .stats-section.band-grey { color: var(--black); }
      **특정도 규칙으로만 보장**했고 눈으로는 못 봤다. */
   html body { background: #fdfbf7; color: #332e27; }
   .page-hero, .hero { min-height: auto; padding: 0; background: none !important; }
-  .page-hero-bg, .hero-slide-bg, .page-hero > picture { display: none; }   /* A-474 */
+  .page-hero-bg, .hero-slide-bg, .page-hero > picture, .hero-slide > picture { display: none; }   /* A-474 · A-580 */
   .container, .page-hero-content, .page-hero-inner { max-width: 100%; padding: 0; }
   a { color: #332e27; text-decoration: underline; }
   /* 외부 링크는 괄호에 URL을 같이 인쇄 */

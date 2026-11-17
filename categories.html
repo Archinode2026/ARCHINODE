@@ -387,7 +387,11 @@
     <div class="categories-grid">
       <!-- Furniture -->
       <a href="categories/furniture.html" class="category-card fade-in">
-        <img loading="lazy" src="assets/photos/photo-1555041469-a586c61ea9bc-600.jpg" alt="Furniture" class="category-card-image">
+        <!-- A-581(브론즈 42차 F): 이 카드는 휴대폰 첫 화면 안에 있는데(상단 603px)
+             `lazy` 가 붙어 **스크롤하기 전까지 받지 않았다**. 게다가 `.fade-in` 으로
+             투명한 상태라 브라우저가 더 미룬다 — 9초를 기다려도 빈 회색 칸이었다.
+             손님은 「깨진 쪽」으로 읽는다. 첫 장 하나만 lazy 에서 뺀다. -->
+        <img fetchpriority="high" width="600" height="400" src="assets/photos/photo-1555041469-a586c61ea9bc-600.jpg" alt="Furniture" class="category-card-image">
         <div class="category-card-content">
           <div class="category-card-title" data-en="Furniture" data-ko="가구">Furniture</div>
           <div class="category-card-korean" data-lang-only="en">가구</div>

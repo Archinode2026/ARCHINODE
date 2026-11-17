@@ -191,6 +191,11 @@ input, select, textarea { font-family: inherit; }
   transition: opacity 1.5s ease;
 }
 .hero-slide.active { opacity: 1; }
+/* A-580: 히어로를 `<picture>` 로 감쌌다. `.hero-slide` 는 `inset:0` 로 자리를
+   잡는데, 감싸는 `picture` 가 기본 `display:inline` 이면 안쪽 `img` 의 높이
+   100% 가 기준을 잃는다 — A-474 가 `.page-hero` 에서 똑같이 겪었다.
+   감싸개를 안쪽 그림과 같은 크기로 못 박아 레이아웃을 전과 같게 둔다. */
+.hero-slide > picture { display: block; width: 100%; height: 100%; }
 .hero-slide-bg {
   width: 100%;
   height: 100%;
@@ -851,14 +856,29 @@ input, select, textarea { font-family: inherit; }
 
 <!-- HERO -->
 <section class="hero" id="hero">
+<!-- A-580(브론즈 42차 D): 이 세 장만 사이트의 반응형 사진 규칙에서 빠져 있었다.
+     다른 81쪽의 히어로는 전부 picture + srcset 을 쓰는데 여기만 1600px 한 장을
+     그대로 받았다 — 휴대폰(375px·DPR2, 필요 751px)에서 2.1배다. 게다가 **보이지도
+     않는 슬라이드 두 장까지** 첫 화면에서 받아 817KB 였다.
+     첫 장만 먼저 받고(fetchpriority) 나머지 둘은 미룬다. 크기를 적어 두어
+     사진이 들어올 때 쪽이 내려앉지 않게 한다(CLS). -->
   <div class="hero-slide active" data-slide="0">
-    <img class="hero-slide-bg" src="assets/photos/photo-1600585154340-be6161a56a0c-1600.jpg" alt="Architecture">
+    <picture>
+      <source type="image/webp" srcset="assets/photos/photo-1600585154340-be6161a56a0c-600.webp 600w, assets/photos/photo-1600585154340-be6161a56a0c-1200.webp 1200w, assets/photos/photo-1600585154340-be6161a56a0c-1600.webp 1600w" sizes="100vw">
+      <img class="hero-slide-bg" fetchpriority="high" width="1600" height="1067" src="assets/photos/photo-1600585154340-be6161a56a0c-1600.jpg" srcset="assets/photos/photo-1600585154340-be6161a56a0c-600.jpg 600w, assets/photos/photo-1600585154340-be6161a56a0c-1600.jpg 1600w" sizes="100vw" alt="Architecture">
+    </picture>
   </div>
   <div class="hero-slide" data-slide="1">
-    <img class="hero-slide-bg" src="assets/photos/photo-1618221195710-dd6b41faaea6-1600.jpg" alt="Interior Design">
+    <picture>
+      <source type="image/webp" srcset="assets/photos/photo-1618221195710-dd6b41faaea6-600.webp 600w, assets/photos/photo-1618221195710-dd6b41faaea6-1200.webp 1200w, assets/photos/photo-1618221195710-dd6b41faaea6-1600.webp 1600w" sizes="100vw">
+      <img class="hero-slide-bg" loading="lazy" width="1600" height="844" src="assets/photos/photo-1618221195710-dd6b41faaea6-1600.jpg" srcset="assets/photos/photo-1618221195710-dd6b41faaea6-600.jpg 600w, assets/photos/photo-1618221195710-dd6b41faaea6-1600.jpg 1600w" sizes="100vw" alt="Interior Design">
+    </picture>
   </div>
   <div class="hero-slide" data-slide="2">
-    <img class="hero-slide-bg" src="assets/photos/photo-1600607687939-ce8a6c25118c-1600.jpg" alt="Design">
+    <picture>
+      <source type="image/webp" srcset="assets/photos/photo-1600607687939-ce8a6c25118c-600.webp 600w, assets/photos/photo-1600607687939-ce8a6c25118c-1200.webp 1200w, assets/photos/photo-1600607687939-ce8a6c25118c-1600.webp 1600w" sizes="100vw">
+      <img class="hero-slide-bg" loading="lazy" width="1600" height="1088" src="assets/photos/photo-1600607687939-ce8a6c25118c-1600.jpg" srcset="assets/photos/photo-1600607687939-ce8a6c25118c-600.jpg 600w, assets/photos/photo-1600607687939-ce8a6c25118c-1600.jpg 1600w" sizes="100vw" alt="Design">
+    </picture>
   </div>
   <div class="hero-content">
     <div class="hero-inner">

@@ -92,7 +92,7 @@
 <section class="page-hero">
   <picture>
     <source type="image/webp" srcset="assets/photos/photo-1524758631624-e2822e304c36-600.webp 600w, assets/photos/photo-1524758631624-e2822e304c36-1200.webp 1200w, assets/photos/photo-1524758631624-e2822e304c36-1600.webp 1600w" sizes="100vw">
-    <img class="page-hero-bg" fetchpriority="high" src="assets/photos/photo-1524758631624-e2822e304c36-1600.jpg" srcset="assets/photos/photo-1524758631624-e2822e304c36-600.jpg 600w, assets/photos/photo-1524758631624-e2822e304c36-1600.jpg 1600w" sizes="100vw" alt="ARCHINODE Magazine">
+    <img class="page-hero-bg" width="1600" height="1067" fetchpriority="high" src="assets/photos/photo-1524758631624-e2822e304c36-1600.jpg" srcset="assets/photos/photo-1524758631624-e2822e304c36-600.jpg 600w, assets/photos/photo-1524758631624-e2822e304c36-1600.jpg 1600w" sizes="100vw" alt="ARCHINODE Magazine">
   </picture>
   <div class="page-hero-content">
     <div class="page-hero-inner">
@@ -114,7 +114,11 @@
 <section class="featured-article">
   <div class="container">
     <a href="magazine/tailored-classic-earth-tone-2026-korea.html" class="featured-card fade-in" style="text-decoration:none;color:inherit;">
-      <img loading="lazy" src="assets/photos/photo-1504307651254-35680f356dfd-600.jpg" alt="테일러드 클래식과 어스톤의 시대">
+      <!-- A-581(브론즈 42차 F): 이 카드는 휴대폰 첫 화면 안에 있는데(상단 603px)
+           `lazy` 가 붙어 **스크롤하기 전까지 받지 않았다**. 게다가 `.fade-in` 으로
+           투명한 상태라 브라우저가 더 미룬다 — 9초를 기다려도 빈 회색 칸이었다.
+           손님은 「깨진 쪽」으로 읽는다. 첫 장 하나만 lazy 에서 뺀다. -->
+      <img fetchpriority="high" width="600" height="397" src="assets/photos/photo-1504307651254-35680f356dfd-600.jpg" alt="테일러드 클래식과 어스톤의 시대">
       <div class="featured-overlay">
         <span class="featured-tag" data-en="TRENDS" data-ko="트렌드">TRENDS</span>
         <h2 data-en="Tailored Classic and the Age of Earth Tones" data-ko="테일러드 클래식과 어스톤의 시대">Tailored Classic and the Age of Earth Tones</h2>
