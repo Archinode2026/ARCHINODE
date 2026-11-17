@@ -146,6 +146,16 @@ CHECKS = [
 #     좁은 폭        27페이지 × 360·390px — 넘치는 페이지 0
 #     호버 대비      요소 361개(8페이지) — 미달 0
 #   네 개 전부 통과. 승리님 기계에서는 크로미움을 못 받으니 이 넷은 컨테이너에서 돈다.
+#
+#   2026-11-17 재실행(A-584 뒤, 컨테이너 + 로컬 http.server). 승리님 기계에서
+#   다시 확인: `cdn.playwright.dev` 가 403 Connection blocked by network allowlist,
+#   시스템 크롬도 없고 root 도 없어 apt 도 안 된다 — 그러니 컨테이너에서 도는 것이
+#   임시방편이 아니라 **이 넷의 정식 실행 경로다.**
+#     좁은 폭        27페이지 × 360·390px — 넘치는 페이지 0
+#     XSS 출력      18화면 — 실행0 · 주입요소0 · 핸들러0 · 나쁜URL0
+#     검색 오버레이  결과 줄 99개(페이지 3 × 폭 3) — 눌린 글자칸 0
+#     호버 대비      A-587 로 고친 뒤 요소 508개(전 365개) — 미달 0
+#   네 개 전부 통과.
 BROWSER_CHECKS = [
     ('호버 대비',  'py', 'scripts/check_hover_contrast.py', '호버 상태의 글자 대비'),
     ('좁은 폭',    'py', 'scripts/check_narrow_width.py',   '좁은 화면에서 넘침'),
@@ -238,8 +248,19 @@ def main():
     bad = [r for r in results if r[1] not in ('통과', '건너뜀')]
     okn = sum(1 for r in results if r[1] == '통과')
     if skipped_browser:
-        print('건너뜀  %s — Playwright 가 없다' % ' · '.join(skipped_browser))
-        print('        pip install playwright && playwright install chromium')
+        print('건너뜀  %s — 이 기계에서는 크로미움을 못 받는다' % ' · '.join(skipped_browser))
+        # A-587(2026-11-17): 전에는 여기서 `pip install playwright && playwright install
+        # chromium` 을 안내했다. 그런데 이 기계에서는 **그 명령이 될 수 없다** —
+        # cdn.playwright.dev 가 403(망 허용목록), 시스템 크롬 없음, root 없음(apt 불가).
+        # 될 수 없는 명령을 안내하면 읽는 사람이 자기 탓인 줄 알고 시간을 버린다.
+        print('        이 넷은 클라우드 컨테이너에서 돈다 — 저장소를 타르로 가져가서:')
+        print('          python3 -m http.server 8321 &')
+        print('          ARCHINODE_ROOT=<루트> python3 scripts/check_narrow_width.py --base http://127.0.0.1:8321 --widths 360,390')
+        print('          ARCHINODE_ROOT=<루트> python3 scripts/check_xss_output.py http://127.0.0.1:8321')
+        print('          ARCHINODE_ROOT=<루트> python3 scripts/check_search_overlay.py http://127.0.0.1:8321')
+        print('          ARCHINODE_ROOT=<루트> python3 scripts/check_hover_contrast.py index.html brands.html ...')
+        print('        (주소는 위치 인수다. --base 를 주면 27화면이 전부 열리지 않는다.)')
+        print('        가장 최근 실행: 2026-11-17 · 네 개 전부 통과 (이 파일 머리글 참고)')
     if bad:
         print('어긋난 검사 %d개 / 통과 %d개' % (len(bad), okn))
         for name, state, rel in bad:
