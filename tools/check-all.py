@@ -161,6 +161,9 @@ BROWSER_CHECKS = [
     ('좁은 폭',    'py', 'scripts/check_narrow_width.py',   '좁은 화면에서 넘침'),
     ('XSS 출력',   'py', 'scripts/check_xss_output.py',     '출력 이스케이프'),
     ('검색 오버레이', 'py', 'scripts/check_search_overlay.py', 'A-445 — 결과가 검색창 옆에 깔려 글자칸이 0px 이 되는지'),
+    ('초점 고리',    'py', 'scripts/check_focus_visible.py',
+     'A-589 — Tab 으로 초점이 가는 자리마다 고리가 **실제로 보이는지**(WCAG 1.4.11 비텍스트 대비 3:1). '
+     'A-587 과 같은 모양의 사각지대였다 — 두 겹 고리를 설계해 놓고 한 번도 재지 않았다'),
 ]
 
 
@@ -259,6 +262,7 @@ def main():
         print('          ARCHINODE_ROOT=<루트> python3 scripts/check_xss_output.py http://127.0.0.1:8321')
         print('          ARCHINODE_ROOT=<루트> python3 scripts/check_search_overlay.py http://127.0.0.1:8321')
         print('          ARCHINODE_ROOT=<루트> python3 scripts/check_hover_contrast.py index.html brands.html ...')
+        print('          ARCHINODE_ROOT=<루트> python3 scripts/check_focus_visible.py index.html list-your-brand.html ...')
         print('        (주소는 위치 인수다. --base 를 주면 27화면이 전부 열리지 않는다.)')
         print('        가장 최근 실행: 2026-11-17 · 네 개 전부 통과 (이 파일 머리글 참고)')
     if bad:
