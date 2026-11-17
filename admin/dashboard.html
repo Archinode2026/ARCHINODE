@@ -599,7 +599,16 @@ async function updateBrand(docId, newStatus) {
                     }
                 });
             }
-        } catch(mailErr) { console.warn('Brand status notification skipped:', mailErr); }
+        } catch (mailErr) {
+            /* A-577(브론즈 41차 ⑧): 여기만 조용했다. 같은 상황에서 리드 배정과
+               1:1 답변은 토스트로 알린다. 승인·정지·거절 통보는 더 중요한
+               메일인데 여기만 침묵하면, 어드민은 브랜드가 통보를 받은 줄 안다. */
+            console.warn('Brand status notification skipped:', mailErr);
+            showToast((typeof t === 'function'
+                ? t('Status changed, but the notification email could not be queued.',
+                    '상태는 바꿨으나 알림 메일을 큐에 넣지 못했습니다.')
+                : '상태는 바꿨으나 알림 메일을 큐에 넣지 못했습니다.'), 'error');
+        }
         
         await loadBrands();
     } catch (e) {

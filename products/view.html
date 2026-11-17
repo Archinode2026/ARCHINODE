@@ -992,7 +992,13 @@ async function submitBimRequest(e) {
     const projectScale = document.getElementById('bimProjectScale').value.trim();
 
     try {
-        await db.collection('bim-requests').add({
+        /* A-576(브론즈 41차 ⑥): 신청을 먼저 하고 알림을 따로 넣은 뒤 메일 실패를
+           삼켰다. 손님 화면은 「접수됐습니다」인데 운영자는 모른다 — 자료 신청은
+           승인해 줘야 손님이 파일을 받으므로, 알림이 없으면 그대로 묵는다.
+           A-490·A-575 와 같이 한 묶음으로 쓰고, 깨지면 표시를 남긴다.
+           신청 쓰기에 시간 제한이 없던 것도 함께 건다 — 오프라인이면 Firestore 가
+           쓰기를 큐에 담아 promise 가 영원히 안 풀린다(R-033). */
+        const bimDoc = {
             requesterUid: auth.currentUser.uid,
             productId: currentProductDocId || '',
             brandId: currentProductBrandId || '',
@@ -1015,9 +1021,8 @@ async function submitBimRequest(e) {
             expiresAt: null,
             hp: '',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        try {
-            await archinodeWithTimeout(db.collection('mail').add({
+        };
+        const bimMail = {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
                 to: 'office@archinode.org',
                 message: {
@@ -1037,8 +1042,18 @@ async function submitBimRequest(e) {
                         'Admin: https://archinodekr.com/admin/bim-requests.html'
                     ].join('\n')
                 }
-            }), 10000);
-        } catch (mailErr) { console.warn('Admin notification skipped:', mailErr); }
+        };
+        try {
+            const batch = db.batch();
+            batch.set(db.collection('bim-requests').doc(), bimDoc);
+            batch.set(db.collection('mail').doc(), bimMail);
+            await archinodeWithTimeout(batch.commit(), 15000);
+        } catch (bundleErr) {
+            console.warn('[BIM] 신청+알림 묶음 실패 — 신청만 따로 한다', (bundleErr && bundleErr.code) || bundleErr);
+            await archinodeWithTimeout(
+                db.collection('bim-requests').add(
+                    Object.assign({}, bimDoc, { notifyPending: true })), 15000);
+        }
 
         document.getElementById('bimFormWrap').style.display = 'none';
         document.getElementById('bimSuccessWrap').style.display = 'block';

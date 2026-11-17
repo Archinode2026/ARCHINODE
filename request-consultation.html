@@ -638,7 +638,14 @@ async function submitConsult(e) {
     if (!captchaData.ok) { throw new Error('ARCHINODE_CAPTCHA_FAILED'); }
 
     const dbRef = firebase.firestore();
-    await archinodeWithTimeout(dbRef.collection('consultations').add({
+    /* A-575(브론즈 41차 ⑥): 전에는 접수를 먼저 하고 알림 메일을 따로 넣은 뒤,
+       메일이 실패하면 console.warn 으로 **삼켰다**. 손님 화면은 「접수됐습니다」인데
+       운영자는 아무 알림을 못 받는다 — 자문 요청은 어드민이 그 화면을 열기 전까지
+       며칠 묵을 수 있다. A-263 이 막으려던 상태가 그대로 남아 있었다.
+       A-490 이 리드에 쓴 방식을 그대로 가져온다: 접수와 알림을 **한 묶음**으로 쓰고,
+       묶음이 깨지면 접수만 따로 하고 `notifyPending` 을 박는다. 어느 쪽이든
+       「갔는지 안 갔는지 모르는 상태」는 남지 않는다. */
+    const consultDoc = {
       companyName: escapeHtml(companyName),
       contactName: escapeHtml(contactName),
       email: email,
@@ -658,9 +665,8 @@ async function submitConsult(e) {
       reviewedAt: null,
       hp: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }), 15000);
-    try {
-        await archinodeWithTimeout(dbRef.collection('mail').add({
+    };
+    const consultMail = {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
             to: 'office@archinode.org',
             message: {
@@ -683,8 +689,21 @@ async function submitConsult(e) {
                     'Admin inbox: https://archinodekr.com/admin/consultations.html'
                 ].join('\n')
             }
-        }), 10000);  // 2026-11-03 QA(R-033): 오프라인 큐잉으로 catch가 영구 미발동하던 문제 차단
-    } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
+    };
+    /* 묶음으로 쓴다. 깨지면 접수만 하고 표시를 남긴다.
+       10초 제한은 그대로 — 오프라인이면 Firestore 가 쓰기를 큐에 담아
+       promise 가 영원히 안 풀린다(R-033). */
+    try {
+        const batch = dbRef.batch();
+        batch.set(dbRef.collection('consultations').doc(), consultDoc);
+        batch.set(dbRef.collection('mail').doc(), consultMail);
+        await archinodeWithTimeout(batch.commit(), 15000);
+    } catch (bundleErr) {
+        console.warn('[자문] 접수+알림 묶음 실패 — 접수만 따로 한다', (bundleErr && bundleErr.code) || bundleErr);
+        await archinodeWithTimeout(
+            dbRef.collection('consultations').add(
+                Object.assign({}, consultDoc, { notifyPending: true })), 15000);
+    }
 
 
     document.getElementById('consultForm').style.display = 'none';

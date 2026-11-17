@@ -382,7 +382,8 @@
             : { type: 'image', url: b.url, alt: b.alt || '', caption: b.caption || '' }
           );
 
-        await archinodeWithTimeout(db.collection('articles').add({
+        // A-577: 문서 참조를 잡아 둔다 — 알림이 실패했을 때 표시를 남기려면 필요하다.
+        const articleRef = await archinodeWithTimeout(db.collection('articles').add({
           brandId: bpId.uid,                 // A-213 — 둘을 한 객체에서 함께
           brandName: bpId.brandName,
           title: title,
@@ -415,7 +416,14 @@
               ].join('\n')
             }
           }), 10000);
-        } catch(mailErr) { console.warn('Admin notification skipped:', mailErr); }
+        } catch (mailErr) {
+          /* A-577: 알림이 실패하면 어드민은 검토할 글이 있는 줄 모른다. 이 글의
+             주인은 본인이라 문서를 고칠 수 있으므로 표시를 남긴다 — 어드민 화면이
+             그 표시를 보고 집어낸다(A-490 이 리드에 둔 것과 같은 뜻). */
+          console.warn('Admin notification skipped:', mailErr);
+          try { await articleRef.update({ notifyPending: true }); }
+          catch (markErr) { console.warn('notifyPending 표시도 실패:', markErr); }
+        }
 
         msg.textContent = pT('✓ Submitted for review', '✓ 검토 요청이 접수되었습니다');
         msg.style.color = '#0a0';
