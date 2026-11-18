@@ -216,21 +216,21 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
      A-426 에서 포털에 한 것과 같은 방식으로 기계적으로 달았다. -->
                 <div class="field">
                     <label for="signupName" data-en="Full Name *" data-ko="이름 *">Full Name *</label>
-                    <input type="text" id="signupName" required placeholder="e.g. John Smith" data-en-placeholder="e.g. John Smith" data-ko-placeholder="홍길동">
+                    <input type="text" id="signupName" required placeholder="e.g. John Smith" data-en-placeholder="e.g. John Smith" data-ko-placeholder="홍길동" autocomplete="name">
                 </div>
                 <div class="field">
                     <label for="signupEmail" data-en="Email *" data-ko="이메일 *">Email *</label>
-                    <input type="email" id="signupEmail" required placeholder="name@company.com">
+                    <input type="email" id="signupEmail" required placeholder="name@company.com" autocomplete="email">
                 </div>
             </div>
             <div class="field-row">
                 <div class="field">
                     <label for="signupPassword" data-en="Password *" data-ko="비밀번호 *">Password *</label>
-                    <input type="password" id="signupPassword" required placeholder="Minimum 6 characters" data-en-placeholder="Minimum 6 characters" data-ko-placeholder="6자 이상" minlength="6">
+                    <input type="password" id="signupPassword" required placeholder="Minimum 6 characters" data-en-placeholder="Minimum 6 characters" data-ko-placeholder="6자 이상" minlength="6" autocomplete="new-password">
                 </div>
                 <div class="field">
                     <label for="signupPasswordConfirm" data-en="Confirm Password *" data-ko="비밀번호 확인 *">Confirm Password *</label>
-                    <input type="password" id="signupPasswordConfirm" required placeholder="Re-enter your password" data-en-placeholder="Re-enter your password" data-ko-placeholder="비밀번호 재입력">
+                    <input type="password" id="signupPasswordConfirm" required placeholder="Re-enter your password" data-en-placeholder="Re-enter your password" data-ko-placeholder="비밀번호 재입력" autocomplete="new-password">
                 </div>
             </div>
 
@@ -239,11 +239,11 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
             <div class="field-row">
                 <div class="field">
                     <label for="signupCompany" data-en="Company / Firm *" data-ko="회사 / 사무소 *">Company / Firm *</label>
-                    <input type="text" id="signupCompany" required placeholder="e.g. Samoo Architects" data-en-placeholder="e.g. Samoo Architects" data-ko-placeholder="e.g. 삼우종합건축사사무소">
+                    <input type="text" id="signupCompany" required placeholder="e.g. Samoo Architects" data-en-placeholder="e.g. Samoo Architects" data-ko-placeholder="e.g. 삼우종합건축사사무소" autocomplete="organization">
                 </div>
                 <div class="field">
                     <label for="signupJobTitle" data-en="Job Title" data-ko="직책">Job Title</label>
-                    <input type="text" id="signupJobTitle" placeholder="e.g. Senior Architect" data-en-placeholder="e.g. Senior Architect" data-ko-placeholder="e.g. 선임 건축가">
+                    <input type="text" id="signupJobTitle" placeholder="e.g. Senior Architect" data-en-placeholder="e.g. Senior Architect" data-ko-placeholder="e.g. 선임 건축가" autocomplete="organization-title">
                 </div>
             </div>
             <div class="field-row">
@@ -264,7 +264,7 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
                 </div>
                 <div class="field">
                     <label for="signupPhone" data-en="Phone" data-ko="전화번호">Phone</label>
-                    <input type="tel" id="signupPhone" placeholder="010-1234-5678">
+                    <input type="tel" id="signupPhone" placeholder="010-1234-5678" autocomplete="tel">
                 </div>
             </div>
 

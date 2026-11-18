@@ -316,33 +316,33 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <div class="form-row">
           <div class="form-group">
             <label for="companyName" data-en="Company / Studio Name" data-ko="회사 · 스튜디오 명">Company / Studio Name <span class="req">*</span></label>
-            <input type="text" id="companyName" maxlength="120" required>
+            <input type="text" id="companyName" maxlength="120" required autocomplete="organization">
           </div>
           <div class="form-group">
             <label for="contactName" data-en="Your Name" data-ko="담당자">Your Name <span class="req">*</span></label>
-            <input type="text" id="contactName" maxlength="100" required>
+            <input type="text" id="contactName" maxlength="100" required autocomplete="name">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="email" data-en="Email" data-ko="이메일">Email <span class="req">*</span></label>
-            <input type="email" id="email" maxlength="254" required>
+            <input type="email" id="email" maxlength="254" required autocomplete="email">
           </div>
           <div class="form-group">
             <label for="phone" data-en="Phone" data-ko="연락처">Phone <span class="hint" data-en="optional" data-ko="선택">optional</span></label>
-            <input type="tel" id="phone" maxlength="50">
+            <input type="tel" id="phone" maxlength="50" autocomplete="tel">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="website" data-en="Company Website" data-ko="회사 웹사이트">Company Website <span class="hint" data-en="optional" data-ko="선택">optional</span></label>
-            <input type="url" id="website" maxlength="300" placeholder="https://...">
+            <input type="url" id="website" maxlength="300" placeholder="https://..." autocomplete="url">
           </div>
           <div class="form-group">
             <label for="country" data-en="Country" data-ko="국가">Country <span class="req">*</span></label>
-            <input type="text" id="country" maxlength="100" required placeholder="e.g. Italy / Germany / Korea" data-en-placeholder="e.g. Italy / Germany / Korea" data-ko-placeholder="예: 이탈리아 / 독일 / 한국">
+            <input type="text" id="country" maxlength="100" required placeholder="e.g. Italy / Germany / Korea" data-en-placeholder="e.g. Italy / Germany / Korea" data-ko-placeholder="예: 이탈리아 / 독일 / 한국" autocomplete="country-name">
           </div>
         </div>
 

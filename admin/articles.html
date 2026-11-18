@@ -259,16 +259,16 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
           여기 채운 내용이 <strong>브랜드 아티클 화면에 그대로 나갑니다</strong> — 보는 사람 언어에 맞춰 자동으로 바뀝니다(A-259).
           비워 두면 원문이 나가고 「이 글은 원문만 있습니다」 안내가 붙습니다.
         </div>
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">제목</label>
+        <label for="trTitle" style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">제목</label>
         <div class="tr-orig" id="trOrigTitle"></div>
         <input type="text" class="editor-input" id="trTitle" style="min-height:0;height:38px;" placeholder="번역한 제목">
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin:14px 0 6px;">요약 (목록·공유 미리보기에 쓰입니다)</label>
+        <label for="trExcerpt" style="font-size:0.85rem;font-weight:600;display:block;margin:14px 0 6px;">요약 (목록·공유 미리보기에 쓰입니다)</label>
         <div class="tr-orig" id="trOrigExcerpt"></div>
         <input type="text" class="editor-input" id="trExcerpt" style="min-height:0;height:38px;" placeholder="번역한 요약">
         <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">본문</label>
         <div id="trBlocks"></div>
 
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Reviewer Note (사유 / 메모)</label>
+        <label for="inNote" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Reviewer Note (사유 / 메모)</label>
         <textarea class="editor-input" id="inNote" placeholder="거절·수정 요청 시 사유. 게시 시 내부 메모로도 사용." style="min-height:80px;"></textarea>
       </div>
 

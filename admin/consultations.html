@@ -230,20 +230,20 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       <div class="modal-section">
         <h3>ARCHI Triage Note (사전 진단)</h3>
         <div class="triage-box empty" id="mTriageBox">archi-gold 에이전트 호출하면 사전 진단이 여기에 채워집니다. 회사 신뢰도, 진짜 needs, 미팅 가치 판단, 사전 답변 가능 부분.</div>
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Edit Triage Note</label>
+        <label for="inTriage" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Edit Triage Note</label>
         <textarea class="editor-input" id="inTriage" placeholder="ARCHI 사전 진단 결과 또는 한울님 자체 메모..."></textarea>
       </div>
 
       <div class="modal-section">
         <h3>Reviewer Action</h3>
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Reviewer Note (내부 메모 / 거절·수정 사유)</label>
+        <label for="inNote" style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Reviewer Note (내부 메모 / 거절·수정 사유)</label>
         <textarea class="editor-input short" id="inNote" placeholder="내부 메모 — 거절 사유, 사전 답변 본문, 미팅 결과 요약 등"></textarea>
 
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Stripe Payment Link (결제 링크)</label>
+        <label for="inPaymentLink" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Stripe Payment Link (결제 링크)</label>
         <input type="url" class="editor-input short" id="inPaymentLink" placeholder="https://buy.stripe.com/..." style="min-height:unset;padding:11px 14px;">
         <div class="editor-hint">Stripe 대시보드에서 Payment Link 생성 후 여기에 붙여넣기. "Send Payment Link" 버튼 누르면 자동으로 client 이메일에 발송 (브랜드에서 직접 처리 — 지금은 수동 발송 기록만).</div>
 
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Meeting Schedule (미팅 일정)</label>
+        <label for="inMeetingAt" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Meeting Schedule (미팅 일정)</label>
         <input type="datetime-local" class="editor-input short" id="inMeetingAt" style="min-height:unset;padding:11px 14px;">
       </div>
 

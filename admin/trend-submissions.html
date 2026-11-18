@@ -232,15 +232,15 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 
       <div class="modal-section">
         <h3>Editor Inputs</h3>
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">English Translation (수정/생성)</label>
+        <label for="inEnglish" style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">English Translation (수정/생성)</label>
         <textarea class="editor-input" id="inEnglish" placeholder="If brand didn't provide English translation, write/paste it here..."></textarea>
         <div class="editor-hint">브랜드가 제공한 영어 번역이 있으면 자동으로 채워집니다. 수정하거나 새로 작성 가능.</div>
 
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Korean Translation (편집부)</label>
+        <label for="inKorean" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Korean Translation (편집부)</label>
         <textarea class="editor-input" id="inKorean" placeholder="한국어 번역을 입력하세요. 한국 디자이너 어휘 우선."></textarea>
         <div class="editor-hint">게시 시 trend-editor 에이전트와 함께 사용. 어휘는 한국 건축·디자인 업계 어휘 우선.</div>
 
-        <label style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Reviewer Note (사유 / 메모)</label>
+        <label for="inNote" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Reviewer Note (사유 / 메모)</label>
         <textarea class="editor-input" id="inNote" placeholder="거절·수정 요청 시 사유. 게시 시 내부 메모로도 사용." style="min-height:80px;"></textarea>
       </div>
 
