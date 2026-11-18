@@ -82,6 +82,12 @@
      다시 칠한다 — 삼항으로 고르기만 하면 이미 박힌 글자는 그대로 남는다(A-222). */
   function archiSay(el, en, ko) {
     if (!el) return;
+    /* A-592(2026-11-18): **보이게 한 다음에** 글을 넣는다.
+       살아 있는 영역(role=alert·status)은 글이 바뀌는 순간 접근성 나무에 있어야
+       읽힌다. 그때까지 display:none 이면 읽기 프로그램이 놓칠 수 있다.
+       글이 비어 있으면 보이게 하지 않는다 — 나중에 「지우기」로 부를 때
+       빈 칸이 드러나지 않게. */
+    if ((en && String(en).trim()) || (ko && String(ko).trim())) el.style.display = 'block';
     el.setAttribute('data-en', en);
     el.setAttribute('data-ko', ko);
     el.textContent = archiFormLang() === 'en' ? en : ko;

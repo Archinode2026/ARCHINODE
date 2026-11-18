@@ -579,7 +579,6 @@ body .scroll-top {
   border-bottom: 2px solid var(--white);
   background: transparent;
   color: var(--white);
-  outline: none;
   font-weight: 300;
 }
 .search-box input::placeholder { color: rgba(255,255,255,0.4); }
@@ -1372,7 +1371,6 @@ body .stats-section.band-grey { color: var(--black); }
   padding: 12px 16px;
   border: 1px solid var(--gray-300);
   font-size: 0.88rem;
-  outline: none;
   transition: border-color 0.2s;
   background: var(--white);
 }
@@ -1544,7 +1542,6 @@ body .stats-section.band-grey { color: var(--black); }
 .brand-search-bar input {
   flex: 1;
   border: none;
-  outline: none;
   font-size: 0.95rem;
   background: transparent;
 }
@@ -1790,7 +1787,6 @@ body .stats-section.band-grey { color: var(--black); }
   border: 1px solid var(--gray-300);
   border-right: none;
   font-size: 0.88rem;
-  outline: none;
 }
 .mag-newsletter-form input:focus { border-color: var(--black); }
 .mag-newsletter-form button {
@@ -3780,7 +3776,7 @@ body.mag .mag-newsletter .newsletter-form { display: flex; gap: 10px; max-width:
 body.mag .mag-newsletter .newsletter-form input {
   flex: 1; min-width: 0; padding: 14px 24px; border-radius: 999px;
   background: var(--band-white); color: var(--black);
-  border: 1px solid var(--gray-300); font-size: 0.88rem; outline: none;
+  border: 1px solid var(--gray-300); font-size: 0.88rem;
   font-family: inherit; transition: border-color .2s;
 }
 body.mag .mag-newsletter .newsletter-form input::placeholder { color: var(--ink-soft); }
@@ -3943,7 +3939,17 @@ body #main:focus { outline: none; }
    A-456 에서 배운 것과 같다: 한 가지 빛깔로는 두 바탕을 다 감당하지 못한다.
    그래서 **두 겹**으로 둔다 — 어두운 테두리 + 그 바깥의 밝은 후광.
    어느 바탕에서도 둘 중 하나는 반드시 보인다.
-   `:focus-visible` 만 쓴다 — 마우스로 누를 때는 안 나온다. */
+   `:focus-visible` 만 쓴다 — 마우스로 누를 때는 안 나온다.
+
+   A-590(2026-11-18): 그런데 이 고리가 **폼 입력칸에는 한 번도 닿지 않았다.**
+   `.form-group input { outline: none }` 같은 바탕 규칙이 쪽수(0,2,0)로 이 규칙
+   (0,1,0)을 눌러 버렸기 때문이다. 그래서 입력칸은 금색 테두리 하나로만 초점을
+   알렸고, 그 금색이 쉬던 회색을 대신하는 변화의 대비가 **2.82** 였다(필요 3.0,
+   A-589 가 실측). 억제하던 `outline: none` 26군데를 걷어 이 고리가 입력칸까지
+   닿게 했다 — 고리 정의는 여기 한 곳에만 둔다(14군데에 베껴 두면 다음에
+   이 값을 고칠 때 또 어긋난다).
+   덧붙임: 글자 입력칸은 마우스로 눌러도 `:focus-visible` 이 걸린다(실측). 그래서
+   이 고리는 키보드로 올 때만이 아니라 눌러서 들어갈 때도 보인다. */
 :focus-visible {
   outline: 3px solid #141414;
   outline-offset: 2px;

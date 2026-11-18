@@ -963,6 +963,7 @@ async function submitBimRequest(e) {
        제조사에 넘기는 것에 동의했다고 우리가 받아 두는 것에 동의한 것이 아니다. */
     const agreePrivacyBim = document.getElementById('agreePrivacyBim');
     if (agreePrivacyBim && !agreePrivacyBim.checked) {
+        /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorMsg.style.display = 'block';
         errorMsg.textContent = (document.documentElement.lang === 'en')
             ? 'Please agree to the collection and use of your personal data.'
             : '개인정보 수집·이용에 동의해 주세요.';
@@ -972,6 +973,7 @@ async function submitBimRequest(e) {
     }
     const lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
     if (!agreeData || !agreeShare) {
+        /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorMsg.style.display = 'block';
         errorMsg.textContent = lang === 'en'
             ? 'Please agree to both policies above to continue.'
             : '위 두 가지 항목에 모두 동의해 주세요.';
@@ -1059,6 +1061,7 @@ async function submitBimRequest(e) {
         document.getElementById('bimSuccessWrap').style.display = 'block';
     } catch (err) {
         console.error('BIM request failed:', err);
+        /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorMsg.style.display = 'block';
         errorMsg.textContent = (lang === 'en' ? 'Submission failed: ' : '제출에 실패했습니다: ') + err.message;
         errorMsg.style.display = 'block';
     }
@@ -1090,6 +1093,7 @@ async function submitRfq(e) {
        개인정보가 그대로 접수된다. */
     const agreedPrivacy = document.getElementById('agreePrivacyRfqProduct');
     if (agreedPrivacy && !agreedPrivacy.checked) {
+        /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorMsg.style.display = 'block';
         errorMsg.textContent = (document.documentElement.lang === 'en')
             ? 'Please agree to the collection and use of your personal data.'
             : '개인정보 수집·이용에 동의해 주세요.';
@@ -1184,6 +1188,12 @@ function updateLikeUI() {
    data-en/data-ko 를 함께 달아 한·영 토글에 따라 다시 칠해지게 한다(A-222). */
 function rfqSay(el, en, ko) {
     if (!el) return;
+    /* A-592(2026-11-18): **보이게 한 다음에** 글을 넣는다.
+       살아 있는 영역(role=alert·status)은 글이 바뀌는 순간 접근성 나무에 있어야
+       읽힌다. 그때까지 display:none 이면 읽기 프로그램이 놓칠 수 있다.
+       글이 비어 있으면 보이게 하지 않는다 — 나중에 「지우기」로 부를 때
+       빈 칸이 드러나지 않게. */
+    if ((en && String(en).trim()) || (ko && String(ko).trim())) el.style.display = 'block';
     el.setAttribute('data-en', en);
     el.setAttribute('data-ko', ko);
     el.textContent = (document.documentElement.lang !== 'en' ? ko : en);

@@ -20,6 +20,12 @@
 적이 없어서 동의 검사가 통과하는 동안 그 자리가 비어 있었다).
 그래서 **훑어서 찾고, 명부에도 제외목록에도 없으면 실패**시킨다.
 
+③ 안내 글을 **보이게 한 다음에** 넣는지 (A-592)
+
+③이 ①과 짝이다. 역할만 붙여 놓고 글을 숨어 있는 동안 넣으면, 살아 있는 영역이
+글이 바뀌는 순간 접근성 나무에 없어서 읽기 프로그램이 놓칠 수 있다. 역할이
+있으니 됐다고 넘어가기 쉬운 자리라 검사로 묶어 둔다.
+
 훑는 범위는 `tools/check-form-consent.py` 의 FORMS 를 **읽어서** 정한다.
 두 명부를 손으로 맞추지 않게 하려는 것이다 — 거기에 폼이 추가되면
 이 검사도 저절로 그 쪽을 보기 시작한다.
@@ -160,6 +166,58 @@ def main():
             else:
                 unknown.append('%s #%s <%s class="%s">%s'
                                % (page, eid, tag, clsv, ' (처음에 숨어 있다)' if hidden else ''))
+
+    # ── A-592: 글을 보이게 한 뒤에 넣는지 ──────────────────────────────────
+    #    그릇을 담는 변수 이름을 찾아, 그 변수에 글을 넣는 줄마다
+    #    바로 앞 6줄 안에 display='block' 이 있는지 본다.
+    #    도움함수(rfqSay·archiSay 등)를 거치는 호출은 그 함수 안에서 먼저
+    #    보이게 하므로, 함수 정의 쪽에 그 줄이 있으면 통과한다.
+    for (page, eid) in sorted(COVERED):
+        fp = os.path.join(ROOT, page)
+        if not os.path.exists(fp):
+            continue
+        src = open(fp, encoding='utf-8', errors='replace').read()
+        names = {eid}
+        for m in re.finditer(r"(?:const|let|var)\s+(\w+)\s*=\s*document\.getElementById\("
+                             r"['\"]%s['\"]\)" % re.escape(eid), src):
+            names.add(m.group(1))
+        lines = src.split('\n')
+        for n, line in enumerate(lines):
+            for v in names:
+                if not re.search(r'\b%s\s*\.\s*(textContent|innerHTML)\s*=' % re.escape(v), line):
+                    continue
+                # 되돌아보는 창은 14줄이다. 6줄로 두었더니 auth/signup.html 처럼
+                # 갈림(branch) 앞에서 한 번 보이게 하고 8줄 뒤에 글을 넣는 **올바른**
+                # 자리를 어긋났다고 읽었다. 창을 넓히면 아주 멀리 떨어진 진짜
+                # 위반은 놓칠 수 있다 — 함수 단위로 보려면 JS 를 제대로 파싱해야
+                # 하므로, 되돌아감을 막는 그물로서 14줄에서 멈춘다.
+                back = '\n'.join(lines[max(0, n - 14):n + 1])
+                if not re.search(r"\b%s\b[^;]{0,60}style\s*\.\s*display\s*=\s*['\"]block['\"]"
+                                 % re.escape(v), back):
+                    bad.append('%s:%d #%s: 숨어 있는 동안 글을 넣는다 — 먼저 보이게 해야 '
+                               '읽기 프로그램이 듣는다 (A-592)' % (page, n + 1, eid))
+
+    # 도움함수들이 글보다 먼저 보이게 하는지
+    HELPERS = [('form-throttle.js', 'archiSay'), ('sourcing-inquiry.html', 'rfqSay'),
+               ('brands/view.html', 'rfqSay'), ('products/view.html', 'rfqSay')]
+    for hf, fn in HELPERS:
+        fp = os.path.join(ROOT, hf)
+        if not os.path.exists(fp):
+            bad.append('%s: 파일이 없다 (도움함수 %s 를 보려 했다)' % (hf, fn))
+            continue
+        src = open(fp, encoding='utf-8', errors='replace').read()
+        m = re.search(r'function\s+%s\s*\([^)]*\)\s*\{(.*?)\n\}' % re.escape(fn), src, re.S)
+        if not m:
+            bad.append('%s: %s 함수를 못 찾았다' % (hf, fn))
+            continue
+        body = m.group(1)
+        ipos = body.find('.textContent')
+        dpos = body.find("style.display = 'block'")
+        if dpos < 0:
+            bad.append('%s %s(): 글을 넣기 전에 보이게 하는 줄이 없다 (A-592)' % (hf, fn))
+        elif ipos >= 0 and dpos > ipos:
+            bad.append('%s %s(): 글을 먼저 넣고 나중에 보이게 한다 — 차례가 뒤집혀 있다 (A-592)'
+                       % (hf, fn))
 
     # 명부에 올렸는데 마크업에서 사라진 것도 잡는다
     for (page, eid) in sorted(COVERED):

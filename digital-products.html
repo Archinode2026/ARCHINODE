@@ -288,7 +288,7 @@
   font-family: inherit;
   background: #fff;
 }
-.dp-notify-form input:focus { outline: none; border-color: var(--accent); }
+.dp-notify-form input:focus { border-color: var(--accent); }
 .dp-notify-form button {
   background: #332e27;
   color: #fff;
@@ -948,6 +948,7 @@ async function submitNotify(e) {
         var dpKo = '신청하지 못했습니다. 잠시 후 다시 시도해 주세요.';
         dpMsg.setAttribute('data-en', dpEn);
         dpMsg.setAttribute('data-ko', dpKo);
+        /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ dpMsg.style.display = 'block';
         dpMsg.textContent = (document.documentElement.lang !== 'en' ? dpKo : dpEn);
         dpMsg.style.display = 'block';
         if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e2) {} }

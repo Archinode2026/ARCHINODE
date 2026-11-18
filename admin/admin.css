@@ -69,7 +69,7 @@
                      white-space: nowrap; }
 .adm-log-note-text.is-clip { cursor: pointer; border-bottom: 1px dotted var(--gray-400); }
 .adm-log-note-text.is-clip:hover,
-.adm-log-note-text.is-clip:focus { color: var(--accent-ink); border-bottom-color: var(--accent-ink); outline: none; }
+.adm-log-note-text.is-clip:focus { color: var(--accent-ink); border-bottom-color: var(--accent-ink); }
 .adm-log-note-text.is-clip:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 
 .adm-log-note-full { white-space: pre-wrap; word-break: break-word; background: var(--gray-50);
@@ -126,7 +126,7 @@
 .adm-set-ctl { flex: 1; min-width: 0; }
 .adm-set-ctl input, .adm-set-ctl textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-300); border-radius: 6px; font-family: inherit; font-size: 0.86rem; }
 .adm-set-ctl textarea { min-height: 70px; resize: vertical; }
-.adm-set-ctl input:focus, .adm-set-ctl textarea:focus { outline: none; border-color: var(--accent); }
+.adm-set-ctl input:focus, .adm-set-ctl textarea:focus { border-color: var(--accent); }
 .adm-set-hint { display: block; font-size: 0.74rem; color: var(--ink-soft); margin-top: 4px; }
 .adm-pending { display: inline-block; margin-top: 6px; font-size: 0.72rem; font-weight: 700; color: #b91c1c; background: #fee2e2; padding: 2px 8px; border-radius: 10px; }
 .adm-set-actions { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
@@ -158,7 +158,7 @@
 .adm-form label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--gray-700); margin: 12px 0 6px; }
 .adm-form input, .adm-form select, .adm-form textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-300); border-radius: 6px; font-family: inherit; font-size: 0.86rem; }
 .adm-form textarea { min-height: 90px; resize: vertical; }
-.adm-form input:focus, .adm-form select:focus, .adm-form textarea:focus { outline: none; border-color: var(--accent); }
+.adm-form input:focus, .adm-form select:focus, .adm-form textarea:focus { border-color: var(--accent); }
 .adm-form .adm-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
 .adm-form-actions { margin-top: 18px; display: flex; gap: 8px; justify-content: flex-end; }
 .adm-btn-cancel { background: var(--gray-200); color: var(--gray-700); }
@@ -239,7 +239,7 @@
 .adm-search { position: relative; margin: 2px 12px 8px; }
 .adm-search > i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); font-size: 0.78rem; pointer-events: none; }
 .adm-search input { width: 100%; padding: 8px 10px 8px 30px; border: 1px solid var(--gray-300); border-radius: 6px; font-family: inherit; font-size: 0.82rem; background: var(--gray-50); }
-.adm-search input:focus { outline: none; border-color: var(--accent); background: var(--white); }
+.adm-search input:focus { border-color: var(--accent); background: var(--white); }
 .adm-search-results { position: absolute; left: 0; top: calc(100% + 4px); width: 420px; max-height: 60vh; overflow-y: auto; background: var(--white); border: 1px solid var(--gray-300); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 900; }
 .adm-sr-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; text-decoration: none; color: var(--black); font-size: 0.82rem; border-bottom: 1px solid var(--gray-200); }
 .adm-sr-item:hover { background: var(--band-beige); }

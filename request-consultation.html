@@ -180,7 +180,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .form-group textarea { resize: vertical; min-height: 140px; line-height: 1.55; }
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus { outline: none; border-color: var(--accent-gold); }
+.form-group textarea:focus { border-color: var(--accent-gold); }
 
 .submit-btn {
   display: inline-block;
@@ -595,6 +595,7 @@ async function submitConsult(e) {
   /* A-535: 이 함수는 agreeContact 만 읽고 **개인정보 동의 칸은 한 번도 읽지
      않았다**. 둘은 다른 동의다. */
   if (agreePrivacy && !agreePrivacy.checked) {
+    /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
     errorDiv.textContent = rcLang() === 'ko'
       ? '개인정보 수집·이용에 동의해 주세요.'
       : 'Please agree to the collection and use of your personal data.';
@@ -607,6 +608,7 @@ async function submitConsult(e) {
 
   if (!agreeContact) {
     var curLang1 = rcLang();
+    /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
     errorDiv.textContent = curLang1 === 'ko' ? '제출하려면 연락처 수집 동의에 체크해 주세요.' : 'Please confirm the contact consent to submit.';
     errorDiv.style.display = 'block';
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -614,6 +616,7 @@ async function submitConsult(e) {
   }
   if (description.length < 100) {
     var curLang2 = rcLang();
+    /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
     errorDiv.textContent = curLang2 === 'ko' ? '충분히 준비할 수 있도록 상황 설명을 100자 이상 적어 주세요.' : 'Please provide at least 100 characters in the description so we can prepare properly.';
     errorDiv.style.display = 'block';
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -714,6 +717,7 @@ async function submitConsult(e) {
     document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth' });
   } catch (err) {
     console.error(err);
+    /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
     errorDiv.textContent = (err.message === 'ARCHINODE_CAPTCHA_FAILED')
       ? 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.'
       : (err.message === 'ARCHINODE_TIMEOUT')

@@ -61,6 +61,8 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
         var el = document.getElementById('msg');
         var lang = 'en';
         try { if (localStorage.getItem('archinode-lang') === 'ko') lang = 'ko'; } catch (e) {}
+        /* A-592: 보이게 한 다음에 글을 넣는다 (살아 있는 영역이 읽히게). */
+        if ((en && String(en).trim()) || (ko && String(ko).trim())) el.style.display = 'block';
         el.setAttribute('data-en', en);
         el.setAttribute('data-ko', ko);
         el.textContent = lang === 'ko' ? ko : en;

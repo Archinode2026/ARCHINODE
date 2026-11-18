@@ -555,9 +555,10 @@ window.subscribeNewsletter = async function(e, source) {
   var msgEl = document.getElementById('newsletterMsg');
   function showMsg(text, isError) {
     if (!msgEl) { if (isError) console.error(text); return; }
-    msgEl.textContent = text;
-    msgEl.style.color = isError ? '#c0392b' : '#2e7d32';
+    /* A-592: 보이게 한 다음에 글을 넣는다 — 살아 있는 영역이 읽히게. */
     msgEl.style.display = 'block';
+    msgEl.style.color = isError ? '#c0392b' : '#2e7d32';
+    msgEl.textContent = text;
   }
   var curLang = document.documentElement.lang === 'ko' ? 'ko' : 'en';
   // 봇 스팸 방지: 허니팟 필드가 채워져 있으면 조용히 중단
