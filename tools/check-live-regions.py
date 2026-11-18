@@ -53,6 +53,7 @@ COVERED = {
     ('products/view.html', 'rfqSuccessWrap'): 'status',
     ('products/view.html', 'bimErrorMsg'): 'alert',
     ('products/view.html', 'bimSuccessWrap'): 'status',
+    ('contact.html', 'formError'): 'alert',          # A-615: 막힌 칸 안내 자리
     ('list-your-brand.html', 'formError'): 'alert',
     ('list-your-brand.html', 'vendorTermsError'): 'alert',
     ('list-your-brand.html', 'formSuccess'): 'status',

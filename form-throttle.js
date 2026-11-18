@@ -130,6 +130,59 @@
   }
 
   document.addEventListener('invalid', function (e) { archiApplyMessage(e.target); }, true);
+
+  /* ── A-615 (브론즈 45차 F-7): 막힌 칸을 **쪽 안에서도** 알린다 ──────────────
+     폼 4개 모두 novalidate 가 없어 브라우저 기본 검사가 먼저 막는다. 그래서
+     submit 이벤트가 안 열리고, 그 안에 쓰여 있던 쪽 안 안내와 aria-invalid 가
+     한 번도 닿지 않았다(실측 10/10 경우에서 화면 안 안내 0 · aria-invalid 0).
+     손님이 안내를 아예 못 받는 것은 아니다 — 위 invalid 처리가 말풍선 글자를
+     우리 말로 갈아끼운다. 그래도 말풍선은 **한 칸만** 말하고 사라지며, 읽어 주는
+     도구가 폼 위쪽 안내 영역을 보는 손님에게는 아무것도 남지 않는다.
+
+     novalidate 를 켜서 submit 을 열지는 않았다 — 그러면 빈 칸 막기를 전부 우리
+     JS 가 해야 하는데 지금은 동의·카테고리만 본다. 대신 브라우저 검사를 그대로
+     두고 **같은 순간에** aria-invalid 와 쪽 안 안내를 함께 켠다. 되돌릴 일이 없고
+     기존 동작을 하나도 바꾸지 않는다. */
+  document.addEventListener('invalid', function (e) {
+    var el = e.target;
+    if (!el || !el.form) return;
+    try {
+      /* 첫 번째로 막힌 칸만 안내에 쓴다 — invalid 는 칸마다 한 번씩 오고,
+         브라우저는 그중 첫 칸으로 초점을 옮긴다. */
+      if (el.form.getAttribute('data-archi-invalid-shown') === '1') return;
+      el.form.setAttribute('data-archi-invalid-shown', '1');
+      setTimeout(function () { try { el.form.removeAttribute('data-archi-invalid-shown'); } catch (e2) {} }, 0);
+
+      var SEL = '#formError, #srcErrorMsg, #errorMsg, .form-error';
+      var box = el.form.querySelector(SEL) || document.querySelector(SEL);
+      /* 칸 바로 옆에 붙는 작은 안내(예: #vendorTermsError)는 쓰지 않는다 —
+         그 칸만의 것이라 다른 칸의 사정을 적으면 거짓이 된다. */
+      if (box && box.id === 'vendorTermsError') box = null;
+      if (window.archiMarkInvalid) window.archiMarkInvalid(el, box && box.id ? box : null);
+      else el.setAttribute('aria-invalid', 'true');
+
+      if (box) {
+        var label = '';
+        var lb = el.id ? el.form.querySelector('label[for="' + el.id + '"]') : null;
+        if (lb) label = (lb.innerText || '').replace(/\s*\*\s*$/, '').trim();
+        var msg = el.validationMessage || '';
+        var ko = label ? (label + ': ' + msg) : msg;
+        box.setAttribute('data-en', ko);
+        box.setAttribute('data-ko', ko);
+        box.textContent = ko;
+        box.style.display = 'block';
+        if (!ko) console.warn('archi: 막힌 칸 안내에 쓸 글이 비었다', el.id || el.name);
+      }
+    } catch (err) {}
+  }, true);
+
+  /* 고치면 표시를 거둔다 */
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (el && el.getAttribute && el.getAttribute('aria-invalid') === 'true' && el.validity && el.validity.valid) {
+      el.removeAttribute('aria-invalid');
+    }
+  }, true);
   /* 고치는 순간 우리 말을 지운다 — 안 지우면 칸이 영영 틀린 채로 남는다 */
   function clear(e) {
     var el = e.target;

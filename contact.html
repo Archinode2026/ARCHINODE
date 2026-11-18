@@ -199,6 +199,9 @@
             </label>
             <p class="form-consent-note" data-en="You may decline, but we then cannot accept your request." data-ko="동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.</p>
           </div>
+          <!-- A-615(브론즈 45차 F-7): 이 폼에는 쪽 안 안내 영역이 아예 없어서,
+               막힌 칸이 생겼을 때 말풍선 말고는 아무 자리도 없었다. -->
+          <div role="alert" aria-live="assertive" aria-atomic="true" class="form-error" id="formError" style="display:none;color:#c62828;font-size:0.9rem;"></div>
           <button type="submit" style="padding:14px 32px;background:#332e27;color:#fff;border:none;border-radius:999px;font-size:1rem;cursor:pointer;font-family:inherit;align-self:flex-start;" data-en="Send Message" data-ko="보내기">Send Message <i class="fas fa-arrow-right"></i></button>
           <!-- Formspree 연동: form ID xgodynvd, office@archinode.org 수신 -->
         </form>
