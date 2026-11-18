@@ -299,7 +299,7 @@
             <span id="lybOwnNoticeText"></span>
             <a href="brand-portal/dashboard.html" data-en="Go to your Brand Portal" data-ko="브랜드 포털로 가기">Go to your Brand Portal</a>
         </div>
-        <div class="form-error" id="formError"></div>
+        <div role="alert" aria-live="assertive" aria-atomic="true" class="form-error" id="formError"></div>
 
         <form id="brandForm">
             <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
@@ -528,7 +528,7 @@
 7. 회사는 본 조 위반이 합리적으로 인정되는 경우 기술자료 제출·노출 권한을 중지할 수 있습니다. 전체 조항은 <a href="terms.html" target="_blank" rel="noopener">서비스 약관</a>을 참고하세요.'>1. &quot;Technical Data&quot; means CAD files, BIM files, 3D models, product catalogs, specification sheets, certification documents, and any other technical materials a Brand Partner uploads to or submits through the Platform.</p>
                     </div>
                 </details>
-                <div class="vendor-terms-error" id="vendorTermsError" style="display:none;color:#c0392b;font-size:0.78rem;margin-top:8px;" data-en="Please agree to Article 9 to continue." data-ko="계속하려면 제9조에 동의해 주세요.">Please agree to Article 9 to continue.</div>
+                <div role="alert" aria-live="assertive" aria-atomic="true" class="vendor-terms-error" id="vendorTermsError" style="display:none;color:#c0392b;font-size:0.78rem;margin-top:8px;" data-en="Please agree to Article 9 to continue." data-ko="계속하려면 제9조에 동의해 주세요.">Please agree to Article 9 to continue.</div>
             </div>
 
             <div class="form-submit">
@@ -559,7 +559,7 @@
     </div>
 
     <!-- SUCCESS SCREEN -->
-    <div class="form-success" id="formSuccess">
+    <div role="status" aria-live="polite" aria-atomic="true" class="form-success" id="formSuccess">
         <i class="fas fa-check-circle"></i>
         <h3 data-en="Application Submitted!" data-ko="신청이 완료되었습니다!">Application Submitted!</h3>
         <p data-en="Your Brand Portal account has been created. Here are your login credentials:" data-ko="브랜드 포털 계정이 생성되었습니다. 로그인 정보는 아래와 같습니다:">Your Brand Portal account has been created. Here are your login credentials:</p>

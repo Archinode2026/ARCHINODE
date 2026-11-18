@@ -175,11 +175,11 @@
           <p class="form-consent-note" data-en="You may decline, but we then cannot accept your request." data-ko="동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.">동의하지 않으실 수 있으나, 그 경우 요청을 접수할 수 없습니다.</p>
         </div>
         <button type="submit" id="srcSubmitBtn" style="padding:14px 32px;background:#332e27;color:#fff;border:none;border-radius:999px;font-size:1rem;cursor:pointer;font-family:inherit;align-self:flex-start;" data-en="Send Inquiry" data-ko="문의 보내기">Send Inquiry <i class="fas fa-arrow-right"></i></button>
-        <div id="srcErrorMsg" style="color:#c62828;font-size:0.85rem;display:none;"></div>
+        <div role="alert" aria-live="assertive" aria-atomic="true" id="srcErrorMsg" style="color:#c62828;font-size:0.85rem;display:none;"></div>
       </form>
     </div>
 
-    <div id="sourcingSuccessWrap" style="display:none;text-align:center;padding:40px 0;">
+    <div role="status" aria-live="polite" aria-atomic="true" id="sourcingSuccessWrap" style="display:none;text-align:center;padding:40px 0;">
       <i class="fas fa-check-circle" style="font-size:3rem;color:#2e7d32;margin-bottom:16px;"></i>
       <h2 style="margin-bottom:8px;" data-en="Thanks — we're on it" data-ko="감사합니다 — 확인 중이에요">Thanks — we're on it</h2>
       <p style="color:#666;" data-en="Our team will review your request and privately introduce you to matching brands." data-ko="저희 팀이 요청을 검토한 후, 맞는 브랜드를 비공개로 소개해 드릴게요.">Our team will review your request and privately introduce you to matching brands.</p>
