@@ -460,7 +460,7 @@ window.openModal = function(id) {
     imgGrid.innerHTML = '<div style="color:#6b6459;font-size:0.85rem;grid-column:1/-1;">(no images submitted)</div>';
   } else {
     imgGrid.innerHTML = imgs.map(function(u){
-      return '<a href="' + escapeAttr(u) + '" target="_blank" rel="noopener"><img src="' + escapeAttr(u) + '" loading="lazy" onerror="this.style.opacity=0.3"></a>';
+      return '<a href="' + escapeAttr(u) + '" target="_blank" rel="noopener"><img alt="" src="' + escapeAttr(u) + '" loading="lazy" onerror="this.style.opacity=0.3"></a>';
     }).join('');
   }
   // 첫 탭 활성화
@@ -663,7 +663,7 @@ function trBuild(d) {
     if (b.type === 'image') {
       return '<div class="tr-row" data-i="' + i + '" data-type="image">'
         + '<div class="tr-no">' + (i + 1) + ' · 이미지</div>'
-        + '<img src="' + escapeAttr(b.url || '') + '" loading="lazy" onerror="this.style.opacity=.3">'
+        + '<img alt="" src="' + escapeAttr(b.url || '') + '" loading="lazy" onerror="this.style.opacity=.3">'
         + '<div class="tr-orig">캡션: ' + escapeHtml(b.caption || '(없음)') + '</div>'
         + '<label class="tr-sub">캡션 (' + langName + ')</label>'
         + '<input type="text" class="editor-input tr-cap" style="min-height:0;height:34px;" value="' + escapeAttr(sv.caption || '') + '">'

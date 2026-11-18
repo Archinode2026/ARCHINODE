@@ -809,7 +809,7 @@ async function loadProducts() {
                 <td>${escapeHtml(p.brandName)}</td>
                 <td class="adm-col-sub">${escapeHtml(p.category || '-')}<br><small style="color:#6b6459;">${escapeHtml(p.subcategory || '')}</small></td>
                 <td class="adm-col-sub">${escapeHtml(p.materials || '-')}</td>
-                <td class="adm-col-sub">${p.imageUrl ? `<img loading="lazy" src="${escapeHtml(p.imageUrl)}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
+                <td class="adm-col-sub">${p.imageUrl ? `<img alt="" loading="lazy" src="${escapeHtml(p.imageUrl)}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
                 <td><span class="status status-${p.status}">${p.status}</span></td>
                 <td>
                     <button class="act-btn act-view" onclick="viewProduct('${doc.id}')">View</button>
@@ -843,7 +843,7 @@ async function viewProduct(docId) {
     const gallery = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.imageUrl ? [p.imageUrl] : []);
     const galleryHtml = gallery.length > 0
         ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">${gallery.map(url =>
-              `<img loading="lazy" src="${escapeHtml(url)}" style="width:120px;height:120px;object-fit:cover;border-radius:6px;border:1px solid #ede7dc;">`
+              `<img alt="" loading="lazy" src="${escapeHtml(url)}" style="width:120px;height:120px;object-fit:cover;border-radius:6px;border:1px solid #ede7dc;">`
           ).join('')}</div>`
         : `<p style="color:#6b6459;font-size:0.85rem;margin-bottom:16px;">No images uploaded.</p>`;
 
@@ -935,7 +935,7 @@ async function viewArticle(docId) {
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(a.title)}</h2>
         <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(a.tag || '')} · ${escapeHtml(a.brandName)}</p>
-        ${admArticleHero(a) ? `<img loading="lazy" src="${escapeHtml(admArticleHero(a))}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
+        ${admArticleHero(a) ? `<img alt="" loading="lazy" src="${escapeHtml(admArticleHero(a))}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
         ${admArticleBody(a)}
         <div style="margin-top:24px;">
             <button class="act-btn act-approve" onclick="approveDoc('articles','${docId}')">Approve</button>

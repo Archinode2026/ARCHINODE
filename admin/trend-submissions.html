@@ -412,7 +412,7 @@ window.openModal = function(id) {
     imgGrid.innerHTML = '<div style="color:#6b6459;font-size:0.85rem;grid-column:1/-1;">(no images submitted)</div>';
   } else {
     imgGrid.innerHTML = imgs.map(function(u){
-      return '<a href="' + escapeAttr(u) + '" target="_blank" rel="noopener"><img src="' + escapeAttr(u) + '" loading="lazy" onerror="this.style.opacity=0.3"></a>';
+      return '<a href="' + escapeAttr(u) + '" target="_blank" rel="noopener"><img alt="" src="' + escapeAttr(u) + '" loading="lazy" onerror="this.style.opacity=0.3"></a>';
     }).join('');
   }
   // 첫 탭 활성화

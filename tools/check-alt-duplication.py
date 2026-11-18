@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """A-514 — 목록 카드의 그림 대체글이 바로 옆 제목과 똑같은지.
+   A-599(2026-11-18) — `alt` 속성이 **아예 없는** 그림도 함께 본다.
+
+   A-514 는 alt 가 **있는데 틀린** 자리를 봤다. 그래서 alt 가 **없는** 자리는
+   한 번도 안 봤다. 2026-11-18 에 세어 보니 그림 938개 중 6개가 그랬고,
+   전부 어드민의 JS 안에서 만들어지는 미리보기였다. 옆에 이름이 이미 있으니
+   장식용(`alt=""`)으로 두는 것이 맞다 — A-514 가 배운 「두 번 말하지 않기」와
+   같은 판단이다. 검사가 있는데도 안 보이던 까닭은, 검사가 **있는 것의 품질**만
+   보고 **없는 것**은 세지 않았기 때문이다.
 
 왜 있는가
 ---------
@@ -108,6 +116,25 @@ def main() -> int:
         if not re.search(pat, t):
             bad.append((rel, '코드가 그리는 카드의 대체글이 비어 있지 않다 (%s)' % pat[:46]))
 
+    # ── A-599: alt 속성이 **아예 없는** 그림 ──────────────────────────────────
+    #    A-514 는 alt 의 품질만 봤다. 없는 것은 세지 않아서 6개가 숨어 있었다.
+    imgs = 0
+    for root, dirs, fs in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in ('.git', 'node_modules', '.netlify',
+                                                'docs', 'assets')]
+        for f in fs:
+            if not f.endswith('.html'):
+                continue
+            fp = os.path.join(root, f)
+            rel = os.path.relpath(fp, ROOT)
+            src = io.open(fp, encoding='utf-8', errors='replace').read()
+            for m in re.finditer(r'<img\b([^>]*)>', src):
+                imgs += 1
+                if not re.search(r'\balt\s*=', m.group(1)):
+                    bad.append((rel, 'alt 속성이 없는 그림: %s' % m.group(0)[:70]))
+    if imgs < 100:
+        bad.append(('(검사 자체)', '그림을 %d개만 봤다 — 100개 밑이면 훑기가 멈춘 것으로 본다' % imgs))
+
     if cards < MIN_CARDS:
         bad.append(('(검사 자체)', '카드를 %d장만 봤다 — %d장 밑이면 검사가 멈춘 것으로 본다'
                     % (cards, MIN_CARDS)))
@@ -120,7 +147,8 @@ def main() -> int:
             print('  … 그리고 %d건 더' % (len(bad) - 40))
         return 1
 
-    print('목록 카드 대체글 — 카드 %d장, 제목을 두 번 말하는 자리 없음' % cards)
+    print('목록 카드 대체글 — 카드 %d장, 제목을 두 번 말하는 자리 없음 '
+          '· 그림 %d개 전부 alt 있음' % (cards, imgs))
     return 0
 
 
