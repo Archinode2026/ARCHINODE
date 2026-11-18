@@ -391,6 +391,7 @@ async function submitSourcing(e) {
       '개인정보 수집·이용에 동의해 주세요.');
     errorMsg.style.display = 'block';
     btn.disabled = false;
+    archiMarkInvalid(agreed, errorMsg);
     agreed.focus();
     return false;
   }

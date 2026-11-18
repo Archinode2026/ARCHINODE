@@ -94,6 +94,32 @@
   }
   window.archiSay = archiSay;
 
+  /* A-598(2026-11-18): 어느 칸이 막혔는지 **그 칸에** 표시한다.
+     A-591 이 안내를 들리게 했고(role=alert), A-595 가 칸에 이름을 달았다.
+     남은 틈이 이것이다 — 손님이 「동의해 주세요」를 듣고 Tab 으로 돌아와도
+     **어느 칸이 문제인지는 아무것도 말해 주지 않는다.** aria-invalid 로 그 칸을
+     표시하고, aria-describedby 로 안내문을 그 칸에 묶는다. 그러면 칸에 들어갈 때
+     「잘못됨」과 이유가 함께 들린다. 보기는 바뀌지 않는다 — 속성뿐이다.
+     (248쪽 전체에서 aria-invalid·aria-describedby 는 0쪽이었다.)
+
+     한 폼 안의 묵은 표시는 먼저 지운다 — 지우지 않으면 한 번 틀린 칸이
+     고친 뒤에도 계속 틀린 것으로 남는다(archiApplyMessage 가 같은 까닭으로
+     setCustomValidity('') 를 먼저 부른다). */
+  function archiMarkInvalid(field, errEl) {
+    if (!field) return;
+    var form = field.form || (field.closest ? field.closest('form') : null);
+    if (form) {
+      var old = form.querySelectorAll('[aria-invalid="true"]');
+      for (var i = 0; i < old.length; i++) {
+        old[i].removeAttribute('aria-invalid');
+        old[i].removeAttribute('aria-describedby');
+      }
+    }
+    field.setAttribute('aria-invalid', 'true');
+    if (errEl && errEl.id) field.setAttribute('aria-describedby', errEl.id);
+  }
+  window.archiMarkInvalid = archiMarkInvalid;
+
   function archiApplyMessage(el) {
     if (!el || typeof el.setCustomValidity !== 'function' || !el.validity) return;
     /* 먼저 비워야 **지금의 진짜 상태**가 보인다 — 비우지 않으면 한 번 틀린 칸이

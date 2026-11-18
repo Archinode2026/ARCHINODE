@@ -602,6 +602,7 @@ async function submitConsult(e) {
     errorDiv.style.display = 'block';
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     submitBtn.disabled = false;
+    archiMarkInvalid(agreePrivacy, errorDiv);
     agreePrivacy.focus();
     return false;
   }

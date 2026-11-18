@@ -820,6 +820,7 @@ form.addEventListener('submit', async function(e) {
         e.preventDefault();
         lybSay('Please agree to the collection and use of your personal data.',
                '개인정보 수집·이용에 동의해 주세요.');
+        archiMarkInvalid(agreePrivacyLyb, document.getElementById('formError'));
         agreePrivacyLyb.focus();
         return false;
     }
@@ -846,6 +847,7 @@ form.addEventListener('submit', async function(e) {
     const vendorTermsErrorEl = document.getElementById('vendorTermsError');
     if (!vendorTermsEl || !vendorTermsEl.checked) {
         vendorTermsErrorEl.style.display = 'block';
+        archiMarkInvalid(vendorTermsEl, vendorTermsErrorEl);
         vendorTermsEl.focus();
         submitBtn.disabled = false;
         window.setLangText && window.setLangText(submitBtn, "Submit Application", "신청서 제출");

@@ -427,6 +427,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
         archiSay(errorDiv, 'Please agree to the collection and use of your personal data.',
                            '개인정보 수집·이용에 동의해 주세요.');
         errorDiv.style.display = 'block';
+        archiMarkInvalid(agreePrivacySignup, errorDiv);
         agreePrivacySignup.focus();
         return;
     }
