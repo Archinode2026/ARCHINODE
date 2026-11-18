@@ -31,7 +31,18 @@
     var wrap = document.createElement('div');
     wrap.id = 'archi-cookie-banner';
     // R-007: 두 단추가 390px 에서 높이 38px 이라 손가락 기준(44px)에 못 미쳤다 — min-height 로 올린다.
-    wrap.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#332e27;color:#fff;padding:20px 24px;border-radius:10px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:720px;margin:0 auto;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;';
+    /* A-593(2026-11-18): 400% 확대(1280x1024 -> 320x256 CSS px)에서 이 배너가
+       **화면보다 커진다.** 글자가 좁은 폭에서 접히며 높이가 333px 이 되는데 창은
+       256px 이다. `bottom:16px` 로 아래에 붙여 두었으니 top 이 -93px 로 밀려
+       나가고, `position:fixed` 라 **스크롤로도 끌어올 수 없다.**
+       실측(2026-11-18): 제목 <h3> 「We use cookies」가 top -73~-49 로 화면 위에
+       완전히 사라지고, 무엇에 동의하는지 적은 문단 앞부분도 잘렸다. 단추 셋은
+       보이니까 **읽지 못한 채 누르게 된다.**
+       좁은 폭 검사가 이걸 못 잡은 까닭은 폭만 320·360·390 으로 바꾸고 높이는 늘
+       크게 두었기 때문이다 — 확대는 폭과 높이를 **같이** 줄인다.
+       그래서 창 높이를 넘지 않게 묶고, 넘칠 때는 배너 안에서 스크롤되게 한다.
+       배너가 창에 들어갈 때는 max-height 가 걸리지 않으므로 보기는 그대로다. */
+    wrap.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#332e27;color:#fff;padding:20px 24px;border-radius:10px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:720px;margin:0 auto;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;max-height:calc(100vh - 32px);overflow-y:auto;';
     /* A-437(2026-11-09): **배너가 영어로 떴다 — 한국 손님이 처음 보는 화면이다.**
        브론즈 26차가 손님 origin(넷리파이 미리보기) 네 페이지에서 전부 영어를 봤다.
        그 순간 `lang="ko"` · 저장값 `ko` · 머리띠는 「로그인」 한국어였는데 배너만 영어였다.
@@ -119,6 +130,14 @@
            **왼쪽으로는 못 피한다** — 배지를 비키려면 x<148 인데 「필수만」이 x208 까지 쓴다.
            한 줄에 셋이면 세 번째는 반드시 걸린다. 그래서 **줄 자체를 올린다.** */
         '@media (max-width:760px){#archi-cookie-banner{padding-bottom:47px !important;}}' +
+        /* A-593: 배너가 창보다 커져 안쪽으로 스크롤될 때, **고르는 줄은 늘 보이게** 한다.
+           그러지 않으면 400% 확대에서 「필수만」과 「자세히」가 스크롤 아래로 밀려,
+           손님이 배너 안을 굴려야 선택지를 찾는다(실측: top 258~302, 창은 256).
+           동의 화면에서 「모두 수락」만 보이고 거절 쪽이 숨는 것은 고르는 일이
+           한쪽으로 기울게 만든다. 배너가 창에 들어갈 때는 넘치는 것이 없어
+           sticky 가 아무 일도 하지 않으므로 보기는 그대로다. */
+        '#archi-cookie-banner .cc-row{position:sticky;bottom:-20px;' +
+        'background:#332e27;padding-top:10px;padding-bottom:20px;margin-bottom:-20px;}' +
         '#archi-cookie-banner .cc-inline{position:relative;}' +
         '#archi-cookie-banner .cc-inline::after{content:"";position:absolute;left:0;right:0;' +
         'top:50%;height:44px;transform:translateY(-50%);}';
