@@ -81,7 +81,22 @@
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
 .form-group textarea { resize: vertical; min-height: 100px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.form-submit { text-align: center; margin-top: 32px; }
+/* A-600(2026-11-18, 브론즈 44차 1번): style.css 1381 의 `.form-submit` 은 **단추**에
+   입히는 스타일이다(검정 배경·흰 글자·padding 16px). 이 쪽은 같은 이름을
+   **감싸개**로 쓰면서 아래 두 줄만 적었기 때문에, 배경과 글자색이 그대로 새어
+   들어와 감싸개 전체가 검게 칠해져 있었다.
+   그 자체로는 눈에 안 띄었다 — 안에 든 것이 흰 글자 단추 하나였으니까.
+   그런데 A-537 이 그 감싸개 안에 **개인정보 수집·이용 고지**를 넣는 순간,
+   밝은 배경을 전제로 색을 정해 둔 제목(`color: var(--black)`)이 검정 배경에
+   얹혀 **대비 1.00** 이 됐다. 법으로 두게 한 고지의 제목이 빈 줄로 보이고,
+   수집 항목·목적·보유 기간 세 줄도 2.30 이었다. 동의 체크박스만 읽히니
+   손님은 **무엇에 동의하는지 못 읽은 채** 누르게 된다.
+   같은 고지를 쓰는 다른 세 쪽은 이 감싸개가 없어 12.57 로 정상이다.
+   감싸개에 단추 스타일이 올 자리는 없으니 여기서 되돌린다. */
+.form-submit { text-align: center; margin-top: 32px;
+    background: none; color: inherit; padding: 0; width: auto; border: none;
+    font-size: inherit; font-weight: inherit; letter-spacing: normal; }
+.form-submit:hover { background: none; }
 .form-submit button {
     background: #332e27; color: #fff; border: none; padding: 14px 48px; font-size: 1rem;
     font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.3s;

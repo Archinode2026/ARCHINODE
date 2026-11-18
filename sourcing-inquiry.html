@@ -374,7 +374,37 @@ async function submitSourcing(e) {
   const btn = document.getElementById('srcSubmitBtn');
   const errorMsg = document.getElementById('srcErrorMsg');
   errorMsg.style.display = 'none';
+
+  /* A-601(2026-11-18, 브론즈 44차 4번): 이 단추는 잠긴 뒤에도 **1픽셀도 안 바뀌었다.**
+     글자도 「문의 보내기」 그대로, 마우스 모양도 손가락(누를 수 있다는 표시) 그대로라
+     손님은 「안 눌렸네」 하고 계속 누르다가 고장난 줄 알고 떠난다. 기다릴 수 있는
+     시간은 reCAPTCHA 검증 15초 + Firestore 쓰기 15초로 최대 30초다.
+     다른 폼은 전부 글자를 바꾼다(자문 「제출 중...」, 입점 「계정 만드는 중...」) —
+     이 폼만 빠져 있었다.
+     setLangText 를 쓰지 않는 까닭: 이 단추에는 화살표 아이콘이 들어 있어서
+     글자만 갈아끼우면 아이콘이 사라지고 돌아오지 않는다. 그래서 원래 모습을
+     그대로 담아 두고 되돌린다. */
+  const srcBtnWas = { html: btn.innerHTML,
+                      en: btn.getAttribute('data-en'),
+                      ko: btn.getAttribute('data-ko') };
+  function srcBtnBusy(on) {
+    if (on) {
+      btn.setAttribute('data-en', 'Sending...');
+      btn.setAttribute('data-ko', '보내는 중...');
+      btn.textContent = (document.documentElement.lang !== 'en' ? '보내는 중...' : 'Sending...');
+      btn.style.opacity = '0.6';
+      btn.style.cursor = 'not-allowed';
+    } else {
+      if (srcBtnWas.en !== null) btn.setAttribute('data-en', srcBtnWas.en);
+      if (srcBtnWas.ko !== null) btn.setAttribute('data-ko', srcBtnWas.ko);
+      btn.innerHTML = srcBtnWas.html;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+    }
+  }
+
   btn.disabled = true;
+  srcBtnBusy(true);
 
   const name = document.getElementById('srcName').value.trim();
   const company = document.getElementById('srcCompany').value.trim();
@@ -391,6 +421,7 @@ async function submitSourcing(e) {
       '개인정보 수집·이용에 동의해 주세요.');
     errorMsg.style.display = 'block';
     btn.disabled = false;
+    srcBtnBusy(false);
     archiMarkInvalid(agreed, errorMsg);
     agreed.focus();
     return false;
@@ -463,6 +494,7 @@ async function submitSourcing(e) {
     errorMsg.style.display = 'block';
   }
   btn.disabled = false;
+  srcBtnBusy(false);
   return false;
 }
 </script>
