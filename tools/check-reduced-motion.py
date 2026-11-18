@@ -85,6 +85,64 @@ def main():
                 bad.append('%s:%d 움직임 줄이기 설정을 묻지 않고 smooth 를 박았다 — %s'
                            % (rel, i + 1, line.strip()[:62]))
 
+    # ── A-605: `!important` 로 적어 둔 전환이 전역 끄기를 빠져나가나 ───────────
+    #    전역 끄기는 `*{ transition-duration: 0.001ms !important }` 로 쪽수가
+    #    (0,0,0) 이다. 같은 `!important` 에 쪽수가 (0,1,0) 인 규칙은 **이긴다.**
+    #    실측: .nav-cta 가 쪽마다 2개, .cat-checkbox 가 10개 살아남았다.
+    #    style.css 끝에 덮어쓰기를 두고도 lyb-extra.css 가 **뒤에 실려서**
+    #    그 쪽에서는 안 닿았다 — 쪽수가 아니라 **차례** 문제였다.
+    #    그래서 「transition·animation 을 !important 로 적은 css 파일은
+    #    자기 안에 reduce 덮어쓰기를 가져야 한다」로 본다.
+    for name in sorted(os.listdir(ROOT)):
+        if not name.endswith('.css'):
+            continue
+        fp = os.path.join(ROOT, name)
+        src = open(fp, encoding='utf-8', errors='replace').read()
+        clean = re.sub(r'/\*.*?\*/', lambda m: re.sub(r'[^\n]', ' ', m.group(0)),
+                       src, flags=re.S)
+        # ★ 내가 둔 reduce 덮어쓰기 자체가 `transition-duration: ... !important` 라서
+        #   처음엔 **자기 자신을 세고** 「덮어쓰기가 앞에 있다」고 걸렸다.
+        #   그래서 reduce 블록을 먼저 지우고(자리는 보존) 센다.
+        def blank_reduce(s):
+            out = list(s)
+            for m in re.finditer(r'prefers-reduced-motion', s):
+                start = s.rfind('@media', 0, m.start())
+                if start < 0:
+                    continue
+                i = s.find('{', m.end())
+                if i < 0:
+                    continue
+                d = 0
+                j = len(s) - 1
+                for j in range(i, len(s)):
+                    if s[j] == '{':
+                        d += 1
+                    elif s[j] == '}':
+                        d -= 1
+                        if d == 0:
+                            break
+                for k in range(start, j + 1):
+                    if out[k] != '\n':
+                        out[k] = ' '
+            return ''.join(out)
+
+        outside = blank_reduce(clean)
+        imp = re.findall(r'(transition|animation)[^;{}]*!important', outside)
+        if not imp:
+            continue
+        if 'prefers-reduced-motion' not in clean:
+            bad.append('%s: transition/animation 을 !important 로 %d곳 적어 두고 '
+                       '자기 안에 reduce 덮어쓰기가 없다 — 다른 파일의 전역 끄기는 '
+                       '차례에서 밀려 안 닿을 수 있다' % (name, len(imp)))
+            continue
+        # 덮어쓰기가 **마지막 !important 보다 뒤**에 있어야 한다
+        last_imp = max(m.start() for m in re.finditer(
+            r'(transition|animation)[^;{}]*!important', outside))
+        reduces = [m.start() for m in re.finditer(r'prefers-reduced-motion', clean)]
+        if not any(r > last_imp for r in reduces):
+            bad.append('%s: reduce 덮어쓰기가 마지막 !important 전환보다 **앞**에 있다 '
+                       '— 뒤에 와야 이긴다' % name)
+
     # ── 공용 함수를 쓰는데 **그 파일을 싣지 않는** 쪽 ─────────────────────────
     #    고치고 나서 알았다: brand-portal/dashboard.html 은 a11y-nav.js 를 싣지
     #    않는다. 그래서 `window.archiScrollIntoView` 가 없고, 내가 둔 else 갈래가

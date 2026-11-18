@@ -3960,3 +3960,27 @@ body #main:focus { outline: none; }
 body .skip-link:focus-visible,
 body #main:focus-visible { box-shadow: none; outline: none; }
 @media (prefers-reduced-motion: reduce) { :focus-visible { transition: none; } }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   A-605(2026-11-18, 브론즈 44차 6번): 전역 끄기를 **빠져나가는** 전환 둘.
+
+   884행의 끄기 블록은 `*, *::before, *::after { transition-duration: 0.001ms
+   !important }` 로 쪽수가 (0,0,0) 이다. 그런데 아래 둘은 `!important` 를 똑같이
+   달면서 쪽수가 (0,1,0) 이라 **이긴다** —
+     118행  `.nav-cta     { transition: background 0.2s !important }`
+     2473행 `.cat-checkbox{ transition: all 0.2s !important }`
+   실측(브론즈): 움직임 줄이기를 켜도 `.nav-cta` 가 쪽마다 2개, 입점 신청의
+   `.cat-checkbox` 가 10개 살아남았다. 색이 0.2초 번지는 정도라 실제 피해는
+   작지만, **`!important` 로 적어 두면 전역 끄기가 안 닿는다**는 자리가 두 곳
+   생긴 것은 그대로 둘 일이 아니다.
+
+   쪽수를 같게 맞추고 **뒤에** 두어 이기게 한다. 파일 끝에 두는 까닭은
+   `.cat-checkbox` 가 2473행이라 그보다 뒤여야 하기 때문이다.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .nav-cta, .cat-checkbox {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+}
