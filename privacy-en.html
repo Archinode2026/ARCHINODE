@@ -638,7 +638,6 @@
             </div>
         </div>
     </header>
-<div id="main" tabindex="-1"></div>
 
     <div class="search-bar" id="searchBar">
         <div class="search-input">
@@ -646,7 +645,10 @@
         </div>
     </div>
 
-    <main>
+    <!-- A-606(2026-11-18): 이 쪽은 진짜 <main> 이 따로 있는데 속이 빈 표지도
+     같이 있어서, 본문 구역이 둘이 되고(규격상 한 쪽에 하나다) 건너뛰기는
+     본문 **밖**에 떨어졌다. 표지를 걷고 이름을 진짜 본문에 옮겼다. -->
+<main id="main" tabindex="-1">
         <div class="content">
             <h1>Privacy Policy</h1>
             <p class="policy-date">Effective Date: April 2026 | Last Updated: November 12, 2026</p>

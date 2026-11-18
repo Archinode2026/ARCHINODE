@@ -83,7 +83,6 @@
     </div>
   </div>
 </header>
-<div id="main" tabindex="-1"></div>
 
 <!-- SEARCH OVERLAY -->
 <div class="search-overlay" id="searchOverlay">
@@ -95,6 +94,13 @@
 </div>
 
 <!-- PAGE HERO -->
+<!-- A-606(2026-11-18, 브론즈 44차 2번): 전에는 이 자리에 **속이 빈 본문 표지**가
+     있었고(건너뛰기 링크가 닿는 빈 div), a11y-nav.js 가 그것에 role="main" 을
+     붙였다. 표지는 붙었지만 그 안이 비어 있어서, 「본문으로 건너뛰기」로 들어오면
+     아무것도 없는 자리에 떨어졌고 진짜 본문은 어느 구역에도 속하지 않은 채
+     바깥에 있었다(실측: 본문 안 글자 0자, 어느 구역에도 안 든 머리글이
+     매거진 134개·index 26개). 그래서 빈 표지를 걷고 본문을 실제로 감싼다. -->
+<main id="main" tabindex="-1">
 <section class="page-hero">
   <picture>
     <source type="image/webp" srcset="../assets/photos/photo-1606170033648-5d55a3edf314-1200.webp 1200w, ../assets/photos/photo-1606170033648-5d55a3edf314-1600.webp 1600w" sizes="100vw">
@@ -210,6 +216,8 @@
 </section>
 
 <!-- FOOTER -->
+    </main>
+
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">

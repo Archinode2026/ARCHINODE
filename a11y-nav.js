@@ -42,13 +42,24 @@
   }
 
   function init() {
-    /* ── 1) 본문 표지 — 건너뛰기 링크가 닿는 자리에 이름을 준다 ──────────
-       `#main` 은 `<div tabindex="-1">` 이라 읽어 주는 도구에게는 **아무것도
-       아니다**. 4화면 모두 `<main>` 도 `role="main"` 도 없었다. markup 을
-       바꾸지 않고 표지만 붙인다. */
-    var main = document.getElementById('main');
-    if (main && main.tagName !== 'MAIN' && !main.getAttribute('role')) {
-      main.setAttribute('role', 'main');
+    /* ── 1) 본문 표지 ────────────────────────────────────────────────────
+       A-513 때는 건너뛰기 링크가 닿는 자리가 속이 빈 `<div tabindex="-1">` 이라
+       읽어 주는 도구에게 아무것도 아니었다. 그래서 markup 을 바꾸지 않고
+       표지(role="main")만 붙였다.
+
+       A-606(2026-11-18): 그 표지가 **빈 채로** 붙어 있었던 것이 문제였다 —
+       건너뛰기로 들어오면 아무것도 없는 자리에 떨어지고, 진짜 본문은 어느
+       구역에도 속하지 않았다(실측: 본문 안 글자 0자, 어느 구역에도 안 든
+       머리글이 매거진 134개). 227쪽을 진짜 `<main>` 이 본문을 감싸도록 바꿨다.
+
+       그래서 여기서 할 일은 **남은 쪽을 위한 뒷배**뿐이다.
+       ★ 쪽에 이미 진짜 `<main>` 이 있으면 손대지 않는다 — 안 그러면 본문 구역이
+         둘이 된다(privacy-en.html 에서 실제로 그랬다. 규격상 한 쪽에 하나다). */
+    if (!document.querySelector('main')) {
+      var main = document.getElementById('main');
+      if (main && main.tagName !== 'MAIN' && !main.getAttribute('role')) {
+        main.setAttribute('role', 'main');
+      }
     }
 
     var nav = document.getElementById('mainNav');

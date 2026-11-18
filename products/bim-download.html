@@ -87,8 +87,11 @@ class="main-nav" id="mainNav">
     </div>
   </div>
 </header>
-<div id="main" tabindex="-1"></div>
 
+<!-- A-606(2026-11-18): 속이 빈 본문 표지를 걷고 본문을 실제로 감싼다.
+     까닭은 같은 번호의 다른 쪽들과 같다 — 빈 표지에 건너뛰기로 들어오면
+     아무것도 없는 자리에 떨어졌고 본문이 어느 구역에도 속하지 않았다. -->
+<main id="main" tabindex="-1">
 <div class="bd-wrap">
   <!-- A-080 패턴: JS 실행 전에도 존재하는 정적 h1 -->
   <h1 style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;">BIM Data Download</h1>
@@ -102,6 +105,8 @@ class="main-nav" id="mainNav">
 </div>
 
 <!-- FOOTER -->
+    </main>
+
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">

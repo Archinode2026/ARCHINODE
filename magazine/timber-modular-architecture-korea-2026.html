@@ -73,8 +73,14 @@
       <a href="../sourcing-inquiry.html" class="nav-cta" data-lang-only="ko" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
       <a href="../list-your-brand.html" class="nav-cta" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
     </nav><div class="header-actions"><a href="../auth/login.html" style="font-size:0.82rem;color:#8a7030;font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a><button class="search-toggle" onclick="toggleSearch()" aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-search"></i></button><a href="../auth/profile.html" aria-label="Saved" data-en-aria-label="Saved" data-ko-aria-label="저장 목록"><i class="far fa-bookmark"></i></a><a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a><button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu" data-en-aria-label="Menu" data-ko-aria-label="메뉴"><i class="fas fa-bars"></i></button></div></div></header>
-<div id="main" tabindex="-1"></div>
 <div class="search-overlay" id="searchOverlay"><button type="button" class="search-close" onclick="toggleSearch()" aria-label="Close search" data-en-aria-label="Close search" data-ko-aria-label="검색 닫기" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;line-height:1;padding:0;font-family:inherit;">&times;</button><div class="search-box"><input type="text" placeholder="Search brands, products, categories..." data-en-placeholder="Search brands, products, categories..." data-ko-placeholder="브랜드, 제품, 카테고리 검색..." aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><button aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-arrow-right"></i></button></div></div>
+<!-- A-606(2026-11-18, 브론즈 44차 2번): 전에는 이 자리에 **속이 빈 본문 표지**가
+     있었고(건너뛰기 링크가 닿는 빈 div), a11y-nav.js 가 그것에 role="main" 을
+     붙였다. 표지는 붙었지만 그 안이 비어 있어서, 「본문으로 건너뛰기」로 들어오면
+     아무것도 없는 자리에 떨어졌고 진짜 본문은 어느 구역에도 속하지 않은 채
+     바깥에 있었다(실측: 본문 안 글자 0자, 어느 구역에도 안 든 머리글이
+     매거진 134개·index 26개). 그래서 빈 표지를 걷고 본문을 실제로 감싼다. -->
+<main id="main" tabindex="-1">
 <section class="article-hero">
     <span class="tag" data-en="Construction" data-ko="건축">Construction</span>
     <h1 data-en="Built in a Factory, Stored in a Forest" data-ko="공장에서 짓고, 숲에서 가둔다">공장에서 짓고, 숲에서 가둔다</h1>
@@ -105,6 +111,8 @@
   <a href="../magazine.html" data-en="← Back to Korean Articles" data-ko="← 매거진으로">&larr; Back to Korean Articles</a>
   <a href="../magazine.html" data-en="Back to Korean Articles →" data-ko="매거진으로 →">Back to Korean Articles &rarr;</a>
 </div>
+    </main>
+
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
