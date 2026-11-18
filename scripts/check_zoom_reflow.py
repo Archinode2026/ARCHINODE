@@ -82,22 +82,64 @@ PROBE = """
         escaped.push(((d.innerText || d.value || '').trim().slice(0, 20)) || d.tagName.toLowerCase());
       }
     });
+    /* 누를 거리가 **정말로 눌리는지** 본다 (A-594).
+       줄바꿈된 inline 링크는 getBoundingClientRect() 가 두 줄을 감싸는 큰 네모라서
+       그 안에 **글자가 없는 빈 자리**가 섞인다. 거기를 찍으면 옆 형제가 잡혀
+       「가려졌다」고 잘못 읽는다 — 2026-11-18 에 내가 그렇게 읽어 멀쩡한 링크를
+       결함으로 셌다. 그래서 getClientRects() 로 **줄마다의 네모**를 받아 그 안에서만
+       찍는다. 한 점이라도 닿으면 그 거리는 닿는 것으로 본다. */
     const ctrls = [];
     e.querySelectorAll('button, a[href], input, select, textarea').forEach(c => {
-      const cb = c.getBoundingClientRect();
       const ccs = getComputedStyle(c);
-      if (ccs.display === 'none' || cb.height <= 0) return;
+      if (ccs.display === 'none' || ccs.visibility === 'hidden') return;
+      const rects = [...c.getClientRects()].filter(r => r.width > 1 && r.height > 1);
+      if (!rects.length) return;
+      let hitSome = false, blocker = '', byDialog = false;
+      for (const r of rects) {
+        for (const fx of [0.3, 0.5, 0.7]) {
+          for (const fy of [0.35, 0.5, 0.65]) {
+            const x = Math.round(r.left + r.width * fx);
+            const y = Math.round(r.top + r.height * fy);
+            if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
+            const hit = document.elementFromPoint(x, y);
+            if (hit === c || (hit && c.contains(hit)) || (hit && hit.contains(c))) hitSome = true;
+            else if (hit && !blocker) {
+              /* A-594: 동의 배너처럼 `role=dialog` 인 것이 본문을 덮는 것은
+                 **그게 하는 일**이다 — 손님이 고르고 나면 비킨다. 그것을
+                 「못 누른다」고 세면 검사가 늑대를 외치게 되고, 늑대를 외치는
+                 검사는 아무도 안 본다. 그래서 대화상자가 가린 것은 따로 센다.
+                 대화상자 **자신의** 누를 거리는 그대로 본다 — A-593 이 바로
+                 그 자리였다. */
+              const dlg = hit.closest('[role=dialog]');
+              if (dlg && !dlg.contains(c)) { byDialog = true; }
+              else {
+                blocker = hit.id ? '#' + hit.id
+                  : (typeof hit.className === 'string' && hit.className
+                     ? '.' + hit.className.split(' ')[0] : hit.tagName);
+              }
+            }
+          }
+        }
+      }
       ctrls.push({t: (c.innerText || c.value || c.getAttribute('aria-label') || '').trim().slice(0, 18),
-                  inView: cb.top >= -1 && cb.bottom <= vh + 1});
+                  inView: hitSome, blocker: blocker, byDialog: byDialog});
     });
-    if (!boxOver && escaped.length === 0) return;
+    /* A-594: 넘침과 **가림**은 다른 일이다.
+       처음엔 넘치는 요소만 골라 그 안의 누를 거리를 봤다. 그래서 넘치지는
+       않는데 다른 막이 위에 떠서 못 누르는 자리를 **아예 들여다보지 않았다** —
+       깨뜨려 시험하다 내 검사가 그 상태를 통과시키는 것을 봤다.
+       그래서 둘 중 하나라도 있으면 보고한다. */
+    const anyBlocked = ctrls.some(c => !c.inView && !c.byDialog);
+    if (!boxOver && escaped.length === 0 && !anyBlocked) return;
     out.push({
       boxOver, escaped: escaped.slice(0, 5), escapedN: escaped.length,
       tag: e.tagName.toLowerCase(), id: e.id || '',
       cls: (typeof e.className === 'string' ? e.className : '').split(' ')[0].slice(0, 24),
       pos: cs.position, h: Math.round(b.height), top: Math.round(b.top), bottom: Math.round(b.bottom),
       scrollable, overflowY: cs.overflowY,
-      ctrlsOut: ctrls.filter(c => !c.inView).map(c => c.t),
+      ctrlsOut: ctrls.filter(c => !c.inView && !c.byDialog)
+                     .map(c => c.t + (c.blocker ? ' <-' + c.blocker : '')),
+      ctrlsByDialog: ctrls.filter(c => !c.inView && c.byDialog).map(c => c.t),
       ctrlsAll: ctrls.length
     });
   });
@@ -105,6 +147,11 @@ PROBE = """
 }
 """
 
+
+SCROLL_JS = ('() => document.querySelectorAll("*").forEach(e => {'
+             ' const cs = getComputedStyle(e);'
+             ' if ((cs.position === "fixed" || cs.position === "sticky") &&'
+             ' e.scrollHeight > e.clientHeight + 1) e.scrollTop = e.scrollHeight; })')
 
 def main():
     hard = []     # 닿을 수 없는 내용 — 실패
@@ -128,13 +175,29 @@ def main():
                     continue
                 pg.wait_for_timeout(600)
                 r = pg.evaluate(PROBE)
+                # 안쪽으로 굴러가는 고정 그릇은 굴림을 끝까지 내려 한 번 더 본다.
+                # 바닥에 붙은 줄이 본문을 잠깐 덮는 것은 정상이다 — 어느 굴림
+                # 위치에서든 한 번 닿으면 닿는 것으로 본다(A-594).
+                try:
+                    pg.evaluate(SCROLL_JS)
+                    pg.wait_for_timeout(220)
+                    r2 = pg.evaluate(PROBE)
+                    still = {}
+                    for it2 in r2['items']:
+                        still[it2['tag'] + '#' + it2['id']] = set(it2['ctrlsOut'])
+                    for it1 in r['items']:
+                        k = it1['tag'] + '#' + it1['id']
+                        if k in still:
+                            it1['ctrlsOut'] = [x for x in it1['ctrlsOut'] if x in still[k]]
+                except Exception:
+                    pass
                 seen += 1
                 for it in r['items']:
                     name = '<%s%s%s>' % (it['tag'], ('#' + it['id']) if it['id'] else '',
                                          (' .' + it['cls']) if it['cls'] else '')
                     where = '%s %s %s 높이%dpx top%d bottom%d (창 %d)' % (
                         label, page, name, it['h'], it['top'], it['bottom'], r['vh'])
-                    if not it['scrollable']:
+                    if it['boxOver'] and not it['scrollable']:
                         why = ('고정 요소라 스크롤로도 못 끌어온다' if it['pos'] == 'fixed'
                                else '끈적 요소인데 창보다 키가 커서 굴려도 일부가 숨는다')
                         detail = ''
@@ -143,8 +206,13 @@ def main():
                                 it['escapedN'], ', '.join(repr(x) for x in it['escaped']))
                         hard.append('%s — 안쪽 스크롤이 안 된다(overflow-y:%s). %s.%s'
                                     % (where, it['overflowY'], why, detail))
-                    elif it['ctrlsOut']:
-                        soft.append('%s — 스크롤은 되지만 단추/링크 %d개가 화면 밖: %s'
+                    if it.get('ctrlsByDialog'):
+                        soft.append('%s — 대화상자가 가린 거리 %d개(고르고 나면 비킨다): %s'
+                                    % (where, len(it['ctrlsByDialog']),
+                                       ', '.join(it['ctrlsByDialog'][:3])))
+                    if it['ctrlsOut']:
+                        # 두 굴림 위치에서 모두 안 닿은 것만 남아 있다 → 정말 못 누른다
+                        hard.append('%s — 누를 거리 %d개가 **어느 굴림 위치에서도** 안 닿는다: %s'
                                     % (where, len(it['ctrlsOut']), ', '.join(it['ctrlsOut'][:4])))
                 pg.close()
             ctx.close()
