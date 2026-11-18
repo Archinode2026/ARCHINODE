@@ -672,6 +672,8 @@ window.addEventListener('scroll', function() {
 // Scroll To Top
 function scrollToTop(e) {
   e.preventDefault();
+  /* A-603: 움직임 줄이기 설정을 보고 결정한다 (공용 함수에 까닭을 적어 두었다). */
+  if (window.archiScrollTop) { window.archiScrollTop(); return; }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

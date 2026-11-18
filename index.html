@@ -1360,7 +1360,9 @@ input, select, textarea { font-family: inherit; }
       var per = Math.max(1, Math.floor(track.clientWidth / w));   /* 한 번에 넘길 칸 수 */
       var dir = Number(b.getAttribute('data-dir'));
       var idx = Math.round(track.scrollLeft / w) + dir * per;     /* 항상 칸 경계로 */
-      track.scrollTo({ left: Math.max(0, idx) * w, behavior: 'smooth' });
+      /* A-603: 가로 레일도 움직임 줄이기 설정을 따른다. */
+      track.scrollTo({ left: Math.max(0, idx) * w,
+                       behavior: (window.archiReduceMotion && window.archiReduceMotion()) ? 'auto' : 'smooth' });
     });
   });
   track.addEventListener('scroll', sync, { passive: true });
@@ -1401,7 +1403,7 @@ input, select, textarea { font-family: inherit; }
 </script>
 
 <!-- SCROLL TO TOP -->
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
+<button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)" aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>
 </button>
 

@@ -131,4 +131,52 @@
   } else {
     init();
   }
+
+  /* ═════════════════════════════════════════════════════════════════════════
+     A-603(2026-11-18, 브론즈 44차 3번): 「맨 위로」가 **움직임 줄이기 설정을
+     무시**했다.
+
+     CSS 는 제대로 되어 있다 — reduce 에서 `scroll-behavior` 가 smooth → auto 로
+     바뀌는 것을 실측했다. 그런데 단추가 `onclick="window.scrollTo({top:0,
+     behavior:'smooth'})"` 로 **JS 안에 smooth 를 박아** 두었고, JS 의 behavior 는
+     CSS 의 scroll-behavior 를 **이긴다.** 그래서 설정을 켜도 화면 전체가 1.5초
+     동안 8,216px 을 흘러 올라갔다(실측: 설정 끔 1,474ms / 켬 1,473ms — 차이 1ms).
+
+     어지럼·편두통 때문에 그 설정을 켠 손님에게 **사이트에서 가장 큰 움직임**이
+     그대로 남은 것이다. 다른 움직임은 다 멈추는데 이것만 안 멈췄다
+     (히어로 자동 넘김 0회, 전환 0.7초→0.000001초 — 둘 다 정상).
+
+     같은 자리가 228쪽에 복사돼 있으니 쪽마다 고치지 않고 여기 한 곳에 둔다.
+     ═════════════════════════════════════════════════════════════════════════ */
+  function archiReduceMotion() {
+    try {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /* 가로 레일처럼 위 두 helper 로 감쌀 수 없는 자리를 위해 판단만 내놓는다. */
+  window.archiReduceMotion = archiReduceMotion;
+
+  window.archiScrollTop = function (e) {
+    if (e && e.preventDefault) e.preventDefault();
+    try {
+      window.scrollTo({ top: 0, behavior: archiReduceMotion() ? 'auto' : 'smooth' });
+    } catch (err) {
+      window.scrollTo(0, 0);   // 옛 브라우저
+    }
+  };
+
+  /* 폼 오류·접수 안내로 끌어올리는 자리에도 같은 판단이 필요하다. */
+  window.archiScrollIntoView = function (el, opts) {
+    if (!el || !el.scrollIntoView) return;
+    var o = opts || {};
+    try {
+      el.scrollIntoView({ behavior: archiReduceMotion() ? 'auto' : 'smooth',
+                          block: o.block || 'center' });
+    } catch (err) {
+      el.scrollIntoView();
+    }
+  };
 })();

@@ -119,6 +119,8 @@ CHECKS = [
      'A-591 — 폼의 결과 안내가 화면 읽기 프로그램에 들리는지. 248쪽 전체에 aria-live·role=alert 가 한 번도 없었다 — 눈으로 못 보는 손님은 보내기가 막혔는지 들어갔는지 소식을 못 들었다(WCAG 4.1.3)'),
     ('입력칸 이름',          'py',   'tools/check-field-labels.py',
      'A-595·A-596 — 보이는 입력칸마다 이름의 출처가 있는지(label[for]·aria-label 등). placeholder 하나만 있는 것은 이름이 아니다. 입점신청 13칸 중 7칸이 화면에는 글자가 있는데 for= 가 없어 칸과 남남이었다. autocomplete 값이 표준 이름인지도 본다 — 틀린 값은 없는 것보다 나쁘다'),
+    ('움직임 줄이기',        'py',   'tools/check-reduced-motion.py',
+     'A-603 — 「맨 위로」가 JS 에 smooth 를 박아 둬서 움직임 줄이기 설정을 무시했다(실측 끔 1446ms / 켬 1446ms). 같은 자리가 228쪽에 복사돼 있었다. JS 의 behavior 는 CSS 의 scroll-behavior 를 이긴다'),
     ('한국어가 새는 자리',     'py',   'tools/check-lang-leak.py',
      'A-534 — 두 언어 속성이 **아예 없는** 한국어 글자. 짝이 한쪽만 있는 것(언어 규약)도, 영어만 나오는 안내(두 언어 안내)도 아닌 세 번째 틈 — A-526·A-529·A-532 가 이리로 지나갔다'),
 ]

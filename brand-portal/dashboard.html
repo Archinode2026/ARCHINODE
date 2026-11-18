@@ -1697,7 +1697,10 @@ async function bpOpenProductForm(product) {
 
     document.getElementById('productForm').style.display = 'block';
     document.getElementById('addProductBtn').style.display = 'none';
-    document.getElementById('productForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    /* A-603: 이 쪽은 a11y-nav.js 를 싣지 않으므로 공용 함수에 기댈 수 없다 —
+       여기서 직접 설정을 묻는다(실측으로 확인했다: 기대면 설정이 무시된다). */
+    (function(){ var r=false; try{ r=matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+      document.getElementById('productForm').scrollIntoView({ behavior: r ? 'auto' : 'smooth', block: 'start' }); })();
 
     /* ★ A-472(브론즈 29차 ④): 상태를 **목록 사본**(bpProductRows)에서만 읽었는데
        그건 마지막 loadProducts() 시점이다. 목록을 그린 뒤 어드민이 승인하면 카드는

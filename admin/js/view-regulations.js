@@ -171,7 +171,10 @@ function reg_onLinkClick(e) {
             var heads = document.querySelectorAll('#regBody h2, #regBody h3');
             for (var i = 0; i < heads.length; i++) if (reg_anchor(heads[i].textContent) === reg_anchor(id)) { target = heads[i]; break; }
         }
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        /* A-603: js 파일은 어느 쪽이 자기를 싣는지 알 수 없으므로 공용 함수에
+           기대지 않고 여기서 직접 설정을 묻는다. */
+        if (target) (function(){ var r=false; try{ r=matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+      target.scrollIntoView({ behavior: r ? 'auto' : 'smooth', block: 'start' }); })();
         return;
     }
     if (/\.md(#.*)?$/i.test(href)) {

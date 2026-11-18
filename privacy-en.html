@@ -942,10 +942,9 @@
         });
 
         function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+            /* A-603: 움직임 줄이기 설정을 보고 결정한다 (까닭은 a11y-nav.js 에). */
+            if (window.archiScrollTop) { window.archiScrollTop(); return; }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Close dropdown when clicking outside

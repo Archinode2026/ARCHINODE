@@ -600,7 +600,7 @@ async function submitConsult(e) {
       ? '개인정보 수집·이용에 동의해 주세요.'
       : 'Please agree to the collection and use of your personal data.';
     errorDiv.style.display = 'block';
-    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv); else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     submitBtn.disabled = false;
     archiMarkInvalid(agreePrivacy, errorDiv);
     agreePrivacy.focus();
@@ -612,7 +612,7 @@ async function submitConsult(e) {
     /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
     errorDiv.textContent = curLang1 === 'ko' ? '제출하려면 연락처 수집 동의에 체크해 주세요.' : 'Please confirm the contact consent to submit.';
     errorDiv.style.display = 'block';
-    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv); else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return false;
   }
   if (description.length < 100) {
@@ -620,7 +620,7 @@ async function submitConsult(e) {
     /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
     errorDiv.textContent = curLang2 === 'ko' ? '충분히 준비할 수 있도록 상황 설명을 100자 이상 적어 주세요.' : 'Please provide at least 100 characters in the description so we can prepare properly.';
     errorDiv.style.display = 'block';
-    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv); else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return false;
   }
 
@@ -715,7 +715,9 @@ async function submitConsult(e) {
 
     document.getElementById('consultForm').style.display = 'none';
     document.getElementById('formSuccess').style.display = 'block';
-    document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth' });
+    (window.archiScrollIntoView
+          ? window.archiScrollIntoView(document.getElementById('formSuccess'), { block: 'start' })
+          : document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth' }));
   } catch (err) {
     console.error(err);
     /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
@@ -725,7 +727,7 @@ async function submitConsult(e) {
       ? 'Your connection seems slow or offline. Please check your network and try again.'
       : 'Failed to submit: ' + (err.message || 'Unknown error') + '. Please try again or email office@archinode.org directly.';
     errorDiv.style.display = 'block';
-    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv); else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     submitBtn.disabled = false;
     submitBtn.textContent = (rcLang() === 'ko' ? '요청 보내기' : 'Send Request');
   }
@@ -758,7 +760,7 @@ async function submitConsult(e) {
      5025px(6.3화면)인데 손님이 위로 돌아갈 수단이 없었다. (브론즈 27차 3번)
      다른 페이지의 토글 코드는 그 페이지의 `header` 변수에 얹혀 있어서, 여기서는
      **남의 변수에 기대지 않는 자급식**으로 넣는다. 두 번 실행돼도 안전하다. -->
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+<button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)"
         aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>
 </button>

@@ -303,7 +303,7 @@
     </div>
   </div>
 </footer>
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
+<button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)" aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>
 </button>
 <script>
@@ -366,7 +366,8 @@ fadeEls.forEach(el => fadeObs.observe(el));
       if (form) form.style.display = 'none';
       // 깨끗한 URL로 교체(새로고침해도 성공 안내가 다시 뜨지 않도록)
       try { history.replaceState(null, '', window.location.pathname); } catch(e){}
-      if (successDiv) successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (successDiv) { if (window.archiScrollIntoView) window.archiScrollIntoView(successDiv);
+                        else successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     }
   } catch(e) {}
 })();
