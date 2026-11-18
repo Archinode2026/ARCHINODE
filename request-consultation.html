@@ -729,7 +729,10 @@ async function submitConsult(e) {
   } catch (err) {
     console.error(err);
     /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
-    errorDiv.textContent = (err.message === 'ARCHINODE_CAPTCHA_FAILED')
+    /* F-3(브론즈 45차): LOAD_FAILED 가 일반 가지로 흘러 내부 코드가 손님에게 보였다 */
+    errorDiv.textContent = (err.message === 'ARCHINODE_CAPTCHA_LOAD_FAILED')
+      ? 'We could not load the security check — an ad blocker or company firewall may be blocking it. Please email office@archinode.org and we will take it from there.'
+      : (err.message === 'ARCHINODE_CAPTCHA_FAILED')
       ? 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.'
       : (err.message === 'ARCHINODE_TIMEOUT')
       ? 'Your connection seems slow or offline. Please check your network and try again.'

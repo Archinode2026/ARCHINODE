@@ -124,6 +124,17 @@
       st.id = 'cc-space-style';
       st.textContent =
         'html.has-cookie-banner body .scroll-top{bottom:calc(var(--cc-h,0px) + 28px);}' +
+        /* F-1·F-4(브론즈 45차): --cc-h 는 여태 「맨 위로」 단추를 띄우는 데만 쓰였고,
+           쪽 본문은 띠만큼의 자리를 전혀 비우지 않았다. 그래서 작은 화면에서
+           띠(320px 폭에서 높이 343px = 화면의 49%) 아래로 들어간 「보내기」 단추가
+           **눌리는 것처럼 보이면서 안 눌렸다**(실측: 실제 클릭이 3.5초 시간초과,
+           elementFromPoint 가 띠를 돌려준다). 키보드로 탭을 눌러도 브라우저가
+           칸을 띠 뒤로 끌어와 17멈춤 중 6개가 가려졌다.
+           padding-bottom 은 쪽 끝이 띠를 넘어 올라갈 자리를 만들고,
+           scroll-padding-bottom 은 브라우저가 초점을 띠 **위로** 끌어오게 한다.
+           둘 다 클래스에 매여 있으니 손님이 고지를 처리하면 함께 사라진다. */
+        'html.has-cookie-banner{scroll-padding-bottom:calc(var(--cc-h,0px) + 24px);}' +
+        'html.has-cookie-banner body{padding-bottom:calc(var(--cc-h,0px) + 24px);}' +
         /* 본문 안내문의 링크도 손가락 기준으로 — 배너 문단엔 다른 링크가 없어
            띠가 이웃 줄로 번져도 탭을 뺏지 않는다(A-421 과 같은 판단). */
         /* A-437: 「자세히」가 넷리파이 배지와 세로 27px 겹쳐 3/7 이었다(브론즈 26차).

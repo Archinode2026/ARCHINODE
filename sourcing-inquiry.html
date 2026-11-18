@@ -374,6 +374,19 @@ function rfqSay(el, en, ko) {
     el.setAttribute('data-ko', ko);
     el.textContent = (document.documentElement.lang !== 'en' ? ko : en);
     if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+    /* F-2(브론즈 45차): 안내가 화면 밖에 떠서, 손님은 단추를 눌렀는데 아무 일도
+       안 일어난 화면을 보았다(실측: 입점 신청 390x844 에서 화면상 y = -2107px).
+       **이미 보이는 안내는 건드리지 않고** 화면 밖일 때만 끌어온다. */
+    if (el.style.display === 'block') {
+        try {
+            var _r = el.getBoundingClientRect();
+            var _out = _r.bottom < 0 || _r.top > (window.innerHeight || 0) - 40;
+            if (_out) {
+                if (window.archiScrollIntoView) window.archiScrollIntoView(el, { block: 'center' });
+                else el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        } catch (e) {}
+    }
 }
 async function submitSourcing(e) {
   e.preventDefault();
@@ -490,7 +503,10 @@ async function submitSourcing(e) {
   } catch (err) {
     console.error('Sourcing inquiry error:', err);
     // A-333: 구체적 사유는 밝히지 않는다(봇 회피 방지) — A-004 가 폼 3곳에 쓴 문장 그대로.
-    if (err.message === 'ARCHINODE_CAPTCHA_FAILED') {
+    if (err.message === 'ARCHINODE_CAPTCHA_LOAD_FAILED') {
+      /* F-3(브론즈 45차): 이 쪽은 코드를 감췄지만 원인도 길도 안 알려 줬다 */
+      rfqSay(errorMsg, 'We could not load the security check — an ad blocker or company firewall may be blocking it. Please email office@archinode.org and we will take it from there.', '보안 확인을 불러올 수 없습니다 — 광고 차단기나 회사 방화벽이 막고 있을 수 있습니다. office@archinode.org 로 메일 주시면 저희가 이어서 처리해 드리겠습니다.');
+    } else if (err.message === 'ARCHINODE_CAPTCHA_FAILED') {
       rfqSay(errorMsg, 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.',
                        '이 제출을 확인하지 못했습니다. 다시 시도해 주시고, 계속 안 되면 office@archinode.org 로 알려 주세요.');
     } else if (err.message === 'ARCHINODE_TIMEOUT') {

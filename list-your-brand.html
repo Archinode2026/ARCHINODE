@@ -832,6 +832,20 @@ function lybSay(en, ko) {
     errorDiv.setAttribute('data-ko', ko);
     errorDiv.textContent = (document.documentElement.lang !== 'en' ? ko : en);
     if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+    /* F-2(브론즈 45차): 이 안내가 화면 **2.6칸 위**에 떠서, 손님은 단추를 눌렀는데
+       아무 일도 안 일어난 화면을 보았다(실측 390x844 에서 화면상 y = -2107px).
+       자문·소싱 폼은 오류마다 스크롤을 불렀는데 이 폼만 빠져 있었다. 호출 자리가
+       열 곳이 넘으므로 자리마다 넣지 않고 **이 통로 한 군데**에서 옮긴다. */
+    if (errorDiv.style.display === 'block') {
+        try {
+            var _r = errorDiv.getBoundingClientRect();
+            var _out = _r.bottom < 0 || _r.top > (window.innerHeight || 0) - 40;
+            if (_out) {
+                if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv, { block: 'center' });
+                else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        } catch (e) {}
+    }
 }
 const submitBtn = document.getElementById('submitBtn');
 
@@ -1043,7 +1057,12 @@ form.addEventListener('submit', async function(e) {
         window.setLangText && window.setLangText(submitBtn, "Submit Application", "신청서 제출");
         errorDiv.style.display = 'block';
 
-        if (error.message === 'ARCHINODE_CAPTCHA_FAILED') {
+        if (error.message === 'ARCHINODE_CAPTCHA_LOAD_FAILED') {
+            /* F-3(브론즈 45차): 이 코드가 아래 일반 가지로 흘러 손님에게
+               「문제가 생겼습니다: ARCHINODE_CAPTCHA_LOAD_FAILED」로 보였다.
+               캡차를 못 받는 손님은 몇 번 눌러도 안 되므로 메일 길을 준다. */
+            lybSay('We could not load the security check — an ad blocker or company firewall may be blocking it. Please email office@archinode.org and we will take it from there.', '보안 확인을 불러올 수 없습니다 — 광고 차단기나 회사 방화벽이 막고 있을 수 있습니다. office@archinode.org 로 메일 주시면 저희가 이어서 처리해 드리겠습니다.');
+        } else if (error.message === 'ARCHINODE_CAPTCHA_FAILED') {
             // A-004: reCAPTCHA v3 검증 실패(낮은 점수/오류) — 재시도 유도, 구체적 사유는 밝히지 않음(봇 회피 방지)
             lybSay('We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.',
                    '이 제출을 확인하지 못했습니다. 다시 시도해 주시고, 계속 안 되면 office@archinode.org 로 알려 주세요.');
@@ -1070,7 +1089,9 @@ form.addEventListener('submit', async function(e) {
 function copyCred(elId, btn) {
     const text = document.getElementById(elId).textContent;
     navigator.clipboard.writeText(text).then(() => {
-        btn.textContent = '✓ Copy됨';
+        /* F-5(브론즈 45차): '✓ Copy됨' 은 영어 낱말 + 한국어 어미로 어느 언어로 봐도
+           어정쩡했다. */
+        btn.textContent = (document.documentElement.lang !== 'en' ? '✓ 복사했습니다' : '✓ Copied');
         btn.classList.add('copied');
         setTimeout(() => {
             btn.textContent = 'Copy';
