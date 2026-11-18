@@ -460,6 +460,13 @@ a { text-decoration: none; color: inherit; }
     .pt-row > div { padding: 2px 0; }
 }
 </style>
+<style>
+/* A-616 */
+.tbl-scroll-hint{display:none;}
+@media (max-width:520px){
+  .tbl-scroll-hint{display:block;margin:0 0 8px;font-size:0.85rem;opacity:0.75;}
+}
+</style>
 </head>
 <body data-langs="en">
 <a class="skip-link" href="#main" data-en="Skip to content" data-ko="본문으로 건너뛰기">Skip to content</a>
@@ -719,7 +726,13 @@ a { text-decoration: none; color: inherit; }
              `.fb-compare table { overflow:hidden; border-radius:8px }` 라 그림자·페이드 힌트도 못 생긴다.
              그래서 글자로 알린다 — 넘칠 때만 보이게 (브론즈 28차 19번). -->
         <p class="fb-compare-hint" data-en="Swipe the table sideways to see the ARCHINODE column →" data-ko="표를 옆으로 밀면 ARCHINODE 열이 보입니다 →">Swipe the table sideways to see the ARCHINODE column &rarr;</p>
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <!-- A-616: 표 폭이 396px 고정이라 390/320 폭에서 30~100px 잘린다. 바깥 div 가
+             overflow-x:auto 라 밀면 닿지만, 밀 수 있다는 표시가 없어 손님은 거기서
+             끝인 줄 안다. 좁은 화면에서만 한 줄 안내를 띄운다(읽어 주는 도구도 읽는다). -->
+        <p class="tbl-scroll-hint" data-en="Swipe the table sideways to see all columns."
+           data-ko="표를 옆으로 밀면 나머지 칸이 보입니다.">Swipe the table sideways to see all columns.</p>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;" role="region" tabindex="0"
+             aria-label="Comparison table" data-en-aria-label="Comparison table" data-ko-aria-label="비교표">
         <table>
             <thead>
                 <tr>

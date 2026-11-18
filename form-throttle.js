@@ -259,3 +259,72 @@
     sessionStorage.setItem(t, String(Date.now()));
   }, true);
 })();
+
+/* ─────────────────────────────────────────────────────────────────────────
+   A-614 (브론즈 45차 F-6): 새로고침·뒤로가기 한 번에 쓴 내용이 전부 사라졌다.
+   실측: 이름·이메일 채우고 동의 켠 뒤 새로고침 → 전부 빈 값, 동의 false, 경고 없음.
+   입점 신청은 필수칸 7개 + 카테고리라 손가락 한 번에 처음부터다.
+
+   **초안을 저장하지 않는다.** 저장하면 이름·연락처가 손님 기기에 남고, 공용 PC
+   라면 다음 사람이 본다 — 처리방침에도 적어야 하는 일이다. 그래서 떠나기 전에
+   한 번 묻기만 한다(브라우저가 제 문구를 보여 주지는 않는다. 그건 브라우저 몫이다).
+
+   한 칸짜리 구독 상자에서는 뜨지 않게 **두 칸 이상** 채워졌을 때만 건다.
+   ───────────────────────────────────────────────────────────────────────── */
+(function () {
+  var armed = false;
+
+  function visibleTyped(form) {
+    var n = 0;
+    var els = form.querySelectorAll('input, textarea, select');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.offsetParent === null) continue;                      // 안 보이는 칸
+      if (el.getAttribute('tabindex') === '-1') continue;          // 꿀단지(A-333)
+      if (el.getAttribute('aria-hidden') === 'true') continue;
+      var t = (el.type || '').toLowerCase();
+      if (t === 'hidden' || t === 'submit' || t === 'button') continue;
+      if (t === 'checkbox' || t === 'radio') { if (el.checked) n++; continue; }
+      if (el.value && String(el.value).trim()) n++;
+    }
+    return n;
+  }
+
+  function anyFormTyped() {
+    var forms = document.querySelectorAll('form');
+    for (var i = 0; i < forms.length; i++) {
+      if (visibleTyped(forms[i]) >= 2) return true;
+    }
+    return false;
+  }
+
+  function onBeforeUnload(e) {
+    if (!anyFormTyped()) return;        // 그 사이 비웠으면 묻지 않는다
+    e.preventDefault();
+    e.returnValue = '';                 // 구형 브라우저용
+    return '';
+  }
+
+  function arm() {
+    if (armed) return;
+    armed = true;
+    window.addEventListener('beforeunload', onBeforeUnload);
+  }
+
+  function disarm() {
+    if (!armed) return;
+    armed = false;
+    window.removeEventListener('beforeunload', onBeforeUnload);
+  }
+
+  // 손님이 실제로 손을 댄 뒤에만 건다
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.form) arm();
+  }, true);
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.form) arm();
+  }, true);
+
+  // 보내고 나면 묻지 않는다. 실패해서 그 자리에 남고 다시 고치면 위에서 또 걸린다.
+  document.addEventListener('submit', disarm, true);
+})();

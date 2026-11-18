@@ -184,7 +184,23 @@
                 query = query.where('subcategory', '==', subcategory);
             }
 
-            const snap = await cpWithTimeout(query.orderBy('createdAt', 'desc').limit(PAGE + 1).get(), 12000);
+            /* A-617: 상위 분류 질의(status + category + createdAt)는 복합 색인이 따로
+               필요하다 — 하위 분류용 색인(subcategory 가 가운데 끼어 있다)으로는 못
+               치른다. 색인이 아직 안 올라간 동안에도 손님에게 제품이 보이도록,
+               failed-precondition 이면 orderBy 를 빼고 다시 묻고 **여기서 정렬한다.**
+               (색인이 올라가면 위쪽 길로 돌아가고 더 보기도 되살아난다.) */
+            var snap, cpNoIndex = false;
+            try {
+                snap = await cpWithTimeout(query.orderBy('createdAt', 'desc').limit(PAGE + 1).get(), 12000);
+            } catch (e1) {
+                if (e1 && e1.code === 'failed-precondition') {
+                    console.warn('category products: 색인이 없어 정렬 없이 받는다 (A-617)');
+                    cpNoIndex = true;
+                    snap = await cpWithTimeout(query.limit(PAGE + 1).get(), 12000);
+                } else {
+                    throw e1;
+                }
+            }
 
             if (snap.empty) {
                 /* ── A-510(브론즈 34차 N34-4): 이 자리는 **손님에게 브랜드 이야기를
@@ -208,7 +224,20 @@
             }
 
             const docs = snap.docs || [];
-            const hasMore = docs.length > PAGE;
+            /* A-617: 색인 없이 받아 왔으면 새것부터 보이도록 여기서 정렬한다.
+               createdAt 은 Timestamp 이거나(toMillis) 문자열이거나 없을 수 있다. */
+            if (cpNoIndex) {
+                var cpWhen = function (doc) {
+                    var v = (doc.data() || {}).createdAt;
+                    if (!v) return 0;
+                    if (typeof v.toMillis === 'function') { try { return v.toMillis(); } catch (e) { return 0; } }
+                    var t = Date.parse(v); return isNaN(t) ? 0 : t;
+                };
+                docs.sort(function (a, b) { return cpWhen(b) - cpWhen(a); });
+            }
+            /* 색인 없이 받은 길에서는 '더 보기'를 걸지 않는다 — startAfter 가 같은
+               정렬에 기대므로 눌러도 엉뚱한 쪽이 나온다. */
+            const hasMore = cpNoIndex ? false : (docs.length > PAGE);
             const page = docs.slice(0, PAGE);
             lastDoc = page.length ? page[page.length - 1] : null;
             shown = page.length;
