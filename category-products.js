@@ -20,6 +20,25 @@
     const subcategory = container.dataset.subcategory;
     if (!category) return;
 
+    // A-609: 자료가 오기 전에는 손님에게 '불러오는 중'을 보여 주고,
+    // 망이 막히면 Firestore 가 안에서 영원히 재시도하므로 시간 제한을 둔다.
+    container.innerHTML = '<p class="cp-loading" data-en="Loading products\u2026" data-ko="제품을 불러오는 중\u2026">Loading products\u2026</p>';
+    if (window.applyLang) window.applyLang();
+
+    function cpErrorHtml() {
+        return '<p class="cp-error" data-en="Unable to load products. Check your connection and try again." data-ko="제품을 불러올 수 없습니다. 연결을 확인하고 다시 시도해 주세요.">Unable to load products.</p>' +
+            '<p class="cp-error-actions"><a href="' + base + 'sourcing-inquiry.html" data-en="Tell us what you are looking for" data-ko="찾으시는 자재를 알려 주세요">Tell us what you are looking for</a></p>';
+    }
+
+    function cpWithTimeout(promise, ms) {
+        return Promise.race([
+            promise,
+            new Promise(function (_, reject) {
+                setTimeout(function () { reject(new Error('cp-timeout')); }, ms);
+            })
+        ]);
+    }
+
     /* ── A-471(2026-11-11): 이 파일은 브랜드가 입력한 값을 **원문 그대로**
        innerHTML 에 꽂고 있었다 — `p.name` · `p.brandName` · `p.materials` ·
        `p.slug`(href) · `p.imageUrl`(src) 다섯. 이 파일은 **공개 카테고리 69개
@@ -139,9 +158,19 @@
         }
     }
 
+    var cpWaits = 0;
+
+    function cpFail(why) {
+        console.error('category products failed:', why);
+        container.innerHTML = cpErrorHtml();
+        if (window.applyLang) window.applyLang();
+    }
+
     async function loadProducts() {
         if (typeof db === 'undefined') {
-            console.warn('Firebase not loaded yet, retrying...');
+            // A-609: 파이어베이스 자체가 안 내려오는 길. 예전에는 여기서 영원히 돌며
+            // 손님에게 '불러오는 중'만 보여 주었다. 24번(약 12초)에서 끊는다.
+            if (++cpWaits > 24) { cpFail('firebase never loaded'); return; }
             setTimeout(loadProducts, 500);
             return;
         }
@@ -155,7 +184,7 @@
                 query = query.where('subcategory', '==', subcategory);
             }
 
-            const snap = await query.orderBy('createdAt', 'desc').limit(PAGE + 1).get();
+            const snap = await cpWithTimeout(query.orderBy('createdAt', 'desc').limit(PAGE + 1).get(), 12000);
 
             if (snap.empty) {
                 /* ── A-510(브론즈 34차 N34-4): 이 자리는 **손님에게 브랜드 이야기를
@@ -202,7 +231,7 @@
 
         } catch (err) {
             console.error('Error loading products:', err);
-            container.innerHTML = '<p class="cp-error" data-en="Unable to load products." data-ko="제품을 불러올 수 없습니다.">Unable to load products.</p>';
+            container.innerHTML = cpErrorHtml();
             if (window.applyLang) window.applyLang();
         }
     }

@@ -24,13 +24,26 @@ const firebaseConfig = {
 };
 
 // Firebase 초기화
-firebase.initializeApp(firebaseConfig);
-// Auth compat SDK는 일부 페이지에서만 로드되므로 조건부 초기화 (BUG-1, 검수대장 A-001)
-const auth = (typeof firebase.auth === 'function') ? firebase.auth() : null;
-// A-056: Firestore SDK가 안 실린 페이지(예: auth/reset-password.html)에서 매번 TypeError가 나던 문제. auth와 같은 패턴으로 가드.
-const db = (typeof firebase.firestore === 'function') ? firebase.firestore() : null;
-// Storage SDK는 일부 페이지에서만 로드되므로 조건부 초기화
-const storage = (typeof firebase.storage === 'function') ? firebase.storage() : null;
+// A-609: 예전에는 여기가 const 였다. firebase 가 아예 안 내려오면 27줄이 던지고
+// 스크립트가 끊겨 auth·db·storage 가 '선언만 되고 초기화 안 된' 상태로 남았다.
+// 그 상태에서는 다른 파일의 `typeof db === 'undefined'` 방어조차 ReferenceError 를
+// 던진다(TDZ). 그래서 var 로 바꾸고 초기화를 감쌌다 — 실패하면 세 값은 undefined 로
+// 남고, 81군데의 기존 방어가 **의도대로** 작동한다.
+var auth, db, storage;
+try {
+    if (typeof firebase === 'undefined') {
+        throw new Error('firebase SDK not loaded');
+    }
+    firebase.initializeApp(firebaseConfig);
+    // Auth compat SDK는 일부 페이지에서만 로드되므로 조건부 초기화 (BUG-1, 검수대장 A-001)
+    auth = (typeof firebase.auth === 'function') ? firebase.auth() : null;
+    // A-056: Firestore SDK가 안 실린 페이지(예: auth/reset-password.html)에서 매번 TypeError가 나던 문제. auth와 같은 패턴으로 가드.
+    db = (typeof firebase.firestore === 'function') ? firebase.firestore() : null;
+    // Storage SDK는 일부 페이지에서만 로드되므로 조건부 초기화
+    storage = (typeof firebase.storage === 'function') ? firebase.storage() : null;
+} catch (e) {
+    console.error('Firebase 초기화 실패 — 이 쪽의 자료 기능은 작동하지 않습니다:', e && e.message);
+}
 
 // ── 관리자 이메일 목록 (어드민 접근 가능한 이메일) ──
 const ADMIN_EMAILS = [
