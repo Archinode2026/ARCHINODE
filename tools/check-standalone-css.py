@@ -64,6 +64,17 @@ RULES = [
     # 안 싣는 쪽은 브라우저 기본(검은 실선 하나)만 남아 그 자리가 다시 묻힌다.
     ('초점 고리 두 겹 (A-513)',
      r':focus-visible\s*\{[^}]*box-shadow', None),
+    # A-641(브론즈 49차 N49-4): 이 쪽에는 `.skip-link:focus-visible` 만 있고
+    # **바탕 규칙이 통째로 없어서** 「Skip to content」가 평상시에도 왼쪽 위에
+    # 글자로 떠 있었다(실측 114x20 @ 0,2 — 1280·390 둘 다). 건너뛰기 링크는
+    # 초점을 받기 전에는 안 보이는 것이 규약이다. `left:-9999px` 로 본다.
+    ('건너뛰기 링크 숨김 (A-641)',
+     r'\.skip-link\s*\{[^}]*left\s*:\s*-9999px', 'skip-link'),
+    # A-641(N49-3): 이 쪽만 움직임 줄이기 설정을 안 들었다 — 자체 <style> 에
+    # transition·animation 이 8개인데 reduce 블록은 0개였다. A-603 의 검사기는
+    # **JS 의 smooth** 만 보므로 이 자리를 지나쳤다. CSS 쪽은 여기서 본다.
+    ('움직임 줄이기 블록 (A-603·A-641)',
+     r'@media[^{]*prefers-reduced-motion\s*:\s*reduce', None),
 ]
 
 # 머리띠를 가졌다고 보는 표시
@@ -90,6 +101,8 @@ def main():
         rel = os.path.relpath(path, ROOT).replace(os.sep, '/')
         try:
             src = io.open(path, encoding='utf-8', errors='replace').read()
+            # 마크업 유무를 보는 gate 도 같은 이유로 HTML 주석을 걷는다
+            src = re.sub(r'<!--.*?-->', '', src, flags=re.S)
         except OSError:
             continue
 
@@ -110,6 +123,13 @@ def main():
             problems.append((rel, 'style.css 도 안 싣고 자체 <style> 도 없다'))
             continue
         css = '\n'.join(blocks)
+        # ★ A-641(2026-11-20): 여기서 **주석 덫**에 걸렸다. 처방 블록을 통째로
+        #   `/* */` 안에 넣어 두고 검사를 돌렸더니 **통과했다** — 주석에 적힌
+        #   규칙은 브라우저가 안 읽는데 검사기는 읽은 것이다. 처방 12종 전부가
+        #   같은 구멍이었다. (A-619 에서도 같은 함정에 걸렸다: privacy-en.html 의
+        #   HTML 주석에 적힌 「style.css」를 「싣는다」로 읽었다. 두 번째다 —
+        #   **문자열로 세는 검사기는 반드시 주석을 먼저 걷어내라.**)
+        css = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
 
         missing = [label for label, pat, needs in RULES
                    if (needs is None or needs in src)

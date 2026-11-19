@@ -626,6 +626,45 @@
               style.css 의 `body #main { scroll-margin-top: 90px }` 과 같은 값. */
         body #main { scroll-margin-top: 90px; }
 
+        /* ── A-641(브론즈 49차 N49-3·N49-4): 이 쪽만 style.css 를 안 실어서
+              빠져 있던 공용 처방 둘. check-standalone-css.py 의 RULES 에 넣었다 —
+              이 쪽을 잊어도 다음부터는 검사가 잡는다(이걸로 여덟 번째다). ──
+
+           ② 「건너뛰기」 링크가 **늘 보였다.** 이 쪽에는 `:focus-visible` 규칙만
+              있고 **바탕 규칙이 통째로 없어서**, 화면 왼쪽 위에 「Skip to content」가
+              평상시에도 글자로 떠 있었다(실측 114x20, 좌표 0,2 — 1280 과 390 둘 다).
+              건너뛰기 링크는 초점을 받기 전에는 보이지 않는 것이 규약이고,
+              privacy.html 은 공용 규칙 덕에 -9999px 로 비켜 있다. 같은 값으로 적는다.
+              (덤으로 타깃도 20px → 44px 이 된다.) */
+        body .skip-link {
+            position: absolute; top: 0; left: -9999px;
+            z-index: 3000;
+            display: inline-flex; align-items: center;
+            min-height: 44px; padding: 0 20px;
+            background: #1b2a41; color: #fff;
+            font-size: 0.9rem; font-weight: 600; text-decoration: none;
+            border-radius: 0 0 6px 0;
+        }
+        body .skip-link:focus { left: 0; }
+
+        /* ③ **움직임 줄이기 설정을 이 쪽만 안 듣고 있었다.** 이 쪽의 자체
+              `<style>` 에는 transition·animation 선언이 8개인데
+              `prefers-reduced-motion` 블록이 **0개**였다(style.css 에는 10개).
+              어지럼·편두통으로 그 설정을 켠 사람에게, 사이트의 다른 쪽은 전부
+              멈추는데 이 쪽만 안 멈춘다. A-603 의 검사기는 **JS 의 smooth** 만
+              보므로 이 자리를 지나쳤다 — 그래서 RULES 쪽에 넣었다.
+              style.css 934행과 같은 규칙이다. */
+        @media (prefers-reduced-motion: reduce) {
+            .fade-in { opacity: 1; transform: none; transition: none; }
+            .fade-in.visible { transition: none; }
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
         /* A-639(브론즈 49차 N49-1): 짧은 창에서 머리글이 쿠키 고지를 덮던 것.
            style.css 와 같은 규칙 — 이 쪽은 그 파일을 안 싣는다. */
         @media (max-height: 480px) {
