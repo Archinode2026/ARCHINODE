@@ -302,7 +302,17 @@ function leads_rowsHtml(list) {
             + '<td>' + escapeHtml(it.email || '-') + (it.phone ? '<small class="adm-log-sub">' + escapeHtml(it.phone) + '</small>' : '') + '</td>'
             + '<td>' + escapeHtml(it.productName || '-') + (it.productId ? '<small class="adm-log-sub">' + escapeHtml(it.productId) + '</small>' : '') + '</td>'
             + '<td>' + escapeHtml(it.brandName || '-') + '</td>'
-            + '<td>' + lead_statusBadge(it.status) + '</td>'
+            + '<td>' + lead_statusBadge(it.status)
+            /* A-618: 알림이 안 들어간 표시가 **상세 화면에만** 있었다. 목록에서는
+               안 보이니, 메일이 안 왔을 때 어느 건이 그런지 리드를 하나씩 열어
+               봐야만 알 수 있었다. 알림 실패는 목록에서 바로 보여야 한다 —
+               손님은 보냈다고 믿고 기다리고 있다. */
+            + (it.notifyPending
+                ? ' <span class="adm-badge" style="background:#8a2b2b;color:#fff;" title="'
+                    + escapeAttr(t('Admin e-mail was NOT queued for this lead.', '이 리드는 알림 메일이 들어가지 않았습니다.'))
+                    + '">' + escapeHtml(t('no e-mail', '알림 실패')) + '</span>'
+                : '')
+            + '</td>'
             + '<td><button type="button" class="act-btn act-view" data-lead-view="' + escapeAttr(it.id) + '" ' + tAttr('View', '보기') + '>' + escapeHtml(t('View', '보기')) + '</button></td>'
             + '</tr>';
     }
