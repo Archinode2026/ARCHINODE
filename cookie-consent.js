@@ -134,7 +134,13 @@
            scroll-padding-bottom 은 브라우저가 초점을 띠 **위로** 끌어오게 한다.
            둘 다 클래스에 매여 있으니 손님이 고지를 처리하면 함께 사라진다. */
         'html.has-cookie-banner{scroll-padding-bottom:calc(var(--cc-h,0px) + 24px);}' +
-        'html.has-cookie-banner body{padding-bottom:calc(var(--cc-h,0px) + 24px);}' +
+        /* A-628(브론즈 46차 N46-8): 이 여백을 body 에 주니 꼬리말 **아래**에 크림색
+           8px 띠가 생겼다(body 배경 rgb(253,251,247) 대 꼬리말 rgb(37,48,64), 320·390·
+           1280 모두 8px). 배치가 깨지는 것은 아니지만 자리가 비어 보인다.
+           꼬리말에 주면 같은 자리가 꼬리말 색으로 메워진다. 꼬리말의 원래 아래 여백은
+           0 이라(`padding: 80px 0 0`) 더해도 잃는 것이 없고, 꼬리말이 없는 6쪽
+           (auth/* · trend-report/view)은 쿠키 고지를 싣지도 않아 빈 구멍이 없다. */
+        'html.has-cookie-banner footer{padding-bottom:calc(var(--cc-h,0px) + 24px);}' +
         /* 본문 안내문의 링크도 손가락 기준으로 — 배너 문단엔 다른 링크가 없어
            띠가 이웃 줄로 번져도 탭을 뺏지 않는다(A-421 과 같은 판단). */
         /* A-437: 「자세히」가 넷리파이 배지와 세로 27px 겹쳐 3/7 이었다(브론즈 26차).

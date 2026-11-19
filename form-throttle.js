@@ -162,16 +162,32 @@
       else el.setAttribute('aria-invalid', 'true');
 
       if (box) {
-        var label = '';
+        /* A-625(브론즈 46차 N46-7): 전에는 여기서 data-en 과 data-ko 에 **같은 글**을
+           넣었다. 그래서 막히는 순간의 언어는 맞지만 손님이 나중에 한/영을 누르면
+           따라오지 않았다(실측: 한국어로 막고 EN 토글 → 그대로 한국어).
+           두 언어를 따로 만든다. 사유는 archiPickMessage 가 언어를 받으므로 그대로
+           두 번 부르고(위 archiApplyMessage 가 setCustomValidity 를 이미 불렀지만
+           valueMissing·typeMismatch 깃발은 **그 뒤에도 살아 있다** — 재서 확인했다),
+           칸 이름은 라벨의 data-en·data-ko 에서 가져온다. */
         var lb = el.id ? el.form.querySelector('label[for="' + el.id + '"]') : null;
-        if (lb) label = (lb.innerText || '').replace(/\s*\*\s*$/, '').trim();
-        var msg = el.validationMessage || '';
-        var ko = label ? (label + ': ' + msg) : msg;
-        box.setAttribute('data-en', ko);
+        var star = /\s*\*\s*$/;
+        var lbEn = '', lbKo = '';
+        if (lb) {
+          var raw = (lb.innerText || '').replace(star, '').trim();
+          lbEn = (lb.getAttribute('data-en') || raw).replace(star, '').trim();
+          lbKo = (lb.getAttribute('data-ko') || raw).replace(star, '').trim();
+        }
+        var type = (el.type || '').toLowerCase();
+        var msgEn = archiPickMessage(el.validity, type, 'en') || el.validationMessage || '';
+        var msgKo = archiPickMessage(el.validity, type, 'ko') || el.validationMessage || '';
+        var en = lbEn ? (lbEn + ': ' + msgEn) : msgEn;
+        var ko = lbKo ? (lbKo + ': ' + msgKo) : msgKo;
+        box.setAttribute('data-en', en);
         box.setAttribute('data-ko', ko);
-        box.textContent = ko;
+        box.textContent = (archiFormLang() === 'ko' ? ko : en);
         box.style.display = 'block';
-        if (!ko) console.warn('archi: 막힌 칸 안내에 쓸 글이 비었다', el.id || el.name);
+        if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e3) {} }
+        if (!en && !ko) console.warn('archi: 막힌 칸 안내에 쓸 글이 비었다', el.id || el.name);
       }
     } catch (err) {}
   }, true);

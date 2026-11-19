@@ -323,13 +323,15 @@ a { text-decoration: none; color: inherit; }
     padding: 80px 24px;
 }
 .fb-compare-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+/* A-626(브론즈 46차 N46-6): 전에는 `max-width:767px` 로 켰고 주석에 「768px 이상에서는
+   숨은 폭 0 으로 실측됨」이라고 적혀 있었다. 그런데 **600px 에서도 숨은 폭이 0** 이다
+   (브론즈 실측) — 즉 521~767px 에서는 밀 것이 없는데 「옆으로 미세요」라고 **거짓말**을
+   했다. 창 크기는 넘침의 대리값일 뿐이다. 실제로 재서 켠다(아래 스크립트가
+   .fb-has-overflow 를 붙인다). */
 .fb-compare-hint { display: none; }
-@media (max-width: 767px) {
-    /* 표가 실제로 넘치는 구간에서만 (768px 이상에서는 숨은 폭 0 으로 실측됨) */
-    .fb-compare-hint {
-        display: block; margin: 0 0 10px; font-size: 0.78rem;
-        color: var(--gray-400); text-align: right;
-    }
+.fb-compare-inner.fb-has-overflow .fb-compare-hint {
+    display: block; margin: 0 0 10px; font-size: 0.78rem;
+    color: var(--gray-400); text-align: right;
 }
 .fb-compare h2 {
     font-family: 'Lora', 'Noto Serif KR', Georgia, serif;
@@ -458,13 +460,6 @@ a { text-decoration: none; color: inherit; }
     .pt-row { grid-template-columns: 1fr; gap: 4px; padding: 12px 0; }
     .pt-row.pt-head { display: none; }
     .pt-row > div { padding: 2px 0; }
-}
-</style>
-<style>
-/* A-616 */
-.tbl-scroll-hint{display:none;}
-@media (max-width:520px){
-  .tbl-scroll-hint{display:block;margin:0 0 8px;font-size:0.85rem;opacity:0.75;}
 }
 </style>
 </head>
@@ -726,11 +721,9 @@ a { text-decoration: none; color: inherit; }
              `.fb-compare table { overflow:hidden; border-radius:8px }` 라 그림자·페이드 힌트도 못 생긴다.
              그래서 글자로 알린다 — 넘칠 때만 보이게 (브론즈 28차 19번). -->
         <p class="fb-compare-hint" data-en="Swipe the table sideways to see the ARCHINODE column →" data-ko="표를 옆으로 밀면 ARCHINODE 열이 보입니다 →">Swipe the table sideways to see the ARCHINODE column &rarr;</p>
-        <!-- A-616: 표 폭이 396px 고정이라 390/320 폭에서 30~100px 잘린다. 바깥 div 가
-             overflow-x:auto 라 밀면 닿지만, 밀 수 있다는 표시가 없어 손님은 거기서
-             끝인 줄 안다. 좁은 화면에서만 한 줄 안내를 띄운다(읽어 주는 도구도 읽는다). -->
-        <p class="tbl-scroll-hint" data-en="Swipe the table sideways to see all columns."
-           data-ko="표를 옆으로 밀면 나머지 칸이 보입니다.">Swipe the table sideways to see all columns.</p>
+        <!-- A-626(브론즈 46차 N46-6): A-616 에서 제가 여기에 안내를 하나 더 넣어
+             520px 이하에서 **두 줄이 겹쳐** 보였다. 위의 fb-compare-hint 로 하나만
+             쓰고, 그것을 창 크기가 아니라 **실제 넘침**으로 켠다(아래 스크립트). -->
         <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;" role="region" tabindex="0"
              aria-label="Comparison table" data-en-aria-label="Comparison table" data-ko-aria-label="비교표">
         <table>
@@ -977,6 +970,29 @@ function toggleMobile() { const n = document.getElementById('mainNav'); if (n) n
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="auth-ui.js"></script>
+<script>
+/* A-626: 비교표가 **실제로** 넘치는지 재서 안내를 켠다. 창 크기로 짐작하지 않는다.
+   표는 폭이 고정이고 바깥 div 가 overflow-x:auto 라서, 넘침은 그 div 의
+   scrollWidth 와 clientWidth 차이로만 알 수 있다. 창 크기·글꼴 로딩·언어 전환으로
+   폭이 바뀌므로 resize 와 ResizeObserver 로 다시 잰다. */
+(function () {
+  var inner = document.querySelector('.fb-compare-inner');
+  var box = inner && inner.querySelector('div[role="region"]');
+  if (!inner || !box) return;
+  function sync() {
+    var over = box.scrollWidth - box.clientWidth > 1;
+    inner.classList.toggle('fb-has-overflow', over);
+    /* 밀 것이 없으면 키보드 초점도 주지 않는다 — 멈출 자리만 늘어난다 */
+    if (over) box.setAttribute('tabindex', '0');
+    else box.removeAttribute('tabindex');
+  }
+  sync();
+  window.addEventListener('resize', sync);
+  if (window.ResizeObserver) { try { new ResizeObserver(sync).observe(box); } catch (e) {} }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(sync).catch(function () {}); }
+  document.addEventListener('archinode:lang', sync);
+})();
+</script>
 <script src="cookie-consent.js?v=20260630" defer></script>
 <script src="analytics-loader.js?v=20260630" defer></script>
 <script src="sentry-loader.js?v=20260630" defer></script>
