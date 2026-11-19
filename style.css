@@ -2638,6 +2638,82 @@ body .stats-section.band-grey { color: var(--black); }
     --accent-hover:    #332e27;
     --navy-gold:       #332e27;
   }
+
+  /* ──────────────────────────────────────────────────────────────────────
+     A-640(브론즈 49차 N49-2): 인쇄에서 **글이 사진 위에 얹혔다.**
+
+     A-630 은 「흰 종이 위의 흰 글자」를 막으려고 글자를 전부 먹색으로 덮고
+     배경을 죽였다. 그런데 **배경은 죽어도 <img> 는 찍힌다.** 이 사이트의 띠·
+     카드는 전부 한 가지 꼴이다 — `relative` 상자 + 꽉 찬 `<img>` + 그 위
+     `*-overlay`(어두운 그라데이션 + 흰 글자). 그래서 그라데이션만 사라지고
+     사진은 남아, **사진 위 먹글씨**가 됐다. 대비 최저 1.02:1.
+
+     ★ 그러면서 더 오래된 것이 드러났다 — 이 블록에 A-474·A-580 이 넣어 둔
+       `.page-hero > picture { display:none }`(0,1,1)이 3666행의
+       `body .page-hero > picture { display:block }`(0,1,2)에 **져서
+       처음부터 죽어 있었다.** 인쇄 때 히어로 사진이 한 번도 안 빠졌다는 뜻이다.
+       A-412 · A-630 에 이어 **같은 함정이 세 번째다**: 인쇄 규칙을 쓸 때
+       화면 규칙의 특정도를 안 보면, 코드에는 있는데 효력은 없는 줄이 남는다.
+       그래서 여기서는 전부 `html body` + `!important` 로 적는다.
+
+     재는 규칙은 색이 아니라 **기하**다. 사진의 픽셀은 쪽마다 다르니
+     「이 사진 위 대비가 몇이냐」로는 보장할 수 없다 — 종이에서는
+     **글자가 사진과 겹치지 않는다**로 잡는다.
+     (검사: scripts/check-print-over-image.py)
+     ────────────────────────────────────────────────────────────────────── */
+  /* ㄱ) 글 바탕으로 깔린 사진은 종이에 찍지 않는다 */
+  html body .page-hero > picture,
+  html body .page-hero-bg,
+  html body .hero-slide,
+  html body .photo-band > img,
+  html body .promo-item img,
+  html body .cat-card img,
+  html body .editorial-card-main img,
+  html body .featured-card img,
+  html body .category-card-image { display: none !important; }
+
+  /* ㄴ) 사진이 빠지면 상자는 제 높이로 줄인다 (안 그러면 빈 자리만 길게 남는다) */
+  html body .page-hero,
+  html body .hero,
+  html body .photo-band,
+  html body .promo-item,
+  html body .cat-card,
+  html body .editorial-card,
+  html body .editorial-card-main,
+  html body .featured-card,
+  html body .category-card {
+    min-height: 0 !important; height: auto !important;
+    max-height: none !important; aspect-ratio: auto !important;
+    display: block !important; overflow: visible !important;
+  }
+
+  /* ㄷ) 덮개는 덮개를 그만두고 글의 흐름으로 돌아온다 */
+  html body .promo-overlay,
+  html body .cat-card-overlay,
+  html body .editorial-overlay,
+  html body .featured-overlay,
+  html body .category-card-content,
+  html body .photo-band .container,
+  html body .page-hero-content,
+  html body .hero-content {
+    position: static !important; inset: auto !important;
+  }
+
+  /* ㄹ) 사진 위에 깔던 그라데이션 가짜 요소도 종이에서는 뺀다 */
+  html body .photo-band::after,
+  html body .page-hero::before,
+  html body .hero::after,
+  html body .category-card::after { display: none !important; }
+
+  /* ㅁ) 기사 섬네일 위의 작은 딱지는 **사진이 내용**이라 사진을 뺄 수 없다.
+     (위 ㄱ 은 「바탕으로 깔린 사진」만 뺀다 — 섬네일은 읽는 사람이 볼 그림이다.)
+     딱지만 흐름으로 돌려 사진 위가 아니라 사진 앞에 오게 한다. */
+  html body .article-card-img { height: auto !important; overflow: visible !important; }
+  html body .article-card-tag {
+    position: static !important; display: inline-block !important;
+    top: auto !important; left: auto !important; margin: 0 0 6px 0 !important;
+    border: 1px solid #332e27 !important;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
