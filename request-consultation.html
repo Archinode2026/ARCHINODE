@@ -568,6 +568,29 @@ function archinodeWithTimeout(promise, ms) {
 /* A-538: 언어 판정은 A-517 의 정본(archiFormLang)을 쓴다 — 네 자리가 저마다
    localStorage 만 보고 있었다. 저장소를 못 쓰는 환경(차단·시크릿)에서는
    한국어 손님에게 영어가 나간다. */
+/* A-620(브론즈 46차 N46-3): 이 쪽의 오류 안내는 `rcLang()` 삼항으로 글자를
+   골라 **한 언어만** 심었다. 그러면 손님이 나중에 한/영을 누를 때 따라오지
+   않는다(A-222·A-492 가 세운 규칙: data-en·data-ko 를 함께 달아야 다시 칠해진다).
+   게다가 캡차 가지들은 한국어 짝이 아예 없어 영어만 나왔다.
+   소싱의 rfqSay·입점의 lybSay 와 같은 통로를 이 쪽에도 둔다. */
+function rcSay(en, ko) {
+  if (!errorDiv) return;
+  /* A-592: 보이게 한 다음에 글을 넣는다. 글이 비면 드러내지 않는다. */
+  if ((en && String(en).trim()) || (ko && String(ko).trim())) errorDiv.style.display = 'block';
+  errorDiv.setAttribute('data-en', en);
+  errorDiv.setAttribute('data-ko', ko);
+  errorDiv.textContent = (rcLang() === 'ko' ? ko : en);
+  if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
+  /* A-611 과 같은 기준: 이미 보이는 안내는 건드리지 않고 화면 밖일 때만 끌어온다. */
+  try {
+    var r = errorDiv.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > (window.innerHeight || 0) - 40) {
+      if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv, { block: 'center' });
+      else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  } catch (e) {}
+}
+
 function rcLang() {
   if (typeof archiFormLang === 'function') return archiFormLang();
   var l = document.documentElement.lang;
@@ -603,12 +626,8 @@ async function submitConsult(e) {
   /* A-535: 이 함수는 agreeContact 만 읽고 **개인정보 동의 칸은 한 번도 읽지
      않았다**. 둘은 다른 동의다. */
   if (agreePrivacy && !agreePrivacy.checked) {
-    /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
-    errorDiv.textContent = rcLang() === 'ko'
-      ? '개인정보 수집·이용에 동의해 주세요.'
-      : 'Please agree to the collection and use of your personal data.';
-    errorDiv.style.display = 'block';
-    if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv); else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    rcSay('Please agree to the collection and use of your personal data.',
+          '개인정보 수집·이용에 동의해 주세요.');
     submitBtn.disabled = false;
     archiMarkInvalid(agreePrivacy, errorDiv);
     agreePrivacy.focus();
@@ -616,19 +635,13 @@ async function submitConsult(e) {
   }
 
   if (!agreeContact) {
-    var curLang1 = rcLang();
-    /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
-    errorDiv.textContent = curLang1 === 'ko' ? '제출하려면 연락처 수집 동의에 체크해 주세요.' : 'Please confirm the contact consent to submit.';
-    errorDiv.style.display = 'block';
-    if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv); else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    rcSay('Please confirm the contact consent to submit.',
+          '제출하려면 연락처 수집 동의에 체크해 주세요.');
     return false;
   }
   if (description.length < 100) {
-    var curLang2 = rcLang();
-    /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
-    errorDiv.textContent = curLang2 === 'ko' ? '충분히 준비할 수 있도록 상황 설명을 100자 이상 적어 주세요.' : 'Please provide at least 100 characters in the description so we can prepare properly.';
-    errorDiv.style.display = 'block';
-    if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv); else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    rcSay('Please provide at least 100 characters in the description so we can prepare properly.',
+          '충분히 준비할 수 있도록 상황 설명을 100자 이상 적어 주세요.');
     return false;
   }
 
@@ -728,17 +741,22 @@ async function submitConsult(e) {
           : document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth' }));
   } catch (err) {
     console.error(err);
-    /* A-592: 살아 있는 영역은 글이 바뀔 때 보이고 있어야 읽힌다 */ errorDiv.style.display = 'block';
-    /* F-3(브론즈 45차): LOAD_FAILED 가 일반 가지로 흘러 내부 코드가 손님에게 보였다 */
-    errorDiv.textContent = (err.message === 'ARCHINODE_CAPTCHA_LOAD_FAILED')
-      ? 'We could not load the security check — an ad blocker or company firewall may be blocking it. Please email office@archinode.org and we will take it from there.'
-      : (err.message === 'ARCHINODE_CAPTCHA_FAILED')
-      ? 'We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.'
-      : (err.message === 'ARCHINODE_TIMEOUT')
-      ? 'Your connection seems slow or offline. Please check your network and try again.'
-      : 'Failed to submit: ' + (err.message || 'Unknown error') + '. Please try again or email office@archinode.org directly.';
-    errorDiv.style.display = 'block';
-    if (window.archiScrollIntoView) window.archiScrollIntoView(errorDiv); else errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    /* A-620: 네 가지 모두 두 언어로. 마지막 가지가 err.message 를 손님에게
+       그대로 보여 주고 있었다 — A-612 가 없애려던 바로 그 모양이다. 사유는
+       콘솔에만 남기고(위 console.error) 손님에게는 사람 말로 말한다. */
+    if (err.message === 'ARCHINODE_CAPTCHA_LOAD_FAILED') {
+      rcSay('We could not load the security check — an ad blocker or company firewall may be blocking it. Please email office@archinode.org and we will take it from there.',
+            '보안 확인을 불러올 수 없습니다 — 광고 차단기나 회사 방화벽이 막고 있을 수 있습니다. office@archinode.org 로 메일 주시면 저희가 이어서 처리해 드리겠습니다.');
+    } else if (err.message === 'ARCHINODE_CAPTCHA_FAILED') {
+      rcSay('We could not verify this submission. Please try again, and contact office@archinode.org if the problem continues.',
+            '이 제출을 확인하지 못했습니다. 다시 시도해 주시고, 계속 안 되면 office@archinode.org 로 알려 주세요.');
+    } else if (err.message === 'ARCHINODE_TIMEOUT') {
+      rcSay('Your connection seems slow or offline. Please check your network and try again.',
+            '연결이 느리거나 끊어진 것 같습니다. 네트워크를 확인하고 다시 시도해 주세요.');
+    } else {
+      rcSay('We could not send your request. Please try again, or email office@archinode.org directly.',
+            '요청을 보내지 못했습니다. 다시 시도해 주시거나 office@archinode.org 로 바로 보내 주세요.');
+    }
     submitBtn.disabled = false;
     submitBtn.textContent = (rcLang() === 'ko' ? '요청 보내기' : 'Send Request');
   }

@@ -352,6 +352,7 @@
   }
 
   function onBeforeUnload(e) {
+    if (successShown()) return;         // A-622: 보냈으면 묻지 않는다
     if (!anyFormTyped()) return;        // 그 사이 비웠으면 묻지 않는다
     e.preventDefault();
     e.returnValue = '';                 // 구형 브라우저용
@@ -364,12 +365,6 @@
     window.addEventListener('beforeunload', onBeforeUnload);
   }
 
-  function disarm() {
-    if (!armed) return;
-    armed = false;
-    window.removeEventListener('beforeunload', onBeforeUnload);
-  }
-
   // 손님이 실제로 손을 댄 뒤에만 건다
   document.addEventListener('input', function (e) {
     if (e.target && e.target.form) arm();
@@ -378,6 +373,22 @@
     if (e.target && e.target.form) arm();
   }, true);
 
-  // 보내고 나면 묻지 않는다. 실패해서 그 자리에 남고 다시 고치면 위에서 또 걸린다.
-  document.addEventListener('submit', disarm, true);
+  /* A-622(브론즈 46차 N46-5): 전에는 여기서 `submit` 을 보고 경고를 풀었다.
+     그런데 그 처리는 ㄱ) **어느 폼이든** 제출되면 풀고 ㄴ) 제출이 **성공했는지
+     보지 않았다**. 실측: 본 폼에 2칸 채워 경고가 켜진 뒤, 관계없는 폼 하나를
+     제출시키자 경고가 꺼졌는데 본 폼은 여전히 내용을 들고 있었다. 캡차·네트워크로
+     제출이 실패해 그 자리에 남는 경우가 바로 A-614 가 막으려던 상황인데, 그때
+     경고가 이미 풀려 있었다.
+
+     그래서 submit 으로 풀지 않는다. 대신 떠날 때 **지금 화면이 어떤지** 본다:
+     ㄱ) 성공 안내가 보이면 묻지 않는다(보낸 것이다) — 이것이 진짜 「끝」 신호다.
+     ㄴ) 폼이 성공 뒤 숨으면 그 칸들은 offsetParent 가 없어 아예 세지 않는다.
+     그러니 실패해 남은 내용만 지켜진다. */
+  function successShown() {
+    var els = document.querySelectorAll('#formSuccess, #sourcingSuccessWrap, .form-success, [id$="SuccessWrap"]');
+    for (var i = 0; i < els.length; i++) {
+      if (els[i].offsetParent !== null) return true;
+    }
+    return false;
+  }
 })();

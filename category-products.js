@@ -89,6 +89,10 @@
        한 개를 더 불러(`PAGE + 1`) 다음 쪽이 있는지 알아내고, 있으면 「더 보기」를
        띄운다. 넘쳐 온 한 개는 그리지 않는다 — 있다는 신호로만 쓴다. */
     const PAGE = 24;
+    /* A-623: 색인 없이 받아 올 때의 상한. 분류 하나가 이보다 많아지면 색인을
+       올려야 한다(콘솔에 남긴다). 너무 크게 잡으면 첫 화면이 느려진다. */
+    const CP_NOINDEX_CAP = 200;
+    let cpAll = null;        // 색인 없는 길에서 받아 둔 전체(정렬된 것)
     let lastDoc = null;      // 다음 쪽의 시작점
     let shown = 0;           // 지금까지 그린 개수
     let gridEl = null;       // 카드가 들어가는 자리(이어 붙인다)
@@ -140,10 +144,17 @@
     async function loadMore(btn) {
         if (btn) btn.disabled = true;
         try {
-            const snap = await baseQuery().startAfter(lastDoc).limit(PAGE + 1).get();
-            const docs = snap.docs || [];
-            const hasMore = docs.length > PAGE;
-            const page = docs.slice(0, PAGE);
+            var docs, hasMore, page;
+            if (cpAll) {
+                // A-623: 색인 없는 길 — 받아 둔 것에서 다음 쪽을 꺼낸다
+                page = cpAll.slice(shown, shown + PAGE);
+                hasMore = cpAll.length > shown + page.length;
+            } else {
+                const snap = await baseQuery().startAfter(lastDoc).limit(PAGE + 1).get();
+                docs = snap.docs || [];
+                hasMore = docs.length > PAGE;
+                page = docs.slice(0, PAGE);
+            }
             if (page.length) lastDoc = page[page.length - 1];
             let add = '';
             page.forEach(d => { add += cardHtml(d.data()); });
@@ -196,7 +207,14 @@
                 if (e1 && e1.code === 'failed-precondition') {
                     console.warn('category products: 색인이 없어 정렬 없이 받는다 (A-617)');
                     cpNoIndex = true;
-                    snap = await cpWithTimeout(query.limit(PAGE + 1).get(), 12000);
+                    /* A-623(브론즈 46차 N46-4): 전에는 여기서도 limit(PAGE+1) 이었다.
+                       색인 없이 limit(25) 만 주면 파이어스토어는 **아무 25개**(문서 id
+                       순)를 주지 최신 25개를 주지 않는다. 그 25개 안에서만 정렬하고
+                       더 보기도 끄니, 한 분류에 승인 제품이 25개를 넘으면 나머지는
+                       분류 쪽에서 **닿을 길이 없었다**. 넉넉히 받아 와서 정렬하고
+                       쪽 넘기기를 여기서 한다. 받은 것이 상한에 닿으면 그 사실을
+                       콘솔에 남긴다 — 그때는 색인을 올려야 한다. */
+                    snap = await cpWithTimeout(query.limit(CP_NOINDEX_CAP + 1).get(), 12000);
                 } else {
                     throw e1;
                 }
@@ -235,10 +253,21 @@
                 };
                 docs.sort(function (a, b) { return cpWhen(b) - cpWhen(a); });
             }
-            /* 색인 없이 받은 길에서는 '더 보기'를 걸지 않는다 — startAfter 가 같은
-               정렬에 기대므로 눌러도 엉뚱한 쪽이 나온다. */
-            const hasMore = cpNoIndex ? false : (docs.length > PAGE);
-            const page = docs.slice(0, PAGE);
+            /* A-623: 색인 없는 길은 받아 둔 것에서 쪽을 넘긴다(startAfter 는 같은
+               정렬에 기대므로 쓸 수 없다). 색인이 있는 길은 전과 같이 서버가 넘긴다. */
+            var hasMore, page;
+            if (cpNoIndex) {
+                if (docs.length > CP_NOINDEX_CAP) {
+                    console.warn('category products: 이 분류의 승인 제품이 ' + CP_NOINDEX_CAP +
+                                 '개를 넘는다 — 색인을 올려야 전부 보인다 (A-623)');
+                }
+                cpAll = docs.slice(0, CP_NOINDEX_CAP);
+                hasMore = cpAll.length > PAGE;
+                page = cpAll.slice(0, PAGE);
+            } else {
+                hasMore = docs.length > PAGE;
+                page = docs.slice(0, PAGE);
+            }
             lastDoc = page.length ? page[page.length - 1] : null;
             shown = page.length;
 

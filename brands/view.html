@@ -97,6 +97,16 @@
 @media (max-width: 768px) {
   .bp-hero { grid-template-columns: 1fr; gap: 40px; padding: 60px 0 40px 0; }
 }
+/* A-621(브론즈 46차 N46-2): 홈페이지 주소가 길면 브랜드 쪽 전체가 옆으로 밀렸다.
+   실측 390폭: 주소 55자 → 36px, 60자 → 75px, 96자 → 358px 옆밀림. 320폭은 45자부터.
+   원인 둘. ㄱ) grid item 의 기본 min-width 는 auto 라서 칸이 내용보다 작아지지
+   못한다 → min-width:0 으로 풀어 준다. ㄴ) 이미 걸려 있던 overflow-wrap:break-word
+   는 **min-content 폭을 줄이지 못한다** — 줄바꿈만 허용하고 「이보다 좁아질 수
+   있다」고 말해 주지 않는다. 그 일을 하는 값은 `anywhere` 다.
+   유럽 브랜드 주소는 /de/kollektionen/… 같은 경로가 붙어 50자를 쉽게 넘는다. */
+.bp-hero > * { min-width: 0; }
+.bp-hero-meta a,
+.bp-hero-content a { overflow-wrap: anywhere; }
 .bp-hero-image {
   width: 100%; aspect-ratio: 3/4; overflow: hidden;
   border-radius: 4px; background: var(--gray-100);
