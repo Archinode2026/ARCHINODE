@@ -152,7 +152,10 @@ input, select, textarea { font-family: inherit; }
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.85);
-  z-index: 2000;
+  /* A-619: 쿠키 고지(99999)보다 위여야 한다 — 아래에 두면 창의 아래쪽이
+     고지에 덮이고, 그 자리를 누른 손가락이 고지의 「필수만」을 누른다.
+     층 규약: 고지 99999 < 모달 100000 이상. */
+  z-index: 100000;
   display: none;
   align-items: flex-start;
   justify-content: center;

@@ -81,7 +81,14 @@
 
 /* CTA Buttons */
 .pp-cta { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:32px; }
-.rfq-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9000; align-items:center; justify-content:center; padding:20px; }
+.rfq-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100000; align-items:center; justify-content:center; padding:20px; }
+/* A-619(브론즈 46차): 쿠키 고지가 z-index 99999 인데 이 창은 9000 이었다. 그래서
+   390x844 에서 문의 창의 아래 226px 가 고지 밑으로 들어가고, 「보내기」 자리를
+   누르면 **고지의 「필수만」이 눌렸다** — 문의는 사라지고 개인정보 설정만 바뀐다.
+   A-610 의 body{padding-bottom} 은 본문만 비키게 하므로 position:fixed 인 이 창에는
+   닿지 않는다. 손님이 **직접 연 일**이 먼저이므로 창을 고지 위로 올린다. 고지는
+   창을 닫으면 다시 닿는다. 층 규약: 고지 99999 < 모달 100000 이상.
+   (넷리파이 배지 2147483645 는 우리 것이 아니다 — A-437 참고.) */
 .rfq-overlay.active { display:flex; }
 .rfq-box { background:#fff; border-radius:10px; max-width:460px; width:100%; max-height:90vh; overflow-y:auto; padding:32px; position:relative; }
 .rfq-close { position:absolute; top:16px; right:16px; font-size:1.4rem; cursor:pointer; color:var(--ink-soft); background:none; border:none; }

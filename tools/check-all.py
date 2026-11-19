@@ -123,6 +123,8 @@ CHECKS = [
      'A-603 — 「맨 위로」가 JS 에 smooth 를 박아 둬서 움직임 줄이기 설정을 무시했다(실측 끔 1446ms / 켬 1446ms). 같은 자리가 228쪽에 복사돼 있었다. JS 의 behavior 는 CSS 의 scroll-behavior 를 이긴다'),
     ('본문 구역',            'py',   'tools/check-main-landmark.py',
      'A-606 — 건너뛰기 링크가 닿는 자리가 **속이 빈** 표지였다. 표지는 붙었지만 그 안이 비어서, 건너뛰면 아무것도 없는 자리에 떨어지고 진짜 본문은 어느 구역에도 속하지 않았다(실측: 본문 안 글자 0자, 구역 밖 머리글 매거진 134개)'),
+    ('겹칩 층 규약',          'py',   'tools/check-overlay-layers.py',
+     'A-619 — 손님이 직접 연 창(문의·검색·사진 확대)이 쿠키 고지(99999)보다 아래에 있었다. 그러면 창 아래쪽이 고지에 덮이고 그 자리를 누른 손가락이 고지의 「필수만」을 누른다 — 문의는 사라지고 개인정보 설정만 바뀐다(라이브 실측: 검색 결과 76개 중 19개가 덮임). A-610 의 body 여백은 position:fixed 에 닿지 않는다'),
     ('파이어베이스 TDZ',      'py',   'tools/check-firebase-tdz.py',
      'A-609 — 전역 auth·db·storage 가 const 여서, firebase 가 안 내려오면 선언만 되고 초기화 안 된 상태로 남았다. 그러면 다른 81군데의 `typeof db` 방어조차 ReferenceError 를 던져 손님 화면이 조용히 멈춘다(실측: 30초 빈칸, 안내문 0)'),
     ('한국어가 새는 자리',     'py',   'tools/check-lang-leak.py',
