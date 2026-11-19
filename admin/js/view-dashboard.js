@@ -28,6 +28,13 @@ function dash_render(el) {
     if (!el) return;
 
     var html = '<div class="adm-notice" id="dashNotice" style="display:none;"></div>'   // settings/config.adminNotice (3단계) — dash_renderNotice 가 채운다
+        /* A-624: 알림 메일이 **보내지지 않은 것**을 여기서 알린다. notifyPending 은
+           「묶음이 거부됨」만 잡고, 큐에 들어갔지만 확장이 못 보낸 것(ERROR)이나
+           손도 안 댄 것은 아무것도 잡지 않았다 — 실측: mail 42건 중 delivery 칸이
+           없는 것 28건, ERROR 1건(「550 The archinode.org domain is not verified」).
+           도메인 인증이 또 풀리면 알림이 전부 조용히 실패하고 아무 화면도 말하지
+           않는다. 손님은 보냈다고 믿고 기다린다. */
+        + '<div class="adm-notice" id="dashMailHealth" style="display:none;"></div>'
         + '<div class="adm-cards">';
     for (var i = 0; i < DASH_CARDS.length; i++) {
         var c = DASH_CARDS[i];
@@ -48,6 +55,57 @@ function dash_render(el) {
     dash_loadCounts();
     dash_loadRecent();
     dash_loadNotice();
+    dash_loadMailHealth();
+}
+
+/* ── A-624: 최근 알림 메일이 실제로 나갔는지 ───────────────────────────────
+   지난 7일만 본다. 더 길게 보면 옛 실패가 영구히 떠 있고, 영구히 떠 있는
+   경고는 아무도 안 보는 경고가 된다(A-618 과 같은 결의 교훈).
+   createdAt 이 없는 문서는 orderBy 가 애초에 빼 주므로 옛 잡동사니는 안 센다. */
+function dash_loadMailHealth() {
+    var box = document.getElementById('dashMailHealth');
+    if (!box) return;
+    if (typeof db === 'undefined' || !db) return;
+    if (typeof auth === 'undefined' || !auth || !auth.currentUser) return;   // 로그인 전: loadAll() 끝에서 다시 부른다
+
+    var WEEK = 7 * 24 * 60 * 60 * 1000;
+    var STALE = 10 * 60 * 1000;          // 10분이 지나도 손 안 댄 것은 안 나간 것으로 본다
+    var now = Date.now();
+
+    db.collection('mail').orderBy('createdAt', 'desc').limit(30).get().then(function (snap) {
+        var errs = 0, stale = 0, lastErr = '';
+        snap.forEach(function (doc) {
+            var v = doc.data() || {};
+            var at = 0;
+            try { at = v.createdAt && v.createdAt.toDate ? v.createdAt.toDate().getTime() : 0; } catch (e) { at = 0; }
+            if (!at || now - at > WEEK) return;
+            var st = (v.delivery && v.delivery.state) || '';
+            if (st === 'ERROR') {
+                errs++;
+                if (!lastErr && v.delivery && v.delivery.error) lastErr = String(v.delivery.error);
+            } else if (!st && now - at > STALE) {
+                stale++;
+            }
+        });
+        if (!errs && !stale) { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+        var parts = [];
+        if (errs) parts.push(t(errs + ' failed to send', '발송 실패 ' + errs + '건'));
+        if (stale) parts.push(t(stale + ' never picked up', '발송기가 손대지 않은 것 ' + stale + '건'));
+        var head = t('Notification e-mail problem in the last 7 days: ',
+                     '최근 7일 알림 메일 문제: ') + parts.join(' / ');
+        box.innerHTML = '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> '
+            + '<strong>' + escapeHtml(head) + '</strong>'
+            + (lastErr ? '<br><span class="adm-muted">' + escapeHtml(lastErr.slice(0, 160)) + '</span>' : '')
+            + '<br><span class="adm-muted">' + escapeHtml(t(
+                'Customers believe their inquiry was sent. Check the Trigger Email extension and the sending domain.',
+                '손님은 문의가 갔다고 믿고 기다립니다. Trigger Email 확장과 발송 도메인 인증을 확인하세요.')) + '</span>';
+        box.style.display = 'block';
+        box.setAttribute('role', 'alert');
+    }).catch(function (err) {
+        /* 못 읽는 것 자체는 손님에게 영향이 없다 — 조용히 넘기고 콘솔에만 남긴다 */
+        console.warn('mail health check failed:', err && err.code);
+    });
 }
 
 // ── 어드민 메모 — settings/config.adminNotice (3단계). 비어 있으면 숨긴다. 읽기 실패는 박스에 작게 표시(조용한 실패 방지) ──
