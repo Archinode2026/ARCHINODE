@@ -43,6 +43,8 @@ CHECKS = [
      'A-362 ~ A-402 — 다시 칠하기 · 짝 · 돈·딜러 문구 · 막다른 링크 (검사 8종)'),
     ('독립 CSS 페이지',      'py',   'tools/check-standalone-css.py',
      'A-385 — style.css 를 안 싣는 페이지가 공용 처방을 놓쳤는지'),
+    ('비공개 쪽 색인금지', 'py',   'tools/check-noindex.py',
+     'A-642 — Netlify 가 저장소를 통째로 올리는데(publish=".") admin/ 7쪽과 brand-portal/dashboard 에 **noindex 가 없었다**. robots.txt 의 Disallow 는 **기어다니는 것만** 막고 색인은 못 막는다 — 링크가 걸리면 내용을 안 읽은 채로도 주소가 검색에 선다. 데이터가 새는 건 아니다(관리 쓰기는 전부 isAdmin() 를 거친다) — 막는 것은 노출이다'),
     ('검색 회귀',            'node', 'tools/test-search.js',
      'A-397 · A-401 · A-402 — 배열 category · 언어 판정 · 색인 설명'),
     ('카테고리 이름 사본',    'py',   'tools/check-category-labels.py',
