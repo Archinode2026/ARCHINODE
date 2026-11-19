@@ -15,6 +15,7 @@
 
 param(
     [switch]$Rules,           # firestore.rules 를 Firebase CLI로 게시 (2026-09-12부터 가능 — office@archinode.org 로 login:use 됨)
+    [switch]$Indexes,         # A-638: firestore.indexes.json 을 게시. -Rules 와 **별개다** — 규칙만 올리면 색인은 안 올라간다
     [switch]$NoPush,          # push 생략, 라이브 대조만
     [string]$CheckString,     # 라이브 페이지에 이 문자열이 몇 번 나오는지 추가 확인
     [string]$CheckPath = '',  # CheckString을 찾을 경로 (기본: 루트 index.html)
@@ -154,6 +155,35 @@ if ($Rules) {
         Write-Host '[주의] firestore 는 올라갔지만 storage 는 못 올렸습니다. 위 안내대로 따로 처리하세요.' -ForegroundColor Yellow
     }
     $rulesChanged = $null
+}
+
+# ── 2-2. firestore.indexes.json — -Indexes 면 CLI로 게시 ──
+# A-638(2026-11-20): 색인은 규칙과 **같은 성질**이다 — git push 로 올라가지 않는다.
+# 그런데 이 스크립트는 -Rules 로 firestore:rules 와 storage 만 올리고 **색인은 한 번도
+# 안 올렸다.** 그래서 A-617 에서 더한 상위 분류 색인(status+category+createdAt)이
+# 푸시해도, -Rules 를 돌려도 올라가지 않았고, 상위 카테고리 10쪽은 계속 대비책
+# (정렬 없이 받아 와서 직접 정렬, 더 보기 없음)으로 돌았다.
+# A-351 의 교훈대로 **묶지 않고 따로** 올리고 따로 보고한다 — 한쪽 실패가 다른 쪽을
+# 끌고 내려가지 않게.
+if ($Indexes) {
+    Write-Host '[색인] firestore.indexes.json 을 Firebase 에 게시합니다 (프로젝트 archinode-8ab04).' -ForegroundColor Yellow
+    Write-Host '       ※ 이것은 Firestore 복합 색인입니다. scripts/make_search_index.py 가 만드는' -ForegroundColor DarkGray
+    Write-Host '         사이트 검색 색인과는 **다른 것**입니다 — 헷갈리지 마세요.' -ForegroundColor DarkGray
+    $logIx = Join-Path $env:TEMP 'archinode-deploy-indexes.log'
+    npx firebase-tools deploy --only firestore:indexes --project archinode-8ab04 | Tee-Object -FilePath $logIx | Out-Host
+    $itext = ''
+    if (Test-Path $logIx) { $itext = Get-Content $logIx -Raw }
+    if ($null -eq $itext) { $itext = '' }
+    $okIx = ($LASTEXITCODE -eq 0 -and $itext -match 'Deploy complete')
+    if ($okIx) {
+        Write-Host '[색인] 게시 완료. 다만 **즉시 쓸 수 있는 것은 아닙니다** — 색인은 백그라운드에서' -ForegroundColor Green
+        Write-Host '       만들어지며, 자료가 적으면 몇 분, 많으면 더 걸립니다.' -ForegroundColor Green
+        Write-Host '       다 됐는지는 Firebase 콘솔 > Firestore > 색인 에서 상태가 "사용 설정됨"인지로 봅니다.' -ForegroundColor Green
+    } else {
+        Write-Host '[실패] 색인 게시가 끝까지 가지 못했습니다. 위 로그를 보세요.' -ForegroundColor Red
+        Write-Host '       흔한 원인: 로그인된 계정이 다르다(npx firebase-tools login:list),' -ForegroundColor Red
+        Write-Host '       또는 firestore.indexes.json 이 JSON 으로 안 읽힌다.' -ForegroundColor Red
+    }
 }
 if ($rulesChanged) {
     Write-Host ''
