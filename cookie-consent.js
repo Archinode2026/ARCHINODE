@@ -42,7 +42,18 @@
        크게 두었기 때문이다 — 확대는 폭과 높이를 **같이** 줄인다.
        그래서 창 높이를 넘지 않게 묶고, 넘칠 때는 배너 안에서 스크롤되게 한다.
        배너가 창에 들어갈 때는 max-height 가 걸리지 않으므로 보기는 그대로다. */
-    wrap.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#332e27;color:#fff;padding:20px 24px;border-radius:10px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:720px;margin:0 auto;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;max-height:calc(100vh - 32px);overflow-y:auto;';
+    wrap.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#332e27;color:#fff;padding:20px 24px;border-radius:10px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:720px;margin:0 auto;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;max-height:calc(100vh - var(--hdr-h, 0px) - 32px);overflow-y:auto;';
+    /* A-639(브론즈 49차 N49-1): 전에는 `calc(100vh - 32px)` 였다. A-629·A-634 에서
+       머리글을 고지 위(100000 > 99999)로 올린 뒤, **창이 짧으면 머리글이 고지를
+       덮는다** — 400% 확대(320x256)에서 머리글이 고지의 **70.8%** 를 가리고
+       「모두 수락」 자리의 맨 위가 `.logo`, 나머지 둘도 머리글 요소였다. 즉
+       동의 단추 **셋 다** 눌리지 않았다. 가로보기(568x320 등)에서는 단추는 눌리되
+       제목 「쿠키 사용에 대한 안내」가 100% 가려졌다 — A-593 이 「읽지 못한 채 누르게
+       된다」고 적은 상태가 다른 길로 돌아온 것이다.
+       메뉴 패널에 한 것과 같은 처방: 고지도 **머리글 자리를 비킨다**.
+       --hdr-h 는 a11y-nav.js 가 머리글 아래끝을 재서 넣는다(없으면 0 으로 떨어져
+       예전과 같게 동작한다). 높이가 줄어도 A-593 의 sticky 단추 줄 덕분에
+       「모두 수락」·「필수만」은 늘 바닥에 보인다. */
     /* A-437(2026-11-09): **배너가 영어로 떴다 — 한국 손님이 처음 보는 화면이다.**
        브론즈 26차가 손님 origin(넷리파이 미리보기) 네 페이지에서 전부 영어를 봤다.
        그 순간 `lang="ko"` · 저장값 `ko` · 머리띠는 「로그인」 한국어였는데 배너만 영어였다.
@@ -163,6 +174,18 @@
            sticky 가 아무 일도 하지 않으므로 보기는 그대로다. */
         '#archi-cookie-banner .cc-row{position:sticky;bottom:-20px;' +
         'background:#332e27;padding-top:10px;padding-bottom:20px;margin-bottom:-20px;}' +
+        /* A-639(브론즈 49차 N49-1): 짧은 창에서는 단추 줄(세로로 감겨 126px)이 고지
+           전체 높이(134px)를 거의 다 먹어 **제목이 그 밑에 깔렸다** — 「무엇에 동의하는가」를
+           읽지 못한 채 누르게 된다(A-593 이 적은 바로 그 상태).
+           ㄱ) 단추를 가로로 나눠 줄 높이를 줄이고 ㄴ) 제목을 위에 고정해 늘 보이게 한다.
+           44px 손가락 기준은 min-height 로 그대로 지킨다(A-437). */
+        '@media (max-height: 400px){' +
+          '#archi-cookie-banner .cc-row{gap:6px;padding-top:6px;flex-wrap:nowrap;}' +
+          '#archi-cookie-banner .cc-row>*{flex:1 1 0;min-width:0;}' +
+          '#archi-cookie-banner .cc-row button,#archi-cookie-banner .cc-row a{' +
+            'padding-left:6px;padding-right:6px;font-size:0.78rem;min-height:44px;' +
+            'display:inline-flex;align-items:center;justify-content:center;text-align:center;}' +
+        '}' +
         '#archi-cookie-banner .cc-inline{position:relative;}' +
         '#archi-cookie-banner .cc-inline::after{content:"";position:absolute;left:0;right:0;' +
         'top:50%;height:44px;transform:translateY(-50%);}';

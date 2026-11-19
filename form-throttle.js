@@ -311,7 +311,11 @@
        **「필수만」만** 덮었다(「모두 수락」은 멀쩡) — 거절 쪽만 막히는 모양이라 더
        나쁘다. 320x400 에서는 「필수만」·「자세히」 둘 다 덮였다.
        style.css 가 「맨 위로」와 꼬리말에 쓰는 것과 같은 방식으로 고지를 비킨다. */
-    el.style.cssText = 'position:fixed;left:50%;bottom:calc(24px + var(--cc-h, 0px));transform:translateX(-50%);' +
+    /* A-639(브론즈 49차 N49-7): A-636 에서 고지를 비키게 했더니, **창이 짧으면
+       화면 위로 잘렸다** — 320x400 에서 보이는 높이 85 중 32px, 320x256 에서는
+       8px 만 남았다. 5초 안에 두 번 보낸 손님에게 그것이 유일한 안내인데 읽을 수가
+       없어 또 누른다. 비키되 **화면을 벗어나지는 않게** 울타리를 둔다. */
+    el.style.cssText = 'position:fixed;left:50%;bottom:min(calc(24px + var(--cc-h, 0px)), calc(100vh - 96px));transform:translateX(-50%);' +
       'background:#332e27;color:#fff;padding:10px 18px;border-radius:8px;font-size:0.85rem;' +
       /* A-633(브론즈 47차 N47-7): 이 알림이 쿠키 고지와 **같은 층(99999)** 이었다.
          둘 다 bottom 에 뜨므로 겹쳐 그려져 5초간 고지 단추를 가렸다.

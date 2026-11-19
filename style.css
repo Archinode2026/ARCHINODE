@@ -75,6 +75,22 @@ input, select, textarea { font-family: inherit; }
   transition: box-shadow 0.3s;
 }
 .header.scrolled { box-shadow: 0 1px 12px rgba(0,0,0,0.06); }
+/* ── A-639(브론즈 49차 N49-1): 짧은 창에서 머리글을 묶는다 ─────────────────
+   머리글을 고지 위로 올린 뒤(A-629·A-634), **창이 짧으면 머리글이 고지를 덮는다** —
+   400% 확대(320x256)에서 머리글이 고지의 70.8% 를 가려 동의 단추 셋이 전부 안 눌렸다.
+   고지에 `max-height: calc(100vh - var(--hdr-h) - 32px)` 를 줘서 비키게 했지만,
+   **320px 폭에서 머리글이 줄바꿈으로 252px 까지 자라** 256px 창에는 비켜 줄 자리가
+   없었다(실측 --hdr-h 252px → 고지가 67px 로 찌그러지고 그대로 덮임).
+   그래서 짧은 창에서는 머리글 자신을 묶는다. position 은 건드리지 않는다 —
+   static 으로 바꾸면 z-index 가 무시되고(고지가 위로 올라와 메뉴가 다시 덮인다)
+   메뉴 패널의 `top:100%` 기준도 달라진다. 높이만 묶으면 둘 다 그대로다. */
+@media (max-height: 480px) {
+  /* 공지 띠는 홍보용이고 영어일 때만 뜬다 — 짧은 창에서는 그 82px 이 동의 단추를
+     못 누르게 만드는 값을 한다. 숨기고 머리글도 한 번 더 묶는다.
+     실측 320x256: 공지 82 + 머리글 115 = 197 로 창의 77% 였다. */
+  .announcement-bar { display: none !important; }
+  .header { max-height: 35vh; overflow-y: auto; overscroll-behavior: contain; }
+}
 .header .container {
   display: flex;
   align-items: center;

@@ -626,6 +626,13 @@
               style.css 의 `body #main { scroll-margin-top: 90px }` 과 같은 값. */
         body #main { scroll-margin-top: 90px; }
 
+        /* A-639(브론즈 49차 N49-1): 짧은 창에서 머리글이 쿠키 고지를 덮던 것.
+           style.css 와 같은 규칙 — 이 쪽은 그 파일을 안 싣는다. */
+        @media (max-height: 480px) {
+            .announcement-bar { display: none !important; }
+            .header { max-height: 35vh; overflow-y: auto; overscroll-behavior: contain; }
+        }
+
         /* ② 인쇄 — 이 쪽에는 @media print 가 **아예 없었다**. 꼬리말이 어두운 배경
               (#332e27) 위 흰 글자인데 브라우저는 배경을 기본으로 인쇄하지 않으므로,
               A-630 과 같은 모양으로 꼬리말이 백지가 된다. 전역과 같은 처방을 둔다. */
