@@ -81,6 +81,7 @@ def main():
         print('검사 못함  .header 의 z-index 를 못 찾았다'); return 1
 
     bad, dead, checked = [], [], 0
+    js_seen = set()
 
     # ── 규약 ①: 머리글이 고지 위여야 한다 (메뉴 패널이 그 안에 갇혀 있다)
     if hz <= bz:
@@ -129,6 +130,37 @@ def main():
             checked += 1
             if val <= hz:
                 bad.append('%s  「%s」  z-index %d ≤ 머리글 %d' % (os.path.relpath(path, SRC), short, val, hz))
+
+    # ── 규약 4: JS 문자열·인라인 style 로 만드는 겹칩도 센다 ──────────────
+    # A-633: #dpBuyWrap(디지털 상품 구매창, role=dialog)이 z-index 9999 였는데
+    # 위의 규약 3 이 **못 봤다** — z-index 가 CSS 블록이 아니라 JS 문자열
+    # (style.cssText) 안에 있어서 선택자를 찾는 방식으로는 걸리지 않는다.
+    # 머리글을 100000 으로 올리면서 그 창이 머리글 밑으로 들어갔다(제가 만든 회귀).
+    # 그래서 position:fixed 와 z-index 가 **같은 자리에 함께 쓰인 것**을 센다.
+    for path in files(('.html', '.js')):
+        text = read(path)
+        for m in re.finditer(r'position\s*:\s*fixed', text):
+            span = text[max(0, m.start() - 280):m.end() + 280]
+            zm = re.search(r'z-index\s*:\s*(\d+)', span)
+            if not zm:
+                continue
+            inline = ('cssText' in span or 'style="' in span or "style='" in span
+                      or ('setAttribute' in span and 'style' in span))
+            if not inline:
+                continue                      # CSS 블록은 규약 3 이 본다
+            if 'archi-cookie-banner' in span:
+                continue                      # 고지 자신이 기준점이다
+            idm = re.search(r"""\.id\s*=\s*['"]([\w-]+)|id\s*=\s*['"]([\w-]+)""", span)
+            who = (idm.group(1) or idm.group(2)) if idm else '(이름 없음)'
+            val = int(zm.group(1))
+            key = (path, who, val)
+            if key in js_seen:
+                continue
+            js_seen.add(key)
+            checked += 1
+            if val <= hz:
+                bad.append('%s  #%s  z-index %d ≤ 머리글 %d  (JS 문자열·인라인 style)'
+                           % (os.path.relpath(path, SRC), who, val, hz))
 
     print('검사함  고지 %d < 머리글 %d < 모달 · 센 살아 있는 겹칩 %d개' % (bz, hz, checked))
     if checked == 0:

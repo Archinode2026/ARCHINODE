@@ -809,7 +809,10 @@ function dpOpenBuy(id) {
   wrap.id = 'dpBuyWrap';
   wrap.setAttribute('role', 'dialog');
   wrap.setAttribute('aria-modal', 'true');
-  wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;'
+  /* A-633: 이 구매창은 z-index 9999 였다. A-629 에서 머리글을 100000 으로 올리면서
+     **머리글이 이 창 위를 덮게 됐다** — 제가 만든 회귀다. 모달 층으로 올린다.
+     층 규약: 토스트 100010 > 모달 100001+ > 머리글 100000 > 쿠키 고지 99999. */
+  wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100001;'
     + 'display:flex;align-items:center;justify-content:center;padding:20px;';
   wrap.innerHTML =
     '<div style="background:#fff;border-radius:12px;max-width:520px;width:100%;padding:28px 26px;max-height:90vh;overflow:auto;">'

@@ -308,7 +308,11 @@
     el.setAttribute('role', 'status');
     el.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);' +
       'background:#332e27;color:#fff;padding:10px 18px;border-radius:8px;font-size:0.85rem;' +
-      'z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,0.25);max-width:90vw;text-align:center;';
+      /* A-633(브론즈 47차 N47-7): 이 알림이 쿠키 고지와 **같은 층(99999)** 이었다.
+         둘 다 bottom 에 뜨므로 겹쳐 그려져 5초간 고지 단추를 가렸다.
+         층 규약: 토스트 100010 > 모달 100001+ > 머리글 100000 > 고지 99999.
+         토스트는 모달이 열려 있을 때도 보여야 하므로 가장 위다. */
+      'z-index:100010;box-shadow:0 4px 16px rgba(0,0,0,0.25);max-width:90vw;text-align:center;';
     document.body.appendChild(el);
     setTimeout(function(){ if (el.parentNode) el.remove(); }, remainMs + 500);
   }
