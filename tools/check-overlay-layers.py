@@ -162,7 +162,51 @@ def main():
                 bad.append('%s  #%s  z-index %d ≤ 머리글 %d  (JS 문자열·인라인 style)'
                            % (os.path.relpath(path, SRC), who, val, hz))
 
-    print('검사함  고지 %d < 머리글 %d < 모달 · 센 살아 있는 겹칩 %d개' % (bz, hz, checked))
+    # ── 규약 5: 쪽 안 <style> 이 전역 층 규약을 덮지 않는가 ────────────────
+    # A-634: index.html 은 style.css 를 실은 **뒤에** 자기 <style> 을 들고 있고 그
+    # 안에 style.css 옛 판의 사본이 있었다. 같은 명시도라 뒤가 이기므로 A-629 의
+    # 100000 이 **홈에서만 죽었다** — 가장 많이 들어오는 쪽에서 메뉴가 고지 밑이고,
+    # 320px 에서는 햄버거 자체가 안 눌렸다. privacy-en.html 은 그보다 더 나아가
+    # style.css 를 **아예 안 싣는다**(A-327·A-366) — 모든 전역 고침이 구조상 닿지
+    # 않으므로, 그런 쪽은 처방을 자기 안에 들고 있어야 한다.
+    pages = 0
+    for path in files(('.html',)):
+        raw = open(path, encoding='utf-8', errors='ignore').read()
+        blocks = re.findall(r'<style[^>]*>(.*?)</style>', raw, re.S)
+        if not blocks:
+            continue
+        pages += 1
+        rel = os.path.relpath(path, SRC)
+        # ★ 낱말로 세면 안 된다 — privacy-en.html 의 **HTML 주석**에 「이 페이지는
+        #   style.css 를 싣지 않고」라고 적혀 있어서, 낱말 검색으로는 「싣는다」로
+        #   읽혔다. 실제 <link> 태그로 센다.
+        loads_global = bool(re.search(r'<link[^>]+href=["\'][^"\']*style\.css', raw, re.I))
+        for blk in blocks:
+            blk = re.sub(r'/\*.*?\*/', '', blk, flags=re.S)
+            # 머리글의 층을 다시 정하는가
+            for r in re.finditer(r'(?:^|[}\s])(\.header|header)\s*\{([^{}]*)\}', blk, re.M):
+                zm = ZIDX.search(r.group(2))
+                if not zm:
+                    continue
+                z = int(zm.group(1))
+                if z <= bz:
+                    bad.append('%s  쪽 안 style 이 머리글을 z-index %d 로 되돌린다 (≤ 고지 %d) — 전역 %d 이 이 쪽에서 죽는다'
+                               % (rel, z, bz, hz))
+            # style.css 를 안 싣는 쪽은 메뉴 패널 처방을 자기 안에 들고 있어야 한다
+            if not loads_global and re.search(r'\.main-nav\b', blk):
+                for r in re.finditer(r'(?:^|[}\s])(\.main-nav[^{}]*)\{([^{}]*)\}', blk, re.M):
+                    body = r.group(2)
+                    if not re.search(r'position\s*:\s*(absolute|fixed)', body):
+                        continue
+                    if 'max-height' not in body or 'overflow-y' not in body:
+                        bad.append('%s  style.css 를 안 싣는 쪽인데 메뉴 패널에 max-height·overflow-y 가 없다 — 패널이 화면보다 길면 아래쪽이 안 닿는다'
+                                   % rel)
+                    zm = ZIDX.search(body)
+                    if zm and int(zm.group(1)) <= bz:
+                        bad.append('%s  메뉴 패널 z-index %d ≤ 고지 %d' % (rel, int(zm.group(1)), bz))
+
+    print('검사함  고지 %d < 머리글 %d < 모달 · 센 살아 있는 겹칩 %d개 · 쪽 안 style 을 가진 쪽 %d개'
+          % (bz, hz, checked, pages))
     if checked == 0:
         print('  결함 — 센 것이 0이다. 0은 통과가 아니다(선택자 이름이 바뀌었나?)')
         return 1

@@ -62,7 +62,11 @@
             border-bottom: 1px solid #e0e0e0;
             position: sticky;
             top: 0;
-            z-index: 1000;
+            /* A-634(브론즈 48차 N48-2): 이 쪽은 **style.css 를 아예 안 싣는다**
+               (A-327·A-366 에 적힌 알려진 자리) — 그래서 전역 고침이 구조상 닿지
+               않는다. A-629 의 층 규약을 여기에도 손으로 적는다.
+               층 규약: 토스트 100010 > 모달 100001+ > 머리글 100000 > 고지 99999. */
+            z-index: 100000;
         }
 
         .header .container {
@@ -456,9 +460,17 @@
                 flex-direction: column;
                 background-color: #fff;
                 border-top: 1px solid #e0e0e0;
-                padding: 20px;
+                padding: 20px 20px 16px;
                 gap: 20px;
-                z-index: 999;
+                /* A-634: 999 였다 — 쿠키 고지(99999) 보다 한참 아래라 메뉴가 덮였고
+                   (브론즈 실측 320x568 에서 4개 못 닿음), max-height 가 없어 패널이
+                   화면보다 길면 아래쪽이 아예 안 닿았다. */
+                z-index: 100000;
+                --nl-badge: 72px;
+                max-height: calc(100vh - var(--hdr-h, 80px) - var(--nl-badge));
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
             }
 
             .main-nav.active {
@@ -522,9 +534,17 @@
                 flex-direction: column;
                 background-color: #fff;
                 border-top: 1px solid #e0e0e0;
-                padding: 20px;
+                padding: 20px 20px 16px;
                 gap: 20px;
-                z-index: 999;
+                /* A-634: 999 였다 — 쿠키 고지(99999) 보다 한참 아래라 메뉴가 덮였고
+                   (브론즈 실측 320x568 에서 4개 못 닿음), max-height 가 없어 패널이
+                   화면보다 길면 아래쪽이 아예 안 닿았다. */
+                z-index: 100000;
+                --nl-badge: 72px;
+                max-height: calc(100vh - var(--hdr-h, 80px) - var(--nl-badge));
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
             }
 
             .main-nav.active {
@@ -542,7 +562,10 @@
 
         .scroll-to-top {
             position: fixed;
-            bottom: 30px;
+            /* A-634: 쿠키 고지가 떠 있으면 이 단추가 그 밑으로 들어간다.
+               style.css 는 --cc-h 로 비켜 주는데 이 쪽은 style.css 를 안 실어
+               그 처방이 닿지 않았다. 같은 값을 여기에 적는다. */
+            bottom: calc(30px + var(--cc-h, 0px));
             right: 30px;
             width: 50px;
             height: 50px;
@@ -596,6 +619,30 @@
         }
         body .skip-link:focus-visible,
         body #main:focus-visible { box-shadow: none; outline: none; }
+
+        /* ── A-634: 이 쪽은 style.css 를 안 실으므로 전역 처방을 손으로 적는다 ──
+           ① 본문 표지(#main)의 scroll-margin-top — 「건너뛰기」로 들어오면 제목의
+              위 21px 이 붙어 있는 머리글에 가렸다(브론즈 실측, 제목 높이의 36~47%).
+              style.css 의 `body #main { scroll-margin-top: 90px }` 과 같은 값. */
+        body #main { scroll-margin-top: 90px; }
+
+        /* ② 인쇄 — 이 쪽에는 @media print 가 **아예 없었다**. 꼬리말이 어두운 배경
+              (#332e27) 위 흰 글자인데 브라우저는 배경을 기본으로 인쇄하지 않으므로,
+              A-630 과 같은 모양으로 꼬리말이 백지가 된다. 전역과 같은 처방을 둔다. */
+        @media print {
+            html body,
+            html body * { color: #332e27 !important; }
+            html body .skip-link,
+            html body .announcement-bar,
+            html body .header,
+            html body .scroll-to-top,
+            html body #archi-cookie-banner { display: none !important; }
+            html body .footer { border-top: 1px solid #ccc; margin-top: 24px; font-size: 9pt; }
+            html body a { text-decoration: underline; }
+            html body *,
+            html body *::before,
+            html body *::after { background-image: none !important; background-color: transparent !important; }
+        }
     </style>
 </head>
 <body>

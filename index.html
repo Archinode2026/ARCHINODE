@@ -59,7 +59,15 @@ input, select, textarea { font-family: inherit; }
   border-bottom: 1px solid var(--gray-200);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  /* A-634(브론즈 48차 N48-1): 이 쪽은 style.css 를 실은 **뒤에** 자기 <style> 을
+     들고 있고, 그 안에 style.css 옛 판의 사본이 들어 있다. 같은 명시도라 뒤가
+     이기므로 **A-629 의 100000 이 홈에서만 죽었다** — 가장 많이 들어오는 쪽에서
+     메뉴가 그대로 고지 밑이었다. 브론즈 실측: 320x568 에서 못 닿는 메뉴 16/17,
+     화면에 보이는 링크 9개가 전부 고지 색으로 칠해져 있고, **햄버거 단추 자체가
+     안 눌린다**(그 자리의 맨 위가 고지다). 동의 단추와 정확히 겹치는 조합 13가지 —
+     375x740 「자재 소싱 문의」→「필수만」, 320x640 「데코」→**「모두 수락」**.
+     층 규약: 토스트 100010 > 모달 100001+ > 머리글 100000 > 고지 99999. */
+  z-index: 100000;
   transition: box-shadow 0.3s;
 }
 .header.scrolled { box-shadow: 0 1px 12px rgba(0,0,0,0.06); }
@@ -139,10 +147,18 @@ input, select, textarea { font-family: inherit; }
     top: 100%;
     left: 0; right: 0;
     background: var(--white);
-    padding: 24px 40px;
+    padding: 24px 40px 16px;
     border-bottom: 1px solid var(--gray-200);
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     gap: 4px;
+    /* A-634: A-629 의 패널 자체 스크롤도 이 사본 때문에 홈에서만 빠졌다.
+       --hdr-h 는 a11y-nav.js 가 머리글 아래끝을 재서 넣고, 72px 은 넷리파이 배지
+       자리다(라이브 실측 196x63px, z-index 가 int 최대값 근처라 못 이긴다). */
+    --nl-badge: 72px;
+    max-height: calc(100vh - var(--hdr-h, var(--header-height, 64px)) - var(--nl-badge));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   .main-nav.active .nav-divider { width: 100%; height: 1px; margin: 8px 0; }
 }

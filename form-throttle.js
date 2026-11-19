@@ -306,7 +306,12 @@
     el.id = 'archiFormThrottleNotice';
     el.textContent = msg;
     el.setAttribute('role', 'status');
-    el.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);' +
+    /* A-636(브론즈 48차 N48-5): 층을 올려도(A-633) **자리는 그대로**였다.
+       이 알림은 bottom:24px 고정이고 --cc-h 를 쓰지 않아서, 320x568 에서 쿠키 고지의
+       **「필수만」만** 덮었다(「모두 수락」은 멀쩡) — 거절 쪽만 막히는 모양이라 더
+       나쁘다. 320x400 에서는 「필수만」·「자세히」 둘 다 덮였다.
+       style.css 가 「맨 위로」와 꼬리말에 쓰는 것과 같은 방식으로 고지를 비킨다. */
+    el.style.cssText = 'position:fixed;left:50%;bottom:calc(24px + var(--cc-h, 0px));transform:translateX(-50%);' +
       'background:#332e27;color:#fff;padding:10px 18px;border-radius:8px;font-size:0.85rem;' +
       /* A-633(브론즈 47차 N47-7): 이 알림이 쿠키 고지와 **같은 층(99999)** 이었다.
          둘 다 bottom 에 뜨므로 겹쳐 그려져 5초간 고지 단추를 가렸다.

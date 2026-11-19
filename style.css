@@ -2580,6 +2580,30 @@ body .stats-section.band-grey { color: var(--black); }
      않는 글자보다는 낫다. 인쇄는 되돌릴 수 없는 매체다. */
   html body,
   html body * { color: #332e27 !important; }
+  /* A-635(브론즈 48차 N48-3): 위 전수 규칙은 (0,0,2)+!important 라서, 더 구체적인
+     !important 규칙에는 **진다**. 실제로 하나가 끝까지 살아남았다 —
+     `body .footer .footer-business-info`(0,3,1, !important) → 쪽 15개 전부에서
+     사업자등록번호·대표자·통신판매업신고번호가 흰 종이 대비 **1.08:1** 이었다.
+     A-630 의 첫 판에는 이 줄을 따로 적어 뒀는데, 전수 규칙으로 바꾸면서 떨어뜨렸다.
+     (글자는 선택·복사는 되고 보이지만 않아서 눈으로 넘기기 쉽다.) */
+  html body .footer .footer-business-info,
+  html body .footer .footer-col ul li a,
+  html body .footer .footer-col details.footer-more > summary,
+  html body .footer .footer-bottom p,
+  html body .footer .footer-bottom-links a { color: #332e27 !important; }
+  /* A-635(브론즈 48차 N48-4): 글자를 전부 어둡게 덮었더니, 손님이 인쇄 대화상자에서
+     「배경 그래픽」을 켜면 **반대 방향으로** 사라졌다 — 어두운 바탕 위 어두운 글자.
+     실측: 배경이 칠해질 때 대비 3:1 미만이 쪽당 31~71종, 가장 나쁜 값 1.00~1.01
+     (로고·「Send Message」 단추). 글자색만 손대면 둘 중 한 방향은 늘 깨진다.
+     그래서 **배경을 아예 안 칠하게** 한다 — 그러면 체크를 켜든 끄든 늘 흰 종이
+     위 어두운 글자다. 사진(img)은 그대로 인쇄된다. */
+  html body *,
+  html body *::before,
+  html body *::after {
+    background-image: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
   /* 종이에 있을 이유가 없는 것은 숨긴다 */
   html body .skip-link,
   html body .announcement-bar { display: none !important; }

@@ -50,6 +50,12 @@ JS = """() => {
        getClientRects() 는 숨은 가지 전체에서 0 이므로 그것으로 센다.
        (같은 함정: check-field-labels.py 의 _hidden_stack — 「0으로 세어 보기」) */
     if (e.getClientRects().length === 0) return;
+    /* A-636(브론즈 48차 N48-8): getClientRects() 만으로는 **닫힌 <details> 안**과
+       content-visibility 로 가려진 것이 안 걸러진다 — 꼬리말 「더 보기」 안 링크 9개가
+       모든 쪽에서 걸렸고 index 에서는 197종이었다. 즉 **안 보이는 글자의 대비를
+       세고 있었다.** checkVisibility 를 함께 쓴다(없는 브라우저는 그냥 통과). */
+    if (typeof e.checkVisibility === 'function' &&
+        !e.checkVisibility({ contentVisibilityAuto: true, opacityProperty: true, visibilityProperty: true })) return;
     const cs = getComputedStyle(e);
     if (cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') < 0.05) return;
     const key = e.tagName + '|' + (e.className || '') + '|' + cs.color;

@@ -219,12 +219,54 @@ function archiStartHeaderWatch() {
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(archiSyncHeaderHeight).catch(function () {});
     }
+    archiWatchMenuForBanner();
   } catch (e) {}
 }
 if (document.readyState === 'loading' && document.addEventListener) {
   document.addEventListener('DOMContentLoaded', archiStartHeaderWatch);
 } else {
   archiStartHeaderWatch();
+}
+
+/* ── A-637 (브론즈 48차 N48-6): 메뉴를 연 동안 쿠키 고지를 **만질 수 없게** 한다 ──
+   층 규약대로 메뉴 패널이 고지 위에 오면서, 패널이 불투명해 고지가 보이지 않는다.
+   그런데 고지는 role="dialog" 로 뜨면서 **「모두 수락」에 초점을 둔다**(A-097).
+   그 상태에서 Enter 를 누르면 **안 보이는 단추로 전체 동의가 들어간다** —
+   브론즈 실측 390x844: 「모두 수락」 자리의 맨 위가 #mainNav, 「필수만」 자리는 메뉴 링크.
+   손님이 고르지 않은 동의가 저장되는 것은 N48-1 과 같은 결의 사고다.
+   메뉴가 열려 있는 동안만 고지를 inert 로 둔다(닫으면 그대로 돌아온다).
+   inert 를 모르는 브라우저에서는 aria-hidden 과 tabindex 로 갈음한다. */
+function archiSyncBannerInert() {
+  try {
+    var nav = document.getElementById('mainNav') || document.querySelector('.main-nav');
+    var ban = document.getElementById('archi-cookie-banner');
+    if (!ban) return;
+    var menuOpen = !!(nav && nav.classList && nav.classList.contains('active'));
+    if (menuOpen) {
+      if ('inert' in ban) ban.inert = true;
+      else {
+        ban.setAttribute('aria-hidden', 'true');
+        var f = ban.querySelectorAll('a, button');
+        for (var i = 0; i < f.length; i++) f[i].setAttribute('tabindex', '-1');
+      }
+    } else {
+      if ('inert' in ban) ban.inert = false;
+      ban.removeAttribute('aria-hidden');
+      var g = ban.querySelectorAll('a, button');
+      for (var j = 0; j < g.length; j++) g[j].removeAttribute('tabindex');
+    }
+  } catch (e) {}
+}
+window.archiSyncBannerInert = archiSyncBannerInert;
+
+function archiWatchMenuForBanner() {
+  try {
+    var nav = document.getElementById('mainNav') || document.querySelector('.main-nav');
+    if (!nav || !window.MutationObserver) return;
+    new MutationObserver(archiSyncBannerInert).observe(nav, { attributes: true, attributeFilter: ['class'] });
+    /* 고지는 메뉴보다 늦게 들어올 수 있다 — 들어온 뒤 한 번 맞춘다 */
+    [0, 300, 1000].forEach(function (ms) { setTimeout(archiSyncBannerInert, ms); });
+  } catch (e) {}
 }
 
 function archiReduceMotion() {
