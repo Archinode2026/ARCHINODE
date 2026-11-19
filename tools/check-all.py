@@ -45,6 +45,8 @@ CHECKS = [
      'A-385 — style.css 를 안 싣는 페이지가 공용 처방을 놓쳤는지'),
     ('비공개 쪽 색인금지', 'py',   'tools/check-noindex.py',
      'A-642 — Netlify 가 저장소를 통째로 올리는데(publish=".") admin/ 7쪽과 brand-portal/dashboard 에 **noindex 가 없었다**. robots.txt 의 Disallow 는 **기어다니는 것만** 막고 색인은 못 막는다 — 링크가 걸리면 내용을 안 읽은 채로도 주소가 검색에 선다. 데이터가 새는 건 아니다(관리 쓰기는 전부 isAdmin() 를 거친다) — 막는 것은 노출이다'),
+    ('건너뛰기 첫 차례', 'py',   'tools/check-skip-link-first.py',
+     'A-643 — order-complete 에서 건너뛰기 링크가 **머리글 전체 뒤**에 적혀 있어 탭 차례 12번째였다(다른 쪽은 1번째). 머리글의 링크 열한 개를 지나치라고 있는 링크인데 그 열한 개를 다 지나야 닿았다. A-237 이 231쪽에 이 링크를 넣을 때 **있는가**만 셌고 **첫째인가**는 안 셌다'),
     ('검색 회귀',            'node', 'tools/test-search.js',
      'A-397 · A-401 · A-402 — 배열 category · 언어 판정 · 색인 설명'),
     ('카테고리 이름 사본',    'py',   'tools/check-category-labels.py',
