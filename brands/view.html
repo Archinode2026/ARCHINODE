@@ -255,7 +255,7 @@
 .fade-in { opacity: 1; animation: fadeIn 0.6s ease-in; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.rfq-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100000; align-items:center; justify-content:center; padding:20px; }
+.rfq-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100001;   /* A-629: 머리글(100000) 위 */ align-items:center; justify-content:center; padding:20px; }
 /* A-619(브론즈 46차): 쿠키 고지가 z-index 99999 인데 이 창은 9000 이었다. 그래서
    390x844 에서 문의 창의 아래 226px 가 고지 밑으로 들어가고, 「보내기」 자리를
    누르면 **고지의 「필수만」이 눌렸다** — 문의는 사라지고 개인정보 설정만 바뀐다.

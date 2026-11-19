@@ -140,7 +140,15 @@
            꼬리말에 주면 같은 자리가 꼬리말 색으로 메워진다. 꼬리말의 원래 아래 여백은
            0 이라(`padding: 80px 0 0`) 더해도 잃는 것이 없고, 꼬리말이 없는 6쪽
            (auth/* · trend-report/view)은 쿠키 고지를 싣지도 않아 빈 구멍이 없다. */
-        'html.has-cookie-banner footer{padding-bottom:calc(var(--cc-h,0px) + 24px);}' +
+        /* A-631(브론즈 47차 N47-5): A-628 에서 이 여백을 `footer` 에 줬더니, 크림색
+           8px 띠가 **남색 210~367px 띠**로 바뀌었을 뿐이었다. 꼬리말의 맨 아래 바는
+           `.footer-bottom::before` 가 한 단 더 어두운 --navy-deep(#1c2533)으로 칠하는데,
+           `footer` 의 여백은 그 밖이라 --navy(#253040)로 메워졌다 — 1280px 에서 고지
+           양옆으로 280px 씩 드러나 두 톤의 이음선이 보였다(브론즈가 화면을 찍어
+           픽셀로 읽었다: y566~584 가 rgb(28,37,51), y590~794 가 rgb(37,48,64)).
+           `.footer-bottom` 에 주면 그 ::before 가 top:0·bottom:0 으로 늘어나 **같은
+           자리를 --navy-deep 으로 칠한다**. 원래 아래 여백 96px 보다 크므로 잃는 것도 없다. */
+        'html.has-cookie-banner body .footer .footer-bottom{padding-bottom:calc(var(--cc-h,0px) + 24px);}' +
         /* 본문 안내문의 링크도 손가락 기준으로 — 배너 문단엔 다른 링크가 없어
            띠가 이웃 줄로 번져도 탭을 뺏지 않는다(A-421 과 같은 판단). */
         /* A-437: 「자세히」가 넷리파이 배지와 세로 27px 겹쳐 3/7 이었다(브론즈 26차).
@@ -162,16 +170,35 @@
     }
 
     document.body.appendChild(wrap);
+    var ccLastH = -1;
 
     function ccSyncSpace() {
-      var h = wrap.offsetHeight || 0;
+      /* A-632(브론즈 47차 N47-6): 라이브에서 --cc-h 가 324px 인데 고지의 실제 높이는
+         252px 이었다 — **72px(28.6%) 더 비우고** 있었고, t=0 부터 2.6초까지 모든
+         표본에서 그대로였다. resize 를 한 번 보내면 맞았으니, 첫 칠 시점의 값이
+         굳은 것이다(글자가 한/영으로 다시 칠해지고 글꼴이 늦게 오면서 높이가
+         줄었는데 그때 다시 재지 못했다). 지금은 **많이 비우는** 쪽이라 손님이 못
+         누르는 일은 없지만, 반대 방향이면 자리를 모자라게 비우는 결함이 된다.
+         그래서 ㄱ) rect 로 재고(소수점까지) ㄴ) 값이 바뀔 때만 쓰고
+         ㄷ) 첫 1.2초 동안 몇 번 더 재고 ㄹ) 글꼴이 준비되면 다시 잰다. */
+      var h = Math.ceil(wrap.getBoundingClientRect().height || wrap.offsetHeight || 0);
+      if (h <= 0) return;
+      if (h === ccLastH) return;
+      ccLastH = h;
       document.documentElement.style.setProperty('--cc-h', h + 'px');
       document.documentElement.classList.add('has-cookie-banner');
+    }
+    function ccSettle() {
+      [0, 80, 250, 600, 1200].forEach(function (ms) { setTimeout(ccSyncSpace, ms); });
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(ccSyncSpace).catch(function () {});
+      }
     }
     // A-437: 넣은 직후 현재 언어로 다시 칠한다. lang.js 가 아직 안 돌았으면
     // 위에서 박은 글자가 그대로 쓰이고, 나중에 돌 때 data-* 를 보고 따라온다.
     if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
     ccSyncSpace();
+    ccSettle();
     window.addEventListener('resize', ccSyncSpace);
     if (window.ResizeObserver) { try { new ResizeObserver(ccSyncSpace).observe(wrap); } catch (e) {} }
 

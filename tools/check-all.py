@@ -176,6 +176,8 @@ BROWSER_CHECKS = [
     ('확대 넘침',    'py', 'scripts/check_zoom_reflow.py',
      'A-593 — 400%·300% 확대 크기에서 고정 요소가 화면을 넘어 내용이 영영 안 보이는지. '
      '좁은 폭 검사는 폭만 바꾸고 높이는 늘 크게 둬서 이 자리를 한 번도 안 봤다'),
+    ('인쇄 대비',    'py', 'scripts/check_print_contrast.py',
+     'A-630 — 인쇄하면 꼬리말이 **흰 종이 위의 흰 글자**로 남아 종이 한 장이 통째로 백지였다(대비 1.03~1.10:1, 사업자등록번호 같은 법정 표시사항까지). 브라우저는 배경을 기본으로 안 찍는데 화면용 밝은 글자색이 @media print 를 명시도로 이기고 있었다. 그 자리 주석은 「인쇄를 할 수 없어 특정도 규칙으로만 보장했다」고 적고 있었다 — 보장이 틀렸다'),
     ('초점 고리',    'py', 'scripts/check_focus_visible.py',
      'A-589 — Tab 으로 초점이 가는 자리마다 고리가 **실제로 보이는지**(WCAG 1.4.11 비텍스트 대비 3:1). '
      'A-587 과 같은 모양의 사각지대였다 — 두 겹 고리를 설계해 놓고 한 번도 재지 않았다'),
@@ -279,6 +281,7 @@ def main():
         print('          ARCHINODE_ROOT=<루트> python3 scripts/check_hover_contrast.py index.html brands.html ...')
         print('          ARCHINODE_ROOT=<루트> python3 scripts/check_focus_visible.py index.html list-your-brand.html ...')
         print('          python3 scripts/check_zoom_reflow.py http://127.0.0.1:8321')
+        print('          python3 scripts/check_print_contrast.py http://127.0.0.1:8321')
         print('        (주소는 위치 인수다. --base 를 주면 27화면이 전부 열리지 않는다.)')
         print('        가장 최근 실행: 2026-11-17 · 네 개 전부 통과 (이 파일 머리글 참고)')
     if bad:

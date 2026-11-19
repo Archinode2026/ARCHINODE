@@ -62,7 +62,16 @@ input, select, textarea { font-family: inherit; }
   border-bottom: 1px solid var(--gray-200);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  /* A-629(브론즈 47차 N47-1): 햄버거 메뉴 패널은 이 머리글 **안에** 있다
+     (`position:absolute; top:100%`). 머리글이 z-index 1000 으로 쌓임 문맥을 만들기
+     때문에, 패널에 아무리 큰 z-index 를 줘도 **머리글 전체가 1000 층**으로 고지
+     (99999) 밑에 들어갔다. 그래서 메뉴에서 「자재 소싱 문의」를 누르면 그 자리의
+     맨 위가 고지의 「필수만」이었고, 실제로 **손님이 고른 적 없는 개인정보 선택이
+     저장됐다**(브론즈가 진짜 터치로 확인: analytics:false 기록, 이동 없음).
+     320px 에서는 「모두 수락」이 눌려 마케팅 쿠키까지 동의로 기록됐다.
+     머리글을 고지 위로 올린다. 머리글은 화면 위, 고지는 아래라 서로 가리지 않는다.
+     층 규약: 모달 100001 이상 > 머리글 100000 > 고지 99999. */
+  z-index: 100000;
   transition: box-shadow 0.3s;
 }
 .header.scrolled { box-shadow: 0 1px 12px rgba(0,0,0,0.06); }
@@ -322,6 +331,28 @@ body .topbar .lang-switch-btn:hover {
     border-bottom: 1px solid var(--gray-200);
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     gap: 4px;
+    /* A-629(브론즈 47차 N47-2): 패널은 붙어 있는 머리글에 매달려 있어 쪽을 굴려도
+       제자리다. 패널이 화면보다 길면 아래쪽 메뉴는 **어떤 스크롤에서도 안 닿았다**
+       (실측 375x667: 16개 중 3개 — 「자재 소싱 문의」·「브랜드 입점」이 그 안에 있다.
+       320x568 에서는 8개). 패널이 스스로 굴러가게 한다.
+       --hdr-h 는 a11y-nav.js 가 머리글을 **재서** 넣는다(좁은 폭에서 머리글은
+       줄바꿈으로 자라므로 고정값 --header-height 로는 모자란다).
+       아래 여백 72px 은 넷리파이 배지(우리 것이 아니고 z-index 가 int 최대값
+       근처라 못 이긴다) 자리를 비켜 두는 것이다 — N47-3. */
+    /* --hdr-h = 머리글 아래끝 (a11y-nav.js 가 재서 넣는다).
+       --nl-badge 는 넷리파이 배지(IFRAME#nl-badge-frame, 라이브 실측 196x63px,
+       오른쪽 아래 끝, z-index 2147483645)를 비켜 두는 자리다 — 우리 것이 아니라
+       z-index 로는 못 이긴다(A-437 과 같은 판단). 메뉴 링크는 가로 전체 줄이라
+       좁은 폭에서는 줄 가운데가 배지의 x 범위에 들어간다(브론즈 실측 375px 에서
+       「매거진」이 배지에 덮였다). **여백으로는 모자란다** — 여백은 내용 끝에만
+       생기므로 중간까지 굴린 상태에서는 여전히 링크가 배지 자리에 온다.
+       그래서 패널 자체가 배지 영역에 **닿지 않게** 높이에서 뺀다. */
+    --nl-badge: 72px;
+    max-height: calc(100vh - var(--hdr-h, var(--header-height)) - var(--nl-badge));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: 16px;
   }
   /* A-559(브론즈 40차): 메뉴 패널을 여는 햄버거는 A-286 에서 44px 로 올렸는데,
      **열린 패널 안의 1차 링크들은 한 번도 세지 않았다**(29~37px). A-113·A-286·
@@ -566,7 +597,7 @@ body .scroll-top {
   /* A-619: 쿠키 고지(99999)보다 위여야 한다 — 아래에 두면 창의 아래쪽이
      고지에 덮이고, 그 자리를 누른 손가락이 고지의 「필수만」을 누른다.
      층 규약: 고지 99999 < 모달 100000 이상. */
-  z-index: 100000;
+  z-index: 100001;   /* A-629: 머리글(100000) 위 */
   display: none;
   align-items: flex-start;
   justify-content: center;
@@ -1880,35 +1911,12 @@ body .stats-section.band-grey { color: var(--black); }
 .pd-thumb:hover { border-color: var(--gray-400); }
 .pd-thumb.active:hover { border-color: var(--black); }
 
-/* Lightbox */
-.pd-lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.92);
-  /* A-619: 쿠키 고지(99999)보다 위여야 한다 — 아래에 두면 창의 아래쪽이
-     고지에 덮이고, 그 자리를 누른 손가락이 고지의 「필수만」을 누른다.
-     층 규약: 고지 99999 < 모달 100000 이상. */
-  z-index: 100001;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-.pd-lightbox.active { display: flex; }
-.pd-lightbox img {
-  max-width: 85vw;
-  max-height: 85vh;
-  object-fit: contain;
-}
-.pd-lightbox-close {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  color: var(--white);
-  font-size: 2rem;
-  cursor: pointer;
-  z-index: 3001;
-}
+/* A-629(브론즈 47차 N47-7): 여기 있던 `.pd-lightbox` 사진 확대창 스타일을 치웠다.
+   저장소의 HTML·JS 어디에서도 그 이름을 쓰지 않고(전수 grep 0건), 라이브 제품
+   상세에서 사진을 눌러도 아무 일도 안 일어난다 — 확대 기능 자체가 없다.
+   그런데 A-619 의 층 검사가 이것을 **통과 항목으로 세어** 「5개를 지켰다」는
+   자신감을 부풀렸다. 지키는 척하는 자리는 지우는 쪽이 정직하다.
+   사진 확대를 넣을 때 git 이력에서 되살리면 된다. */
 
 /* Product Info — Sticky Sidebar */
 .pd-info { position: sticky; top: calc(var(--header-height) + 40px); }
@@ -2550,6 +2558,46 @@ body .stats-section.band-grey { color: var(--black); }
   .article-body { font-size: 11pt; line-height: 1.5; }
   .footer { border-top: 1px solid #ccc; padding-top: 8px; margin-top: 24px; font-size: 9pt; color: #666; }
   .footer-grid, .footer-col ul li a { color: #666; }
+  /* A-630(브론즈 47차 N47-4): 위 두 줄은 `.footer`(0,1,0)·`.footer-grid`(0,1,0) 인데
+     아래 2796줄의 `body .footer`(0,1,1)가 **특정도와 순서 둘 다에서** 이겼다.
+     그래서 인쇄에서 꼬리말이 **흰 종이 위의 흰 글자**로 남았다 — 브론즈가 PDF 를
+     그림으로 떠서 재니 마지막 장의 흰색 아닌 픽셀이 **0.17%**, 흰 종이 기준 대비가
+     사업자정보 1.07:1 · 저작권 1.06:1 · 꼬리말 링크 1.10:1 이었다.
+     **사업자등록번호 같은 법정 표시사항이 종이에서 사라졌다.**
+     이 자리의 옛 주석은 「여기서 인쇄를 할 수 없어 특정도 규칙으로만 보장했고
+     눈으로는 못 봤다」고 적고 있었다 — 보장이 틀렸고, 눈으로 보니 드러났다.
+     `html body` 로 올려(0,1,2) 순서와 무관하게 이기게 한다. 자손까지 함께 잡는다. */
+  /* ── A-630·A-633: 인쇄에서 **흰 종이 위의 흰 글자**가 되는 것을 전부 막는다 ──
+     브라우저는 배경을 기본으로 인쇄하지 않는다. 그런데 이 사이트는 어두운 배경 위의
+     밝은 글자를 많이 쓴다(꼬리말·히어로·띠·단추). 그래서 그 자리들이 종이에서
+     **사라졌다**. 새로 만든 검사(scripts/check_print_contrast.py)로 쪽 8개를 재니
+     인쇄 매체에서 글자 든 요소 201종 중 **안 읽히는 것이 수십 종**이었다 —
+     꼬리말뿐 아니라 **모든 쪽의 h1(쪽 제목)과 설명문**이 들어 있었다.
+
+     한 자리씩 맞추지 않는다 — 꼬리말만 해도 글자색을 정하는 규칙이 28개이고, 그중
+     하나는 이미 !important 이고 또 하나는 클래스 2개+요소 4개로 더 구체적이다.
+     그래서 **전부 어둡게 덮는다.** 인쇄에서 색 단계(회색 농담)는 잃지만, 읽히지
+     않는 글자보다는 낫다. 인쇄는 되돌릴 수 없는 매체다. */
+  html body,
+  html body * { color: #332e27 !important; }
+  /* 종이에 있을 이유가 없는 것은 숨긴다 */
+  html body .skip-link,
+  html body .announcement-bar { display: none !important; }
+  /* 위 전수 규칙(html body *)은 명시도가 (0,0,2)라서, 클래스를 여러 개 쓰는
+     !important 규칙에는 진다 — 실제로 하나가 남았다:
+     `body.home .korea-network > .container > div:first-child > div:first-child`
+     (클래스 3개, `color: var(--accent) !important`, 대비 3.83).
+     명시도 경쟁을 계속하지 않고 **금색 변수 자체를 인쇄에서 어둡게** 바꾼다 —
+     그러면 var(--accent) 를 쓰는 모든 규칙이 함께 따라온다. 배경에 쓰이는 변수
+     (--white·--band-* 등)는 건드리지 않는다. */
+  /* `:root`(0,1,0) 가 `html`(0,0,1) 을 이기므로 html:root(0,1,1) 로 올린다 */
+  html:root {
+    --accent:          #332e27;
+    --accent-gold:     #332e27;
+    --accent-on-dark:  #332e27;
+    --accent-hover:    #332e27;
+    --navy-gold:       #332e27;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

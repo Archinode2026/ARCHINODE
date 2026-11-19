@@ -159,7 +159,75 @@
 
      같은 자리가 228쪽에 복사돼 있으니 쪽마다 고치지 않고 여기 한 곳에 둔다.
      ═════════════════════════════════════════════════════════════════════════ */
-  function archiReduceMotion() {
+  /* ── A-629 (브론즈 47차 N47-2): 햄버거 메뉴 패널의 높이 예산 ─────────────────
+   패널은 `position:absolute; top:100%` 로 **붙어 있는 머리글에 매달려** 있다.
+   그래서 쪽을 아무리 굴려도 패널은 제자리이고, 패널이 화면보다 길면 아래쪽
+   메뉴는 **영원히 못 누른다**(브론즈 실측 375x667: 16개 중 3개 — 「자재 소싱
+   문의」·「브랜드 입점」이 그 안에 있다. 320x568 에서는 8개).
+   패널에 스스로 굴러갈 높이를 주려면 머리글 높이를 알아야 한다. CSS 의
+   --header-height 는 고정값(64px)이고 좁은 폭에서 머리글은 줄바꿈으로 자라므로
+   (style.css:355 `height:auto`), **실제로 재서** 넘긴다. */
+var _archiHdrLast = -1, _archiHdrQueued = false;
+
+function archiSyncHeaderHeight() {
+  try {
+    var h = document.querySelector('header');
+    if (!h) return;
+    /* ★ 높이가 아니라 **아래끝**을 넘긴다. 머리글 위에 공지 띠가 있을 수 있고
+       (`.announcement-bar`, 영어일 때만 보인다), 그 띠가 보이는 동안 패널의 윗변은
+       머리글 높이보다 아래에 있다. 처음에 높이로 잡았더니 360x640 에서 패널이
+       화면 아래로 80px 넘쳤다(실측: 패널 윗변 196, 머리글 높이 116).
+       쪽을 굴리면 띠가 올라가고 머리글이 붙으므로 값이 바뀐다 — 그래서 스크롤에도
+       따라온다. */
+    var px = Math.round(h.getBoundingClientRect().bottom);
+    if (px < 0) px = 0;
+    if (px === _archiHdrLast) return;          // 값이 같으면 건드리지 않는다
+    _archiHdrLast = px;
+    document.documentElement.style.setProperty('--hdr-h', px + 'px');
+  } catch (e) {}
+}
+
+/* 스크롤마다 쓰면 배치가 흔들린다 — 한 프레임에 한 번으로 모은다 */
+function archiQueueHeaderSync() {
+  if (_archiHdrQueued) return;
+  _archiHdrQueued = true;
+  var run = function () { _archiHdrQueued = false; archiSyncHeaderHeight(); };
+  if (window.requestAnimationFrame) window.requestAnimationFrame(run);
+  else setTimeout(run, 16);
+}
+window.archiSyncHeaderHeight = archiSyncHeaderHeight;
+
+/* 이 파일은 <head> 에서 실리므로 그 시점에는 <header> 가 아직 없다 — 준비된 뒤에 잰다. */
+function archiStartHeaderWatch() {
+  /* 이 파일은 브라우저 밖에서도 불린다 — tools/test-a11y-nav.js 가 가짜 window 로
+     돌린다(그 window 에는 addEventListener 가 없다). 그래서 쓰기 전에 있는지 본다. */
+  try {
+    archiSyncHeaderHeight();
+    if (window.addEventListener) {
+      window.addEventListener('resize', archiQueueHeaderSync);
+      window.addEventListener('scroll', archiQueueHeaderSync, { passive: true });
+    }
+    if (window.ResizeObserver) {
+      var hdr = document.querySelector('header');
+      if (hdr) new ResizeObserver(archiSyncHeaderHeight).observe(hdr);
+    }
+    /* 언어를 바꾸면 라벨 길이가 달라져 머리글이 줄바꿈될 수 있다 */
+    if (document.addEventListener) {
+      document.addEventListener('archinode:lang', archiSyncHeaderHeight);
+    }
+    /* 글꼴이 늦게 오면 머리글 높이가 바뀐다 */
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(archiSyncHeaderHeight).catch(function () {});
+    }
+  } catch (e) {}
+}
+if (document.readyState === 'loading' && document.addEventListener) {
+  document.addEventListener('DOMContentLoaded', archiStartHeaderWatch);
+} else {
+  archiStartHeaderWatch();
+}
+
+function archiReduceMotion() {
     try {
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) {
