@@ -99,7 +99,7 @@ input, select, textarea { font-family: inherit; }
 }
 .logo {
   font-size: 1.35rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--black);
   display: flex;
@@ -663,7 +663,7 @@ body .scroll-top {
   border-bottom: 2px solid var(--white);
   background: transparent;
   color: var(--white);
-  font-weight: 300;
+  font-weight: 400;
 }
 .search-box input::placeholder { color: rgba(255,255,255,0.4); }
 /* A-114: 키보드 접근성 — 검색 입력칸 포커스 시각 표시 */
@@ -798,14 +798,14 @@ body .scroll-top {
 }
 .cta-listing h2 {
   font-size: 2.4rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 16px;
 }
 .cta-listing p {
   font-size: 1rem;
   color: rgba(255,255,255,0.6);
-  font-weight: 300;
+  font-weight: 400;
   max-width: 560px;
   margin: 0 auto 40px;
   line-height: 1.7;
@@ -1036,7 +1036,7 @@ html[lang="ko"] [data-lang-only="en"] { display: none !important; }
 }
 .page-hero h1 {
   font-size: 3rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--white);
   letter-spacing: -0.03em;
   margin-bottom: 12px;
@@ -1044,7 +1044,7 @@ html[lang="ko"] [data-lang-only="en"] { display: none !important; }
 .page-hero p {
   font-size: 0.95rem;
   color: rgba(255,255,255,0.55);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.7;
 }
 
@@ -1144,7 +1144,7 @@ html[lang="ko"] [data-lang-only="en"] { display: none !important; }
 }
 .about-text h2 {
   font-size: 2.2rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 24px;
   line-height: 1.2;
@@ -1180,7 +1180,7 @@ body .stats-section.band-grey { color: var(--black); }
 }
 .stat-item h3 {
   font-size: 3rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 8px;
 }
@@ -1282,7 +1282,7 @@ body .stats-section.band-grey { color: var(--black); }
 }
 .listing-hero h1 {
   font-size: 3.2rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 16px;
   line-height: 1.15;
@@ -1290,7 +1290,7 @@ body .stats-section.band-grey { color: var(--black); }
 .listing-hero p {
   font-size: 1.05rem;
   color: rgba(255,255,255,0.55);
-  font-weight: 300;
+  font-weight: 400;
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.7;
@@ -1305,7 +1305,7 @@ body .stats-section.band-grey { color: var(--black); }
 .why-card { text-align: center; }
 .why-card .why-num {
   font-size: 3rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--gray-200);
   margin-bottom: 16px;
   line-height: 1;
@@ -1362,7 +1362,7 @@ body .stats-section.band-grey { color: var(--black); }
 }
 .pricing-card .price {
   font-size: 2.5rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 4px;
 }
@@ -1752,7 +1752,7 @@ body .stats-section.band-grey { color: var(--black); }
 }
 .mag-hero-content h2 {
   font-size: 1.8rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.3;
   margin-bottom: 16px;
@@ -1851,7 +1851,7 @@ body .stats-section.band-grey { color: var(--black); }
 }
 .mag-newsletter-inner h2 {
   font-size: 1.8rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   margin-bottom: 12px;
 }
@@ -2004,7 +2004,7 @@ body .stats-section.band-grey { color: var(--black); }
 
 .pd-title {
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.2;
   margin-bottom: 8px;
@@ -2032,7 +2032,7 @@ body .stats-section.band-grey { color: var(--black); }
 .pd-price-request { }
 .pd-por-label {
   font-size: 1.2rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--black);
   margin-bottom: 8px;
@@ -2277,7 +2277,7 @@ body .stats-section.band-grey { color: var(--black); }
 }
 .pd-desc-text h3 {
   font-size: 1.4rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   margin-bottom: 20px;
 }
@@ -2315,7 +2315,7 @@ body .stats-section.band-grey { color: var(--black); }
 }
 .pd-designer-bio h3 {
   font-size: 1.6rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
@@ -2546,7 +2546,7 @@ body .stats-section.band-grey { color: var(--black); }
 /* 체크 표시가 흰색이라 --accent(3.26:1)로는 약하다 (A-186) */
 .cat-checkbox input[type="checkbox"]:checked { background: var(--accent-ink); }
 .cat-checkbox input[type="checkbox"]:checked::after {
-  content: '✓'; color: #fdfbf7; font-size: 12px; font-weight: 900;
+  content: '✓'; color: #fdfbf7; font-size: 12px; font-weight: 700;
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
 }
 
@@ -2919,7 +2919,33 @@ select, textarea { border-radius: var(--radius); }
   backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--rule);
 }
-.logo { font-size: 1.16rem; font-weight: 600; letter-spacing: 0.1em; color: var(--black); }
+/* ── A-648(2026-11-20): 로고 굵기를 **Lora 700 하나로** 통일했다 ──
+   전에는 한 사이트의 상호가 쪽마다 다른 굵기로 그려졌다(실측 쪽 29개):
+     Lora 600 18.56px — 24쪽  (이 줄이 정한 값)
+     Lora 800 17.6px  —  2쪽  (admin·brand-portal, 쪽 안 <style>)
+     Lora 800 20.8px  —  1쪽  (auth/login)
+     Lora 900 21.6px  —  1쪽  (**index**, 쪽 안 <style> 사본)
+   그런데 Lora 는 400·500·600 만 불렀으므로 **800·900 은 브라우저가 억지로
+   두껍게 그린 가짜 굵게**였다 — 홈페이지 상호가 바로 그것이었다.
+
+   ★ 100행의 `.logo { font-weight: 900 }` 은 **이 줄에 덮여 죽어 있었다**
+     (같은 특정도, 뒤가 이김). 그런데 index.html 은 그 100행 블록의 **사본**을
+     쪽 안 <style> 에 갖고 있어서, 죽은 값이 홈에서만 되살아났다. 죽은 줄을
+     지우지 않고 복사하면 이렇게 한 쪽에서만 살아난다.
+
+   700 을 고른 까닭: Lora 700 은 본문에서 **이미 38군데 쓰는데 안 부르던**
+   굵기다(A-585). 어차피 불러야 하므로 추가 비용이 0이고, 홈 상호의 지금
+   두께에 가장 가깝다. 크기(17.6~21.6px)는 머리글 배치에 영향이 커서
+   **이번에 손대지 않았다** — 승리님과 화면을 보며 따로 맞춘다. */
+.logo { font-size: 1.16rem; font-weight: 700; letter-spacing: 0.1em; color: var(--black); }
+
+/* ── A-648: `<strong>`·`<b>` 의 기본값은 `bolder` 라서 **상속으로 올라간다** ──
+   for-brands.html 의 비교표에서 「Free」가 **900** 으로 그려졌다. 선언이
+   어디에도 없었다 — 부모가 700 인데 `<strong>` 의 기본 `bolder` 가 한 칸 더
+   올려서다. 부르는 목록에 900 이 없으니 그 자리는 **가짜 굵게**가 된다.
+   `bolder` 는 쓰는 자리마다 결과가 달라지므로(400 안에서는 700, 700 안에서는
+   900) 굵기를 네 가지로 묶어 두려면 숫자로 못박아야 한다. */
+b, strong { font-weight: 700; }
 body .logo-sub {
   font-family: 'Inter','Noto Sans KR',sans-serif;
   font-size: 0.58rem; font-weight: 400; letter-spacing: 0.26em;

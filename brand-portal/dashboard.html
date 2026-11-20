@@ -13,7 +13,7 @@
 <link rel="icon" type="image/x-icon" href="../favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/vendor/fontawesome-6.5.1/css/all.min.css">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -28,8 +28,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 
 /* TOPBAR */
 .topbar { background: var(--black); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
-.topbar .logo { color: var(--white); font-size: 1.1rem; font-weight: 800; text-decoration: none; }
-.topbar .logo span { color: var(--navy-gold); font-size: 0.7rem; font-weight: 400; margin-left: 8px; }
+.topbar .logo { color: var(--white); font-size: 1.1rem; font-weight: 700; text-decoration: none; }
+.topbar .logo span { color: var(--navy-gold); font-size: 0.7rem; font-weight: 600; margin-left: 8px; }
 .topbar .user-info { display: flex; align-items: center; gap: 16px; }
 .topbar .user-email { color: var(--gray-400); font-size: 0.8rem; }
 .topbar .logout-btn { background: none; border: 1px solid var(--gray-700); color: var(--gray-400); padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
@@ -286,19 +286,19 @@ h1, h2, .section-card h2 {
     <div id="statsCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;">
         <div style="background:#fdfbf7;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#6b6459;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Brand Saves" data-ko="브랜드 저장 수">Brand Saves</div>
-            <div id="statBrandLikes" style="font-size:1.8rem;font-weight:800;color:#be123c;">0</div>
+            <div id="statBrandLikes" style="font-size:1.8rem;font-weight:700;color:#be123c;">0</div>
         </div>
         <div style="background:#fdfbf7;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#6b6459;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Product Saves" data-ko="제품 저장 수">Product Saves</div>
-            <div id="statProductLikes" style="font-size:1.8rem;font-weight:800;color:#7a5c32;">0</div>
+            <div id="statProductLikes" style="font-size:1.8rem;font-weight:700;color:#7a5c32;">0</div>
         </div>
         <div style="background:#fdfbf7;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#6b6459;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Products" data-ko="등록 제품">Products</div>
-            <div id="statProductCount" style="font-size:1.8rem;font-weight:800;color:#332e27;">0</div>
+            <div id="statProductCount" style="font-size:1.8rem;font-weight:700;color:#332e27;">0</div>
         </div>
         <div style="background:#fdfbf7;border-radius:10px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);text-align:center;">
             <div style="font-size:0.75rem;font-weight:600;color:#6b6459;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</div>
-            <div id="statArticleCount" style="font-size:1.8rem;font-weight:800;color:#332e27;">0</div>
+            <div id="statArticleCount" style="font-size:1.8rem;font-weight:700;color:#332e27;">0</div>
         </div>
     </div>
 
