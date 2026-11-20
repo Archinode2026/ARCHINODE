@@ -109,6 +109,28 @@ def main():
                 bad.append('%s: hreflang="en" 이 ?lang=en 도 -en.html 도 아니다 — %s'
                            % (rel, got['en'][:60]))
 
+    # 4) style.css 를 안 싣는 쪽에 문 CSS 가 있나 — A-650.
+    #    privacy-en.html 은 자체 <style> 로 서므로(A-327) 문 CSS 를 손으로
+    #    적어야 하고, 안 적으면 **유럽 브랜드가 입구를 못 찾는다**.
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        for f in sorted(filenames):
+            if not f.endswith('.html'):
+                continue
+            fp = os.path.join(dirpath, f)
+            rel = os.path.relpath(fp, ROOT).replace(os.sep, '/')
+            raw = open(fp, encoding='utf-8', errors='replace').read()
+            src = strip_html_comments(raw)
+            if 'nav-gate' not in src:
+                continue
+            if re.search(r'<link[^>]+href=["\'][^"\']*style\.css', src, re.I):
+                continue          # 공용 CSS 를 싣는 쪽 — style.css 가 책임진다
+            css = '\n'.join(re.findall(r'<style[^>]*>(.*?)</style>', src, re.S))
+            css = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+            if not re.search(r'\.nav-gate\s*\{', css):
+                bad.append('%s: style.css 를 안 싣는데 .nav-gate CSS 가 없다 — '
+                           '문이 밋밋하게 나와 입구로 안 읽힌다 (A-650)' % rel)
+
     print('검사함  쪽 %d개 + lang.js (문 안 %d쪽은 3번 규칙 면제)' % (checked, gated))
     if checked == 0:
         print('  결함 — 센 것이 0이다. 0은 통과가 아니다')

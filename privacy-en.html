@@ -140,6 +140,16 @@
             color: #666;
         }
 
+        /* A-650: 이 쪽은 style.css 를 안 싣는다(A-327) — 문 CSS 를 손으로 적는다.
+           이 쪽만 따로 고치는 것이 아홉 번째다(A-312·321·327·340·385·634·639·641). */
+        .nav-gate {
+            color: #6b6459;
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid transparent;
+        }
+        .nav-gate:hover { color: #8a7030; border-bottom-color: currentColor; }
+
         .nav-cta {
             background-color: #332e27 !important;
             color: #fff !important;
@@ -720,8 +730,8 @@
       <a href="trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a>
       <a href="magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a>
       <a href="about.html" data-en="About" data-ko="소개">About</a>
-      <a href="for-brands.html" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
-      <a href="list-your-brand.html" class="nav-cta" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+      <a href="for-brands.html" class="nav-gate" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
+      <a href="sourcing-inquiry.html" class="nav-cta" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
     </nav>
             <div class="header-actions">
                 <button class="search-toggle" onclick="toggleSearch()" aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-search"></i></button>
