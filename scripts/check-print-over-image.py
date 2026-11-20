@@ -83,7 +83,22 @@ def main():
     pages = sys.argv[2:]
     if not pages:
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        pages = sorted(os.path.basename(f) for f in glob.glob(os.path.join(root, '*.html')))
+        # ★ A-646(브론즈 50차): 처음에는 `glob(root/*.html)` — **최상위 쪽만** 봤다.
+        #   그래서 쪽 19개를 재고 「통과」라고 적었는데, 하위 폴더 229쪽은
+        #   **한 번도 안 봤다.** 그 틈에 `.subcat-overlay`(categories/ 79쪽·449자리,
+        #   인쇄 대비 최저 1.36:1)가 그대로 남아 있었다 — A-640 이 잡은 것과
+        #   완전히 같은 꼴인데 선택자 목록에서만 빠져 있었다.
+        #   「쪽 19개 통과」는 거짓말은 아니었지만, **고칠 목록을 19쪽에서 뽑았다.**
+        #   표본이 좁으면 통과도 좁다. 이제 하위 폴더를 걸어 전부 본다.
+        SKIP = {'.git', 'node_modules', '.netlify', 'docs', 'assets', 'previews'}
+        found = []
+        for dirpath, dirnames, filenames in os.walk(root):
+            dirnames[:] = [d for d in dirnames if d not in SKIP]
+            for f in filenames:
+                if f.endswith('.html'):
+                    found.append(os.path.relpath(os.path.join(dirpath, f), root)
+                                 .replace(os.sep, '/'))
+        pages = sorted(found)
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:

@@ -184,6 +184,8 @@ BROWSER_CHECKS = [
      'A-630 — 인쇄하면 꼬리말이 **흰 종이 위의 흰 글자**로 남아 종이 한 장이 통째로 백지였다(대비 1.03~1.10:1, 사업자등록번호 같은 법정 표시사항까지). 브라우저는 배경을 기본으로 안 찍는데 화면용 밝은 글자색이 @media print 를 명시도로 이기고 있었다. 그 자리 주석은 「인쇄를 할 수 없어 특정도 규칙으로만 보장했다」고 적고 있었다 — 보장이 틀렸다'),
     ('인쇄-사진위글', 'py', 'scripts/check-print-over-image.py',
      'A-640 — 위 「인쇄 대비」가 글자를 전부 먹색으로 덮은 뒤, **배경은 안 찍혀도 <img> 는 찍힌다**는 것이 남았다. 띠·카드가 전부 「사진 + 그 위 흰 글자 덮개」 꼴이라 그라데이션만 사라지고 사진 위 먹글씨가 됐다(쪽 9개·34자리, 최저 1.02:1). 겸사겸사 A-474 가 넣은 히어로 사진 인쇄 숨김이 특정도에 져서 **처음부터 죽어 있던 것**도 여기서 드러났다. 색이 아니라 **겹침**으로 잰다 — 사진 픽셀은 보장할 수 없다'),
+    ('인쇄-백지', 'py', 'scripts/check-print-hidden-content.py',
+     'A-646 — `.fade-in` 이 opacity 0 으로 시작해 스크롤로 열리는데 **인쇄는 스크롤을 안 한다**. 높이는 차지하면서 투명하니 **빈 종이**가 됐다(about 10장 중 6장·magazine 6장 중 3장 백지, 숨은 글자 35,072자). ★ 위 인쇄 검사기 둘은 대비·겹침을 재려고 **보이는 요소만** 골라서 이 칸들이 표본에서 조용히 빠졌다 — 이 검사기는 거꾸로 **안 보이는 것만** 센다'),
     ('초점 고리',    'py', 'scripts/check_focus_visible.py',
      'A-589 — Tab 으로 초점이 가는 자리마다 고리가 **실제로 보이는지**(WCAG 1.4.11 비텍스트 대비 3:1). '
      'A-587 과 같은 모양의 사각지대였다 — 두 겹 고리를 설계해 놓고 한 번도 재지 않았다'),
@@ -279,7 +281,7 @@ def main():
         # chromium` 을 안내했다. 그런데 이 기계에서는 **그 명령이 될 수 없다** —
         # cdn.playwright.dev 가 403(망 허용목록), 시스템 크롬 없음, root 없음(apt 불가).
         # 될 수 없는 명령을 안내하면 읽는 사람이 자기 탓인 줄 알고 시간을 버린다.
-        print('        이 여덟은 클라우드 컨테이너에서 돈다 — 저장소를 타르로 가져가서:')
+        print('        이 아홉은 클라우드 컨테이너에서 돈다 — 저장소를 타르로 가져가서:')
         print('          python3 -m http.server 8321 &')
         print('          ARCHINODE_ROOT=<루트> python3 scripts/check_narrow_width.py --base http://127.0.0.1:8321 --widths 360,390')
         print('          ARCHINODE_ROOT=<루트> python3 scripts/check_xss_output.py http://127.0.0.1:8321')
@@ -289,8 +291,9 @@ def main():
         print('          python3 scripts/check_zoom_reflow.py http://127.0.0.1:8321')
         print('          python3 scripts/check_print_contrast.py http://127.0.0.1:8321')
         print('          python3 scripts/check-print-over-image.py http://127.0.0.1:8321')
+        print('          python3 scripts/check-print-hidden-content.py http://127.0.0.1:8321')
         print('        (주소는 위치 인수다. --base 를 주면 27화면이 전부 열리지 않는다.)')
-        print('        가장 최근 실행: 2026-11-20 · 인쇄 둘 통과 (사진위글 0자리 · 흰종이대비 0종)')
+        print('        가장 최근 실행: 2026-11-20 · 인쇄 셋 통과 (사진위글 248쪽 0자리 · 백지 0자리 · 흰종이대비 0종)')
     if bad:
         print('어긋난 검사 %d개 / 통과 %d개' % (len(bad), okn))
         for name, state, rel in bad:

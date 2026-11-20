@@ -2704,7 +2704,8 @@ body .stats-section.band-grey { color: var(--black); }
   html body .cat-card img,
   html body .editorial-card-main img,
   html body .featured-card img,
-  html body .category-card-image { display: none !important; }
+  html body .category-card-image,
+  html body .subcat-card img { display: none !important; }
 
   /* ㄴ) 사진이 빠지면 상자는 제 높이로 줄인다 (안 그러면 빈 자리만 길게 남는다) */
   html body .page-hero,
@@ -2715,7 +2716,8 @@ body .stats-section.band-grey { color: var(--black); }
   html body .editorial-card,
   html body .editorial-card-main,
   html body .featured-card,
-  html body .category-card {
+  html body .category-card,
+  html body .subcat-card {
     min-height: 0 !important; height: auto !important;
     max-height: none !important; aspect-ratio: auto !important;
     display: block !important; overflow: visible !important;
@@ -2729,7 +2731,8 @@ body .stats-section.band-grey { color: var(--black); }
   html body .category-card-content,
   html body .photo-band .container,
   html body .page-hero-content,
-  html body .hero-content {
+  html body .hero-content,
+  html body .subcat-overlay {
     position: static !important; inset: auto !important;
   }
 
@@ -2738,6 +2741,34 @@ body .stats-section.band-grey { color: var(--black); }
   html body .page-hero::before,
   html body .hero::after,
   html body .category-card::after { display: none !important; }
+
+  /* ──────────────────────────────────────────────────────────────────────
+     A-646(브론즈 50차 N50-6): **인쇄하면 쪽 내용이 백지로 나갔다.**
+
+     `.fade-in`(960행)은 `opacity: 0` 으로 시작해서, 스크롤로 `.visible` 이
+     붙을 때 열린다. **인쇄는 스크롤을 하지 않는다.** 그래서 안 열린 칸이
+     투명한 채로 찍히는데 **높이는 차지하므로 빈 종이**가 된다.
+     움직임 줄이기 블록(968행)에는 이 처방이 있는데 인쇄 블록에는 없었다.
+
+     브론즈 실측(PDF 를 떠서 센 것):
+       about.html     fade-in 33개 중 29개 opacity 0 · 숨은 글자 5,503자 · 10장 중 6장 백지
+       magazine.html  134개 중 126개 opacity 0 · 숨은 글자 34,715자 · 6장 중 3장 백지
+       쪽 18개 합계 79장 중 9장(11.4%) 백지
+     회사 소개와 매거진을 인쇄하면 **본문이 종이에 없었다.**
+
+     ★ A-630 은 글자색을, A-640 은 사진 위 글자를 고쳤다. 둘 다 인쇄 가독성을
+       두 차수에 걸쳐 고친 것인데, **정작 가장 큰 인쇄 결손은 글자색이 아니라
+       「칸이 열리지 않는 것」이었다.** 읽기 어려운 글자를 재는 동안, 애초에
+       종이에 없는 글자는 세지 않았다 — 검사기가 **보이는 요소만** 골라 재니
+       (checkVisibility) opacity 0 인 칸은 조용히 표본에서 빠졌다.
+       **안 보이는 것을 빼고 재면, 안 보이는 것이 결함일 때 못 찾는다.**
+     ────────────────────────────────────────────────────────────────────── */
+  html body .fade-in,
+  html body .fade-in.visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 
   /* ㅁ) 기사 섬네일 위의 작은 딱지는 **사진이 내용**이라 사진을 뺄 수 없다.
      (위 ㄱ 은 「바탕으로 깔린 사진」만 뺀다 — 섬네일은 읽는 사람이 볼 그림이다.)
