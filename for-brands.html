@@ -842,24 +842,33 @@ a { text-decoration: none; color: inherit; }
      4장을 보여 주었다(A-344) — 한 슬롯이 언어로 대상을 가르던 자리다. -->
 <section class="services" id="brand-services">
   <div class="container">
-    <h2 class="section-title fade-in" data-en="Brand Services" data-ko="브랜드 서비스">Brand Services</h2>
+    <!-- A-653(2026-11-21): `fade-in` 을 뺐다. A-649 에서 이 묶음을 index.html 에서
+         옮겨 올 때 클래스까지 함께 왔는데, **이 쪽에는 `.visible` 을 붙이는
+         관찰자가 없다**(index.html 은 인라인으로 갖고 있다). `.fade-in` 은
+         `opacity:0` 으로 시작하므로, 옮겨 온 네 장과 제목이 **영영 안 열렸다** —
+         실측 opacity 0.00 · 글자 526자 · 348,000px² 가 391px 흰 띠로 남았다.
+         A-649 이전 이 쪽의 `fade-in` 은 0개였다. 원래대로 되돌린다.
+         (관찰자를 여기 또 복사하는 길도 있지만, 85쪽이 같은 코드를 각자
+          갖고 있는 상태를 하나 더 늘릴 이유가 없다. 공용 js 로 모으는 건
+          별건으로 승리님 결정 목록에 올린다.) · 브론즈 51차 N51-5 발견 -->
+    <h2 class="section-title" data-en="Brand Services" data-ko="브랜드 서비스">Brand Services</h2>
     <div class="services-grid">
-      <div class="service-item fade-in">
+      <div class="service-item">
         <i class="fas fa-handshake"></i>
         <h3 data-en="Dealership Screening">Dealership Screening</h3>
         <p data-en="We verify and evaluate potential Korean dealers on behalf of global brands.">We verify and evaluate potential Korean dealers on behalf of global brands.</p>
       </div>
-      <div class="service-item fade-in">
+      <div class="service-item">
         <i class="fas fa-eye"></i>
         <h3 data-en="Dealer Monitoring">Dealer Monitoring</h3>
         <p data-en="Ongoing compliance monitoring for dealership agreements in Korea.">Ongoing compliance monitoring for dealership agreements in Korea.</p>
       </div>
-      <div class="service-item fade-in">
+      <div class="service-item">
         <i class="fas fa-calendar-check"></i>
         <h3 data-en="Korean Certification Support" data-ko="한국 인증 지원">Korean Certification Support</h3>
         <p data-en="Guidance on Korean product certifications — KC mark, KS standards, eco-labels. We help you identify required certifications, connect with accredited testing labs, and prepare documentation." data-ko="한국 시장 진출에 필요한 인증을 지원합니다 — KC인증, KS규격, 환경표지. 필요한 인증 안내, 공인 인증기관 연결, 서류 준비 지원.">Guidance on Korean product certifications — KC mark, KS standards, eco-labels. We help you identify required certifications, connect with accredited testing labs, and prepare documentation.</p>
       </div>
-      <div class="service-item fade-in">
+      <div class="service-item">
         <i class="fas fa-trophy"></i>
         <h3 data-en="ARCHINODE Awards" data-ko="ARCHINODE 어워드">ARCHINODE Awards</h3>
         <p data-en="Annual awards celebrating the best products across every category." data-ko="매년 각 카테고리 최고의 제품을 선정하는 어워드 프로그램입니다.">Annual awards celebrating the best products across every category.</p>

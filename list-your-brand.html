@@ -209,7 +209,14 @@
       <a href="about.html" data-en="About" data-ko="소개">About</a>
       <a href="for-brands.html" class="nav-gate" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
       <a href="sourcing-inquiry.html" class="nav-cta" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
-      <a href="list-your-brand.html" class="nav-cta active-nav" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+      <!-- A-653(2026-11-21): `nav-cta` 를 뗐다. 이 자리는 **지금 보고 있는 쪽 표시**인데
+           단추 꾸밈을 쓰고 있어, 영어 화면에서 「SOURCING INQUIRY」 와 「LIST YOUR BRAND」
+           **같은 모양 단추가 나란히** 떴다(146x29 와 137x29). 손님이 어느 쪽이 주행동인지
+           한 번 더 읽어야 한다. 표시는 `active-nav` 가 하므로 단추 꾸밈은 필요 없다.
+           `data-lang-only="en"` 은 **그대로 둔다** — A-343 의 승리님 결정 영역이라
+           제가 혼자 풀지 않는다(한국어 손님이 현재 쪽 표시를 못 받는 점은 결정 목록에 올렸다).
+           (브론즈 51차 N51-7) -->
+      <a href="list-your-brand.html" class="active-nav" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
     </nav>
     <div class="header-actions">
       <a href="auth/login.html" style="font-size:0.82rem;color:var(--accent-ink);font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>

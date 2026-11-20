@@ -120,6 +120,16 @@ JS = r"""() => {
   return out;
 }"""
 
+# ★ 스크롤로 열리는 칸을 **열린 상태로** 재기 위한 주입 (A-646·A-652)
+#   `.fade-in` 은 opacity 0 으로 시작해 스크롤하면 열린다. 그대로 재면 화면 밖
+#   칸이 전부 '투명한 글자'로 분류돼 표본에서 조용히 빠진다 — 처음 쟀을 때
+#   categories.html 의 카드 10장 중 **2장만** 보고됐다. 사람이 보는 상태는
+#   '열린 상태'이므로 그 상태로 잰다.
+REVEAL_CSS = """
+  .fade-in, .fade-in.visible { opacity: 1 !important; transform: none !important;
+                               transition: none !important; }
+"""
+
 async def run(root, pages):
     bad = {}
     async with async_playwright() as p:
@@ -128,6 +138,7 @@ async def run(root, pages):
         for f in pages:
             try:
                 await pg.goto('file://' + os.path.join(root, f), wait_until='load')
+                await pg.add_style_tag(content=REVEAL_CSS)
                 await pg.wait_for_timeout(300)
                 r = await pg.evaluate(JS)
             except Exception as e:
