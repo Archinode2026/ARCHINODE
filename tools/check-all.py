@@ -43,6 +43,8 @@ CHECKS = [
      'A-362 ~ A-402 — 다시 칠하기 · 짝 · 돈·딜러 문구 · 막다른 링크 (검사 8종)'),
     ('독립 CSS 페이지',      'py',   'tools/check-standalone-css.py',
      'A-385 — style.css 를 안 싣는 페이지가 공용 처방을 놓쳤는지'),
+    ('언어·주소 규약', 'py',   'tools/check-lang-url.py',
+     'A-650 — 언어가 localStorage 에만 있어 **주소가 상태를 안 들고 있었다**. 영문 화면 링크를 보내도 받는 사람은 자기 저장값대로 봤고, 구글로 온 유럽 브랜드는 한국어 메뉴를 보고 자기 입구를 못 찾았다(hreflang 0줄). `?lang=en` 읽기·쓰기와 hreflang 세 줄을 지키고, A-649 의 게이트 규약(대상은 문으로, 언어로 가르지 않기)이 되돌아가지 않게 막는다'),
     ('비공개 쪽 색인금지', 'py',   'tools/check-noindex.py',
      'A-642 — Netlify 가 저장소를 통째로 올리는데(publish=".") admin/ 7쪽과 brand-portal/dashboard 에 **noindex 가 없었다**. robots.txt 의 Disallow 는 **기어다니는 것만** 막고 색인은 못 막는다 — 링크가 걸리면 내용을 안 읽은 채로도 주소가 검색에 선다. 데이터가 새는 건 아니다(관리 쓰기는 전부 isAdmin() 를 거친다) — 막는 것은 노출이다'),
     ('건너뛰기 첫 차례', 'py',   'tools/check-skip-link-first.py',

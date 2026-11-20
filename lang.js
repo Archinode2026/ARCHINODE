@@ -32,8 +32,28 @@
       .filter(function(l) { return LANG_LABELS[l]; });
   }
 
+  /* A-650(2026-11-21): 주소에서 언어를 읽는다 — **없어서 유입이 새던 자리**.
+
+     전에는 언어가 `localStorage` 에만 있었다. 그래서:
+       · 승리님이 영문 화면 링크를 보내도 받는 사람은 **자기 저장값대로** 봤다
+       · 구글로 들어온 유럽 브랜드는 한국어 메뉴를 보고 자기 입구를 못 찾았다
+     주소가 상태를 들고 있지 않으면 **공유·북마크·검색 결과가 전부 어긋난다.**
+     `?lang=en` 을 0단계로 둔다 — 사용자가 고른 값보다도 앞이다. 링크를 누른
+     것 자체가 그 언어로 보겠다는 뜻이기 때문이다. */
+  function langFromUrl() {
+    try {
+      var m = /[?&]lang=([a-z-]{2,10})/i.exec(window.location.search || '');
+      if (!m) return null;
+      var v = String(m[1]).toLowerCase().split('-')[0];
+      return (availableLangs.indexOf(v) !== -1) ? v : null;
+    } catch (e) { return null; }
+  }
+
   function pickInitialLang() {
-    // 1. 사용자가 명시적으로 토글한 선택 — 항상 최우선
+    // 0. 주소에 실린 언어 — 공유된 링크가 보낸 사람이 본 화면을 그대로 보여준다
+    var fromUrl = langFromUrl();
+    if (fromUrl) return fromUrl;
+    // 1. 사용자가 명시적으로 토글한 선택
     var saved = null;
     try { saved = localStorage.getItem('archinode-lang'); } catch(e){}
     if (saved && availableLangs.indexOf(saved) !== -1) return saved;
@@ -245,11 +265,35 @@
   }
   window.archinodeLang = function() { return currentLang; };
 
+  /* A-650: 지금 보는 언어를 주소에 적는다. **한국어는 주소를 깨끗하게 둔다** —
+     이 사이트의 기본이 한국어이고(쪽 232개가 lang="ko", canonical 에도 물음표가
+     없다), 공유가 필요한 쪽은 영어다. 그래서 en 일 때만 `?lang=en` 을 붙이고
+     ko 로 돌아오면 떼어낸다. canonical 은 물음표 없는 주소를 가리키므로
+     검색 쪽 중복 걱정도 없다.
+     pushState 가 아니라 **replaceState** 다 — 언어 토글이 뒤로가기 역사를
+     쌓으면 손님이 뒤로 눌러도 안 나가진다. */
+  function syncLangToUrl(lang) {
+    try {
+      if (!window.history || !window.history.replaceState) return;
+      var u = new URL(window.location.href);
+      if (lang === 'ko') {
+        if (!u.searchParams.has('lang')) return;
+        u.searchParams.delete('lang');
+      } else {
+        if (u.searchParams.get('lang') === lang) return;
+        u.searchParams.set('lang', lang);
+      }
+      var q = u.searchParams.toString();
+      window.history.replaceState(null, '', u.pathname + (q ? '?' + q : '') + u.hash);
+    } catch (e) { /* URL 을 못 만드는 옛 브라우저 — 주소만 안 바뀐다 */ }
+  }
+
   window.setLang = function(lang, e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     if (availableLangs.indexOf(lang) === -1) return;
     currentLang = lang;
     try { localStorage.setItem('archinode-lang', lang); } catch(err){}
+    syncLangToUrl(lang);                 // A-650 — 주소가 화면을 따라가게
     applyLanguage(lang);
     updateLangButton(lang);
     broadcastLang(lang);                 // A-259
