@@ -495,9 +495,8 @@ a { text-decoration: none; color: inherit; }
       <a href="trend-report.html" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</a>
       <a href="magazine.html" data-en="Korean Articles" data-ko="매거진">Korean Articles</a>
       <a href="about.html" data-en="About" data-ko="소개">About</a>
-      <a href="for-brands.html" data-lang-only="en" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
-      <a href="sourcing-inquiry.html" class="nav-cta" data-lang-only="ko" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
-      <a href="list-your-brand.html" class="nav-cta" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
+      <a href="for-brands.html" class="nav-gate" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
+      <a href="sourcing-inquiry.html" class="nav-cta" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
     </nav>
     <div class="header-actions">
       <a href="auth/login.html" style="font-size:0.82rem;color:var(--accent-ink);font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
@@ -835,6 +834,37 @@ a { text-decoration: none; color: inherit; }
 </section>
 
 <!-- CONSULTING CTA -->
+<!-- A-649: index.html 에서 옮겨 왔다. 브랜드 유료 서비스라 게이트 안이 제자리다.
+     전에는 index 의 같은 격자가 영어에서는 이 4장을, 한국어에서는 바이어 서비스
+     4장을 보여 주었다(A-344) — 한 슬롯이 언어로 대상을 가르던 자리다. -->
+<section class="services" id="brand-services">
+  <div class="container">
+    <h2 class="section-title fade-in" data-en="Brand Services" data-ko="브랜드 서비스">Brand Services</h2>
+    <div class="services-grid">
+      <div class="service-item fade-in">
+        <i class="fas fa-handshake"></i>
+        <h3 data-en="Dealership Screening">Dealership Screening</h3>
+        <p data-en="We verify and evaluate potential Korean dealers on behalf of global brands.">We verify and evaluate potential Korean dealers on behalf of global brands.</p>
+      </div>
+      <div class="service-item fade-in">
+        <i class="fas fa-eye"></i>
+        <h3 data-en="Dealer Monitoring">Dealer Monitoring</h3>
+        <p data-en="Ongoing compliance monitoring for dealership agreements in Korea.">Ongoing compliance monitoring for dealership agreements in Korea.</p>
+      </div>
+      <div class="service-item fade-in">
+        <i class="fas fa-calendar-check"></i>
+        <h3 data-en="Korean Certification Support" data-ko="한국 인증 지원">Korean Certification Support</h3>
+        <p data-en="Guidance on Korean product certifications — KC mark, KS standards, eco-labels. We help you identify required certifications, connect with accredited testing labs, and prepare documentation." data-ko="한국 시장 진출에 필요한 인증을 지원합니다 — KC인증, KS규격, 환경표지. 필요한 인증 안내, 공인 인증기관 연결, 서류 준비 지원.">Guidance on Korean product certifications — KC mark, KS standards, eco-labels. We help you identify required certifications, connect with accredited testing labs, and prepare documentation.</p>
+      </div>
+      <div class="service-item fade-in">
+        <i class="fas fa-trophy"></i>
+        <h3 data-en="ARCHINODE Awards" data-ko="ARCHINODE 어워드">ARCHINODE Awards</h3>
+        <p data-en="Annual awards celebrating the best products across every category." data-ko="매년 각 카테고리 최고의 제품을 선정하는 어워드 프로그램입니다.">Annual awards celebrating the best products across every category.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section style="background:#332e27;color:#fdfbf7;padding:70px 24px;text-align:center;">
   <div style="max-width:760px;margin:0 auto;">
     <div style="display:inline-block;font-size:0.7rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent-on-dark);margin-bottom:14px;" data-en="ARCHINODE Consulting" data-ko="ARCHINODE 컨설팅">ARCHINODE Consulting</div>
@@ -888,7 +918,7 @@ a { text-decoration: none; color: inherit; }
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
           <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
                이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
-          <li data-lang-only="en">
+          <li>
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
               <ul>

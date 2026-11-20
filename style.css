@@ -131,6 +131,22 @@ input, select, textarea { font-family: inherit; }
 }
 .main-nav > a:hover { color: var(--black); }
 .main-nav > a.active-nav { color: var(--black); font-weight: 700; }
+/* ── A-649: 브랜드 게이트 문 ──
+   전에는 머리글의 nav-cta 슬롯 하나가 **언어에 따라 대상을 갈랐다** — 영어면
+   「List Your Brand」, 한국어면 「자재 소싱 문의」. 그래서 영어를 읽는 한국
+   스펙라이터는 브랜드용 메뉴를 봤고, 한국어로 보는 유럽 브랜드는 자기 입구를
+   잃었다. 언어는 언어만 하게 두고, 대상은 **문**으로 가른다.
+   문은 버튼이 아니라 조용한 글자 링크다 — 손님의 다수는 바이어이고 브랜드는
+   찾아오는 쪽이므로, 버튼 두 개가 나란히 설 자리가 아니다. */
+.nav-gate {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid transparent;
+}
+.nav-gate:hover { color: var(--accent-ink); border-bottom-color: currentColor; }
+.nav-gate:focus-visible { border-bottom-color: transparent; }
+
 .nav-cta {
   background: var(--black) !important;
   color: var(--white) !important;
