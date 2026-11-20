@@ -42,7 +42,12 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 /* TOPBAR */
 .topbar { background: var(--black); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
 .topbar .logo { color: var(--white); font-size: 1.1rem; font-weight: 700; text-decoration: none; }
-.topbar .logo span { color: var(--navy-gold); font-size: 0.7rem; font-weight: 600; margin-left: 8px; background: rgba(201,163,106,0.15); padding: 2px 8px; border-radius: 3px; }
+/* A-652(2026-11-21): 글자색 `--navy-gold`(#c9a36a) 는 A-454 가 #332e27 기준
+   5.77:1 로 검증한 색이다. 그런데 이 배지가 **자기 배경에 금색 15% 를 깔아**
+   실효 배경을 #4a4031 로 밝혀서 4.35:1 이 됐다 — 색이 틀린 게 아니라
+   검증된 배경을 바꾼 것이다(A-206 과 같은 모양). 틴트를 10% 로 낮추고
+   테두리로 칩 모양을 지킨다 → 4.78:1. */
+.topbar .logo span { color: var(--navy-gold); font-size: 0.7rem; font-weight: 600; margin-left: 8px; background: rgba(201,163,106,0.10); border: 1px solid rgba(201,163,106,0.35); padding: 2px 8px; border-radius: 3px; }
 .topbar .right { display: flex; align-items: center; gap: 16px; }
 .topbar .admin-email { color: var(--gray-400); font-size: 0.8rem; }
 .topbar .logout-btn { background: none; border: 1px solid var(--gray-400); color: var(--gray-400); padding: 6px 14px; border-radius: 4px; font-size: 0.78rem; cursor: pointer; font-family: inherit; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }

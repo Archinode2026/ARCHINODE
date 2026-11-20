@@ -3,6 +3,13 @@
 <head>
     <meta name="description" content="ARCHINODE Privacy Policy (English)">
 <meta charset="UTF-8">
+<!-- A-652(2026-11-21): 이 쪽만 style.css 를 안 읽어(A-327) 상호가 Lora 가 아니라
+     시스템 서체(-apple-system) 24px 로 떴다. 나머지 233쪽과 다른 상호였다.
+     CSP 는 이미 fonts.googleapis.com(style-src)·fonts.gstatic.com(font-src) 을
+     허용하므로 CSP 는 건드리지 않는다. 상호 한 곳에만 필요하니 Lora 700 만 받는다. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
 <link rel="canonical" href="https://archinodekr.com/privacy-en.html">
 <link rel="alternate" hreflang="ko" href="https://archinodekr.com/privacy.html">
 <link rel="alternate" hreflang="en" href="https://archinodekr.com/privacy-en.html">
@@ -103,7 +110,10 @@
         }
 
         .logo {
-            font-size: 24px;
+            /* A-652: 서체·크기를 나머지 233쪽(style.css:2871, :2956)과 맞춘다 */
+            font-family: 'Lora', 'Noto Serif KR', Georgia, serif;
+            font-size: 1.16rem;
+            letter-spacing: 0.1em;
             font-weight: 700;
             color: #332e27;
             text-decoration: none;
@@ -458,7 +468,10 @@
         }
 
         .footer-copyright {
-            color: #666;
+            /* A-652: #666 은 이 쪽 꼬리말(#332e27) 위에서 **2.34:1** 이었다.
+               이 쪽은 style.css 를 안 읽어 토큰이 없으므로 값을 직접 쓴다.
+               #a89f93 = 5.15:1 (--gray-400 #b5ab9b 보다 한 단 조용하다) */
+            color: #a89f93;
             font-size: 12px;
         }
 
