@@ -527,7 +527,20 @@
              autocomplete="email">
       <button type="submit" data-en="Notify Me" data-ko="알림 신청">Notify Me</button>
     </form>
-    <div role="status" aria-live="polite" aria-atomic="true" class="dp-notify-msg" id="notifyMsg" data-en="Thanks — we'll send a single email when the first product launches." data-ko="감사합니다 — 첫 상품 출시 시 1회 알림 메일을 보내드립니다.">Thanks — we'll send a single email when the first product launches.</div>
+          <!-- A-656(2026-11-21): A-521 이 정한 모양을 이 쪽에만 안 쓰고 있었다 —
+           「뉴스레터는 이메일 한 칸뿐이라 체크박스 대신 **안내와 링크**만 둔다」(승리님 결정).
+           이메일 한 칸만 받는 폼 여섯 중 다섯(index·magazine·trend-report·sourcing-inquiry·
+           brands/view)은 폼 옆에 안내문 + 처리방침 링크를 달고 있는데, 이 쪽은 쓰임새를
+           **윗 문단 산문**으로만 말하고 링크가 없었다. 꼬리말 링크는 있지만 폼 옆이 아니다.
+           보관 기간과 철회 방법은 처리방침에 있으므로, 링크가 없으면 안내가 반쪽이다.
+           새 결정이 아니라 A-521 을 이 쪽에 적용하는 것이다.
+           ★ 처음에 「보낸 뒤 삭제합니다」로 썼다가 고쳤다 — `submitNotify` 는 이메일을
+             `digital-products-notify` 컬렉션에 쓰고 **지우는 코드가 없다.** 고지문은
+             코드가 하는 일을 적어야 한다. 처리방침 제5조의 「구독 해지 시까지 보유」와
+             같은 뜻으로 맞췄다. -->
+      <p class="newsletter-consent" data-en="We use your email only to send this launch notification, and keep it until you ask us to stop." data-ko="이메일은 출시 알림을 보내는 데만 쓰고, 받지 않겠다고 알려 주실 때까지 보관합니다.">이메일은 출시 알림을 보내는 데만 쓰고, 받지 않겠다고 알려 주실 때까지 보관합니다.</p>
+      <p class="newsletter-consent"><a href="privacy.html" data-en-href="privacy-en.html" data-ko-href="privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a></p>
+      <div role="status" aria-live="polite" aria-atomic="true" class="dp-notify-msg" id="notifyMsg" data-en="Thanks — we'll send a single email when the first product launches." data-ko="감사합니다 — 첫 상품 출시 시 1회 알림 메일을 보내드립니다.">Thanks — we'll send a single email when the first product launches.</div>
   </div>
 </section>
 
