@@ -41,7 +41,45 @@ from playwright.sync_api import sync_playwright
 import os
 # 저장소 루트. 환경변수 ARCHINODE_ROOT 로 덮어쓸 수 있다.
 SRC = os.environ.get('ARCHINODE_ROOT') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PAGES = sys.argv[1:] or ['index.html']
+def _default_pages():
+    """A-659: 기본 표본이 `['index.html']` **한 쪽**이었다(248쪽 중 1쪽).
+    A-657 에서 초점 고리 검사기를 같은 이유로 고쳤고, 거기서는 **쪽의 18%만
+    재고 「통과」**라고 말하고 있었다. 호버는 쪽마다 20~40초가 걸려 전수는
+    현실적이지 않으니, **고르는 기준을 코드에 적는다**:
+      ㄱ) 쪽 단위 `<style>` 에 **색을 바꾸는** `:hover` 규칙이 있는 쪽
+          (transform·shadow 만 바꾸는 호버는 대비와 무관하므로 세지 않는다)
+      ㄴ) `style.css` 를 안 싣는 쪽 (공용 호버 규칙이 아예 없을 수 있다)
+      ㄷ) 폴더마다 대표 한 쪽
+    하드코딩 목록은 「왜 이 표본인가」에 답하지 못한다.
+    """
+    import glob, os as _os
+    root = _os.environ.get('ARCHINODE_ROOT') or _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+    def _strip(t):
+        t = re.sub(r'<!--.*?-->', '', t, flags=re.S)
+        return re.sub(r'/\*.*?\*/', '', t, flags=re.S)
+    risky, by_dir = [], {}
+    for q in sorted(glob.glob(_os.path.join(root, '**', '*.html'), recursive=True)):
+        rel = _os.path.relpath(q, root).replace(_os.sep, '/')
+        if rel.startswith('previews/'):
+            continue
+        try:
+            raw = _strip(open(q, encoding='utf-8', errors='replace').read())
+        except OSError:
+            continue
+        css = '\n'.join(m.group(1) for m in re.finditer(r'<style[^>]*>(.*?)</style>', raw, re.S))
+        hov = re.findall(r'([^{}]*:hover[^{}]*)\{([^}]*)\}', css)
+        color_hov = [1 for _sel, body in hov
+                     if re.search(r'(?:^|[;{\s])(?:color|background(?:-color)?|border-color)\s*:', body)]
+        has_sc = bool(re.search(r"""href\s*=\s*['"][^'"]*style\.css""", raw))
+        if color_hov or not has_sc:
+            risky.append(rel)
+        else:
+            d = rel.split('/')[0] if '/' in rel else '.'
+            by_dir.setdefault(d, rel)
+    return risky + [v for v in by_dir.values() if v not in risky]
+
+
+PAGES = sys.argv[1:] or _default_pages()
 
 def revealable_classes(css_path):
     """평소 display:none 인데 .active/:hover 로 드러나는 클래스를 style.css 에서 뽑는다.

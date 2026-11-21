@@ -59,6 +59,12 @@ PAGES = [
     'list-your-brand.html', 'magazine.html', 'trend-report.html', 'request-consultation.html',
     'digital-products.html', 'brand-guide.html', 'submit-trend.html',
     'brands/view.html', 'products/view.html', 'magazine/view.html',
+    # A-659(2026-11-21): 이 목록에 **privacy-en.html 이 없었다.** 쪽 단위 `@media` 가
+    #   6개인데(자체 반응형 CSS — 이 쪽만 style.css 를 안 싣는다, A-327) 좁은 폭을
+    #   한 번도 재 본 적이 없었다. 재 보니 320·360·390px 전부 통과였다 —
+    #   **구멍은 진짜였고 결함은 아직 없었다.** 목록에 넣어 앞으로도 보게 한다.
+    #   (목록에 없는데 쪽 단위 @media 가 3개 이상인 쪽은 전수에서 이 하나뿐이었다)
+    'privacy-en.html',
     'auth/login.html', 'auth/signup.html', 'auth/profile.html', 'auth/reset-password.html',
     'admin/dashboard.html', 'admin/articles.html', 'brand-portal/dashboard.html',
 ]
