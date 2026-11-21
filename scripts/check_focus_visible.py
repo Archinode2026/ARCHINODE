@@ -35,7 +35,45 @@ import sys
 from playwright.sync_api import sync_playwright
 
 SRC = os.environ.get('ARCHINODE_ROOT') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PAGES = sys.argv[1:] or ['index.html']
+def _default_pages(root):
+    """A-657: 기본 표본이 `['index.html']` **한 쪽**이었다. 248쪽 중 1쪽이다.
+    쪽마다 20~40초가 걸려 전수는 현실적이지 않으니, **위험한 쪽을 골라낸다**:
+      ㄱ) 쪽 단위 <style> 이 :focus / :focus-visible / outline 을 건드리는 쪽
+      ㄴ) style.css 를 안 싣는 쪽(두 겹 고리가 아예 없을 수 있다)
+      ㄷ) 폴더마다 대표 한 쪽 (같은 판으로 찍힌 쪽들을 한 번은 본다)
+    고르는 기준을 **코드에 적어 두는 것**이 요점이다 — 누가 왜 이 표본인지
+    물을 수 있어야 한다. 하드코딩한 목록은 그 물음에 답하지 못한다.
+    """
+    import glob as _g
+    def _strip(t):
+        t = re.sub(r'<!--.*?-->', '', t, flags=re.S)
+        return re.sub(r'/\*.*?\*/', '', t, flags=re.S)
+    risky, by_dir = [], {}
+    all_pages = sorted(os.path.relpath(q, root).replace(os.sep, '/')
+                       for q in _g.glob(os.path.join(root, '**', '*.html'), recursive=True))
+    for rel in all_pages:
+        if rel.startswith('previews/'):
+            continue
+        try:
+            raw = _strip(open(os.path.join(root, rel), encoding='utf-8', errors='replace').read())
+        except OSError:
+            continue
+        focusable = len(re.findall(r'<(?:a\b[^>]*href|button|input|select|textarea)', raw))
+        if not focusable:
+            continue
+        css = '\n'.join(m.group(1) for m in re.finditer(r'<style[^>]*>(.*?)</style>', raw, re.S))
+        has_sc = bool(re.search(r"""href\s*=\s*['"][^'"]*style\.css""", raw))
+        if re.search(r':focus(?:-visible)?|outline\s*:', css) or not has_sc:
+            risky.append(rel)
+        else:
+            d = rel.split('/')[0] if '/' in rel else '.'
+            by_dir.setdefault(d, rel)
+    return risky + [v for v in by_dir.values() if v not in risky]
+
+
+PAGES = sys.argv[1:] or _default_pages(SRC)
+# A-657: 70 고정이면 초점 갈 자리가 107개인 쪽(index.html)을 다 못 돈다.
+#        쪽마다 실제 개수를 세어 그보다 넉넉히 돈다(아래 tab_budget).
 MAX_TABS = int(os.environ.get('ARCHINODE_MAX_TABS', '70'))
 NEED = 3.0          # WCAG 1.4.11 비텍스트 대비
 PNG = bytes.fromhex('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489'
@@ -187,6 +225,7 @@ def run(pages):
             return r.fulfill(status=204, body='')
         ctx.route('**/*', route)
 
+        coverage = []
         for f in pages:
             pg = ctx.new_page()
             pg.goto('file://' + SRC + '/' + f, wait_until='load', timeout=20000)
@@ -209,7 +248,12 @@ def run(pages):
             bad = []
             stops = 0
             seen = set()
-            for _ in range(MAX_TABS):
+            # A-657: 이 쪽의 초점 갈 자리를 세어 예산을 잡는다(+8 여유)
+            tab_budget = pg.evaluate(
+                "() => document.querySelectorAll('a[href],button,input,select,textarea,"
+                "[tabindex]:not([tabindex=\\\"-1\\\"])').length") + 8
+            tab_budget = max(MAX_TABS, min(tab_budget, 400))
+            for _ in range(tab_budget):
                 pg.keyboard.press('Tab')
                 # 전환(transition)보다 길게 기다린다. `.hero-dot` 은 `transition: all 0.3s`
                 # 라서 55ms 에 재면 **중간색**을 읽는다 — 2026-11-18 에 내가 그렇게 재서
@@ -219,10 +263,20 @@ def run(pages):
                 pg.wait_for_timeout(420)
                 el = pg.evaluate_handle("() => document.activeElement")
                 try:
+                    # ★ A-657: 열쇠를 **요소 자체**로 만든다.
+                    #   전에는 `태그#id.class|글자18자` 였다. 그런데 히어로 점 10개는
+                    #   id 도 글자도 없어서 **열 개가 같은 열쇠**였고, 두 번째 점에서
+                    #   「한 바퀴 돌았다」로 읽고 `break` 했다 — index.html 의 초점 갈
+                    #   자리 107개 중 **16개만 재고 「통과」**라고 말했다.
+                    #   위에서 모든 초점 요소에 `data-archi-fidx` 를 박아 뒀으니
+                    #   그걸 쓰면 같은 요소로 돌아온 것만 한 바퀴다.
                     key = pg.evaluate(
-                        "(e) => e ? (e.tagName + '#' + (e.id||'') + '.' + "
-                        "(typeof e.className === 'string' ? e.className : '') + '|' + "
-                        "((e.innerText||e.value||'').slice(0,18))) : 'none'", el)
+                        "(e) => { if (!e) return 'none';"
+                        " const ix = e.dataset ? e.dataset.archiFidx : undefined;"
+                        " const base = e.tagName + '#' + (e.id||'') + '.' +"
+                        "   (typeof e.className === 'string' ? e.className : '');"
+                        " return (ix !== undefined && ix !== '') ? ('ix:' + ix + '|' + base)"
+                        "   : (base + '|' + ((e.innerText||e.value||'').slice(0,18))); }", el)
                 except Exception:
                     break
                 if key == 'none' or key.startswith('BODY#') or key.startswith('HTML#'):
@@ -252,6 +306,30 @@ def run(pages):
             total_bad += len(bad)
             print('%-42s 정거장 %2d개 · 안 보이는 고리 %d건' % (f[:40], stops, len(bad)))
             shown = set()
+            # A-657: 몇 개를 **못 쟀는지**도 센다. 로그인이 필요한 쪽은
+            #   화면이 「Loading…」에서 멈춰 초점 요소의 대부분이 DOM 에 없다.
+            #   brand-portal/dashboard.html 은 초점 요소 86개 중 **4개**만
+            #   잴 수 있었다. 이걸 적지 않고 「통과」라고만 하면, 안 잰 82개가
+            #   통과한 것처럼 읽힌다 — 오늘 하루 그 실수를 네 번 봤다.
+            # 셋을 따로 센다 — 안 쟀다고 다 같은 까닭이 아니다.
+            #   dom     : DOM 에 있는 초점 요소
+            #   tabbable: 그중 **실제로 Tab 차례에 드는 것**(화면에 있고 숨지 않은 것)
+            #   stops   : 내가 실제로 멈춘 자리
+            # magazine.html 은 dom 189 · tabbable 64 였다 — 「더 보기」로 125개가
+            # `display:none` 이어서다. 숨은 칸이 Tab 차례에 없는 건 **정상**이다.
+            # 반대로 로그인 쪽은 dom 자체가 작다(화면이 Loading 에서 멈춘다).
+            cnt = pg.evaluate("""() => {
+              const sel = 'a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])';
+              const all = [...document.querySelectorAll(sel)];
+              const tab = all.filter(e => {
+                const c = getComputedStyle(e);
+                if (c.display === 'none' || c.visibility === 'hidden') return false;
+                if (e.disabled) return false;
+                return !!(e.offsetParent || c.position === 'fixed');
+              });
+              return {dom: all.length, tab: tab.length};
+            }""")
+            coverage.append((f, stops, cnt['dom'], cnt['tab']))
             for m in bad:
                 k = (m['outline'], m['halo'], m['bg'])
                 if k in shown:
@@ -277,13 +355,41 @@ def run(pages):
             print('     %s <%s%s> "%s"  초점 %s ← 뗀 뒤 %s'
                   % (f, m['tag'], ('.' + m['cls']) if m['cls'] else '', m['text'], mv[0], mv[1]))
 
+    # ── A-657: 못 쟀으면 못 쟀다고 적는다. 그리고 **까닭을 단정하지 않는다** ──
+    #   처음 쓴 판은 「로그인이 필요한 쪽은…」이라고 까닭을 박아 놨는데,
+    #   magazine.html 은 로그인 쪽이 아니라 「더 보기」로 125개가 숨은 것이었다.
+    #   재지도 않은 까닭을 적으면 그 줄이 틀린 말을 한다. 그래서 숫자로 가른다.
+    missed = [c for c in coverage if c[3] and c[1] < c[3] * 0.8]        # Tab 차례인데 못 쟀다
+    gated  = [c for c in coverage if c[2] and c[3] < c[2] * 0.5]        # DOM 에 있는데 Tab 차례가 아니다
+    if missed:
+        print('')
+        print('  ※ **덜 쟀다** — Tab 차례에 드는 자리인데 내가 못 멈춘 곳이 있다.')
+        print('     검사기 쪽 문제일 수 있다(한 바퀴 판정, 예산 상한 등). 봐야 한다.')
+        for f, st, dom, tab in missed:
+            print('       %-38s Tab 차례 %3d개 중 %3d개만 쟀다' % (f, tab, st))
+    if gated:
+        print('')
+        print('  ※ **Tab 차례에 안 드는 자리가 많다** — 아래 쪽들은 DOM 에 있는 초점 요소의')
+        print('     절반 이상이 숨어 있다. 두 가지 중 하나이고, 숫자만으로는 못 가른다:')
+        print('       ㄱ) 「더 보기」·접힌 메뉴처럼 **원래 숨어 있는 것** (정상)')
+        print('       ㄴ) 로그인이 필요해 화면이 「Loading…」에서 멈춘 것')
+        print('     ㄴ이면 저는 로그인하지 않으므로(규칙) **승리님만 확인할 수 있습니다** —')
+        print('     로그인한 채로 Tab 을 눌러 고리가 보이는지 봐 주세요.')
+        for f, st, dom, tab in gated:
+            print('       %-38s DOM %3d개 · Tab 차례 %3d개 · 쟀 %3d개' % (f, dom, tab, st))
+    thin = missed or gated
+
     if total_stops == 0:
         print('결과: 실패 — 초점이 간 자리가 0개다. 센 것이 없으면 통과가 아니다 (A-433 · A-443).')
         return 1
     if total_bad:
         print('결과: 실패 — 키보드로 쓰는 사람이 지금 어디 있는지 모르는 자리 %d건' % total_bad)
         return 1
-    print('결과: 통과 (초점 정거장 %d개 측정 · 전부 3:1 이상)' % total_stops)
+    if thin:
+        print('결과: 통과(쟀 자리만) — 정거장 %d개 전부 3:1 이상. 다만 위 %d쪽은 덜 쟀다.'
+              % (total_stops, len(thin)))
+    else:
+        print('결과: 통과 (초점 정거장 %d개 측정 · 전부 3:1 이상)' % total_stops)
     return 0
 
 
