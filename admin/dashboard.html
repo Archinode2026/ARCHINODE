@@ -168,6 +168,21 @@ tr:hover { background: var(--gray-50); }
     .topbar .right > * { white-space: nowrap; }
     .topbar .admin-email { max-width: 60vw; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* ── 한국 수요 리포트 (2026-11-23) ─────────────────────────────────────── */
+.dmd-top { display:flex; align-items:baseline; gap:18px; flex-wrap:wrap; margin:4px 0 18px; }
+.dmd-big { display:flex; align-items:baseline; gap:10px; }
+.dmd-big b { font-size:2.1rem; font-weight:700; line-height:1; color:#332e27; }
+.dmd-big span { font-size:0.84rem; color:#6b6459; }
+.dmd-note { font-size:0.78rem; color:#7a7164; }
+.dmd-row { display:flex; align-items:center; gap:10px; padding:3px 0; font-size:0.86rem; }
+.dmd-k { flex:0 0 120px; color:#332e27; }
+.dmd-bar { flex:1 1 auto; height:9px; background:#ede7dc; border-radius:5px; overflow:hidden; }
+.dmd-bar i { display:block; height:100%; background:#a07c4a; }
+.dmd-n { flex:0 0 76px; text-align:right; color:#332e27; font-variant-numeric:tabular-nums; }
+.dmd-n small { color:#7a7164; font-size:0.76rem; }
+.dmd-ex { margin:6px 0 0 18px; font-size:0.84rem; color:#5d564c; }
+@media (max-width: 600px) { .dmd-k { flex-basis:92px; } .dmd-n { flex-basis:62px; } }
 </style>
 </head>
 <body>
@@ -241,6 +256,12 @@ tr:hover { background: var(--gray-50); }
     <div class="tab-content" id="tab-regulations"></div>
     <!-- VIEW: LEAD INBOX (4a단계 — view-leads.js 가 그린다) -->
     <div class="tab-content" id="tab-leads"></div>
+    <!-- VIEW: KOREAN DEMAND (2026-11-23 — view-demand.js 가 그린다)
+         정본: docs/설계/수요증거-2026-11-23.md
+         이미 받고 있는 leads 를 **읽기만** 한다 — 새 수집 없음, 처리방침·규칙 무변경.
+         집계는 dmd_aggregate() 순수 함수에 있고 tools/test-demand-aggregate.js 가 검증한다
+         (이 화면은 로그인이 있어야 열려서 사람이 아니면 눈으로 못 본다). -->
+    <div class="tab-content" id="tab-demand"></div>
     <!-- VIEW: PROFESSIONAL MEMBERS (6단계 — view-users.js 가 그린다, 읽기 전용) -->
     <div class="tab-content" id="tab-users"></div>
     <!-- VIEW: NOTICES (5단계 — view-notices.js 가 그린다) -->
@@ -380,6 +401,7 @@ tr:hover { background: var(--gray-50); }
 <script src="js/view-settings.js?v=20261105c"></script>
 <script src="js/view-regulations.js?v=20261104g"></script>
 <script src="js/view-leads.js?v=20261104g"></script>
+<script src="js/view-demand.js?v=20261123a"></script>
 <script src="js/view-users.js?v=20261104g"></script>
 <script src="js/view-notices.js?v=20261104g"></script>
 <script src="js/view-inquiries.js?v=20261104g"></script>
