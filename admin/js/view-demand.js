@@ -246,9 +246,16 @@ var DMD_CAT_KO = {
     kitchen: '주방', office: '오피스', finishes: '마감재', wellness: '웰니스',
     decor: '데코', construction: '건축자재'
 };
+/* A-670(2026-11-24): 이 지도가 공개 폼의 어휘와 **달랐다** — distributor·contractor
+   를 갖고 있고 landscape·furniture·construction 이 없었다. 그 세 값이 들어오면
+   화면에 영문 키가 그대로 뜬다. 하나의 어휘는 세 곳에 같은 값으로 있어야 한다:
+   `auth/signup.html` 의 #signupIndustry · `admin/js/view-leads.js` 의
+   LEAD_INDUSTRIES · 그리고 여기. A-498 이 말한 것과 같은 규칙이다 —
+   **공개 폼의 값과 어드민의 이름표는 함께 고친다.** */
 var DMD_IND_KO = {
-    architect: '건축사', interior: '인테리어', dealer: '딜러', distributor: '유통',
-    contractor: '시공', developer: '시행', student: '학생', other: '기타'
+    architect: '건축', interior: '인테리어 디자인', landscape: '조경',
+    furniture: '가구 디자인', construction: '건설', dealer: '딜러 / 유통',
+    developer: '부동산 개발', student: '학생', other: '기타'
 };
 var DMD_SRC_KO = {
     'sourcing-page': '소싱 문의', 'brand-page': '브랜드 쪽', 'product-page': '제품 쪽',
@@ -388,7 +395,12 @@ function dmd_draw() {
       (a.unknownCategory ? '<p class="adm-empty">' + escapeHtml(t('category unknown: ' + a.unknownCategory,
           '품목 미상: ' + a.unknownCategory)) + '</p>' : '') +
       '<h3>' + escapeHtml(t('Who asked', '묻는 사람')) + '</h3>' +
-      /* A-666(2026-11-23): 공개 폼 세 곳이 industry 를 빈 문자열로 담는다
+      /* A-670(2026-11-24): 이제 **받는다** — 공개 폼 세 곳에 업종 선택 칸을 넣고
+         처리방침 제3조도 같은 커밋으로 고쳤다(승리님 결정: 선택 칸).
+         그래서 이 자리의 문구가 바뀌었다. A-666 때는 「아예 안 받는다」였는데
+         지금은 「아직 아무도 답하지 않았다」다 — 둘은 다른 말이고, 화면이
+         그걸 섞으면 우리가 수요를 잘못 읽는다.
+         옛 주석(A-666): 공개 폼 세 곳이 industry 를 빈 문자열로 담는다
          (brands/view.html 1061 · products/view.html 1131 · sourcing-inquiry.html 516).
          그래서 이 집계는 구조적으로 빈다 — 「미기재」가 아니라 **아예 안 받는다**다.
          전에는 「직군 미기재: N」만 떠서 손님이 답을 안 한 것처럼 읽혔다. 그 말을 믿고
@@ -397,8 +409,8 @@ function dmd_draw() {
          회원가입에만 있다. 승리님과 변호사 몫이다. */
       (Object.keys(a.byIndustry).length === 0
         ? '<p class="adm-empty">' + escapeHtml(t(
-              'Not collected — the public forms do not ask for industry. Adding that field needs a privacy-policy change first.',
-              '받지 않는 값입니다 — 공개 폼이 업종을 묻지 않습니다. 칸을 더하려면 처리방침 제3조(수집 항목)를 먼저 고쳐야 합니다.')) + '</p>'
+              'Nobody has answered yet. The field is optional, so it fills in only as people choose to say.',
+              '아직 아무도 답하지 않았습니다. 선택 칸이라 답해 주신 분만큼만 채워집니다.')) + '</p>'
         : dmd_barRows(dmd_rank(a.byIndustry), a.total, DMD_IND_KO) +
           (a.unknownIndustry ? '<p class="adm-empty">' + escapeHtml(t('not stated: ' + a.unknownIndustry,
               '직군 미기재: ' + a.unknownIndustry)) + '</p>' : '')) +

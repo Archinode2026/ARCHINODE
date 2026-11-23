@@ -171,6 +171,22 @@
           <input type="text" id="srcCompany" maxlength="200" autocomplete="organization" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
         </div>
         <div>
+          <!-- A-670 — 검수대장 -->
+          <label for="srcIndustry" style="display:block;font-size:0.85rem;color:#6b6459;margin-bottom:4px;" data-en="Your field (optional)" data-ko="업종 (선택)">Your field (optional)</label>
+          <select id="srcIndustry" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;background:#fff;">
+            <option value="" data-en="Prefer not to say" data-ko="밝히지 않음">Prefer not to say</option>
+            <option value="architect" data-en="Architecture" data-ko="건축">Architecture</option>
+            <option value="interior" data-en="Interior Design" data-ko="인테리어 디자인">Interior Design</option>
+            <option value="landscape" data-en="Landscape Architecture" data-ko="조경">Landscape Architecture</option>
+            <option value="furniture" data-en="Furniture Design" data-ko="가구 디자인">Furniture Design</option>
+            <option value="construction" data-en="Construction" data-ko="건설">Construction</option>
+            <option value="dealer" data-en="Dealer / Distributor" data-ko="딜러 / 유통">Dealer / Distributor</option>
+            <option value="developer" data-en="Real Estate Developer" data-ko="부동산 개발">Real Estate Developer</option>
+            <option value="student" data-en="Student" data-ko="학생">Student</option>
+            <option value="other" data-en="Other" data-ko="기타">Other</option>
+          </select>
+        </div>
+        <div>
           <label for="srcEmail" style="display:block;font-size:0.85rem;color:#6b6459;margin-bottom:4px;" data-en="Email *" data-ko="이메일 *">Email *</label>
           <input type="email" id="srcEmail" maxlength="254" required autocomplete="email" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:4px;font-size:1rem;font-family:inherit;">
         </div>
@@ -463,6 +479,7 @@ async function submitSourcing(e) {
 
   const name = document.getElementById('srcName').value.trim();
   const company = document.getElementById('srcCompany').value.trim();
+  const industry = document.getElementById('srcIndustry').value;
   const email = document.getElementById('srcEmail').value.trim();
   const category = document.getElementById('srcCategory').value;
   const message = document.getElementById('srcMessage').value.trim();
@@ -513,7 +530,7 @@ async function submitSourcing(e) {
       company: company,
       email: email,
       phone: '',
-      industry: '',
+      industry: industry,
       category: category,
       message: message,
       source: 'sourcing-page',

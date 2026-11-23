@@ -275,7 +275,8 @@
 .rfq-box .rfq-sub { color:var(--gray-700); font-size:0.85rem; margin-bottom:20px; }
 .rfq-field { margin-bottom:14px; }
 .rfq-field label { display:block; font-size:0.82rem; color:#666; margin-bottom:4px; }
-.rfq-field input, .rfq-field textarea { width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:5px; font-size:0.95rem; font-family:inherit; }
+.rfq-field select,
+        .rfq-field input, .rfq-field textarea { width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:5px; font-size:0.95rem; font-family:inherit; }
 .rfq-field textarea { resize:vertical; min-height:70px; }
 .rfq-submit { width:100%; padding:13px; background:#332e27; color:#fff; border:none; border-radius:5px; font-size:0.95rem; cursor:pointer; margin-top:6px; }
 .rfq-submit:disabled { opacity:0.6; cursor:not-allowed; }
@@ -382,6 +383,22 @@
         <div class="rfq-field">
           <label for="rfqCompany" data-en="Company" data-ko="회사명">Company</label>
           <input type="text" id="rfqCompany" maxlength="200" autocomplete="organization">
+        </div>
+        <div class="rfq-field">
+          <!-- A-670 — 검수대장 -->
+          <label for="rfqIndustry" data-en="Your field (optional)" data-ko="업종 (선택)">Your field (optional)</label>
+          <select id="rfqIndustry">
+            <option value="" data-en="Prefer not to say" data-ko="밝히지 않음">Prefer not to say</option>
+            <option value="architect" data-en="Architecture" data-ko="건축">Architecture</option>
+            <option value="interior" data-en="Interior Design" data-ko="인테리어 디자인">Interior Design</option>
+            <option value="landscape" data-en="Landscape Architecture" data-ko="조경">Landscape Architecture</option>
+            <option value="furniture" data-en="Furniture Design" data-ko="가구 디자인">Furniture Design</option>
+            <option value="construction" data-en="Construction" data-ko="건설">Construction</option>
+            <option value="dealer" data-en="Dealer / Distributor" data-ko="딜러 / 유통">Dealer / Distributor</option>
+            <option value="developer" data-en="Real Estate Developer" data-ko="부동산 개발">Real Estate Developer</option>
+            <option value="student" data-en="Student" data-ko="학생">Student</option>
+            <option value="other" data-en="Other" data-ko="기타">Other</option>
+          </select>
         </div>
         <div class="rfq-field">
           <label for="rfqEmail" data-en="Email" data-ko="이메일">Email</label>
@@ -1029,6 +1046,7 @@ async function submitRfq(e) {
 
     const name = document.getElementById('rfqName').value.trim();
     const company = document.getElementById('rfqCompany').value.trim();
+    const industry = document.getElementById('rfqIndustry').value;
     const email = document.getElementById('rfqEmail').value.trim();
     const message = document.getElementById('rfqMessage').value.trim();
 
@@ -1058,7 +1076,7 @@ async function submitRfq(e) {
             company: company,
             email: email,
             phone: '',
-            industry: '',
+            industry: industry,
             message: message,
             source: 'brand-page',
             // A-537: 동의한 사실을 남긴다. 받아 놓고 버리면 나중에 증명할 수 없다.
