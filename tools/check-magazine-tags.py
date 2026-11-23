@@ -17,6 +17,9 @@
    91편**이 한국어 화면에서 영문 이름을 보여 주고 있었다
 ⑤ 태그 성격에 맞는 **문(mg-door)** 이 달렸는가 (A-673). 안 달기로 한 39편에
    문이 생기는 것도 잡는다 — 그건 결정이지 실수가 아니다
+⑥ 태그의 **보이는 글자**가 국문인가 (A-678) — 103편이 영문 폴백이었다
+⑦ 문이 가리키는 **파일이 실제로 있는가** (A-678)
+⑧ 문의 `?topic=` 이 `request-consultation.html` 의 **허용 옵션**인가 (A-678)
 
 ②③ 은 2026-11-24 에 실제로 어긋나 있었다 — `Industry` 에 국문이 셋(산업·업계·
 업계 동향), `자재` 에 영문이 셋(Materials·Material·Finishes), `Trend`/`Trends`,
@@ -182,7 +185,52 @@ def main():
         if kh and h and kh.group(1) != h.group(1):
             probs.append('문 링크의 기본 href 가 국문 주소와 다르다: %s — 첫 그림에서 엉뚱한 데로 간다' % f)
 
-    print('매거진 태그·문 검사 (A-672 · A-673)')
+    # ⑥ 태그의 **보이는 글자**도 국문이어야 한다 (A-678, 브론즈 55차)
+    #    전에는 문 CTA 에만 「이 쪽은 lang="ko" 다」를 강제했고 class="tag" 는
+    #    두 속성 중 하나면 통과시켰다 — 그래서 **130편 중 103편이 영문 폴백**인
+    #    채로 통과했다. `lang.js` 가 DOMContentLoaded 에 다시 칠하므로 평소에는
+    #    안 보이지만, **JS 가 실패하면 그 글자가 남는다.** 같은 쪽·같은 lang 인데
+    #    한쪽만 강제하는 것은 기준을 반만 적용하는 것이다. 103편을 국문으로 맞췄다.
+    for f, v in sorted(art.items()):
+        if not v: continue
+        en, ko, vis = v
+        if vis and ko and vis != ko:
+            probs.append('태그의 보이는 글자가 국문이 아니다: %s — 「%s」 (국문 「%s」) · 이 쪽은 lang="ko" 다' % (f, vis, ko))
+
+    # ⑦ 문이 가리키는 **파일이 실제로 있는가** (A-678, 브론즈 55차)
+    #    전에는 주소를 없는 파일로 바꿔도 통과했다. 손으로 세 파일을 확인했을
+    #    뿐이고, 검사가 그걸 지키지 않았다.
+    ALLOWED_TOPICS = None
+    rc = os.path.join(ROOT, 'request-consultation.html')
+    if os.path.exists(rc):
+        s3 = read(rc)
+        m3 = re.search(r'id="category"[\s\S]*?</select>', s3)
+        if m3:
+            ALLOWED_TOPICS = set(v for v in re.findall(r'<option[^>]*value="([^"]*)"', m3.group(0)) if v)
+    for f, v in sorted(art.items()):
+        if not v: continue
+        s2 = strip_comments(read(os.path.join(ROOT, 'magazine', f)))
+        m = re.search(r'<a[^>]*class="mg-door-cta"[^>]*>', s2)
+        if not m: continue
+        for attr in ('href', 'data-ko-href', 'data-en-href'):
+            mm = re.search(r'(?:^|\s)' + attr + r'="([^"]*)"', m.group(0))
+            if not mm: continue
+            url = mm.group(1)
+            path, _, query = url.partition('?')
+            # 기사는 magazine/ 안에 있으므로 ../ 로 시작해야 한다
+            target = os.path.normpath(os.path.join(ROOT, 'magazine', path))
+            if not os.path.exists(target):
+                probs.append('문의 %s 가 없는 파일을 가리킨다: %s → %s' % (attr, f, url))
+                continue
+            # ⑧ ?topic= 값이 request-consultation 의 허용 옵션인가
+            if query and ALLOWED_TOPICS is not None:
+                for kv in query.split('&'):
+                    k, _, val = kv.partition('=')
+                    if k == 'topic' and val not in ALLOWED_TOPICS:
+                        probs.append('문의 ?topic= 가 허용 옵션이 아니다: %s → %s (허용: %s)'
+                                     % (f, val, ' · '.join(sorted(ALLOWED_TOPICS))))
+
+    print('매거진 태그·문 검사 (A-672 · A-673 · A-678)')
     print('  기사 %d편 · 카드 %d개 · 태그 %d종' % (len(art), len(card), len(en2ko)))
     inv = defaultdict(int)
     for v in art.values():

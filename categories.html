@@ -187,12 +187,19 @@
   line-height: 1.6;
   margin-bottom: 12px;
 }
-.category-card-meta {
+/* A-677(2026-11-24): 이 색이 어두운 카드 위에서 **3.43:1** 이었다(기준 4.5).
+     「N개 세부 분류」 10자리가 전부 이 색이다. A-662 로 글자를 바꿀 때 색은
+     안 건드렸으니 **전부터 있던 결함**이다 — 어두운배경 검사의 11-21 기록에
+     「표본을 넓히니 +1쪽 10자리」가 적혀 있는데 그게 이 쪽이고, 고쳤다고 적힌
+     것과 달리 값은 0.5 그대로였다. 컨테이너에서 실측해 0.62→4.35(미달),
+     0.68 부터 통과를 확인하고 여유를 둬 0.7 로 올린다. 같은 쪽
+     `.category-card-korean` 과 같은 값이라 눈금도 맞는다. */
+  .category-card-meta {
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.7);
   font-weight: 500;
   letter-spacing: 0.05em;
 }

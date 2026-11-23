@@ -406,7 +406,7 @@ function dmd_draw() {
          전에는 「직군 미기재: N」만 떠서 손님이 답을 안 한 것처럼 읽혔다. 그 말을 믿고
          이 숫자를 수요 근거로 쓰면 안 된다. 화면이 이유를 말하게 한다.
          받으려면 처리방침 제3조(수집 항목)부터 고쳐야 한다 — 거기 업종은 전문가
-         회원가입에만 있다. 운영자과 변호사 몫이다. */
+         회원가입에만 있다. 운영자와 변호사 몫이다. */
       (Object.keys(a.byIndustry).length === 0
         ? '<p class="adm-empty">' + escapeHtml(t(
               'Nobody has answered yet. The field is optional, so it fills in only as people choose to say.',
