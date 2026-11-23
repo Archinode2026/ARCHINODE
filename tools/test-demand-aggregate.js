@@ -90,5 +90,63 @@ console.log('── ⑧ 많은 것부터 정렬');
 eq('rank', M.dmd_rank({ a: 1, b: 5, c: 5 }), [{ key: 'b', n: 5 }, { key: 'c', n: 5 }, { key: 'a', n: 1 }]);
 
 console.log('');
+
+/* ─────────────────────────────────────────────────────────────────────
+   브랜드에게 보낼 한 장 (A-667) — dmd_sheet / dmd_sheetText
+   ───────────────────────────────────────────────────────────────────── */
+var sheet = M.dmd_sheet, sheetText = M.dmd_sheetText;
+
+console.log('\n── ⑨ 한 장: 품목으로 좁힌다');
+var SH = [
+    { type: 'quote',         productId: 'lamp1', source: 'product-page',  createdAt: D(5)  },
+    { type: 'sourcing',      category: 'lighting', source: 'sourcing-page', createdAt: D(10) },
+    { type: 'sourcing',      category: 'lighting', source: 'sourcing-page', createdAt: D(40) },
+    { type: 'brand-inquiry', brandId: 'oska',   source: 'brand-page',    createdAt: D(7)  },  // outdoor
+    { type: 'quote',         category: 'finishes', source: 'product-page', createdAt: D(8)  },
+    { type: 'quote',         category: 'lighting', source: 'sourcing-page', createdAt: D(200) }, // 창 밖
+    { type: 'quote',         category: 'lighting', hp: 'bot',            createdAt: D(3)  }   // 봇
+];
+var s1 = sheet(SH, CATMAP, NOW, 90, 'lighting');
+eq('조명만 3건',            s1.enquiries, 3);
+eq('그중 소싱 2건',          s1.sourcing, 2);
+eq('다른 품목은 안 센다',     s1.category, 'lighting');
+eq('제외는 전체 기준 1건',    s1.excludedTotal, 1);
+eq('읽은 수는 전체 7건',      s1.readTotal, 7);
+eq('경로 정렬',             s1.bySource, [{ key: 'sourcing-page', n: 2 }, { key: 'product-page', n: 1 }]);
+eq('달은 오래된 것부터',      s1.byMonth.map(function (x) { return x.key; }), ['2026-10', '2026-11']);
+
+console.log('\n── ⑩ 한 장: 빈 결과도 거짓말하지 않는다');
+var s0 = sheet(SH, CATMAP, NOW, 90, 'kitchen');
+eq('주방 0건',              s0.enquiries, 0);
+eq('주방 소싱 0건',          s0.sourcing, 0);
+eq('경로 빈 배열',           s0.bySource, []);
+eq('달 빈 배열',             s0.byMonth, []);
+
+console.log('\n── ⑪ 한 장: 품목을 안 주면 전부 센다');
+var sAll = sheet(SH, CATMAP, NOW, 90, null);
+eq('전부 5건',              sAll.enquiries, 5);
+eq('전부 소싱 2건',          sAll.sourcing, 2);
+
+console.log('\n── ⑫ 영문 평문');
+var txt = sheetText(s1, M.DMD_CAT_EN['lighting']);
+eq('머리글',                txt.split('\n')[0], 'Korean demand — Lighting');
+eq('기간 줄',               txt.split('\n')[1], 'Last 90 days, as recorded by ARCHINODE');
+eq('문의 수 줄 있나',        /Enquiries from Korean professionals\s+3/.test(txt), true);
+eq('빈손 줄 있나',           /could not find it in Korea\s+2/.test(txt), true);
+eq('제외 밝히나',            /Not counted: 1 records/.test(txt), true);
+eq('올려 부르지 않는다',      /We do not round these numbers up\.$/.test(txt), true);
+eq('이름을 담지 않는다',      /lamp1|oska/.test(txt), false);
+
+console.log('\n── ⑬ 모르는 경로 키가 들어와도 undefined 를 찍지 않는다');
+var sU = sheet([{ type: 'quote', category: 'lighting', source: 'telepathy', createdAt: D(2) }],
+               CATMAP, NOW, 90, 'lighting');
+var tU = sheetText(sU, 'Lighting');
+eq('모르는 경로 그대로',      /telepathy\s+1/.test(tU), true);
+eq('undefined 없음',        /undefined/.test(tU), false);
+
+
+/* A-667: 이 요약은 **반드시 파일 맨 끝**에 있어야 한다. 전에는 93행에 있어서,
+   그 뒤에 시험을 덧붙이면 「통과: N건 전부」가 **새 시험보다 먼저** 찍히고
+   종료 코드도 0 이 됐다. 실패를 못 보는 통과였다 — 0 을 기뻐하지 말고 의심한다. */
 if (fails) { console.log('실패: ' + fails + '건 / ' + ran + '건 중'); process.exit(1); }
 console.log('통과: ' + ran + '건 전부');

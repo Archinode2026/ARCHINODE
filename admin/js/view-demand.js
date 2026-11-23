@@ -71,7 +71,10 @@ function dmd_catOf(d, catMap) {
    돌려주는 것에 **제외 건수와 까닭**이 함께 들어간다 — 작은 숫자가 왜 작은지
    보이지 않으면 사람이 숫자를 안 믿는다.
    ───────────────────────────────────────────────────────────────────────── */
-function dmd_aggregate(leads, catMap, nowMs, days) {
+/* onlyCategory 를 주면 **그 품목만** 센다 — 브랜드에게 보낼 한 장이 쓴다(A-667).
+   창 밖·제외 건수는 그대로 전체 기준이다. 그래야 「무엇을 세지 않았는지」가
+   품목을 좁혀도 같은 뜻을 유지한다. */
+function dmd_aggregate(leads, catMap, nowMs, days, onlyCategory) {
     var win = (days || DMD_WINDOW_DAYS) * 86400000;
     var from = nowMs - win;
     var out = {
@@ -81,6 +84,10 @@ function dmd_aggregate(leads, catMap, nowMs, days) {
         unknownCategory: 0, unknownIndustry: 0,
         excluded: {}, excludedTotal: 0,
         noDate: 0, outOfWindow: 0,
+        /* A-667: 유형별(견적·브랜드 문의·소싱 ...). 「한국에서 못 찾아 들여와
+           달라」는 요청이 sourcing 이고, 그게 브랜드가 가장 듣고 싶어 하는 줄이다. */
+        byType: {},
+        otherCategory: 0,
         readTotal: (leads || []).length
     };
     for (var i = 0; i < (leads || []).length; i++) {
@@ -103,11 +110,16 @@ function dmd_aggregate(leads, catMap, nowMs, days) {
         if (ms === null) { out.noDate++; continue; }
         if (ms < from || ms > nowMs) { out.outOfWindow++; continue; }
 
+        var cat = dmd_catOf(d, catMap);
+        if (onlyCategory && cat !== onlyCategory) { out.otherCategory++; continue; }
+
         out.total++;
 
-        var cat = dmd_catOf(d, catMap);
         if (cat) out.byCategory[cat] = (out.byCategory[cat] || 0) + 1;
         else out.unknownCategory++;
+
+        var tp = d.type ? String(d.type) : 'unknown';
+        out.byType[tp] = (out.byType[tp] || 0) + 1;
 
         var ind = d.industry ? String(d.industry) : '';
         if (ind) out.byIndustry[ind] = (out.byIndustry[ind] || 0) + 1;
@@ -123,6 +135,16 @@ function dmd_aggregate(leads, catMap, nowMs, days) {
     return out;
 }
 
+var DMD_SRC_EN = {
+    'sourcing-page': 'Sourcing enquiry', 'brand-page': 'Brand page', 'product-page': 'Product page',
+    'contact-page': 'Contact form', unknown: 'Source not recorded'
+};
+var DMD_CAT_EN = {
+    furniture: 'Furniture', bathroom: 'Bathroom', outdoor: 'Outdoor', lighting: 'Lighting',
+    kitchen: 'Kitchen', office: 'Office', finishes: 'Finishes', wellness: 'Wellness',
+    decor: 'Decor', construction: 'Construction'
+};
+
 /* ── 많은 것부터 정렬한 배열로 ── */
 function dmd_rank(obj) {
     var a = [];
@@ -131,8 +153,86 @@ function dmd_rank(obj) {
     return a;
 }
 
+
+/* ═══ 브랜드에게 보낼 한 장 (A-667) ═══════════════════════════════════════
+   `docs/설계/수요증거-2026-11-23.md` §4-ㄴ 가 설계한 다섯 줄 중 **넷이 지금
+   못 나온다** — 검색 횟수(계수기 미결) · 빈손 건수(2단계, 변호사) ·
+   직군(A-666, 공개 폼이 안 받는다) · 기사 조회수(analytics-loader.js 의
+   GA_ID 가 null). 그래서 **`leads` 만으로 참인 줄**로 다시 세웠다.
+
+   왜 어드민에 두는가: 규칙상 브랜드는 **자기에게 배정된** 리드만 읽는다
+   (brandId == uid 그리고 status in assigned·contacted·closed). 품목 전체의
+   집계는 브랜드가 읽을 수 없고, 열려면 규칙을 고쳐 **따로 게시**해야 한다.
+   그래서 이 한 장은 우리가 뽑아 우리가 보낸다 — 규칙 재게시도, 처리방침
+   변경도 필요 없다.
+
+   무엇을 **담지 않는가**: 제품명·브랜드명을 담지 않는다. 그 이름들은 대개
+   **다른 브랜드의 것**이고, 구독 브랜드에게 남의 제품이 얼마나 문의됐는지
+   알려 주는 것은 경쟁 정보다. 그걸 줄지는 승리님이 정할 일이고, 기본은
+   「수만 준다」로 둔다. 숫자만 담으면 개인정보도 아니다.
+   ═══════════════════════════════════════════════════════════════════════ */
+function dmd_sheet(leads, catMap, nowMs, days, category) {
+    var a = dmd_aggregate(leads, catMap, nowMs, days, category);
+    var keys = [];
+    for (var k in a.byMonth) if (Object.prototype.hasOwnProperty.call(a.byMonth, k)) keys.push(k);
+    keys.sort();
+    var months = [];
+    for (var i = 0; i < keys.length; i++) months.push({ key: keys[i], n: a.byMonth[keys[i]] });
+    return {
+        category: category || '',
+        windowDays: a.windowDays,
+        enquiries: a.total,
+        sourcing: a.byType['sourcing'] || 0,
+        bySource: dmd_rank(a.bySource),
+        byMonth: months,
+        excludedTotal: a.excludedTotal,
+        readTotal: a.readTotal
+    };
+}
+
+/* 영문 평문 — 승리님이 메일에 그대로 붙이실 자리.
+   브랜드는 영문으로 읽는다. 숫자를 올려 부르지 않는다는 말을 **마지막 줄에**
+   둔다 — 작은 진짜 숫자가 큰 가짜 숫자보다 세다는 것이 이 장의 값이다. */
+function dmd_sheetText(sheet, categoryEn) {
+    function pad(label, n) {
+        var L = String(label), N = String(n);
+        var gap = 46 - L.length - N.length;
+        return L + (gap > 1 ? new Array(gap + 1).join(' ') : '  ') + N;
+    }
+    var L = [];
+    L.push('Korean demand — ' + (categoryEn || sheet.category || 'all categories'));
+    L.push('Last ' + sheet.windowDays + ' days, as recorded by ARCHINODE');
+    L.push('');
+    L.push(pad('Enquiries from Korean professionals', sheet.enquiries));
+    L.push(pad('of which: could not find it in Korea', sheet.sourcing));
+    if (sheet.bySource.length) {
+        L.push('');
+        L.push('Where they came from');
+        for (var i = 0; i < sheet.bySource.length; i++) {
+            /* 괄호가 필요하다 — '  ' + undefined 는 "  undefined" 라서 참이고,
+               괄호 없이 || 를 쓰면 폴백이 **절대 안 돈다**. 모르는 경로 키가
+               들어온 날 브랜드에게 보낼 메일에 undefined 가 찍힌다. */
+            var sk = sheet.bySource[i].key;
+            L.push(pad('  ' + (DMD_SRC_EN[sk] || sk), sheet.bySource[i].n));
+        }
+    }
+    if (sheet.byMonth.length) {
+        L.push('');
+        L.push('By month');
+        for (var j = 0; j < sheet.byMonth.length; j++) L.push(pad('  ' + sheet.byMonth[j].key, sheet.byMonth[j].n));
+    }
+    L.push('');
+    if (sheet.excludedTotal) {
+        L.push('Not counted: ' + sheet.excludedTotal + ' records (our own tests, bots, internal).');
+    }
+    L.push('We do not round these numbers up.');
+    return L.join('\n');
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { dmd_aggregate: dmd_aggregate, dmd_ms: dmd_ms, dmd_catOf: dmd_catOf, dmd_rank: dmd_rank, DMD_EXCLUDE: DMD_EXCLUDE };
+    module.exports = { dmd_aggregate: dmd_aggregate, dmd_ms: dmd_ms, dmd_catOf: dmd_catOf, dmd_rank: dmd_rank,
+                       dmd_sheet: dmd_sheet, dmd_sheetText: dmd_sheetText, DMD_EXCLUDE: DMD_EXCLUDE,
+                       DMD_SRC_EN: DMD_SRC_EN, DMD_CAT_EN: DMD_CAT_EN };
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -312,10 +412,78 @@ function dmd_draw() {
         '<p class="adm-empty">' + escapeHtml(t(
            'A demand report that counts our own test records is the same mistake as claiming brands we do not have.',
            '우리 테스트 기록을 수요로 세면, 없는 브랜드 수를 광고하는 것과 같은 잘못입니다.')) + '</p>'
-       : '');
+       : '') +
+      /* A-667: 브랜드에게 보낼 한 장. 그릴 것만 하고 판단은 dmd_sheet 에 있다. */
+      '<h3>' + escapeHtml(t('One page to send a brand', '브랜드에게 보낼 한 장')) + '</h3>' +
+      '<p class="adm-empty">' + escapeHtml(t(
+          'Pick a category. The text below is English and ready to paste into an email. It carries no product or brand names — counts only.',
+          '품목을 고르세요. 아래 글은 영문이고 메일에 그대로 붙이실 수 있습니다. 제품명·브랜드명은 담지 않습니다 — 수만 담습니다.')) + '</p>' +
+      '<div class="dmd-sheet-bar">' +
+        '<select id="dmdSheetCat" onchange="dmd_drawSheet()">' + dmd_catOptions() + '</select>' +
+        /* A-667: 클래스는 **어드민이 실제로 쓰는 것**이다. 처음에 adm-btn 이라고
+           썼는데 그런 클래스는 CSS 에 없다 — 그럴듯한 이름을 지어내면 단추가
+           맨 글자로 뜬다. 어드민 전역에서 쓰는 것은 act-btn 이다(쓰임 60여 곳). */
+        '<button type="button" class="act-btn" onclick="dmd_copySheet()">' +
+          escapeHtml(t('Copy', '복사')) + '</button>' +
+        '<span id="dmdSheetMsg" class="adm-empty"></span>' +
+      '</div>' +
+      '<textarea id="dmdSheetText" class="dmd-sheet" rows="18" readonly></textarea>';
+
+    dmd_drawSheet();
 
     if (a.total === 0) {
         dmd_msg('No real enquiries in this window yet. The report is here so the clock starts now.',
                 '이 기간에 진짜 문의가 아직 없습니다. 지금부터 쌓이도록 리포트를 먼저 둡니다.', false);
     }
+}
+
+/* ── 브랜드에게 보낼 한 장: 화면 쪽 (A-667) ──────────────────────────────
+   로그인이 있어야 열리는 자리라 제가 눈으로 못 본다. 그래서 여기서는
+   고른 값을 순수 함수에 넘기고 **나온 글자를 그대로 칸에 넣는 것**만 한다. */
+function dmd_catOptions() {
+    var html = '<option value="">' + escapeHtml(t('All categories', '전체 품목')) + '</option>';
+    for (var k in DMD_CAT_EN) {
+        if (!Object.prototype.hasOwnProperty.call(DMD_CAT_EN, k)) continue;
+        var sel = (dmd_state.sheetCat === k) ? ' selected' : '';
+        html += '<option value="' + escapeHtml(k) + '"' + sel + '>' +
+                escapeHtml(admLang() === 'ko' ? (DMD_CAT_KO[k] || k) : DMD_CAT_EN[k]) + '</option>';
+    }
+    return html;
+}
+
+function dmd_drawSheet() {
+    var sel = document.getElementById('dmdSheetCat');
+    var box = document.getElementById('dmdSheetText');
+    if (!box) return;
+    var cat = sel ? sel.value : (dmd_state.sheetCat || '');
+    dmd_state.sheetCat = cat;
+    var sh = dmd_sheet(dmd_state.items, dmd_state.catMap, Date.now(), dmd_state.days, cat || null);
+    box.value = dmd_sheetText(sh, cat ? DMD_CAT_EN[cat] : '');
+    var msg = document.getElementById('dmdSheetMsg');
+    if (msg) {
+        msg.textContent = sh.enquiries === 0
+            ? t('0 enquiries — send it anyway only if you want to show the clock started.',
+                '문의 0건 — 「지금부터 셉니다」를 보여 주실 때만 보내세요.')
+            : '';
+    }
+}
+
+function dmd_copySheet() {
+    var box = document.getElementById('dmdSheetText');
+    var msg = document.getElementById('dmdSheetMsg');
+    if (!box) return;
+    function done(ok) {
+        if (!msg) return;
+        msg.textContent = ok ? t('Copied', '복사했습니다')
+                             : t('Could not copy — select the text and copy it yourself.',
+                                 '복사하지 못했습니다 — 글을 직접 선택해 복사해 주세요.');
+    }
+    try {
+        box.select();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(box.value).then(function () { done(true); }, function () { done(false); });
+        } else {
+            done(!!(document.execCommand && document.execCommand('copy')));
+        }
+    } catch (e) { done(false); }
 }

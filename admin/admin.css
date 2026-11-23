@@ -56,6 +56,19 @@
 .adm-spacer { flex: 1; }
 .adm-msg { font-size: 0.8rem; color: var(--gray-700); margin-bottom: 12px; min-height: 1em; }
 .adm-msg.err { color: #b91c1c; }
+
+/* A-667(2026-11-23): .adm-head · .adm-sub · .adm-empty 가 **정의 없이** 쓰이고
+   있었다. A-661 에서 「한국 수요」 화면을 만들며 그럴듯한 이름으로 썼는데 CSS 에
+   없었다 — 글자가 전부 같은 크기·같은 색으로 나왔다. 망가진 건 아니지만 설계와
+   다르다. 특히 .adm-sub 와 .adm-empty 는 「무엇을 세지 않았는지」를 말하는 자리라
+   본문과 구별돼야 한다. 그 구별이 이 화면의 값이다.
+   (.adm-lead-detail · .adm-logs · .adm-notices · .adm-inquiries · .adm-set-form ·
+    .adm-err-inline 도 정의가 없다 — 그쪽은 제가 화면을 못 봐서 어떤 모양이어야
+    하는지 모른다. 지어내지 않고 A-668 의 검사기가 세도록 남긴다.) */
+.adm-head { margin: 0 0 14px; }
+.adm-head h2 { margin: 0 0 4px; font-size: 1.15rem; font-weight: 600; color: var(--black); }
+.adm-sub { margin: 0; font-size: 0.82rem; line-height: 1.5; color: var(--ink-soft); max-width: 70ch; }
+.adm-empty { margin: 6px 0 0; font-size: 0.8rem; line-height: 1.5; color: var(--gray-700); }
 .adm-nowrap { white-space: nowrap; }
 .adm-log-sub { display: block; font-size: 0.7rem; color: var(--ink-soft); margin-top: 2px;
                overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }   /* R-072: break-all 이 51px 칸에서 1글자씩 쌓았다 */

@@ -20,7 +20,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/vendor/fontawesome-6.5.1/css/all.min.css">
 <link rel="stylesheet" href="../style.css">
-<link rel="stylesheet" href="admin.css?v=20261105b">
+<link rel="stylesheet" href="admin.css?v=20261123a">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -175,6 +175,15 @@ tr:hover { background: var(--gray-50); }
 .dmd-big b { font-size:2.1rem; font-weight:700; line-height:1; color:#332e27; }
 .dmd-big span { font-size:0.84rem; color:#6b6459; }
 .dmd-note { font-size:0.78rem; color:#7a7164; }
+        /* A-667: 브랜드에게 보낼 한 장. 글자는 영문 평문이라 칸을 고정폭으로 둬야
+           숫자 열이 맞는다 — 메일에 붙였을 때 줄이 흐트러지지 않게 하는 값이다. */
+        .dmd-sheet-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:10px 0; }
+        .dmd-sheet-bar select { padding:7px 10px; border:1px solid #d8d2c7; border-radius:4px;
+            background:#fff; color:#332e27; font-size:0.86rem; }
+        .dmd-sheet { width:100%; box-sizing:border-box; padding:14px 16px; border:1px solid #d8d2c7;
+            border-radius:4px; background:#fbfaf8; color:#332e27; resize:vertical;
+            font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size:0.80rem; line-height:1.55; white-space:pre; }
 .dmd-row { display:flex; align-items:center; gap:10px; padding:3px 0; font-size:0.86rem; }
 .dmd-k { flex:0 0 120px; color:#332e27; }
 .dmd-bar { flex:1 1 auto; height:9px; background:#ede7dc; border-radius:5px; overflow:hidden; }
@@ -401,7 +410,7 @@ tr:hover { background: var(--gray-50); }
 <script src="js/view-settings.js?v=20261105c"></script>
 <script src="js/view-regulations.js?v=20261104g"></script>
 <script src="js/view-leads.js?v=20261104g"></script>
-<script src="js/view-demand.js?v=20261123a"></script>
+<script src="js/view-demand.js?v=20261123b"></script>
 <script src="js/view-users.js?v=20261104g"></script>
 <script src="js/view-notices.js?v=20261104g"></script>
 <script src="js/view-inquiries.js?v=20261104g"></script>
