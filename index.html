@@ -974,7 +974,10 @@ input, select, textarea { font-family: inherit; }
 
 <!-- MAGAZINE MOSAIC (A-166) — 가로열 기준 2장·3장·1장.
      지금은 매거진 글로 채우고, 추후 광고 슬롯으로 교체 예정.
-     슬롯 크기는 promo-half(2장) / promo-third(3장) / promo-full(1장) 클래스로만 정해진다. -->
+     슬롯 크기는 promo-half(2장) / promo-third(3장) / promo-full(1장) 클래스로 정해진다.
+     A-668(2026-11-23): 이 말이 한동안 거짓이었다 — promo-half 에 규칙이 0곳이어서
+     절반 칸의 크기는 바탕 .promo-item(span 3)에서 왔다. 지금은 명시돼 있다.
+     바탕을 고칠 때 세 자매가 다 적혀 있는지 보고 고칠 것. -->
 <section class="promo-mosaic" id="trend-report">
   <div class="container">
     <div class="section-header fade-in">
