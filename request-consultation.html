@@ -44,9 +44,7 @@ img { max-width: 100%; height: auto; display: block; }
 ul { list-style: none; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 
-/* 토큰은 style.css 의 :root 가 단일 출처다 (A-181).
-   여기에 복제본을 두면 link 뒤라 이쪽이 이겨서, 토큰을 바꿔도 이 페이지만 안 따라온다.
-   실제로 A-159 에서 index.html 의 --accent 가 금색 대신 에스프레소로 들어가 20여 커밋 동안 방치됐다. */
+/* A-159 · A-181 — 검수대장 */
 
 .container { max-width: var(--max-width); margin: 0 auto; padding: 0 40px; }
 @media (max-width: 768px) { .container { padding: 0 20px; } }
@@ -63,7 +61,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--accent-on-dark);   /* A-454: 2.94 → 4.82 (승리님 결정 ①-ㄱ) */
+  color: var(--accent-on-dark);   /* A-454 — 검수대장 */
   margin-bottom: 20px;
 }
 .consult-hero h1 {
@@ -82,9 +80,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .consult-hero .price-tag {
   display: inline-block;
-  /* A-456: 이 칩의 **자기 배경**이 금빛이라 배경을 밝혀 4.12 로 내려갔다.
-     (내 픽셀 측정이 글자를 visibility:hidden 으로 숨겨 **자기 배경까지 지우는** 바람에
-      4.82 로 잘못 읽었다 — 브론즈 28차가 잡았다.) 채우기를 어둡게, 테두리는 금색 유지. */
+  /* A-456 — 검수대장 */
   background: rgba(51,46,39,0.55);
   color: var(--accent-on-dark);   /* A-454: 2.94 → 측정값은 아래 주석 참고 */
   padding: 8px 20px;
@@ -195,7 +191,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   transition: background 0.2s;
   font-family: inherit;
 }
-/* 흰 글자가 얹히는 버튼이라 --accent 계열은 3.71 이다 — --accent-ink 5.97 (A-192) */
+/* A-192 — 검수대장 */
 .submit-btn:hover { background: var(--accent-ink); }
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
@@ -560,14 +556,8 @@ function archinodeWithTimeout(promise, ms) {
     ]);
 }
 
-/* A-538: 언어 판정은 A-517 의 정본(archiFormLang)을 쓴다 — 네 자리가 저마다
-   localStorage 만 보고 있었다. 저장소를 못 쓰는 환경(차단·시크릿)에서는
-   한국어 손님에게 영어가 나간다. */
-/* A-620(브론즈 46차 N46-3): 이 쪽의 오류 안내는 `rcLang()` 삼항으로 글자를
-   골라 **한 언어만** 심었다. 그러면 손님이 나중에 한/영을 누를 때 따라오지
-   않는다(A-222·A-492 가 세운 규칙: data-en·data-ko 를 함께 달아야 다시 칠해진다).
-   게다가 캡차 가지들은 한국어 짝이 아예 없어 영어만 나왔다.
-   소싱의 rfqSay·입점의 lybSay 와 같은 통로를 이 쪽에도 둔다. */
+/* A-517 · A-538 — 검수대장 */
+/* A-222 · A-492 · A-620 — 검수대장 */
 function rcSay(en, ko) {
   if (!errorDiv) return;
   /* A-592: 보이게 한 다음에 글을 넣는다. 글이 비면 드러내지 않는다. */
@@ -618,8 +608,7 @@ async function submitConsult(e) {
   const agreeContact = document.getElementById('agreeContact').checked;
   const agreePrivacy = document.getElementById('agreePrivacyConsult');
 
-  /* A-535: 이 함수는 agreeContact 만 읽고 **개인정보 동의 칸은 한 번도 읽지
-     않았다**. 둘은 다른 동의다. */
+  /* A-535 — 검수대장 */
   if (agreePrivacy && !agreePrivacy.checked) {
     rcSay('Please agree to the collection and use of your personal data.',
           '개인정보 수집·이용에 동의해 주세요.');
@@ -661,13 +650,7 @@ async function submitConsult(e) {
     if (!captchaData.ok) { throw new Error('ARCHINODE_CAPTCHA_FAILED'); }
 
     const dbRef = firebase.firestore();
-    /* A-575(브론즈 41차 ⑥): 전에는 접수를 먼저 하고 알림 메일을 따로 넣은 뒤,
-       메일이 실패하면 console.warn 으로 **삼켰다**. 손님 화면은 「접수됐습니다」인데
-       운영자는 아무 알림을 못 받는다 — 자문 요청은 어드민이 그 화면을 열기 전까지
-       며칠 묵을 수 있다. A-263 이 막으려던 상태가 그대로 남아 있었다.
-       A-490 이 리드에 쓴 방식을 그대로 가져온다: 접수와 알림을 **한 묶음**으로 쓰고,
-       묶음이 깨지면 접수만 따로 하고 `notifyPending` 을 박는다. 어느 쪽이든
-       「갔는지 안 갔는지 모르는 상태」는 남지 않는다. */
+    /* A-263 · A-490 · A-575 — 검수대장 */
     const consultDoc = {
       companyName: escapeHtml(companyName),
       contactName: escapeHtml(contactName),
@@ -736,9 +719,7 @@ async function submitConsult(e) {
           : document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth' }));
   } catch (err) {
     console.error(err);
-    /* A-620: 네 가지 모두 두 언어로. 마지막 가지가 err.message 를 손님에게
-       그대로 보여 주고 있었다 — A-612 가 없애려던 바로 그 모양이다. 사유는
-       콘솔에만 남기고(위 console.error) 손님에게는 사람 말로 말한다. */
+    /* A-612 · A-620 — 검수대장 */
     if (err.message === 'ARCHINODE_CAPTCHA_LOAD_FAILED') {
       rcSay('We could not load the security check — an ad blocker or company firewall may be blocking it. Please email office@archinode.org and we will take it from there.',
             '보안 확인을 불러올 수 없습니다 — 광고 차단기나 회사 방화벽이 막고 있을 수 있습니다. office@archinode.org 로 메일 주시면 저희가 이어서 처리해 드리겠습니다.');
@@ -796,9 +777,7 @@ async function submitConsult(e) {
 </script>
 
 <script>
-/* A-665(2026-11-23): `for-brands.html#fair-entry` 의 단추가 `?topic=fair-entry` 로 보낸다.
-   그 값을 읽어 관심분야를 미리 골라 둔다 — 브랜드가 방금 읽은 것을 다시 고르게 하지 않는다.
-   ★ 허용된 열쇠만 받는다. 주소에서 온 값을 그대로 넣으면 손님이 아무 값이나 심을 수 있다. */
+/* A-665 — 검수대장 */
 (function () {
   try {
     var m = /[?&]topic=([a-z-]{2,20})/i.exec(window.location.search || '');

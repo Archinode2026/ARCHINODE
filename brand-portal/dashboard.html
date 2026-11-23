@@ -38,8 +38,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 /* STATUS BADGE */
 .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 .status-pending { background: #fef3c7; color: #92400e; }
-/* A-204 — '수정 요청됨'. 반려(빨강)와 구분되고, 끝이 아니라 할 일이 있다는 뜻의 앰버.
-   #faf0e0 위 #6b4f2a = 6.07:1 */
+/* A-204 — 검수대장 */
 .status-revision { background: #faf0e0; color: #6b4f2a; }
 .status-approved { background: #d1fae5; color: #065f46; }
 .status-suspended { background: #fed7aa; color: #9a3412; }
@@ -73,11 +72,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 /* FORM FIELDS */
 .field { margin-bottom: 18px; }
 .field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--gray-700); margin-bottom: 4px; }
-/* A-426(2026-11-09): 이 한 줄과 아래 `.btn` 한 줄이 **56곳**을 손가락 기준 아래로
-   내려보내고 있었다 — 입력칸 52개 중 44개(38.7px), 단추 14개 중 12개(38.7~40px).
-   padding 만 있고 min-height 가 없어서, 글자 크기가 곧 칸 높이가 됐다.
-   낱낱이 class 를 다는 대신 **규칙 두 줄을 고친다** — 낱개로 세면 또 빠뜨린다(A-414 ④).
-   textarea 는 바로 아래 줄의 min-height: 80px 이 이긴다(순서가 뒤다). */
+/* A-414 · A-426 — 검수대장 */
 .field input, .field select, .field textarea {
     width: 100%; padding: 10px 14px; border: 1px solid var(--gray-300); border-radius: 6px;
     font-size: 0.9rem; font-family: inherit; background: var(--gray-50); min-height: 44px;
@@ -85,8 +80,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); background: var(--white); }
 .field textarea { resize: vertical; min-height: 80px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-/* A-415: 브랜드 카테고리는 여러 개를 고를 수 있다(쓰는 쪽이 배열이다). 칸 높이 44px 는
-   손가락 기준 최소 타깃 — A-393 에서 쓴 기준과 같다. */
+/* A-393 · A-415 — 검수대장 */
 /* 줄 사이 10px: 44px 칸이 세 줄로 접히는데 2px 만 띄우면 세로로 살짝 빗나간 탭이
    이웃 줄로 간다(브론즈 23차). 가로 16px 은 그대로. */
 .bp-cat-grid { display: flex; flex-wrap: wrap; gap: 10px 16px; padding: 4px 0 2px; }
@@ -208,12 +202,10 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 @media (max-width: 768px) {
     .field-row { grid-template-columns: 1fr; }
     .product-grid { grid-template-columns: 1fr; }
-    /* A-039: 좁은 화면에서 탭("제품"·"브랜드 아티클" 등) 글자가 세로로 쪼개지는 문제 —
-       탭 폭을 고정 flex로 욱여넣지 않고 한 줄을 유지한 채(nowrap) 가로 스크롤을 허용한다. */
+    /* A-039 — 검수대장 */
     .tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .tab { white-space: nowrap; flex: 0 0 auto; }
-    /* A-049: 좁은 화면에서 상단바("Brand Guide"·"로그아웃") 글자가 세로로 쪼개지는 문제 —
-       admin/dashboard.html A-038 처방과 동일하게 줄바꿈을 허용해 각 항목은 통째로 보이게 한다. */
+    /* A-038 · A-049 — 검수대장 */
     .topbar { flex-wrap: wrap; height: auto; min-height: 56px; padding: 10px 16px; row-gap: 6px; }
     .topbar .user-info { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
     .topbar .user-info > * { white-space: nowrap; }
@@ -928,25 +920,7 @@ h1, h2, .section-card h2 {
 let currentUser = null;
 let brandDataUid = null;   // brandData 를 '어느 계정으로' 불러왔는지 (R-031 = A-213)
 
-/* ── 제출 직전 신원 확정 (R-031 = A-213) ─────────────────────────────────
-   제품·글을 저장할 때 `brandId` 는 실시간 `currentUser.uid` 에서, `brandName` 은
-   페이지가 불러둔 `brandData` 에서 가져왔다. **두 출처의 수명이 다르다.**
-   같은 브라우저에서 계정이 바뀌면(세션 꼬임, 다중 탭, 자동 재로그인)
-   `onAuthStateChanged` 가 `currentUser` 를 즉시 갈아치우는데 `loadBrandData()` 는
-   비동기라 아직 끝나지 않았거나 실패할 수 있다. 그 틈에 제출하면
-   **`brandId` 는 새 계정, `brandName` 은 옛 브랜드**로 저장된다 —
-   화면에는 옛 브랜드 이름이 그대로 떠 있으니 아무도 눈치채지 못한다. 3/3 재현.
-
-   `firestore.rules` 로는 막을 수 없다. 규칙은 `isApprovedBrand()` 로
-   `request.auth.uid == brandId` 를 요구하므로 이 쓰기는 **정당하게 허가된다** —
-   두 계정 모두 승인된 브랜드일 수 있기 때문이다. 규칙은 "이 폼을 누가 채웠나" 를
-   알 수 없다. 그래서 클라이언트에서 막아야 한다.
-
-   방법: 쓰기 직전에 `brandId` 와 `brandName` 을 **한 객체에서 함께** 받는다.
-   살아 있는 인증과 `brandData` 의 주인이 어긋나면 **저장하지 않고 멈춘다.**
-   어느 한쪽으로 추측해 쓰는 것보다 멈추는 게 낫다 — 소유권은 조용히 틀리면 안 된다.
-   업로드가 await 를 여러 번 거치므로 **업로드 전과 쓰기 직전에 각각** 확인한다.
-   ──────────────────────────────────────────────────────────────────────── */
+/* A-213 — 검수대장 */
 let bpFormUid = null;   // 이 폼을 '누가 열었는지' (A-213)
 
 function bpIdentity(expectUid) {
@@ -983,9 +957,7 @@ function escapeHtml(text) {
     return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-/* A-218 / R-003: 이스케이프만으로는 URL 을 막을 수 없다 — `javascript:` 에는
-   `&<>"'` 가 없어 escapeHtml 을 그대로 통과한다. href·src 에 넣기 전에
-   스킴을 본다 (어드민의 rvSafeUrl 과 같은 방식). */
+/* A-218 — 검수대장 */
 function bpSafeUrl(u) { return (u && /^https?:\/\//i.test(String(u))) ? String(u) : ''; }
 
 // ── 카테고리 → 서브카테고리 매핑 ──
@@ -1129,11 +1101,7 @@ async function loadBrandData(uid) {
             return;
         }
         brandData = doc.data();
-        /* ★ A-480(2026-11-12): 담당자 개인정보 8개는 공개 브랜드 문서에서 빼고
-           `brands/{uid}/internal/contact` 로 옮겼다(승인된 브랜드 문서는 문서
-           전체가 공개 읽기라, 화면에 안 그려도 질의로 전량 수집됐다).
-           이 화면은 전과 같이 `brandData.contactName` 을 보므로 여기서 병합한다.
-           못 읽으면 **조용히 비우지 않고** 연락처 칸만 빈 채로 두고 경고를 남긴다. */
+        /* A-480 — 검수대장 */
         try {
             const cdoc = await db.collection('brands').doc(uid).collection('internal').doc('contact').get();
             if (cdoc.exists) brandData = Object.assign({}, brandData, cdoc.data() || {});
@@ -1146,8 +1114,7 @@ async function loadBrandData(uid) {
         document.getElementById('dashboardContent').style.display = 'block';
     } catch (err) {
         console.error('Error loading brand:', err);
-        /* A-475: 전에는 로그만 남기고 **로딩 화면을 그대로 뒀다** — 로딩 화면은
-           성공 경로에서만 걷히므로 손님은 영원히 도는 바람개비만 봤다. */
+        /* A-475 — 검수대장 */
         if (window.archinodeLoadingFailed) window.archinodeLoadingFailed('brand: ' + (err && err.code || err));
     }
 }
@@ -1222,9 +1189,7 @@ function populateDashboard() {
 
     // Brand info
     document.getElementById('editBrandName').value = brandData.brandName || '';
-    /* A-311: 목록에 없는 기존 값(예: "seoul", "Korea" — 옵션은 "South Korea" 다)을
-       그냥 넣으면 셀렉트가 **조용히 빈칸**이 되고, 저장하면 국가가 지워진다.
-       그래서 없는 값은 표시를 달아 임시 옵션으로 넣어 둔다 — 브랜드가 알아보고 고르게. */
+    /* A-311 — 검수대장 */
     (function () {
         var sel = document.getElementById('editCountry');
         var cur = brandData.country || '';
@@ -1311,10 +1276,7 @@ document.getElementById('addCertBtn').addEventListener('click', async () => {
     const file = document.getElementById('certFile').files[0];
     if (!name) { pNote(pT('Certification name is required', '인증서 이름을 입력해 주세요.'), true); return; }
     if (!file) { pNote(pT('Please choose a certificate file', '인증서 파일을 선택해 주세요.'), true); return; }
-    /* A-484: 인증서는 공개 브랜드 페이지에 배지로 **그대로 열린다**(brands/view.html).
-       그래서 PDF·사진만 받는다(SVG 는 스크립트가 돌아 제외). storage.rules 의
-       isCertFile() 이 같은 조건으로 한 번 더 막지만, 거부 메시지가 사람이 읽을 수
-       없는 말이라 여기서 먼저 알려 준다. */
+    /* A-484 — 검수대장 */
     const CERT_OK = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
     if (CERT_OK.indexOf(String(file.type || '').split(';')[0].trim()) === -1) {
         pNote(document.documentElement.lang !== 'en'
@@ -1361,17 +1323,7 @@ async function deleteCertification(index) {
     renderCertList(updatedCerts);
 }
 
-/* A-415(2026-11-09) ─ brands.category 는 배열이다 ─────────────────────────────
-   list-your-brand.html:783 이 체크박스 10개를 map 해서 **배열**로 쓴다. 그런데 이
-   화면은 단일 <select> 로 읽고 .value 하나를 도로 썼다. 2개 이상 고른 브랜드가
-   무엇이든 저장하면 카테고리가 통째로 지워졌다(조용히).
-
-   아래 세 함수가 지키는 약속:
-     읽기 — 배열도 문자열("a,b" 꼴 옛 문서)도 받는다.
-     쓰기 — **언제나 배열**로 쓴다. 0개면 [] 다.
-     모르는 값 — 목록에 없는 값(옛 표기·오타)은 지우지 않고 "확인 필요" 를 달아
-                 체크된 채로 남긴다. A-311 이 editCountry 에서 쓴 방법과 같다.
-   tools/test-bp-category.js 가 이 세 함수를 HTML 에서 그대로 뽑아 돌린다. */
+/* A-311 · A-415 — 검수대장 */
 function bpCategoryToArray(v) {
     if (v === null || v === undefined) return [];
     if (Array.isArray(v)) {
@@ -1412,23 +1364,8 @@ function bpGetCategory(root) {
                 .map(function (b) { return b.value; });
 }
 
-/* A-439(2026-11-10) ─ 저장 단추가 눌러도 아무 일이 없었다 ────────────────────
-   승리님이 브랜드 계정으로 포털에 들어가 「저장이 활성화가 안 된다」고 하셨다.
-   단추는 멀쩡했다(`disabled:false`). **폼이 통째로 무효**였다 —
-   `form.checkValidity()` 가 false 인데 `required` 미충족은 **0개**.
-
-   범인은 `#editWebsite`(`type="url"`) 에 들어 있던 **`www.rainkiss.co.kr`** 이다.
-   스킴이 없어서 브라우저가 URL 로 인정하지 않는다(`typeMismatch`).
-
-   ★ 두 폼이 서로 모순이었다 — 신청서(`list-your-brand.html:410`)의 웹사이트 칸은
-     **`type="text"`** 라 그 값을 받아서 저장하는데, 포털의 같은 칸은 **`type="url"`**
-     이라 거부한다. **한쪽이 받은 것을 다른 쪽이 거부한다.** 그래서 그렇게 신청한
-     브랜드는 포털에서 **무엇도 저장할 수 없다** — 설명도 안 나온다.
-     포털에 `type="url"` 칸이 **11개**라 그중 하나만 걸려도 폼 전체가 막힌다.
-     그리고 이 파일엔 `reportValidity()` 를 부르는 코드가 **하나도 없었다.** */
-/* A-439: 막혔으면 **어느 칸이 왜 막는지 보여 준다.** 전에는 브라우저가 제 말풍선을
-   띄울 뿐이고, 그 칸이 화면 밖이면 「눌러도 아무 일이 없다」로만 보였다.
-   이 화면의 제출 자리 **넷 모두** 같은 침묵을 갖고 있었다. */
+/* A-439 — 검수대장 */
+/* A-439 — 검수대장 */
 function bpBlocked(form) {
     if (!form || form.checkValidity()) return false;
     var bad = Array.prototype.find.call(form.elements, function (el) {
@@ -1488,8 +1425,7 @@ document.getElementById('brandInfoForm').addEventListener('submit', async (e) =>
 document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (bpBlocked(e.currentTarget)) return;   // A-439
-    /* A-480: 담당자 연락처는 `internal/contact` 에 쓴다. `set(merge)` 로 —
-       문서가 아직 없는 옛 브랜드도 이 저장으로 만들어진다. */
+    /* A-480 — 검수대장 */
     await db.collection('brands').doc(currentUser.uid)
         .collection('internal').doc('contact').set({
             contactName: document.getElementById('editContactName').value,
@@ -1591,17 +1527,9 @@ window.bpApplyGate = function() {
     if (!ok && window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
 };
 
-/* ── A-467 (2026-11-11, 승리님 결정) ─────────────────────────────────────────
-   전에는 브랜드도 어드민도 **올린 제품을 고칠 수 없었다** — 포털은 add() 만 했고
-   어드민은 승인·반려만 눌렀다. 규칙(firestore.rules)은 소유 브랜드의 update 를
-   이미 허용했는데 그걸 쓰는 화면이 어디에도 없었다. 그래서 사진 없이 올라간
-   제품은 영영 사진이 없었고, 제품명 오타도 영영 남았다.
-   승리님 결정: 「고치면 다시 심사 대기로」 · 「제품 정보 전체」.
-   등록 폼을 그대로 다시 쓴다 — 폼이 둘로 갈리면 하나만 고쳐진다(이 저장소에서
-   반복된 실패: A-458 · A-460 · A-466). */
+/* A-458 · A-460 · A-466 · A-467 — 검수대장 */
 let bpEditingProductId = null;
-/* A-472: 제출이 도는 동안 켜진다. 저장 단추만 잠그면 **취소·수정은 그대로 눌려서**
-   업로드가 끝난 뒤 엉뚱한 문서에 쓰는 길이 났다(브론즈 29차 ①). */
+/* A-472 — 검수대장 */
 let bpSubmitting = false;
 
 // 폼 비우기 — 전에는 제출 뒤 **거래조건·스펙 파일 6칸을 안 비웠다**(다음 제품에 묻어
@@ -1648,8 +1576,7 @@ function bpFillProductForm(p) {
 
 // 폼 열기 — product 가 없으면 등록, 있으면 수정
 async function bpOpenProductForm(product) {
-    /* A-472: 저장이 도는 중에는 폼을 갈아타지 못한다. 갈아타면 업로드가 끝난 뒤
-       **먼저 고르던 문서**에 지금 화면의 값이 들어간다. */
+    /* A-472 — 검수대장 */
     if (bpSubmitting) {
         prodMsg(document.documentElement.lang !== 'en'
             ? '저장이 끝날 때까지 기다려 주세요.' : 'Please wait until the save finishes.', true);
@@ -1686,16 +1613,11 @@ async function bpOpenProductForm(product) {
 
     document.getElementById('productForm').style.display = 'block';
     document.getElementById('addProductBtn').style.display = 'none';
-    /* A-603: 이 쪽은 a11y-nav.js 를 싣지 않으므로 공용 함수에 기댈 수 없다 —
-       여기서 직접 설정을 묻는다(실측으로 확인했다: 기대면 설정이 무시된다). */
+    /* A-603 — 검수대장 */
     (function(){ var r=false; try{ r=matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
       document.getElementById('productForm').scrollIntoView({ behavior: r ? 'auto' : 'smooth', block: 'start' }); })();
 
-    /* ★ A-472(브론즈 29차 ④): 상태를 **목록 사본**(bpProductRows)에서만 읽었는데
-       그건 마지막 loadProducts() 시점이다. 목록을 그린 뒤 어드민이 승인하면 카드는
-       「심사 대기중」이고 경고도 안 떠서, 저장하는 순간 공개 중이던 제품이 목록에서
-       빠진다. 저장할 때는 문서를 다시 읽는데(그건 맞게 했다) **경고 판정만 묵은
-       자료를 썼다.** 폼을 연 뒤 한 번 더 읽어 바로잡는다. 못 읽으면 목록 값이 남는다. */
+    /* A-472 — 검수대장 */
     if (product && product.__id) {
         try {
             const fresh = await db.collection('products').doc(product.__id).get();
@@ -1757,10 +1679,7 @@ function prodMsg(text, isErr) {
     if (!el) { if (text) pNote(text, !!isErr); return; }       // A-564: 자리가 없으면 화면 안내로(옛날엔 alert 였다)
     el.textContent = text || '';
     el.style.color = isErr ? '#991b1b' : '#15803d';
-    /* ★ A-472(브론즈 29차 ⑤): `#prodFormMsg` 는 `#productForm` **안**에 있어서
-       폼이 닫혀 있으면 아무도 못 본다. 「수정」을 눌렀는데 그 제품이 목록에 없을 때
-       (다른 탭에서 지워졌을 때) 안내가 숨은 상자에 들어가 **화면 변화가 0** 이었다.
-       폼이 닫혀 있으면 폼 밖의 자리에도 같이 적는다. */
+    /* A-472 — 검수대장 */
     const outside = document.getElementById('prodGateMsg');
     const formOpen = document.getElementById('productForm').style.display !== 'none';
     if (outside && !formOpen) {
@@ -1777,16 +1696,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     // R-061: 이미지 업로드보다 **먼저** 본다. 폼을 열어 둔 사이에 관리자가 정지시켰을 수 있고,
     // 뒤에서 막으면 스토리지에 파일만 올라간 뒤 permission-denied 로 끝난다.
     if (!window.bpCanSubmit()) { prodMsg(window.bpGateMessage(), true); window.bpApplyGate(); return; }
-    /* ★★ A-472(2026-11-11, 브론즈 29차 ①): 전에는 `editing` 과 `name` 만 여기서
-       읽고 **나머지 칸은 업로드 await 가 끝난 뒤에** 읽었다. 그 사이에 사람이
-       폼을 바꿀 수 있으므로 이런 길이 났다 —
-         ㄱ. 제품 A 의 「수정」 → 큰 사진을 고르고 저장 (업로드가 수 초 돈다)
-         ㄴ. 업로드 중 「취소」는 그대로 눌린다(잠근 것은 저장 단추 하나뿐이었다)
-         ㄷ. 「제품 추가」 → 새 제품 B 를 타이핑
-         ㄹ. 업로드가 끝나면 핸들러가 **지금 화면의 값(B)** 을 읽어 **A 의 문서**에 쓴다
-       결과: A 가 B 의 내용으로 덮어써지고(이름만 A 의 옛 이름) B 는 만들어지지 않는다.
-       고치는 방법 둘 다 쓴다 — ① 칸을 **전부 지금 읽어** 스냅샷으로 들고 간다.
-       ② 제출이 도는 동안 **취소·수정 단추도 잠근다**(bpSubmitting). */
+    /* A-472 — 검수대장 */
     const form = {
         name:        document.getElementById('prodName').value.trim(),
         collection:  document.getElementById('prodCollection').value.trim(),
@@ -1819,8 +1729,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     }
 
     const btn = document.getElementById('submitProduct');
-    /* A-467: 되살릴 라벨이 모드마다 다르다. 전에는 「검수 요청」 하나만 되살려서,
-       수정 중에 막히면 단추가 엉뚱한 글자로 남는다. 한 군데서 고른다. */
+    /* A-467 — 검수대장 */
     const editing = bpEditingProductId;
     const restoreBtn = () => {
         bpSubmitting = false;                       // A-472 — 잠금 해제는 여기 한 군데서만
@@ -1835,24 +1744,14 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     btn.disabled = true;
     window.setLangText && window.setLangText(btn, "Uploading...", "올리는 중...");
 
-  /* ★ A-472(브론즈 29차 ③): 업로드·쓰기가 거부되면 reject 가 아무 데서도 안 잡혀
-     `restoreBtn()` 에 도달하지 못했다 — 단추가 「올리는 중...」으로 **영구 정지**하고
-     안내도 비어 있었다. 새로고침 말고 벗어날 길이 없었다. 여기서부터 감싸고
-     finally 에서 반드시 되살린다. `restoreBtn` 은 `const` 라 try 블록 안에서
-     선언하면 finally 에서 안 보인다 — 그래서 선언을 try **밖**에 둔다. */
+  /* A-472 — 검수대장 */
   try {
 
     /* A-472: 입력칸 id 가 아니라 **미리 잡아 둔 File 객체**를 받는다. */
     async function uploadFile(file, folder) {
         if (!file) return '';
         const ref = storage.ref(`${folder}/${currentUser.uid}/${Date.now()}_${file.name}`);
-        /* A-484(2026-11-12): 자료 파일(카탈로그·BIM·3D)은 **다운로드로 고정**한다.
-           이 파일들의 토큰 URL 은 승인된 신청자에게 ARCHINODE 이름의 메일로 간다.
-           형식 검사만 두면 `contentType` 은 클라이언트가 보내는 값이라 속일 수 있고,
-           속인 HTML 이 firebasestorage.googleapis.com 에서 그대로 렌더됐다.
-           attachment 를 붙이면 **무엇을 올리든 브라우저가 렌더하지 않는다.**
-           storage.rules 의 isAttachment() 가 이걸 **요구**하므로 빼면 업로드가 거부된다.
-           제품 사진(`products`)에는 붙이지 않는다 — 그건 페이지에 그려져야 한다. */
+        /* A-484 — 검수대장 */
         const meta = folder === 'products-specs' ? { contentDisposition: 'attachment' } : undefined;
         await ref.put(file, meta);
         return await ref.getDownloadURL();
@@ -1875,13 +1774,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
     const fields = form;   // A-472 — 핸들러 맨 앞에서 뜬 스냅샷. 업로드 뒤에 다시 읽지 않는다.
 
     if (editing) {
-        /* ── A-467 수정 ────────────────────────────────────────────────────────
-           지금 문서를 **다시 읽는다**. 폼을 열어 둔 사이에 어드민이 상태를 바꿨을 수
-           있고, 파일을 새로 고르지 않았을 때 지금 올라가 있는 URL 을 그대로 써야 한다
-           (목록 자료만 믿으면 그 사이의 변화를 덮어쓴다).
-           `slug` 은 **바꾸지 않는다** — 공개 주소가 `?id=<slug>` 라서, 이름을 고치면서
-           슬러그까지 바꾸면 이미 돌아다니는 링크가 전부 죽는다.
-           `brandId` · `createdAt` 은 payload 에 아예 넣지 않는다(규칙이 보호한다).  */
+        /* A-467 — 검수대장 */
         let cur;
         try {
             cur = await db.collection('products').doc(editing).get();
@@ -1899,11 +1792,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
             restoreBtn(); return;
         }
         const prev = cur.data();
-        /* ★ A-483(2026-11-12): 자료 파일(카탈로그·BIM·3D)의 **URL** 은 공개 제품 문서에서
-           빼고 `products/{id}/internal/files` 로 옮겼다. 공개 문서에는 **있는지 여부**만 둔다
-           (승인된 제품 문서는 문서 전체가 공개 읽기라, 신청·승인 절차가 아무것도 막지 못했다).
-           파일을 새로 고르지 않았으면 지금 올라가 있는 URL 을 그대로 써야 하므로,
-           옛 자리(본문서)와 새 자리(internal) 를 **둘 다** 본다 — 아직 안 옮긴 제품도 산다. */
+        /* A-483 — 검수대장 */
         let prevFiles = { catalogPdf: prev.catalogPdf || '', bimFile: prev.bimFile || '', model3d: prev.model3d || '' };
         try {
             const fsnap = await db.collection('products').doc(editing)
@@ -1930,7 +1819,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
             catalogPdf: FVd.delete(),   // 옛 자리를 비운다(공개 문서에 URL 을 남기지 않는다)
             bimFile:    FVd.delete(),
             model3d:    FVd.delete(),
-            status: 'pending',          // 승리님 결정 — 고치면 다시 심사 대기
+            status: 'pending',          // A-467 결정 — 고치면 다시 심사 대기
             reviewerNote: null,         // 옛 반려 사유를 들고 가지 않는다
             updatedAt: FVd.serverTimestamp()
         });
@@ -1964,9 +1853,7 @@ document.getElementById('submitProduct').addEventListener('click', async () => {
         return;
     }
 
-    /* A-472: 등록 쪽도 **스냅샷**을 쓴다 — 업로드 뒤에 칸을 다시 읽지 않는다.
-       A-483: 자료 파일 URL 은 internal/files 로. 본문서와 **한 묶음**으로 쓴다
-       (규칙이 쓰기에 getAfter 를 쓰는 이유 — 이 순간 부모 문서가 아직 없다). */
+    /* A-472 · A-483 — 검수대장 */
     const nref = db.collection('products').doc();
     const nbatch2 = db.batch();
     nbatch2.set(nref, Object.assign({
@@ -2034,7 +1921,7 @@ async function loadProducts() {
     empty.style.display = 'none';
 
     const prows = [];
-    /* A-467: 전에는 doc.data() 만 담아 **문서 id 를 버렸다**. 수정에는 id 가 필요하다. */
+    /* A-467 — 검수대장 */
     snap.forEach(doc => prows.push(Object.assign({ __id: doc.id }, doc.data())));
     window.bpProductRows = prows;   // A-467 — 「수정」 이 같은 자료를 그대로 쓴다
     prows.sort((x, y) => articleMillis(y) - articleMillis(x));
@@ -2049,12 +1936,7 @@ async function loadProducts() {
         const pCollection = escapeHtml(p.collection || '');
         const pMaterials = escapeHtml(p.materials || '');
         const pSt = (p.status === 'approved' || p.status === 'rejected') ? p.status : 'pending';
-        /* A-373(2026-11-09): 여기 `ko` 는 `document.documentElement.lang` 을 보는데
-           html 은 `lang="en"` 으로 시작한다. 제품 목록이 lang.js 보다 먼저 그려지면
-           `ko=false` 가 되어 **한국어 브랜드에게 영어 배지**가 뜨고, 짝 속성이 없어
-           나중에 칠해도 안 고쳐졌다(브론즈 14차). 기사 목록은 A-204 에서 같은 함정을
-           고쳤는데 제품 목록만 남아 있었다. 양쪽을 속성으로 달고, 목록을 다 그린 뒤
-           한 번 칠한다 — A-354 의 「다시 그린 뒤 반드시 한 번 칠한다」와 같은 약속이다. */
+        /* A-204 · A-354 · A-373 — 검수대장 */
         const pStatusEn = pSt === 'approved' ? 'Approved' : pSt === 'rejected' ? 'Rejected' : 'Pending';
         const pStatusKo = pSt === 'approved' ? '승인됨'   : pSt === 'rejected' ? '반려됨'   : '심사 대기중';
         const pStatus = ko ? pStatusKo : pStatusEn;
@@ -2092,19 +1974,14 @@ function articleMillis(a) {
 // ── 반려 사유 (A-154) ──
 // 어드민은 같은 reviewerNote 칸을 "게시 시 내부 메모"로도 쓴다.
 // 그래서 status === 'rejected' 일 때만 노출한다 — 승인 건의 내부 메모는 보이지 않는다.
-/* A-204: 반려 사유만 보여주던 함수 — 수정 요청 사유도 보여준다.
-   수정 요청은 '끝' 이 아니라 '고쳐서 다시 내라' 는 뜻이므로 빨강이 아니라 앰버로 쓴다.
-   이름도 rejectReasonHtml → reviewerNoteHtml 로 (이제 반려 전용이 아니다). */
+/* A-204 — 검수대장 */
 function reviewerNoteHtml(status, note) {
     if (status !== 'rejected' && status !== 'revision-requested') return '';
     const ko = (document.documentElement.lang || 'ko').indexOf('ko') === 0;
     const rejected = (status === 'rejected');
     const headEn = rejected ? 'Reason for rejection' : 'Requested changes';
     const headKo = rejected ? '반려 사유' : '수정 요청 사유';
-    /* A-377: 머리말에는 짝이 있는데 **본문만 없어서**, 언어를 바꾸면 한 상자 안에서
-       머리말만 바뀌었다. 사유가 적혀 있으면 양쪽이 같은 글이고, 비어 있을 때만
-       갈린다 — 그 경우에도 따라오도록 양쪽을 만들어 둔다.
-       이 함수는 `rejectReasonHtml` 이라는 옛 이름으로 **제품 카드도 같이 쓴다.** */
+    /* A-377 — 검수대장 */
     const written = (note || '').trim();
     const bodyEn = written ? escapeHtml(written) : 'No reason was given. Please contact us.';
     const bodyKo = written ? escapeHtml(written) : '사유가 입력되지 않았습니다. 문의해 주세요.';
@@ -2147,12 +2024,7 @@ async function loadArticles() {
     snap.forEach(doc => rows.push(doc.data()));
     rows.sort((x, y) => articleMillis(y) - articleMillis(x));
 
-    /* A-204 / R-063: 어드민(admin/articles.html)은 status 를 5단계로 쓴다 —
-       pending · reviewing · revision-requested · approved · rejected.
-       여기서는 앞의 셋만 알아서 나머지를 pending 으로 접었는데(A-153),
-       그 결과 **수정 요청이 브랜드에게 전달되지 않았다**: 어드민은 사유 입력을
-       강제당하고 저장까지 되는데, 브랜드 화면에는 "심사 대기중" 만 떴다.
-       다섯 상태를 모두 알아듣고, 모르는 값만 pending 으로 접는다. */
+    /* A-153 · A-204 — 검수대장 */
     const LABEL = {
         pending:                { ko: '심사 대기중', en: 'Pending' },
         reviewing:              { ko: '검토 중',     en: 'In review' },

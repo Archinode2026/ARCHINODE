@@ -112,8 +112,7 @@ a { text-decoration: none; color: inherit; }
     gap: 32px;
     text-align: center;
 }
-/* A-542: 머리글 단계가 비어 읽히던 자리. 태그만 한 단계 올리고 생김새는
-   그대로 둔다 — 옛 선택자를 지우지 않고 새 태그를 **함께** 적는다. */
+/* A-542 — 검수대장 */
 .fb-stat h3, .fb-stat h2 {
     font-size: 2.4rem;
     font-weight: 700;
@@ -326,11 +325,7 @@ a { text-decoration: none; color: inherit; }
     padding: 80px 24px;
 }
 .fb-compare-inner { max-width: 900px; margin: 0 auto; text-align: center; }
-/* A-626(브론즈 46차 N46-6): 전에는 `max-width:767px` 로 켰고 주석에 「768px 이상에서는
-   숨은 폭 0 으로 실측됨」이라고 적혀 있었다. 그런데 **600px 에서도 숨은 폭이 0** 이다
-   (브론즈 실측) — 즉 521~767px 에서는 밀 것이 없는데 「옆으로 미세요」라고 **거짓말**을
-   했다. 창 크기는 넘침의 대리값일 뿐이다. 실제로 재서 켠다(아래 스크립트가
-   .fb-has-overflow 를 붙인다). */
+/* A-626 — 검수대장 */
 .fb-compare-hint { display: none; }
 .fb-compare-inner.fb-has-overflow .fb-compare-hint {
     display: block; margin: 0 0 10px; font-size: 0.78rem;
@@ -1068,10 +1063,7 @@ function toggleMobile() { const n = document.getElementById('mainNav'); if (n) n
 <script src="firebase-config.js"></script>
 <script src="auth-ui.js"></script>
 <script>
-/* A-626: 비교표가 **실제로** 넘치는지 재서 안내를 켠다. 창 크기로 짐작하지 않는다.
-   표는 폭이 고정이고 바깥 div 가 overflow-x:auto 라서, 넘침은 그 div 의
-   scrollWidth 와 clientWidth 차이로만 알 수 있다. 창 크기·글꼴 로딩·언어 전환으로
-   폭이 바뀌므로 resize 와 ResizeObserver 로 다시 잰다. */
+/* A-626 — 검수대장 */
 (function () {
   var inner = document.querySelector('.fb-compare-inner');
   var box = inner && inner.querySelector('div[role="region"]');

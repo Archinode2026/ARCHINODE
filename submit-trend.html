@@ -246,9 +246,7 @@ function toggleMobile() { document.getElementById('mainNav').classList.toggle('a
 <script src="a11y-nav.js?v=20261113a"></script>
 <script src="auth-ui.js"></script>
 <script>
-/* A-266: 이 페이지는 「입점 → 승인 → 로그인 → 글쓰기」 를 설명한다. 이미 로그인한 브랜드에게
-   「브랜드 포털 로그인」 이라고 말하면 한 단계 뒤로 보내는 셈이라, 바로 포털로 보낸다.
-   ★ 문구는 data-en/data-ko 로 단다 — 이 함수는 lang.js 가 언어를 세우기 전에 돌 수 있다(A-222). */
+/* A-222 · A-266 — 검수대장 */
 if (typeof auth !== 'undefined' && auth && auth.onAuthStateChanged) {
   auth.onAuthStateChanged(async function(user) {
     var cta = document.getElementById('stPortalCta');

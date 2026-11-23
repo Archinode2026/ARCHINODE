@@ -696,19 +696,13 @@ var DP_PRODUCTS = [
   // 아직 올린 상품이 없습니다. 위 틀을 복사해 여기에 넣으세요.
 ];
 
-/* 화면에 꽂기 전에 반드시 거친다 — 상품 글은 저장소에서 오지만, 꺾쇠 하나로
-   페이지가 깨지는 것을 막는다(A-471 의 규칙을 이 페이지에도 적용). */
+/* A-471 — 검수대장 */
 function dpEsc(t) {
   return String(t == null ? '' : t)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
-/* PayPal 주소만 받는다. 오타·다른 주소면 **버튼을 안 만든다** — 엉뚱한 곳으로
-   손님을 보내느니 버튼이 없는 편이 낫다.
-   A-527: paypal.me 를 받고 있었다. 그런데 구매창은 손님에게 「주소창이
-   paypal.com 인지 확인하세요」라고 적는다. 둘이 어긋나면, 가르친 확인 습관이
-   바로 그 자리에서 무너진다. 물건을 파는 길목이므로 상거래용 결제만 받는다.
-   paypal.me 를 쓰시려면 여기와 아래 안내 문구를 **함께** 고쳐야 한다. */
+/* A-527 — 검수대장 */
 function dpPayUrl(u) {
   u = String(u || '');
   return /^https:\/\/(www\.)?paypal\.com\//i.test(u) ? u : '';
@@ -771,10 +765,7 @@ function dpRenderProducts() {
   if (window.applyLangAgain) { try { window.applyLangAgain(); } catch (e) {} }
 }
 
-/* 구매 확인 — 기본 confirm 을 쓰지 않는다(A-487: 막히면 눌러도 아무 일도 안 일어난다).
-   전자상거래법상 디지털 콘텐츠는 **전송이 시작되면 청약철회가 제한**되는데,
-   그 사실을 **사기 전에 알리고 동의를 받아야** 제한할 수 있다. 그래서 체크 전에는
-   결제 단추를 열지 않는다. (문구는 승리님·변호사 확인 대상입니다.) */
+/* A-487 — 검수대장 */
 function dpOpenBuy(id) {
   var p = null;
   for (var i = 0; i < DP_PRODUCTS.length; i++) if (DP_PRODUCTS[i].id === id) p = DP_PRODUCTS[i];
@@ -790,9 +781,7 @@ function dpOpenBuy(id) {
   wrap.id = 'dpBuyWrap';
   wrap.setAttribute('role', 'dialog');
   wrap.setAttribute('aria-modal', 'true');
-  /* A-633: 이 구매창은 z-index 9999 였다. A-629 에서 머리글을 100000 으로 올리면서
-     **머리글이 이 창 위를 덮게 됐다** — 제가 만든 회귀다. 모달 층으로 올린다.
-     층 규약: 토스트 100010 > 모달 100001+ > 머리글 100000 > 쿠키 고지 99999. */
+  /* A-629 · A-633 — 검수대장 */
   wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100001;'
     + 'display:flex;align-items:center;justify-content:center;padding:20px;';
   wrap.innerHTML =
@@ -809,13 +798,11 @@ function dpOpenBuy(id) {
     +   '<p style="margin:0;" data-en="After payment we send the file to the email address used for the payment, within one business day."'
     +     ' data-ko="결제 후 영업일 기준 1일 이내에 결제하신 이메일 주소로 파일을 보내 드립니다.">'
     +     dpEsc(dpPick('After payment we send the file to the email address used for the payment, within one business day.', '결제 후 영업일 기준 1일 이내에 결제하신 이메일 주소로 파일을 보내 드립니다.')) + '</p>'
-    /* A-522: 전자상거래법 제13조제2항이 **사기 전에** 알리라는 것들 — 지급 시기,
-       파일을 여는 데 필요한 것(기술적 사항), 그리고 약관을 어디서 보는지. */
+    /* A-522 — 검수대장 */
     +   '<p style="margin:8px 0 0;" data-en="You pay now, in full, on PayPal. There is no instalment or deferred payment."'
     +     ' data-ko="대금은 지금 PayPal 에서 전액 결제됩니다. 분할·후불 결제는 없습니다.">'
     +     dpEsc(dpPick('You pay now, in full, on PayPal. There is no instalment or deferred payment.', '대금은 지금 PayPal 에서 전액 결제됩니다. 분할·후불 결제는 없습니다.')) + '</p>'
-    /* A-524: 처음에는 `requires` 한 칸이었다 — 영어로 보는 손님에게 한국어가 그대로
-       나왔다(라이브에서 13자 측정). 이름·설명이 두 언어인데 이 칸만 아니었다. */
+    /* A-524 — 검수대장 */
     +   (dpPick(p.requiresEn, p.requiresKo)
           ? '<p style="margin:8px 0 0;"><strong>' + dpEsc(dpPick('To open it: ', '여는 데 필요한 것: ')) + '</strong>'
             + dpEsc(dpPick(p.requiresEn, p.requiresKo)) + '</p>'
@@ -902,8 +889,7 @@ function filterProducts(category) {
   });
 }
 
-/* A-501(2026-11-12): 옛 `buyProduct()` 는 「알림 신청 칸으로 스크롤」이었다
-   (Pre-launch 임시). 이제 위 `dpOpenBuy()` 가 구매 확인 → PayPal 결제 링크로 보낸다. */
+/* A-501 — 검수대장 */
 
 // Notify form — Firestore digital-products-notify 컬렉션에 저장 (단순 이메일 collect)
 async function submitNotify(e) {
@@ -936,8 +922,7 @@ async function submitNotify(e) {
       document.getElementById('notifyMsg').style.display = 'block';
       return false;
     }
-    /* A-497: `alert()` 이었다 — 막혀 있는 환경에서는 **눌러도 아무것도 안 보인다**
-       (A-440 에서 저장 단추로 같은 일을 겪었다). 화면 안내로 바꾸고 두 언어로 적는다. */
+    /* A-440 · A-497 — 검수대장 */
     var dpMsg = document.getElementById('notifyMsg');
     if (dpMsg) {
         var dpEn = 'We could not sign you up. Please try again in a moment.';
