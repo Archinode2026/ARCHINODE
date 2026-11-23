@@ -288,9 +288,20 @@ function dmd_draw() {
       (a.unknownCategory ? '<p class="adm-empty">' + escapeHtml(t('category unknown: ' + a.unknownCategory,
           '품목 미상: ' + a.unknownCategory)) + '</p>' : '') +
       '<h3>' + escapeHtml(t('Who asked', '묻는 사람')) + '</h3>' +
-      dmd_barRows(dmd_rank(a.byIndustry), a.total, DMD_IND_KO) +
-      (a.unknownIndustry ? '<p class="adm-empty">' + escapeHtml(t('not stated: ' + a.unknownIndustry,
-          '직군 미기재: ' + a.unknownIndustry)) + '</p>' : '') +
+      /* A-666(2026-11-23): 공개 폼 세 곳이 industry 를 빈 문자열로 담는다
+         (brands/view.html 1061 · products/view.html 1131 · sourcing-inquiry.html 516).
+         그래서 이 집계는 구조적으로 빈다 — 「미기재」가 아니라 **아예 안 받는다**다.
+         전에는 「직군 미기재: N」만 떠서 손님이 답을 안 한 것처럼 읽혔다. 그 말을 믿고
+         이 숫자를 수요 근거로 쓰면 안 된다. 화면이 이유를 말하게 한다.
+         받으려면 처리방침 제3조(수집 항목)부터 고쳐야 한다 — 거기 업종은 전문가
+         회원가입에만 있다. 승리님과 변호사 몫이다. */
+      (Object.keys(a.byIndustry).length === 0
+        ? '<p class="adm-empty">' + escapeHtml(t(
+              'Not collected — the public forms do not ask for industry. Adding that field needs a privacy-policy change first.',
+              '받지 않는 값입니다 — 공개 폼이 업종을 묻지 않습니다. 칸을 더하려면 처리방침 제3조(수집 항목)를 먼저 고쳐야 합니다.')) + '</p>'
+        : dmd_barRows(dmd_rank(a.byIndustry), a.total, DMD_IND_KO) +
+          (a.unknownIndustry ? '<p class="adm-empty">' + escapeHtml(t('not stated: ' + a.unknownIndustry,
+              '직군 미기재: ' + a.unknownIndustry)) + '</p>' : '')) +
       '<h3>' + escapeHtml(t('Where from', '들어온 경로')) + '</h3>' +
       dmd_barRows(dmd_rank(a.bySource), a.total, DMD_SRC_KO) +
       '<h3>' + escapeHtml(t('By month', '달별')) + '</h3>' +
