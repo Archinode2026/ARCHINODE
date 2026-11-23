@@ -135,6 +135,8 @@ CHECKS = [
      'A-609 — 전역 auth·db·storage 가 const 여서, firebase 가 안 내려오면 선언만 되고 초기화 안 된 상태로 남았다. 그러면 다른 81군데의 `typeof db` 방어조차 ReferenceError 를 던져 손님 화면이 조용히 멈춘다(실측: 30초 빈칸, 안내문 0)'),
     ('한국어가 새는 자리',     'py',   'tools/check-lang-leak.py',
      'A-534 — 두 언어 속성이 **아예 없는** 한국어 글자. 짝이 한쪽만 있는 것(언어 규약)도, 영어만 나오는 안내(두 언어 안내)도 아닌 세 번째 틈 — A-526·A-529·A-532 가 이리로 지나갔다'),
+    ('쪽 틀 세대', 'py', 'tools/check-page-shell.py',
+     'A-675 — 옛 세대 쪽 틀을 쓰는 쪽을 센다. 승리님 목록에 「privacy-en 을 공용 CSS 로(13번 따로 고쳤다)」가 있었는데, 열어 보니 **CSS 중복이 아니었다** — 그 쪽은 꾸밈 전체를 다른 마크업 낱말로 든 옛 틀이다(`footer-column`·`footer-content`·`search-bar`·`scroll-to-top` 대 지금 틀의 `footer-col`·`footer-grid`·`search-box`·`scroll-top`). 마크업이 다르니 `style.css` 가 닿지 않고, 그래서 쪽 단위 CSS 20,794자로 자기 꾸밈을 따로 든다 — 변수 대신 하드코딩, 컨테이너 폭도 다르다. 전역 수정 A-206·A-630·A-641·A-648·A-652 가 **전부 이 쪽을 비껴갔다.** 고치는 일은 CSS 삭제가 아니라 **쪽을 다시 짜는 것**이고 법률 쪽이라 브라우저 실측이 필요하다. 그래서 이 검사는 ① 옛 낱말을 쓰는 쪽을 세고 ② 아는 쪽은 까닭과 함께 KNOWN 에 두어, **새로 생기는 것만** 실패로 잡는다. 깨기 2종 통과.'),
     ('매거진 태그', 'py', 'tools/check-magazine-tags.py',
      'A-672 — 같은 태그가 두 자리에 산다: 기사 쪽 `magazine/<글>.html` 의 `class="tag"` 와 목록 쪽 `magazine.html` 의 `article-card-tag`. 사본이 **조용히 갈라지는 것**이 A-348·A-367·A-393·A-409 에서 반복된 실패다. 세 가지를 본다 — ① 기사와 카드가 쌍으로 같은가 ② 영문 하나에 국문이 둘 이상 붙지 않았나 ③ 국문 하나에 영문이 둘 이상 붙지 않았나. 보이는 글자가 두 언어 속성 중 하나와 같은지도 본다(속성만 고치면 토글 전까지 옛 글자가 보인다). 2026-11-24 에 실제로 어긋나 있었다 — `Industry` 에 국문 셋(산업·업계·업계 동향) · `자재` 에 영문 셋(Materials·Material·Finishes) · `Trend`/`Trends` · `Sustainability` 에 둘 · `건축` 에 Architecture 와 Construction 둘. 기사 내용을 읽고 12편을 정본으로 맞췄다(28종 → 20종, 일대일). 깨기 5종 통과 — 주석 덫 포함.'),
     ('정의 없는 클래스', 'py', 'tools/check-css-classes.py',
