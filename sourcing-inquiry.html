@@ -36,6 +36,18 @@
      폼에 처음 손이 닿을 때 recaptcha-lazy.js 가 싣는다(첫 화면에서 354.8KB 빠짐,
      손대지 않은 손님에게는 localStorage `_grecaptcha` 도 안 생긴다). -->
 <script src="recaptcha-lazy.js?v=20261117" defer></script>
+<style>
+/* A-664: 소싱 문의의 약속 — 네 단계 */
+.si-steps { list-style:none; counter-reset:si; margin:0; padding:0; }
+.si-steps li { counter-increment:si; position:relative; padding:0 0 16px 38px; line-height:1.75; }
+.si-steps li::before { content:counter(si); position:absolute; left:0; top:1px;
+  width:24px; height:24px; border-radius:50%; background:var(--gray-200); color:var(--black);
+  font-size:0.76rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.si-steps b { display:block; font-size:0.95rem; color:var(--black); margin-bottom:2px; }
+.si-steps span { font-size:0.9rem; color:var(--ink-soft); }
+.si-note { margin:4px 0 0; padding:12px 14px; background:var(--gray-100);
+  border-left:3px solid var(--accent); font-size:0.88rem; line-height:1.7; color:var(--gray-700); }
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main" data-en="Skip to content" data-ko="본문으로 건너뛰기">Skip to content</a>
@@ -117,6 +129,29 @@
   </div>
 </div>
 
+<!-- A-664(2026-11-23, 승리님 결정): 이 쪽에는 **약속이 한 줄도 없었다** — 제목과 폼과
+     「감사합니다」뿐이었다. 한국 스펙라이터가 맨 폼 앞에 서 있었다.
+     핵심코어 설계(docs/설계/핵심코어-2026-11-23.md §2-ㄴ)에서 이 쪽은 고리의 **시작점**이다 —
+     바이어는 답을 받고, 우리는 수요 기록을 쌓는다. 가장 값싸고 가장 크게 바뀌는 자리다.
+     승리님 결정: 「찾아보는 것까지 무료」 · 「영업일 5일 이내」.
+     ★ 「없습니다」도 답으로 쓴다 — 「한국에 없습니다. 만드는 유럽 브랜드가 세 곳입니다.
+        들여올까요?」 그 한 문장이 바이어와 브랜드를 동시에 움직인다. -->
+<section class="si-promise" style="padding:44px 0 0;">
+<div class="container" style="max-width:640px;">
+  <h2 style="font-size:1.12rem;margin:0 0 14px;" data-en="What we do with your enquiry" data-ko="문의하시면 이렇게 합니다">문의하시면 이렇게 합니다</h2>
+  <ol class="si-steps">
+    <li><b data-en="We look" data-ko="찾습니다">찾습니다</b>
+        <span data-en="Tell us the specification. We check whether it is already distributed in Korea — and if it is not, we find who makes it in Europe." data-ko="사양을 알려 주시면 한국에 이미 유통되는지 확인하고, 없으면 유럽에서 만드는 곳을 찾습니다.">사양을 알려 주시면 한국에 이미 유통되는지 확인하고, 없으면 유럽에서 만드는 곳을 찾습니다.</span></li>
+    <li><b data-en="You get four things" data-ko="네 가지를 돌려드립니다">네 가지를 돌려드립니다</b>
+        <span data-en="Whether it is available in Korea · alternative brands that make it · lead time · an approximate price band." data-ko="한국 유통 여부 · 같은 것을 만드는 대안 브랜드 · 리드타임 · 개략 단가.">한국 유통 여부 · 같은 것을 만드는 대안 브랜드 · 리드타임 · 개략 단가.</span></li>
+    <li><b data-en="Within 5 business days" data-ko="영업일 5일 이내">영업일 5일 이내</b>
+        <span data-en="If it will take longer than that, we tell you why before the five days are up." data-ko="그보다 오래 걸릴 일이면, 5일이 지나기 전에 왜 그런지 먼저 알려 드립니다.">그보다 오래 걸릴 일이면, 5일이 지나기 전에 왜 그런지 먼저 알려 드립니다.</span></li>
+    <li><b data-en="Looking is free" data-ko="찾아보는 것까지는 무료입니다">찾아보는 것까지는 무료입니다</b>
+        <span data-en="You pay only if you ask us to actually import or quote. No fee for the search itself." data-ko="실제로 수입이나 견적을 의뢰하실 때부터 비용이 생깁니다. 찾아보는 것 자체는 값을 받지 않습니다.">실제로 수입이나 견적을 의뢰하실 때부터 비용이 생깁니다. 찾아보는 것 자체는 값을 받지 않습니다.</span></li>
+  </ol>
+  <p class="si-note" data-en="And &quot;it is not available in Korea&quot; is an answer too — we will tell you who makes it in Europe and ask whether you want us to bring it in." data-ko="그리고 「한국에 없습니다」도 답입니다 — 유럽에서 만드는 곳을 알려 드리고, 들여올지 여쭙겠습니다.">그리고 「한국에 없습니다」도 답입니다 — 유럽에서 만드는 곳을 알려 드리고, 들여올지 여쭙겠습니다.</p>
+</div>
+</section>
 <section style="padding:60px 0;">
   <div class="container" style="max-width:640px;">
     <div id="sourcingFormWrap">
