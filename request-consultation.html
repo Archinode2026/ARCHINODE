@@ -279,7 +279,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 <!-- SERVICES -->
 <section class="services">
   <div class="container">
-    <h2 data-en="Four ways we work with you" data-ko="네 가지 자문 방식">Four ways we work with you</h2>
+    <h2 data-en="Five ways we work with you" data-ko="다섯 가지 자문 방식">Five ways we work with you</h2>
     <div class="services-grid">
       <div class="service-card">
         <i class="fas fa-compass"></i>
@@ -296,10 +296,19 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <h3 data-en="Material Sourcing" data-ko="자재 소싱">Material Sourcing</h3>
         <p data-en="For Korean buyers — sourcing specific European materials, brands, or product specs. Spec sheets, lead times, MOQs." data-ko="한국 발주자용 — 유럽 특정 자재·브랜드·스펙 소싱. 스펙시트, 리드타임, 최소발주 안내.">For Korean buyers — sourcing specific European materials, brands, or product specs. Spec sheets, lead times, MOQs.</p>
       </div>
+      <!-- A-665(2026-11-23, 승리님 승인): 박람회 진출이 아래 「기타 · 맞춤형」 안에
+           「전시회 준비 (KOREA BUILD, SLDF)」로 묻혀 있었다. 승리님이 가장 잘 하실 수
+           있고 가장 차별되는 것이 「기타」였다. 제 갈래로 꺼내고, 아래 카드에서는 뺀다.
+           자세한 단계는 for-brands.html#fair-entry 에 있다(숫자는 아직 비어 있다). -->
+      <div class="service-card">
+        <i class="fas fa-store"></i>
+        <h3 data-en="Trade Fair Entry" data-ko="박람회 진출">Trade Fair Entry</h3>
+        <p data-en="For European brands exhibiting in Korea — we act as the importer of record, decide the customs route, arrange and build the stand, and staff the floor in both languages." data-ko="한국 박람회에 나가는 유럽 브랜드용 — 수입 주체를 맡고, 통관 경로를 정하고, 부스를 확보해 짓고, 현장에 두 언어를 쓰는 사람을 둡니다.">For European brands exhibiting in Korea — we act as the importer of record, decide the customs route, arrange and build the stand, and staff the floor in both languages.</p>
+      </div>
       <div class="service-card">
         <i class="fas fa-question-circle"></i>
         <h3 data-en="Other / Custom" data-ko="기타 · 맞춤형">Other / Custom</h3>
-        <p data-en="Strategic advisory, due diligence on Korean partners, exhibition prep (KOREA BUILD, SLDF), or anything that doesn't fit the boxes above." data-ko="전략 자문, 한국 파트너 실사, 전시회 준비 (KOREA BUILD, SLDF), 또는 위 카테고리 외 맞춤형 요청.">Strategic advisory, due diligence on Korean partners, exhibition prep (KOREA BUILD, SLDF), or anything that doesn't fit the boxes above.</p>
+        <p data-en="Strategic advisory, due diligence on Korean partners, or anything that doesn't fit the boxes above." data-ko="전략 자문, 한국 파트너 실사, 또는 위 카테고리 외 맞춤형 요청.">Strategic advisory, due diligence on Korean partners, or anything that doesn't fit the boxes above.</p>
       </div>
     </div>
   </div>
@@ -361,7 +370,12 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
             <option value="market-entry">Korean Market Entry — 한국 시장 진출</option>
             <option value="partnership-match">Partnership Match — 브랜드 파트너십 매칭</option>
             <option value="material-sourcing">Material Sourcing — 자재 소싱</option>
-            <option value="other">Other / Custom — 기타</option>
+            <!-- A-665(2026-11-23): 박람회 진출 갈래. 이게 없으면 for-brands#fair-entry 에서
+     온 브랜드가 다시 「기타」를 골라야 한다 — 묻혀 있던 자리로 되돌아간다.
+     ★ 열쇠(`fair-entry`)는 저장되는 값이므로 `admin/consultations.html` 의
+       CATEGORY_LABEL 에도 **같이** 넣어야 한다. A-498 이 적어 둔 규약이다. -->
+              <option value="fair-entry" data-en="Trade Fair Entry — 박람회 진출" data-ko="박람회 진출 — Trade Fair Entry">Trade Fair Entry — 박람회 진출</option>
+              <option value="other">Other / Custom — 기타</option>
           </select>
         </div>
 
@@ -806,5 +820,23 @@ async function submitConsult(e) {
   })();
 </script>
 
+<script>
+/* A-665(2026-11-23): `for-brands.html#fair-entry` 의 단추가 `?topic=fair-entry` 로 보낸다.
+   그 값을 읽어 관심분야를 미리 골라 둔다 — 브랜드가 방금 읽은 것을 다시 고르게 하지 않는다.
+   ★ 허용된 열쇠만 받는다. 주소에서 온 값을 그대로 넣으면 손님이 아무 값이나 심을 수 있다. */
+(function () {
+  try {
+    var m = /[?&]topic=([a-z-]{2,20})/i.exec(window.location.search || '');
+    if (!m) return;
+    var want = String(m[1]).toLowerCase();
+    if (want === 'fair') want = 'fair-entry';
+    var sel = document.getElementById('category');
+    if (!sel) return;
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === want) { sel.selectedIndex = i; break; }
+    }
+  } catch (e) { /* 미리 고르기는 덤이다 — 실패해도 폼은 그대로 쓸 수 있어야 한다 */ }
+})();
+</script>
 </body>
 </html>
