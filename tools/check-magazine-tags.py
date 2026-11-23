@@ -8,11 +8,15 @@
 사본을 둘 만든 것이 좋은 설계는 아니지만, 지금 구조가 그렇다. 사본이 **조용히
 갈라지는 것**이 A-348·A-367·A-393·A-409 에서 반복된 바로 그 실패다.
 
-세 가지를 본다
+네 가지를 본다
 --------------
 ① 기사와 카드의 태그가 **쌍으로 같은가**
 ② 영문 하나에 **국문이 둘 이상** 붙지 않았나
 ③ 국문 하나에 **영문이 둘 이상** 붙지 않았나
+④ 기사 끝 메타의 「카테고리: X」 가 태그와 같은가 — 2026-11-24 에 **130편 중
+   91편**이 한국어 화면에서 영문 이름을 보여 주고 있었다
+⑤ 태그 성격에 맞는 **문(mg-door)** 이 달렸는가 (A-673). 안 달기로 한 39편에
+   문이 생기는 것도 잡는다 — 그건 결정이지 실수가 아니다
 
 ②③ 은 2026-11-24 에 실제로 어긋나 있었다 — `Industry` 에 국문이 셋(산업·업계·
 업계 동향), `자재` 에 영문이 셋(Materials·Material·Finishes), `Trend`/`Trends`,
@@ -96,6 +100,27 @@ def main():
             if vis and vis not in (en, ko):
                 probs.append('%s 보이는 글자가 두 언어 어느 쪽도 아니다: %s — 「%s」' % (name, f, vis))
 
+    # ④ 기사 끝 메타의 「카테고리: X」 가 태그와 같은가
+    #    2026-11-24: **130편 중 91편**이 한국어 화면에서 영문 이름을 보여 주고 있었다
+    #    — 「카테고리: Sustainability · 작성: ARCHINODE 편집국」. 태그에는 국문이
+    #    제대로 있는데 메타만 영문이었다. 같은 사실이 한 쪽에 두 번 적히면 한쪽이
+    #    낡는다. 태그를 정본으로 본다.
+    for f, v in sorted(art.items()):
+        if not v: continue
+        en, ko, _ = v
+        s2 = strip_comments(read(os.path.join(ROOT, 'magazine', f)))
+        m = re.search(r'class="article-meta-foot">\s*<span data-en="([^"]*)"\s+data-ko="([^"]*)"', s2)
+        if not m:
+            probs.append('기사 끝 메타를 못 읽었다: %s' % f); continue
+        cen = re.search(r'Category:\s*([^·&]+)', m.group(1))
+        cko = re.search(r'카테고리:\s*([^·&]+)', m.group(2))
+        cen = cen.group(1).strip() if cen else ''
+        cko = cko.group(1).strip() if cko else ''
+        if cen != en:
+            probs.append('메타 영문 카테고리가 태그와 다르다: %s — 태그 %s 대 메타 %s' % (f, en, cen))
+        if cko != ko:
+            probs.append('메타 국문 카테고리가 태그와 다르다: %s — 태그 %s 대 메타 %s' % (f, ko, cko))
+
     # ②③ 하나에 하나인가
     en2ko, ko2en = defaultdict(set), defaultdict(set)
     for f, v in art.items():
@@ -108,7 +133,56 @@ def main():
         if len(ens) > 1:
             probs.append('국문 하나에 영문이 여럿: %s → %s' % (ko, ' · '.join(sorted(ens))))
 
-    print('매거진 태그 검사 (A-672)')
+    # ⑤ 문(mg-door) — A-673
+    #    태그 성격별로 문 하나. 달기로 한 태그에 문이 없으면 잡고, **안 달기로 한
+    #    태그에 문이 생기면** 그것도 잡는다. 39편(문화·디자인 등)에 문을 안 단 것은
+    #    실수가 아니라 결정이다 — 그 결정이 조용히 뒤집히지 않게 한다.
+    DOOR_TAGS = {
+        'A': {'Materials', 'Finishes', 'Furniture', 'Interior'},
+        'B': {'Policy', 'Construction', 'Safety', 'Technology', 'Sustainability'},
+        'C': {'Market', 'Industry', 'Global', 'Trend', 'Urban'},
+    }
+    NO_DOOR = {'Culture', 'Design', 'Lifestyle', 'Project', 'Architecture', 'Award'}
+    want = {}
+    for k, ts in DOOR_TAGS.items():
+        for t in ts:
+            want[t] = k
+    for f, v in sorted(art.items()):
+        if not v:
+            continue
+        en = v[0]
+        s2 = strip_comments(read(os.path.join(ROOT, 'magazine', f)))
+        m = re.search(r'<aside class="mg-door"[^>]*data-door="([A-C])"[\s\S]*?</aside>', s2)
+        if en in NO_DOOR:
+            if m:
+                probs.append('문을 달지 않기로 한 태그에 문이 있다: %s (태그 %s)' % (f, en))
+            continue
+        if en not in want:
+            probs.append('문 매핑에 없는 태그다: %s — %s (검사기의 DOOR_TAGS 와 NO_DOOR 에 넣어라)' % (f, en))
+            continue
+        if not m:
+            probs.append('문이 없다: %s (태그 %s → 문 %s)' % (f, en, want[en]))
+            continue
+        if m.group(1) != want[en]:
+            probs.append('문 종류가 태그와 안 맞는다: %s — 태그 %s 는 문 %s 인데 문 %s 가 붙었다'
+                         % (f, en, want[en], m.group(1)))
+        blk = m.group(0)
+        a = re.search(r'<a[^>]*class="mg-door-cta"[^>]*>([^<]*)</a>', blk)
+        if not a:
+            probs.append('문에 링크가 없다: %s' % f); continue
+        atag = a.group(0)
+        for need in ('data-ko-href', 'data-en-href', 'data-en=', 'data-ko='):
+            if need not in atag:
+                probs.append('문 링크에 %s 가 없다: %s — 한쪽만 적으면 토글해 돌아올 때 주소가 안 돌아온다' % (need, f))
+        ko = re.search(r'data-ko="([^"]*)"', atag)
+        if ko and a.group(1).strip() != ko.group(1):
+            probs.append('문 링크의 보이는 글자가 국문 속성과 다르다: %s — 이 쪽은 lang="ko" 다' % f)
+        kh = re.search(r'data-ko-href="([^"]*)"', atag)
+        h = re.search(r'\shref="([^"]*)"', atag)
+        if kh and h and kh.group(1) != h.group(1):
+            probs.append('문 링크의 기본 href 가 국문 주소와 다르다: %s — 첫 그림에서 엉뚱한 데로 간다' % f)
+
+    print('매거진 태그·문 검사 (A-672 · A-673)')
     print('  기사 %d편 · 카드 %d개 · 태그 %d종' % (len(art), len(card), len(en2ko)))
     inv = defaultdict(int)
     for v in art.values():

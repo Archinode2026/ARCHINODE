@@ -3226,6 +3226,51 @@ body.home .promo-item {
    지금 화면은 한 픽셀도 안 바뀐다. 좁은 폭에서는 아래 3250행 묶음이 `.promo-item`
    으로 half 까지 함께 span 6 으로 덮는다(특정도 같고 뒤에 있어 이긴다 — 확인함). */
 body.home .promo-half  { grid-column: span 3; aspect-ratio: 16 / 10; }
+
+/* ── 매거진 기사의 문 (A-673, 2026-11-24) ─────────────────────────────────
+   기사 130편 안의 내부 링크가 **0개**였다. 한국 시장 글을 끝까지 읽은 손님이
+   갈 곳이 없었다 — 가장 큰 자산이 막다른 길이었다(핵심코어 설계 §5).
+   꼬리말에 일괄 CTA 를 붙이는 방식은 쓰지 않았다. 아무도 안 누른다.
+   **태그로 성격을 갈라 문 하나씩** 달았다 — 91편, 나머지 39편(문화·디자인·
+   프로젝트·건축·라이프스타일·어워드)에는 **일부러 안 달았다.** 읽을 것을
+   읽게 두는 것도 설계다.
+   한국어 쪽은 셋 다 소싱 문의로 간다 — 한국 독자에게 다음 걸음은 하나다.
+   영문 쪽은 갈린다(브랜드 안내 / 시장 진출 자문) — `data-ko-href` 와
+   `data-en-href` 를 **둘 다** 적는다. 하나만 적으면 토글해 돌아올 때 주소가
+   안 돌아온다(lang.js:353 은 그 언어의 속성이 있을 때만 바꾼다).
+   꾸밈을 여기 한 곳에 두는 이유: 기사 130편의 쪽 단위 style 이 이미 **72종**으로
+   갈라져 있다. 거기에 또 사본을 130개 만들면 안 된다. */
+.mg-door {
+    max-width: 720px;
+    margin: 36px auto 0;
+    padding: 22px 24px 4px;
+    border-top: 1px solid var(--gray-200);
+}
+.mg-door p {
+    margin: 0 0 12px;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+}
+.mg-door-cta {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-ink);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+}
+.mg-door-cta:hover,
+.mg-door-cta:focus-visible {
+    color: var(--black);
+}
+@media (max-width: 600px) {
+    .mg-door { margin-top: 28px; padding: 18px 20px 4px; }
+    .mg-door p { font-size: 0.88rem; }
+}
+
+
 body.home .promo-third { grid-column: span 2; aspect-ratio: 4 / 3; }
 body.home .promo-full  { grid-column: span 6; aspect-ratio: 32 / 9; }
 body.home .promo-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .9s cubic-bezier(.2,.6,.2,1); }
