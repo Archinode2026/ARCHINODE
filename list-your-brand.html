@@ -30,10 +30,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<!-- A-004(2026-11-03): reCAPTCHA v3 — 사이트 키는 공개돼도 안전함(설계상 그렇게 쓰도록 되어 있음). 비밀 키는 netlify/functions/recaptcha-verify.js 서버 쪽에만 있음 -->
-<!-- A-584(2026-11-17, 브론즈 42차 C+H): api.js 를 머리에서 바로 싣지 않는다.
-     폼에 처음 손이 닿을 때 recaptcha-lazy.js 가 싣는다(첫 화면에서 354.8KB 빠짐,
-     손대지 않은 손님에게는 localStorage `_grecaptcha` 도 안 생긴다). -->
+<!-- A-004 — 검수대장 -->
+<!-- A-584 — 검수대장 -->
 <script src="recaptcha-lazy.js?v=20261117" defer></script>
 
 <style>
@@ -209,29 +207,20 @@
       <a href="about.html" data-en="About" data-ko="소개">About</a>
       <a href="for-brands.html" class="nav-gate" data-en="Enter Korea" data-ko="한국 진출 안내">Enter Korea</a>
       <a href="sourcing-inquiry.html" class="nav-cta" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">자재 소싱 문의</a>
-      <!-- A-653(2026-11-21): `nav-cta` 를 뗐다. 이 자리는 **지금 보고 있는 쪽 표시**인데
-           단추 꾸밈을 쓰고 있어, 영어 화면에서 「SOURCING INQUIRY」 와 「LIST YOUR BRAND」
-           **같은 모양 단추가 나란히** 떴다(146x29 와 137x29). 손님이 어느 쪽이 주행동인지
-           한 번 더 읽어야 한다. 표시는 `active-nav` 가 하므로 단추 꾸밈은 필요 없다.
-           `data-lang-only="en"` 은 **그대로 둔다** — A-343 의 승리님 결정 영역이라
-           제가 혼자 풀지 않는다(한국어 손님이 현재 쪽 표시를 못 받는 점은 결정 목록에 올렸다).
-           (브론즈 51차 N51-7) -->
+      <!-- A-343 · A-653 — 검수대장 -->
       <a href="list-your-brand.html" class="active-nav" data-lang-only="en" data-en="List Your Brand" data-ko="브랜드 입점">List Your Brand</a>
     </nav>
     <div class="header-actions">
       <a href="auth/login.html" style="font-size:0.82rem;color:var(--accent-ink);font-weight:600;" data-en="Log In" data-ko="로그인">Log In</a>
       <button class="search-toggle" onclick="toggleSearch()" aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-search"></i></button>
-      <!-- A-207: 이 주석은 "영어 전용 페이지" 라고 적혀 있었는데 그 판단은 A-008 이 2026-11-03 에 뒤집었다.
-           이 페이지는 한국어 번역이 40%(1,330자) 있고 data-langs="en,ko" 다. 스위처가 있어야 한다.
-           낡은 주석을 근거로 A-206 에서 내가 껐던 것을 되돌린다 — 주석이 아니라 번역을 세어야 한다. -->
+      <!-- A-008 · A-206 · A-207 — 검수대장 -->
       <a href="#" class="lang-switch" onclick="toggleLang(event)">KR / EN</a>
       <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu" data-en-aria-label="Menu" data-ko-aria-label="메뉴"><i class="fas fa-bars"></i></button>
     </div>
   </div>
 </header>
 
-<!-- SEARCH OVERLAY — A-458(2026-11-11): 이 페이지만 헤더에 돋보기가 없었다. A-452 에서
-     brand-guide·submit-trend 에 넣을 때 여기를 빠뜨렸다. (브론즈 28차 12번) -->
+<!-- A-452 · A-458 — 검수대장 -->
 <div class="search-overlay" id="searchOverlay">
   <button type="button" class="search-close" onclick="toggleSearch()" aria-label="Close search" data-en-aria-label="Close search" data-ko-aria-label="검색 닫기" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;line-height:1;padding:0;font-family:inherit;">&times;</button>
   <div class="search-box">
@@ -242,18 +231,10 @@
 
 
 <!-- HERO -->
-<!-- A-606(2026-11-18, 브론즈 44차 2번): 전에는 이 자리에 **속이 빈 본문 표지**가
-     있었고(건너뛰기 링크가 닿는 빈 div), a11y-nav.js 가 그것에 role="main" 을
-     붙였다. 표지는 붙었지만 그 안이 비어 있어서, 「본문으로 건너뛰기」로 들어오면
-     아무것도 없는 자리에 떨어졌고 진짜 본문은 어느 구역에도 속하지 않은 채
-     바깥에 있었다(실측: 본문 안 글자 0자, 어느 구역에도 안 든 머리글이
-     매거진 134개·index 26개). 그래서 빈 표지를 걷고 본문을 실제로 감싼다. -->
+<!-- A-606 — 검수대장 -->
 <main id="main" tabindex="-1">
 <section class="lyb-hero">
-    <!-- A-553: 내비 단추는 이 쪽을 「브랜드 입점」이라 부르는데 쪽 자신은
-     「브랜드를 등록하세요」라고만 적었다. 그래서 손님이 「입점」으로 검색하면
-     이 쪽이 **안 나왔다** — 가장 돈이 되는 길 하나가 검색에서 끊겨 있었다.
-     내비 쪽 말로 맞춘다(승리님 결정, 2026-11-15). -->
+    <!-- A-553 — 검수대장 -->
 <h1><span data-en="List Your Brand on " data-ko=""></span><span class="gold">ARCHINODE</span><span data-en="" data-ko=" 브랜드 입점 신청"></span></h1>
     <p data-en="Register below and get your own brand page, login portal, and direct access to Korean architects and designers." data-ko="아래 입점 신청서를 작성하시면 브랜드 페이지, 로그인 포털, 한국 건축가·디자이너 접근권을 받으실 수 있습니다."></p>
     <div style="margin-top:28px; text-align:center;">
@@ -462,10 +443,7 @@
             <fieldset class="form-group" style="border:none;padding:0;margin:0 0 20px;">
                 <legend data-en="Category *" data-ko="카테고리 *" style="display:block;margin-bottom:8px;font-size:0.85rem;color:#6b6459;">Category *</legend>
                 <small style="color:#6b6459;font-weight:400;display:block;margin:-6px 0 10px;" data-en="(Select all that apply)" data-ko="(해당하는 항목을 모두 선택하세요)">(Select all that apply)</small>
-                <!-- A-457(2026-11-11): 이 10개만 평문 영어였다. 이 페이지는 data-langs="en,ko" 라
-                     한국어 손님도 오는데, 바로 위 「(해당하는 항목을 모두 선택하세요)」는 한국어인데
-                     정작 고를 항목이 영어였다. 한국어 이름은 카테고리 페이지의 두 언어 h1 이 정본이고
-                     tools/check-category-labels.py 가 그 정본과 맞춰 본다. (브론즈 28차 8번) -->
+                <!-- A-457 — 검수대장 -->
                 <div class="category-grid" id="categoryGrid" role="group" aria-label="Category" data-en-aria-label="Category" data-ko-aria-label="카테고리">
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Bathroom"><span data-en="Bathroom" data-ko="욕실">Bathroom</span></label>
                     <label class="cat-checkbox"><input type="checkbox" name="category" value="Construction"><span data-en="Construction" data-ko="건축자재">Construction</span></label>
@@ -560,9 +538,7 @@
             </div>
 
             <div class="form-submit">
-                <!-- A-537(브론즈 38차 7번): 전화번호까지 받으면서 고지도 동의도
-                     없었다. 처리방침 제3조가 「브랜드 입점 신청 시」를 스스로
-                     적어 둔 바로 그 자리다. -->
+                <!-- A-537 — 검수대장 -->
                 <div class="form-consent">
                   <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
                   <ul>
@@ -615,8 +591,7 @@
         <div class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">Bridging Architecture</span></div>
         <p data-en="The premier gateway for high-end European design brands entering Korea." data-ko="엄선된 해외 건축·디자인 브랜드와 한국 크리에이터를 위한 B2B 쇼케이스">The premier gateway for high-end European design brands entering Korea.</p>
         <div class="footer-contact">
-          <!-- A-316: 소셜 아이콘 4개가 전부 href="#" 였다 → 문의 한 줄로 교체(승리님 결정).
-               계정이 생기면 이 자리에 다시 넣는다. -->
+          <!-- A-316 — 검수대장 -->
           <a href="mailto:office@archinode.org" data-en="Brand listing &amp; partnership: office@archinode.org" data-ko="입점·제휴 문의 office@archinode.org">Brand listing &amp; partnership: office@archinode.org</a>
         </div>
       </div>
@@ -644,8 +619,7 @@
         <h2 class="footer-col-title" data-en="Services" data-ko="서비스">Services</h2>
         <ul>
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
-          <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
-               이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
+          <!-- A-340 — 검수대장 -->
           <li>
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
@@ -1198,10 +1172,7 @@ document.addEventListener('click', function(e) {
 });
 function toggleMobile() { var n = document.getElementById('mainNav'); if (n) n.classList.toggle('active'); }
 </script>
-<!-- SCROLL TO TOP — A-458(2026-11-11): A-451 에서 네 페이지에 넣었는데 **더 긴 페이지들을
-     빠뜨렸다.** 매거진 기사 131편은 이 사이트에서 가장 긴 문서들이고, 제품 상세 ·
-     for-brands · list-your-brand 도 넣은 네 곳보다 길다. (브론즈 28차 11번)
-     A-451 과 같은 자급식 — 남의 변수에 기대지 않고, 두 번 실행돼도 안전하다. -->
+<!-- A-451 · A-458 — 검수대장 -->
 <button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)"
         aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>

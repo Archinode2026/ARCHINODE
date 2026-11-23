@@ -362,19 +362,14 @@
 
 
 <!-- HERO -->
-<!-- A-606(2026-11-18, 브론즈 44차 2번): 전에는 이 자리에 **속이 빈 본문 표지**가
-     있었고(건너뛰기 링크가 닿는 빈 div), a11y-nav.js 가 그것에 role="main" 을
-     붙였다. 표지는 붙었지만 그 안이 비어 있어서, 「본문으로 건너뛰기」로 들어오면
-     아무것도 없는 자리에 떨어졌고 진짜 본문은 어느 구역에도 속하지 않은 채
-     바깥에 있었다(실측: 본문 안 글자 0자, 어느 구역에도 안 든 머리글이
-     매거진 134개·index 26개). 그래서 빈 표지를 걷고 본문을 실제로 감싼다. -->
+<!-- A-606 — 검수대장 -->
 <main id="main" tabindex="-1">
 <section class="dp-hero">
   <div class="container">
     <div class="badge-prelaunch" data-en="Coming H2 2026" data-ko="2026 하반기 출시">Coming H2 2026</div>
     <h1 data-en="ARCHINODE Digital Products" data-ko="ARCHINODE 디지털 상품">ARCHINODE Digital Products</h1>
     <p data-en="Curated PDFs, CAD libraries, BIM families, material spec sheets, and market intelligence — built for Korean architects, interior designers, and specifiers who want European depth without European overhead." data-ko="한국 건축가·인테리어 디자이너·스펙라이터를 위해 큐레이팅된 PDF, CAD 라이브러리, BIM 패밀리, 자재 스펙시트, 시장 인텔리전스 자료 — 유럽의 깊이를 한국에 맞춰 정리.">Curated PDFs, CAD libraries, BIM families, material spec sheets, and market intelligence — built for Korean architects, interior designers, and specifiers who want European depth without European overhead.</p>
-    <!-- A-498(2026-11-12): 승리님 결정(2026-11-12): 고객 타겟이 유럽이라 **우리가 받는 돈은 전부 유로**로 적는다. -->
+    <!-- A-498 — 검수대장 -->
     <div class="price-range" data-en="EUR 29 — EUR 49 per item · Notify me when available" data-ko="1건 EUR 29 — EUR 49 · 출시 알림 신청 가능">EUR 29 — EUR 49 per item · Notify me when available</div>
   </div>
 </section>
@@ -435,20 +430,13 @@
   </div>
 </section>
 
-<!-- 결제·전달·환불 안내 — A-501(2026-11-12) -->
-<!-- 전자상거래법상 디지털 콘텐츠는 **사기 전에** 거래조건과 청약철회 제한을 알려야
-     제한이 성립한다. 구매 확인 창의 체크박스와 **한 쌍**이다 — 둘 중 하나만 있으면
-     의미가 없다. ★ 문구는 승리님·변호사 확인 대상입니다(노드는 변호사가 아닙니다).
-     ※ A-522(2026-11-13): `terms.html` 에 **제10조(청약철회)·제11조(환급)·제12조(제공)**
-       가 들어갔다. 이 섹션은 그 조항을 **사기 전에 보여 주는 자리**다 — 제13조제2항의
-       계약 전 고지. 조항이 바뀌면 이 섹션도 같이 바꿔야 한다. -->
+<!-- A-501 — 검수대장 -->
+<!-- A-522 — 검수대장 -->
 <section class="dp-notify" style="background:#fff;border-top:1px solid #eee;">
   <div class="container" style="max-width:860px;">
     <h2 style="font-size:1.35rem;font-weight:700;color:#332e27;margin-bottom:20px;"
         data-en="Payment, delivery and refunds" data-ko="결제·전달·환불 안내">결제·전달·환불 안내</h2>
-    <!-- A-523: 제4조제2항의 **시행 7일 전 공지**. 상단 띠는 `data-lang-only="en"` 이라
-         한국어 손님에게는 보이지 않는다 — 그래서 약관과 구매 길목에 두 언어로 붙인다.
-         시행일이 지나도 **기록으로 남긴다**(언제 무엇을 고쳤는지가 증거다). -->
+    <!-- A-523 — 검수대장 -->
     <div class="terms-amend-notice" role="note" style="border:1px solid #e8d9b8;background:#fdf8ee;border-radius:8px;padding:14px 16px;margin:0 0 26px;font-size:0.85rem;line-height:1.75;color:#5d564c;"
          data-en-html='<strong>Notice of amendment to the Terms</strong> (posted November 13, 2026) — We have added <strong>Article 10 (Withdrawal of Offer), Article 11 (Refund) and Article 12 (Provision of Digital Products)</strong> for sales of digital products, and added the sale of digital products to the list of services in Article 3. <strong>Effective November 20, 2026</strong> — announced 7 days in advance under Article 4(2). If you do not agree to the amendment you may stop using the service before it takes effect. Questions: office@archinode.org' data-ko-html='<strong>약관 개정 공지</strong> (2026년 11월 13일 게시) — 디지털 상품 판매에 관한 <strong>제10조(청약철회 등)·제11조(환급)·제12조(디지털 상품의 제공)</strong>를 신설하고, 제3조 서비스 목록에 디지털 상품 판매를 추가했습니다. <strong>시행일: 2026년 11월 20일</strong>(제4조제2항에 따라 시행 7일 전 공지). 개정 내용에 동의하지 않으시면 시행일 전에 서비스 이용을 중단하실 수 있습니다. 문의: office@archinode.org'><strong>약관 개정 공지</strong> (2026년 11월 13일 게시) — 디지털 상품 판매에 관한 <strong>제10조(청약철회 등)·제11조(환급)·제12조(디지털 상품의 제공)</strong>를 신설하고, 제3조 서비스 목록에 디지털 상품 판매를 추가했습니다. <strong>시행일: 2026년 11월 20일</strong>(제4조제2항에 따라 시행 7일 전 공지). 개정 내용에 동의하지 않으시면 시행일 전에 서비스 이용을 중단하실 수 있습니다. 문의: office@archinode.org</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;font-size:0.9rem;line-height:1.75;color:#5d564c;">
@@ -467,12 +455,7 @@
       <div>
         <h3 style="font-size:0.95rem;font-weight:700;color:#332e27;margin-bottom:6px;"
             data-en="Withdrawal and refunds" data-ko="청약철회·환불">청약철회·환불</h3>
-        <!-- ★ A-502(2026-11-13): 전에는 「전송이 시작되면 청약철회가 제한됩니다」라고 **단정**했다.
-             법령상 그 제한은 ㄱ)불가 사실의 표시와 ㄴ)미리보기 같은 시험 사용 수단 제공을
-             **함께** 해야 성립하고, 하지 않으면 제한 사유가 있어도 철회할 수 있다.
-             지금 우리는 ㄴ이 없다 — 그러니 제한을 주장할 수 없다. 사실대로 적는다.
-             (미리보기를 붙이면 그때 문장을 바꾸면 된다.) 그리고 손상·불일치 시
-             「재전송 또는 환불」을 **회사가 고르는** 문장이었는데, 고르는 쪽은 손님이다. -->
+        <!-- A-502 — 검수대장 -->
         <p data-en="Before the file has been sent you can cancel for a full refund. After it has been sent, withdrawal follows Korean e-commerce law and our Terms. If the file is damaged or differs from its description, you may choose either a resend or a refund."
            data-ko="파일을 보내기 전에는 전액 환불해 드립니다. 전송이 시작된 뒤의 청약철회는 전자상거래법과 이용약관에 따릅니다. 파일이 손상됐거나 설명과 다르면 재전송과 환불 중 원하시는 쪽을 고르실 수 있습니다.">파일을 보내기 전에는 전액 환불해 드립니다. 전송이 시작된 뒤의 청약철회는 전자상거래법과 이용약관에 따릅니다. 파일이 손상됐거나 설명과 다르면 재전송과 환불 중 원하시는 쪽을 고르실 수 있습니다.</p>
       </div>
@@ -527,31 +510,16 @@
              autocomplete="email">
       <button type="submit" data-en="Notify Me" data-ko="알림 신청">Notify Me</button>
     </form>
-          <!-- A-656(2026-11-21): A-521 이 정한 모양을 이 쪽에만 안 쓰고 있었다 —
-           「뉴스레터는 이메일 한 칸뿐이라 체크박스 대신 **안내와 링크**만 둔다」(승리님 결정).
-           이메일 한 칸만 받는 폼 여섯 중 다섯(index·magazine·trend-report·sourcing-inquiry·
-           brands/view)은 폼 옆에 안내문 + 처리방침 링크를 달고 있는데, 이 쪽은 쓰임새를
-           **윗 문단 산문**으로만 말하고 링크가 없었다. 꼬리말 링크는 있지만 폼 옆이 아니다.
-           보관 기간과 철회 방법은 처리방침에 있으므로, 링크가 없으면 안내가 반쪽이다.
-           새 결정이 아니라 A-521 을 이 쪽에 적용하는 것이다.
-           ★ 처음에 「보낸 뒤 삭제합니다」로 썼다가 고쳤다 — `submitNotify` 는 이메일을
-             `digital-products-notify` 컬렉션에 쓰고 **지우는 코드가 없다.** 고지문은
-             코드가 하는 일을 적어야 한다. 처리방침 제5조의 「구독 해지 시까지 보유」와
-             같은 뜻으로 맞췄다. -->
+          <!-- A-521 · A-656 — 검수대장 -->
       <p class="newsletter-consent" data-en="We use your email only to send this launch notification, and keep it until you ask us to stop." data-ko="이메일은 출시 알림을 보내는 데만 쓰고, 받지 않겠다고 알려 주실 때까지 보관합니다.">이메일은 출시 알림을 보내는 데만 쓰고, 받지 않겠다고 알려 주실 때까지 보관합니다.</p>
       <p class="newsletter-consent"><a href="privacy.html" data-en-href="privacy-en.html" data-ko-href="privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ko="개인정보 처리방침">개인정보 처리방침</a></p>
       <div role="status" aria-live="polite" aria-atomic="true" class="dp-notify-msg" id="notifyMsg" data-en="Thanks — we'll send a single email when the first product launches." data-ko="감사합니다 — 첫 상품 출시 시 1회 알림 메일을 보내드립니다.">Thanks — we'll send a single email when the first product launches.</div>
   </div>
 </section>
 
-<!-- A-497(2026-11-12, 브론즈 32·33차): 이 띠는 **푸터 뒤, 스크립트 사이**에 있었다.
-     라이브에서 푸터가 y=4201 에서 끝나는데 이 블록은 y=4241 에서 시작했다 — 손님이
-     푸터를 지나 더 내려가야 「주문하기」가 나온다. 아무도 거기까지 안 내려간다.
-     본문 끝(알림 신청 아래)으로 옮긴다. 마크업만 옮겼고 내용은 그대로다. -->
+<!-- A-497 — 검수대장 -->
 <!-- P3-1 Order CTA -->
-<!-- A-454(2026-11-11): 이 띠 위 흰 글자가 3.36~3.60 이었다(필요 4.5). 글자를 바꾸는 게
-     아니라 **띠를 한 단 어둡게** 한다 — 새 색이 아니라 이미 있는 --accent-hover(#8a6a3d)
-     계열이다. 흰 글자 4.99 / 4.61 로 두 끝 모두 통과. (승리님 결정 ①) -->
+<!-- A-454 — 검수대장 -->
 <div style="background:linear-gradient(135deg,#8a6a3d 0%,#8f7040 100%);color:#fff;padding:40px 24px;text-align:center;margin:40px 0;">
   <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:8px;" data-en="Ready to order?" data-ko="주문 준비 되셨나요?">Ready to order?</h2>
   <p style="font-size:0.95rem;margin-bottom:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;" data-en="Contact us with the product name and we will send a PayPal invoice within 24 hours." data-ko="원하시는 상품명을 알려주시면 24시간 내 PayPal 인보이스를 보내드립니다.">Contact us with the product name and we will send a PayPal invoice within 24 hours.</p>
@@ -568,8 +536,7 @@
         <div class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">Bridging Architecture</span></div>
         <p data-en="The premier gateway for high-end European design brands entering Korea." data-ko="엄선된 해외 건축·디자인 브랜드와 한국 크리에이터를 위한 B2B 쇼케이스">The premier gateway for high-end European design brands entering Korea.</p>
         <div class="footer-contact">
-          <!-- A-316: 소셜 아이콘 4개가 전부 href="#" 였다 → 문의 한 줄로 교체(승리님 결정).
-               계정이 생기면 이 자리에 다시 넣는다. -->
+          <!-- A-316 — 검수대장 -->
           <a href="mailto:office@archinode.org" data-en="Brand listing &amp; partnership: office@archinode.org" data-ko="입점·제휴 문의 office@archinode.org">Brand listing &amp; partnership: office@archinode.org</a>
         </div>
       </div>
@@ -597,8 +564,7 @@
         <h2 class="footer-col-title" data-en="Services" data-ko="서비스">Services</h2>
         <ul>
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
-          <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
-               이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
+          <!-- A-340 — 검수대장 -->
           <li>
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
@@ -995,11 +961,7 @@ async function submitNotify(e) {
 <script src="form-throttle.js?v=20260630" defer></script>
 
 
-<!-- SCROLL TO TOP — A-451(2026-11-11): 이 네 페이지에는 「맨 위로」가 **아예 없었다.**
-     360px 에서 digital-products 는 문서 높이 4979px(6.2화면), request-consultation 은
-     5025px(6.3화면)인데 손님이 위로 돌아갈 수단이 없었다. (브론즈 27차 3번)
-     다른 페이지의 토글 코드는 그 페이지의 `header` 변수에 얹혀 있어서, 여기서는
-     **남의 변수에 기대지 않는 자급식**으로 넣는다. 두 번 실행돼도 안전하다. -->
+<!-- A-451 — 검수대장 -->
 <button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)"
         aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>

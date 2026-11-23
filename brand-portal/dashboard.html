@@ -324,11 +324,7 @@ h1, h2, .section-card h2 {
                     </div>
                     <div class="field">
                         <label for="editCountry" data-en="Country" data-ko="국가">Country</label>
-                        <!-- A-311(2026-11-06): 자유 입력이었다. 검증이 어디에도 없어(규칙에도 없다)
-                             브랜드가 입점 후 국가를 아무 문자열로 덮어쓸 수 있었다 — 라이브에
-                             country="seoul"(도시)이 그렇게 들어와 있었다. 신청서(list-your-brand.html)
-                             와 **같은 107개 목록**을 쓴다. 목록을 여기 새로 쓰지 않고 그대로 옮겼다 —
-                             두 벌로 갈라지면 또 어긋난다. -->
+                        <!-- A-311 — 검수대장 -->
                         <select id="editCountry">
                             <option value="" data-en="Select country" data-ko="국가 선택">Select country</option>
                             <option value="Afghanistan">Afghanistan</option>
@@ -443,13 +439,7 @@ h1, h2, .section-card h2 {
                 <div class="field-row">
                     <div class="field">
                         <label id="editCategoryLabel" data-en="Category" data-ko="카테고리">Category</label>
-                        <!-- A-415(2026-11-09): 이 자리는 단일 <select> 였다. 그런데 brands.category 는
-                             list-your-brand.html:783 이 **배열**로 쓴다. 카테고리를 2개 이상 고른 브랜드가
-                             이 화면에서 무엇이든(설명 한 줄이라도) 저장하면 select.value 가 "Furniture,Lighting"
-                             이 되어 어떤 option 과도 안 맞고 selectedIndex 가 -1 이 된다. 그 상태로 저장하면
-                             **빈 문자열이 Firestore 에 덮어써졌다** — 브랜드가 모르는 사이에 제 카테고리가
-                             통째로 지워진 것이다. A-311 이 바로 윗줄 editCountry 에서 똑같은 모양을 이미
-                             고쳤는데 그 아래 한 줄은 그대로였다. 쓰는 쪽과 같은 모양으로 맞춘다. -->
+                        <!-- A-311 · A-415 — 검수대장 -->
                         <div class="bp-cat-grid" id="editCategoryGroup" role="group" aria-labelledby="editCategoryLabel">
                           <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Bathroom"><span data-en="Bathroom" data-ko="욕실">Bathroom</span></label>
                           <label class="bp-cat-check"><input type="checkbox" name="editCategory" value="Construction"><span data-en="Construction" data-ko="건축자재">Construction</span></label>
@@ -621,7 +611,7 @@ h1, h2, .section-card h2 {
             <!-- Add Product Form (hidden) -->
             <div id="productForm" style="display:none;margin-top:24px;padding:24px;background:#f7f3ec;border-radius:8px;">
                 <h3 id="productFormTitle" style="font-size:1rem;margin-bottom:16px;" data-en="New Product" data-ko="제품 등록">New Product</h3>
-                <!-- A-467: 공개 중인 제품을 고치면 다시 심사 대기로 내려간다 -->
+                <!-- A-467 — 검수대장 -->
                 <div id="prodEditWarn" style="display:none;margin-bottom:16px;padding:10px 12px;border:1px solid #fde68a;background:#fffbeb;border-radius:4px;font-size:0.82rem;line-height:1.6;color:#92400e;"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> <span></span></div>
                 <div class="field-row">
                     <div class="field">
@@ -680,8 +670,7 @@ h1, h2, .section-card h2 {
                         <label for="prodPrice" data-en="Price Range" data-ko="가격대">Price Range</label>
                         <select id="prodPrice">
                             <option value="" data-en="Select" data-ko="선택">Select</option>
-                            <!-- A-498(2026-11-12): 보이는 글자는 유로, `value` 는 그대로다.
-                                 값은 이미 올라간 제품이 쓰는 열쇠이고 공개 페이지가 그걸 찍는다. -->
+                            <!-- A-498 — 검수대장 -->
                             <option value="$" data-en="€ (Under EUR 500)" data-ko="€ (500유로 미만)">€ (Under EUR 500)</option>
                             <option value="$$" data-en="€€ (EUR 500–2,000)" data-ko="€€ (EUR 500–2,000)">€€ (EUR 500–2,000)</option>
                             <option value="$$$" data-en="€€€ (EUR 2,000–5,000)" data-ko="€€€ (EUR 2,000–5,000)">€€€ (EUR 2,000–5,000)</option>
@@ -747,8 +736,7 @@ h1, h2, .section-card h2 {
                     <button type="button" class="btn btn-primary" id="submitProduct" data-en="Submit for Review" data-ko="검수 요청">Submit for Review</button>
                     <button type="button" class="btn btn-secondary" id="cancelProduct" data-en="Cancel" data-ko="취소">Cancel</button>
                 </div>
-                <!-- R-026 = A-216: 이 폼에는 메시지 자리가 없어 전부 alert() 로 띄웠다.
-                     매거진 폼(#artFormMsg)과 같은 꼴로 폼 안에서 말하게 한다. -->
+                <!-- A-216 — 검수대장 -->
                 <div id="prodFormMsg" style="margin-top:14px;font-size:0.85rem;line-height:1.6;"></div>
             </div>
 
@@ -768,7 +756,7 @@ h1, h2, .section-card h2 {
             <p style="font-size:0.88rem;color:#5d564c;margin-bottom:20px;" data-en="Write articles about your brand, products, or industry insights. Articles are reviewed before publishing." data-ko="브랜드·제품·업계 인사이트에 대한 글을 쓰세요. 게시 전에 검수를 거칩니다.">Write articles about your brand, products, or industry insights. Articles are reviewed before publishing.</p>
 
             <button class="btn btn-primary" id="addArticleBtn"><i class="fas fa-plus"></i> <span data-en="Write Article" data-ko="글 쓰기">Write Article</span></button>
-            <!-- R-061: 매거진 쪽도 같은 자리. 전에는 네이티브 alert 영문 한 줄이었다(A-216 의 그 문제). -->
+            <!-- A-216 — 검수대장 -->
             <div class="bp-gate" id="artGateMsg"></div>
 
             <!-- Article Form (hidden) — Block Editor (logic: brand-portal/article-editor.js) -->

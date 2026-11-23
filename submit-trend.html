@@ -76,10 +76,7 @@
   </div>
 </header>
 
-<!-- SEARCH OVERLAY — A-452(2026-11-11): 이 두 페이지에는 헤더에 돋보기가 없었고
-     오버레이 마크업·search.js·toggleSearch() 도 **아예 없었다.** 같은 사이트에서
-     헤더 기능이 페이지마다 다른 셈이다. (브론즈 27차 3번)
-     digital-products.html 의 조각을 그대로 옮긴다 — 둘 다 루트 페이지라 경로가 같다. -->
+<!-- A-452 — 검수대장 -->
 <div class="search-overlay" id="searchOverlay">
   <button type="button" class="search-close" onclick="toggleSearch()" aria-label="Close search" data-en-aria-label="Close search" data-ko-aria-label="검색 닫기" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;line-height:1;padding:0;font-family:inherit;">&times;</button>
   <div class="search-box">
@@ -90,18 +87,13 @@
 
 
 <!-- HERO -->
-<!-- A-606(2026-11-18, 브론즈 44차 2번): 전에는 이 자리에 **속이 빈 본문 표지**가
-     있었고(건너뛰기 링크가 닿는 빈 div), a11y-nav.js 가 그것에 role="main" 을
-     붙였다. 표지는 붙었지만 그 안이 비어 있어서, 「본문으로 건너뛰기」로 들어오면
-     아무것도 없는 자리에 떨어졌고 진짜 본문은 어느 구역에도 속하지 않은 채
-     바깥에 있었다(실측: 본문 안 글자 0자, 어느 구역에도 안 든 머리글이
-     매거진 134개·index 26개). 그래서 빈 표지를 걷고 본문을 실제로 감싼다. -->
+<!-- A-606 — 검수대장 -->
 <main id="main" tabindex="-1">
 <section style="padding:120px 24px 60px; background:linear-gradient(135deg,#332e27 0%,#332e27 100%); text-align:center;">
   <div style="max-width:780px; margin:0 auto;">
     <span style="display:inline-block; font-size:0.78rem; color:var(--accent-on-dark); font-weight:600; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:16px;" data-en="Brand Articles" data-ko="브랜드 아티클">Brand Articles</span>
     <h1 style="font-family: 'Lora', 'Noto Serif KR', Georgia, serif; font-size:2.6rem; color:#fff; margin-bottom:18px; letter-spacing:-0.02em;" data-en="Publish Your Brand Story" data-ko="브랜드 이야기를 게재하세요">Publish Your Brand Story</h1>
-    <!-- A-447(2026-11-10): #6b6459 는 style.css 의 --ink-soft 다. 그 토큰 주석에 **「밝은 배경 전용」**이라고 적혀 있는데(A-183) 여기는 #332e27 짙은 히어로다. 실측 대비 2.30 (필요 4.5). 같은 램프에서 어두운 배경에 맞는 --gray-400(#b5ab9b)로 바꾼다 — 실측 5.94. -->
+    <!-- A-183 · A-447 — 검수대장 -->
     <p style="font-size:1.1rem; color:#b5ab9b; line-height:1.7; font-weight:400;" data-en="Articles are now published through the Brand Portal. Only approved brands can publish — this keeps the Brand Articles focused and trustworthy." data-ko="이제 매거진 글은 브랜드 포털에서 발행됩니다. 승인된 브랜드만 발행할 수 있어 브랜드 아티클의 신뢰도가 유지됩니다.">Articles are now published through the Brand Portal. Only approved brands can publish — this keeps the Brand Articles focused and trustworthy.</p>
   </div>
 </section>
@@ -158,8 +150,7 @@
         <div class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">Bridging Architecture</span></div>
         <p data-en="The premier gateway for high-end European design brands entering Korea." data-ko="엄선된 해외 건축·디자인 브랜드와 한국 크리에이터를 위한 B2B 쇼케이스">The premier gateway for high-end European design brands entering Korea.</p>
         <div class="footer-contact">
-          <!-- A-316: 소셜 아이콘 4개가 전부 href="#" 였다 → 문의 한 줄로 교체(승리님 결정).
-               계정이 생기면 이 자리에 다시 넣는다. -->
+          <!-- A-316 — 검수대장 -->
           <a href="mailto:office@archinode.org" data-en="Brand listing &amp; partnership: office@archinode.org" data-ko="입점·제휴 문의 office@archinode.org">Brand listing &amp; partnership: office@archinode.org</a>
         </div>
       </div>
@@ -187,8 +178,7 @@
         <h2 class="footer-col-title" data-en="Services" data-ko="서비스">Services</h2>
         <ul>
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
-          <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
-               이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
+          <!-- A-340 — 검수대장 -->
           <li>
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
@@ -247,9 +237,7 @@ document.addEventListener('click', function(e) {
 function toggleMobile() { document.getElementById('mainNav').classList.toggle('active'); }
 
 </script>
-<!-- A-266: 이 페이지만 Firebase 를 안 싣고 있어서 로그인 여부를 알 방법이 없었다.
-     그래서 로그인한 채로 들어와도 헤더에 늘 「로그인」 이 떠 로그아웃된 것처럼 보였다.
-     다른 공개 페이지와 같은 순서로 싣는다(SDK → config → auth-ui). -->
+<!-- A-266 — 검수대장 -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -292,11 +280,7 @@ if (typeof auth !== 'undefined' && auth && auth.onAuthStateChanged) {
 <script src="cookie-consent.js?v=20260630" defer></script>
 <script src="analytics-loader.js?v=20260630" defer></script>
 <script src="sentry-loader.js?v=20260630" defer></script>
-<!-- SCROLL TO TOP — A-451(2026-11-11): 이 네 페이지에는 「맨 위로」가 **아예 없었다.**
-     360px 에서 digital-products 는 문서 높이 4979px(6.2화면), request-consultation 은
-     5025px(6.3화면)인데 손님이 위로 돌아갈 수단이 없었다. (브론즈 27차 3번)
-     다른 페이지의 토글 코드는 그 페이지의 `header` 변수에 얹혀 있어서, 여기서는
-     **남의 변수에 기대지 않는 자급식**으로 넣는다. 두 번 실행돼도 안전하다. -->
+<!-- A-451 — 검수대장 -->
 <button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)"
         aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>

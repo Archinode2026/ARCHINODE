@@ -93,12 +93,7 @@
 .bg-founding strong { color:#332e27; }
 </style>
 </head>
-<!-- A-207 / R-059: 이 페이지는 번역 커버가 **1%**(58/7,194자) 다 — 네비게이션 몇 개만
-     data-en/data-ko 짝이 있고 본문은 전부 영어다. 그래서 스위처에 한국어가 떠도 눌러도
-     아무 일이 없는 **죽은 선택지**였고, 방문자는 "KR" 표시를 보고 한국어로 보고 있다고
-     착각했다. 없는 선택지를 보여주는 것보다 안 보여주는 게 정직하다.
-     data-langs="en" 이면 lang.js 의 availableLangs < 2 가드가 스위처를 숨긴다(A-008 때 만든 것).
-     **한국어 원고가 생기면 이 한 줄을 "en,ko" 로 바꾸고 본문에 data-ko 를 채우면 된다** (A-208). -->
+<!-- A-008 · A-207 · A-208 — 검수대장 -->
 <body data-langs="en">
 <a class="skip-link" href="#main" data-en="Skip to content" data-ko="본문으로 건너뛰기">Skip to content</a>
 
@@ -140,10 +135,7 @@
   </div>
 </header>
 
-<!-- SEARCH OVERLAY — A-452(2026-11-11): 이 두 페이지에는 헤더에 돋보기가 없었고
-     오버레이 마크업·search.js·toggleSearch() 도 **아예 없었다.** 같은 사이트에서
-     헤더 기능이 페이지마다 다른 셈이다. (브론즈 27차 3번)
-     digital-products.html 의 조각을 그대로 옮긴다 — 둘 다 루트 페이지라 경로가 같다. -->
+<!-- A-452 — 검수대장 -->
 <div class="search-overlay" id="searchOverlay">
   <button type="button" class="search-close" onclick="toggleSearch()" aria-label="Close search" data-en-aria-label="Close search" data-ko-aria-label="검색 닫기" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;line-height:1;padding:0;font-family:inherit;">&times;</button>
   <div class="search-box">
@@ -153,16 +145,7 @@
 </div>
 
 
-<!-- A-450(2026-11-11): 이 페이지는 `<body data-langs="en">` 인 **영어 전용**이다.
-     그래서 lang.js 가 언어를 영어로 고정하고(availableLangs < 2 → 스위처도 감춘다),
-     한국어 손님에게는 **화면이 혼자 영어로 바뀌고 되돌릴 단추가 없는** 상태가 된다.
-     (브론즈 27차 11번)
-
-     `data-lang-only="ko"` 로는 못 푼다 — 이 페이지의 lang 은 언제나 'en' 이라
-     그 가지는 영원히 안 돈다. 그래서 lang.js 를 거치지 않고 **저장된 언어 선택**을
-     직접 읽어 안내만 띄운다. 키 두 개를 본다: 사용자가 직접 고른 `archinode-lang`,
-     그리고 IP 로 추정한 `archinode-lang-auto`(한국 IP → ko). 둘 다 없으면
-     브라우저 언어를 본다. 페이지 내용은 건드리지 않는다. -->
+<!-- A-450 — 검수대장 -->
 <div id="bgKoNotice" style="display:none; background:#403a30; color:#b5ab9b;
      font-size:0.84rem; line-height:1.5; padding:12px 20px; text-align:center;">
   이 안내서는 아직 <strong style="color:#e8e2d8; font-weight:600;">영어로만</strong> 제공됩니다. 한국어판은 준비 중입니다.
@@ -182,12 +165,7 @@
 </script>
 
 <!-- HERO -->
-<!-- A-606(2026-11-18, 브론즈 44차 2번): 전에는 이 자리에 **속이 빈 본문 표지**가
-     있었고(건너뛰기 링크가 닿는 빈 div), a11y-nav.js 가 그것에 role="main" 을
-     붙였다. 표지는 붙었지만 그 안이 비어 있어서, 「본문으로 건너뛰기」로 들어오면
-     아무것도 없는 자리에 떨어졌고 진짜 본문은 어느 구역에도 속하지 않은 채
-     바깥에 있었다(실측: 본문 안 글자 0자, 어느 구역에도 안 든 머리글이
-     매거진 134개·index 26개). 그래서 빈 표지를 걷고 본문을 실제로 감싼다. -->
+<!-- A-606 — 검수대장 -->
 <main id="main" tabindex="-1">
 <section class="bg-hero">
   <div class="container">
@@ -375,8 +353,7 @@
         <div class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">Bridging Architecture</span></div>
         <p data-en="The premier gateway for high-end European design brands entering Korea." data-ko="엄선된 해외 건축·디자인 브랜드와 한국 크리에이터를 위한 B2B 쇼케이스">The premier gateway for high-end European design brands entering Korea.</p>
         <div class="footer-contact">
-          <!-- A-316: 소셜 아이콘 4개가 전부 href="#" 였다 → 문의 한 줄로 교체(승리님 결정).
-               계정이 생기면 이 자리에 다시 넣는다. -->
+          <!-- A-316 — 검수대장 -->
           <a href="mailto:office@archinode.org" data-en="Brand listing &amp; partnership: office@archinode.org" data-ko="입점·제휴 문의 office@archinode.org">Brand listing &amp; partnership: office@archinode.org</a>
         </div>
       </div>
@@ -404,8 +381,7 @@
         <h2 class="footer-col-title" data-en="Services" data-ko="서비스">Services</h2>
         <ul>
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
-          <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
-               이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
+          <!-- A-340 — 검수대장 -->
           <li>
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
@@ -452,8 +428,7 @@
 
 <script src="lang.js?v=20261106a"></script>
 <script src="a11y-nav.js?v=20261113a"></script>
-<!-- 2026-11-03 A-047 확장(R-019 전수 점검): auth-ui.js 가 있어도 Firebase SDK 가 없어
-     typeof auth === "undefined" 로 조용히 종료 → 로그인해도 헤더가 비로그인 그대로였다. -->
+<!-- A-047 — 검수대장 -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -470,11 +445,7 @@ window.addEventListener('scroll', () => { header.classList.toggle('scrolled', wi
 <script src="cookie-consent.js?v=20260630" defer></script>
 <script src="analytics-loader.js?v=20260630" defer></script>
 <script src="sentry-loader.js?v=20260630" defer></script>
-<!-- SCROLL TO TOP — A-451(2026-11-11): 이 네 페이지에는 「맨 위로」가 **아예 없었다.**
-     360px 에서 digital-products 는 문서 높이 4979px(6.2화면), request-consultation 은
-     5025px(6.3화면)인데 손님이 위로 돌아갈 수단이 없었다. (브론즈 27차 3번)
-     다른 페이지의 토글 코드는 그 페이지의 `header` 변수에 얹혀 있어서, 여기서는
-     **남의 변수에 기대지 않는 자급식**으로 넣는다. 두 번 실행돼도 안전하다. -->
+<!-- A-451 — 검수대장 -->
 <button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)"
         aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>

@@ -27,10 +27,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<!-- A-004(2026-11-03): reCAPTCHA v3 — 사이트 키는 공개돼도 안전함. 비밀 키는 netlify/functions/recaptcha-verify.js 서버 쪽에만 있음 -->
-<!-- A-584(2026-11-17, 브론즈 42차 C+H): api.js 를 머리에서 바로 싣지 않는다.
-     폼에 처음 손이 닿을 때 recaptcha-lazy.js 가 싣는다(첫 화면에서 354.8KB 빠짐,
-     손대지 않은 손님에게는 localStorage `_grecaptcha` 도 안 생긴다). -->
+<!-- A-004 — 검수대장 -->
+<!-- A-584 — 검수대장 -->
 <script src="recaptcha-lazy.js?v=20261117" defer></script>
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -257,21 +255,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 
 <!-- HERO -->
-<!-- A-606(2026-11-18, 브론즈 44차 2번): 전에는 이 자리에 **속이 빈 본문 표지**가
-     있었고(건너뛰기 링크가 닿는 빈 div), a11y-nav.js 가 그것에 role="main" 을
-     붙였다. 표지는 붙었지만 그 안이 비어 있어서, 「본문으로 건너뛰기」로 들어오면
-     아무것도 없는 자리에 떨어졌고 진짜 본문은 어느 구역에도 속하지 않은 채
-     바깥에 있었다(실측: 본문 안 글자 0자, 어느 구역에도 안 든 머리글이
-     매거진 134개·index 26개). 그래서 빈 표지를 걷고 본문을 실제로 감싼다. -->
+<!-- A-606 — 검수대장 -->
 <main id="main" tabindex="-1">
 <section class="consult-hero">
   <div class="container">
     <div class="hero-tag" data-en="ARCHINODE Consulting" data-ko="ARCHINODE 컨설팅">ARCHINODE Consulting</div>
     <h1 data-en="Korea, Decoded" data-ko="한국 시장을 정확하게 읽어드립니다">Korea, Decoded</h1>
     <p data-en="Twelve years of European design partnership, translated into actionable Korean market strategy. We work with brands, designers, and architects who want to enter Korea — without burning a year on trial and error." data-ko="12년의 유럽 디자인 파트너십을 한국 시장 전략으로 직접 옮깁니다. 시행착오로 1년을 태우지 않고 한국에 진출하려는 브랜드·디자이너·건축가를 위한 자문.">Twelve years of European design partnership, translated into actionable Korean market strategy. We work with brands, designers, and architects who want to enter Korea — without burning a year on trial and error.</p>
-    <!-- A-498(2026-11-12, 브론즈 33차 N33-2 · 승리님 결정(2026-11-12): 고객 타겟이 유럽이라 **우리가 받는 돈은 전부 유로**로 적는다.
-         for-brands.html 은 같은 서비스를 「EUR 280 / 회」로 적고 있었다 — 통화까지 달라
-         같은 값인지도 알 수 없었다. EUR 280 으로 맞춘다. -->
+    <!-- A-498 — 검수대장 -->
     <div class="price-tag" data-en="Starting from EUR 280 per session" data-ko="1회 EUR 280부터">Starting from EUR 280 per session</div>
   </div>
 </section>
@@ -296,10 +287,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <h3 data-en="Material Sourcing" data-ko="자재 소싱">Material Sourcing</h3>
         <p data-en="For Korean buyers — sourcing specific European materials, brands, or product specs. Spec sheets, lead times, MOQs." data-ko="한국 발주자용 — 유럽 특정 자재·브랜드·스펙 소싱. 스펙시트, 리드타임, 최소발주 안내.">For Korean buyers — sourcing specific European materials, brands, or product specs. Spec sheets, lead times, MOQs.</p>
       </div>
-      <!-- A-665(2026-11-23, 승리님 승인): 박람회 진출이 아래 「기타 · 맞춤형」 안에
-           「전시회 준비 (KOREA BUILD, SLDF)」로 묻혀 있었다. 승리님이 가장 잘 하실 수
-           있고 가장 차별되는 것이 「기타」였다. 제 갈래로 꺼내고, 아래 카드에서는 뺀다.
-           자세한 단계는 for-brands.html#fair-entry 에 있다(숫자는 아직 비어 있다). -->
+      <!-- A-665 — 검수대장 -->
       <div class="service-card">
         <i class="fas fa-store"></i>
         <h3 data-en="Trade Fair Entry" data-ko="박람회 진출">Trade Fair Entry</h3>
@@ -370,10 +358,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
             <option value="market-entry">Korean Market Entry — 한국 시장 진출</option>
             <option value="partnership-match">Partnership Match — 브랜드 파트너십 매칭</option>
             <option value="material-sourcing">Material Sourcing — 자재 소싱</option>
-            <!-- A-665(2026-11-23): 박람회 진출 갈래. 이게 없으면 for-brands#fair-entry 에서
-     온 브랜드가 다시 「기타」를 골라야 한다 — 묻혀 있던 자리로 되돌아간다.
-     ★ 열쇠(`fair-entry`)는 저장되는 값이므로 `admin/consultations.html` 의
-       CATEGORY_LABEL 에도 **같이** 넣어야 한다. A-498 이 적어 둔 규약이다. -->
+            <!-- A-498 · A-665 — 검수대장 -->
               <option value="fair-entry">Trade Fair Entry — 박람회 진출</option>
               <option value="other">Other / Custom — 기타</option>
           </select>
@@ -394,9 +379,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
             <label for="budget" data-en="Budget Range" data-ko="예산 범위">Budget Range <span class="hint" data-en="for scope alignment" data-ko="작업 범위 조율용">for scope alignment</span></label>
             <select id="budget">
               <option value="" data-en="— Select —" data-ko="— 선택 —">— Select —</option>
-              <!-- A-498: `value` 는 **저장되는 열쇠**다(consultations 문서의 budget).
-                   이미 저장된 신청서의 뜻이 바뀌지 않게 값은 그대로 두고 **보이는 글자만** 유로로 바꾼다.
-                   어드민의 BUDGET_LABEL 도 같이 고쳤다 — 한쪽만 고치면 화면마다 다른 값이 보인다. -->
+              <!-- A-498 — 검수대장 -->
               <option value="single-300">Starting from EUR 280 (single session) — EUR 280부터 (1회 세션)</option>
               <option value="package-1000">EUR 1,000+ (multi-session package) — EUR 1,000 이상 (다회차 패키지)</option>
               <option value="custom">Custom — let's discuss — 협의 가능 (상담 후 결정)</option>
@@ -413,9 +396,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
           </label>
         </div>
 
-        <!-- A-521: 받는 **그 자리에서** 알리고 동의를 받는다(개인정보보호법 제15조·제22조).
-             푸터의 처리방침 링크만으로는 「수집 시 고지」가 되지 않는다.
-             보유 기간 3년의 근거는 전자상거래법 시행령 제6조(소비자 불만·분쟁처리 기록). -->
+        <!-- A-521 — 검수대장 -->
         <div class="form-consent">
           <p class="form-consent-title" data-en="Personal data we collect" data-ko="개인정보 수집·이용 안내">개인정보 수집·이용 안내</p>
           <ul>
@@ -457,8 +438,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <div class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">Bridging Architecture</span></div>
         <p data-en="The premier gateway for high-end European design brands entering Korea." data-ko="엄선된 해외 건축·디자인 브랜드와 한국 크리에이터를 위한 B2B 쇼케이스">The premier gateway for high-end European design brands entering Korea.</p>
         <div class="footer-contact">
-          <!-- A-316: 소셜 아이콘 4개가 전부 href="#" 였다 → 문의 한 줄로 교체(승리님 결정).
-               계정이 생기면 이 자리에 다시 넣는다. -->
+          <!-- A-316 — 검수대장 -->
           <a href="mailto:office@archinode.org" data-en="Brand listing &amp; partnership: office@archinode.org" data-ko="입점·제휴 문의 office@archinode.org">Brand listing &amp; partnership: office@archinode.org</a>
         </div>
       </div>
@@ -486,8 +466,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <h2 class="footer-col-title" data-en="Services" data-ko="서비스">Services</h2>
         <ul>
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
-          <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
-               이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
+          <!-- A-340 — 검수대장 -->
           <li>
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
@@ -800,11 +779,7 @@ async function submitConsult(e) {
 <script src="analytics-loader.js?v=20260630" defer></script>
 <script src="sentry-loader.js?v=20260630" defer></script>
 <script src="form-throttle.js?v=20260630" defer></script>
-<!-- SCROLL TO TOP — A-451(2026-11-11): 이 네 페이지에는 「맨 위로」가 **아예 없었다.**
-     360px 에서 digital-products 는 문서 높이 4979px(6.2화면), request-consultation 은
-     5025px(6.3화면)인데 손님이 위로 돌아갈 수단이 없었다. (브론즈 27차 3번)
-     다른 페이지의 토글 코드는 그 페이지의 `header` 변수에 얹혀 있어서, 여기서는
-     **남의 변수에 기대지 않는 자급식**으로 넣는다. 두 번 실행돼도 안전하다. -->
+<!-- A-451 — 검수대장 -->
 <button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)"
         aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>
