@@ -317,7 +317,8 @@ def main():
         print('          ※ 배경이 **사진**인 자리는 색으로 못 잰다 — 그 자리는 인쇄-사진위글 검사기가 겹침으로 본다.')
         print('        초점 고리: 2026-11-21 · 15쪽 정거장 441개 0건 (고치기 전 기본 표본은 index.html **한 쪽**, 그 한 쪽도 16/88 만 쟀다)')
         print('          ※ 기본 표본이 전수가 아니다 — 쪽마다 20~40초다. 쪽 단위 <style> 이 focus·outline 을 건드리는 쪽 17개 + 폴더 대표 7개 = 24쪽을 자동으로 고른다.')
-        print('          ※ 로그인이 필요한 쪽(admin·brand-portal·auth/profile)은 화면이 Loading 에서 멈춰 **승리님만 확인할 수 있다** — brand-portal/dashboard 는 초점 요소 86개 중 4개만 닿는다.')
+        print('          ※ 로그인이 필요한 화면(admin/dashboard · brand-portal/dashboard · auth/profile)은 Loading 에서 멈춰 **승리님만 확인할 수 있다** — brand-portal/dashboard 는 초점 요소 86개 중 4개만 닿는다.')
+        print('          ※ A-669(2026-11-23) 정정: 폴더 **뿌리**(admin/ · brand-portal/ · auth/)는 멈추는 게 아니라 **404** 다 — index.html 이 아예 없다(확인함). 전에 이 줄이 뿌리까지 멈춘다고 적어 브론즈 53차를 헛짚게 했다.')
     if bad:
         print('어긋난 검사 %d개 / 통과 %d개' % (len(bad), okn))
         for name, state, rel in bad:

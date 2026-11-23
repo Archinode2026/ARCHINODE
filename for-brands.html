@@ -544,12 +544,7 @@ a { text-decoration: none; color: inherit; }
 
 
 <!-- HERO -->
-<!-- A-606(2026-11-18, 브론즈 44차 2번): 전에는 이 자리에 **속이 빈 본문 표지**가
-     있었고(건너뛰기 링크가 닿는 빈 div), a11y-nav.js 가 그것에 role="main" 을
-     붙였다. 표지는 붙었지만 그 안이 비어 있어서, 「본문으로 건너뛰기」로 들어오면
-     아무것도 없는 자리에 떨어졌고 진짜 본문은 어느 구역에도 속하지 않은 채
-     바깥에 있었다(실측: 본문 안 글자 0자, 어느 구역에도 안 든 머리글이
-     매거진 134개·index 26개). 그래서 빈 표지를 걷고 본문을 실제로 감싼다. -->
+<!-- A-606 — 검수대장 -->
 <main id="main" tabindex="-1">
 <section class="fb-hero">
     <div class="fb-hero-inner">
@@ -573,38 +568,11 @@ a { text-decoration: none; color: inherit; }
             <h2>12<span>%</span></h2>
             <p data-en="Premium segment annual growth rate" data-ko="프리미엄 부문 연간 성장률">Premium segment annual growth rate</p>
         </div>
-        <!-- A-498(2026-11-12, 브론즈 33차 N33-1 · 승리님 결정): 이 칸은 큰 글씨로 「0%」에
-             「Listing fee after the first three months」였다. 같은 페이지 요금표는
-             「3개월 무료, 이후 월 EUR 10」이고, index·list-your-brand·brand-guide·about·
-             terms 다섯 곳도 전부 유료로 일치한다. **이 칸 하나만 어긋났다.**
-             승리님 결정: 「첫 3개월 무료, 그다음 월 10 EUR」로 통일. 숫자를 그대로 적는다.
-             (data-ko 도 없었다 — 옆 칸들은 다 있다. 함께 단다.) -->
+        <!-- A-498 — 검수대장 -->
         <div class="fb-stat">
             <h2>EUR 10<span>/mo</span></h2>
-            <!-- A-663(2026-11-23, 승리님 승인): 이 칸은 「입점비」라고만 말했다. 그런데 손님이
-                 보는 디렉터리에는 아직 브랜드가 1개다 — 「자리」를 €10 에 파는 말은 들어와 본
-                 유럽 브랜드에게 통하지 않는다. **요금과 구조는 그대로 두고**(A-261 승리님 확정:
-                 월 €10 / 연 €100 · 처음 3개월 무료 · 창립 요금 고정은 거둠), **그 돈이 무엇을
-                 사는지**만 바꾼다 — 자리가 아니라 **한국 수요 기록**이다.
-                 그 기록은 어드민 「한국 수요」 리포트(A-661)가 집계한다. -->
-            <!-- A-666(2026-11-23): 이 칸이 약속한 셋 중 **둘이 거짓이었다.**
-                 ㄱ) 「묻는 분들의 직군」 — 공개 폼 세 곳이 전부 industry 를 빈 문자열로
-                     박아 넣는다(brands/view.html 1061, products/view.html 1131,
-                     sourcing-inquiry.html 516). 한 건도 뽑히지 않는다. 그 칸을 더하려면
-                     처리방침 제3조의 수집 항목을 고쳐야 한다 — 거기 업종은 전문가
-                     회원가입에만 있고 소싱·브랜드 문의에는 없다. 승리님과 변호사 몫이라
-                     약속에서 뺀다. 대신 **어느 품목을 묻는지**로 바꿨다 — 그건 분류와
-                     productId 로 실제로 갈라진다.
-                 ㄴ) 「찾았는데 없었던 것」 — 검색 계수기(미결 5번)로 생각했는데, 그게
-                     아니라 **소싱 문의**가 이미 그것이다. type 이 sourcing 이고 분류까지
-                     담는다. 한국에서 못 찾아 들여와 달라는 요청이니 그대로 쓸 수 있다.
-                     말만 정확하게 바꿨다.
-                 ㄷ) 같은 거짓이 **비교표 줄에도** 있었다(929행). 통계 칸만 보고 끝낼
-                     뻔했다 — 한 문구를 고칠 때는 저장소 전체에서 그 말을 전수로 찾는다.
-                 ㄹ) 자세한 내용은 비교표로 옮겼다. 이 통계 칸의 형제 석 장은 34·47·52자인데
-                     128자를 넣으면 넉 칸 그리드에서 이 칸만 네 줄 더 길어진다(0.85rem,
-                     1000px/4). 통계 칸은 짧은 주장만 담는다.
-                 어드민 「한국 수요」 리포트(A-661)가 집계한다. -->
+            <!-- A-261 · A-661 · A-663 — 검수대장 -->
+            <!-- A-661 · A-666 — 검수대장 -->
             <p data-en="Your monthly record of Korean demand in your category"
                data-ko="당신 품목의 한국 수요를 매달 기록합니다">Your monthly record of Korean demand in your category</p>
         </div>
@@ -655,21 +623,7 @@ a { text-decoration: none; color: inherit; }
     </div>
 </section>
 
-<!-- A-665(2026-11-23, 승리님 승인 「숫자 없이 구조만 올려줘」): 박람회 진출을
-     사이트에 올린다. 지금까지 이 서비스는 `request-consultation.html` 의
-     「Other / Custom」 안에 「exhibition prep」으로 **묻혀** 있었다 —
-     승리님이 가장 잘 하실 수 있고 가장 차별되는 것이 「기타」였다.
-     정본: docs/상품/고객용-메시지-2026-11-21.md · docs/설계/브랜드혜택-2026-11-23.md
-
-     ★ 숫자를 적지 않는다 — 리드타임·부스비·최소 브랜드 수는 승리님이 실무로
-       확정하실 값이고(고객용 메시지 §6 의 8칸), 지킬 수 없는 숫자는 안 적는 것보다
-       나쁘다(A-664 와 같은 판단).
-     ★ 이 쪽은 `data-langs="en"` 전용이므로 **보이는 글자는 영문**이고 data-ko 는
-       속성으로만 둔다. 그리고 data-ko 에 딜러 스크리닝·감시 얘기를 넣지 않는다
-       (A-342·343 승리님 결정). A-649·A-663 에서 같은 실수를 두 번 했다.
-     ★ 「왜 이 순서인가」: 손님이 사는 순서다. 유럽 브랜드는 「쇼케이스에 실어
-       주세요」를 먼저 사지 않는다 — 「우리가 한국에 들어갈 수 있나」를 먼저 묻는다.
-       그래서 쇼룸·디렉터리 섹션보다 **앞**에 둔다. -->
+<!-- A-342 · A-649 · A-663 · A-664 · A-665 — 검수대장 -->
 <section class="fb-fair" id="fair-entry">
   <div class="container">
     <span class="fb-fair-eyebrow" data-en="Trade Fair Entry" data-ko="박람회 진출">Trade Fair Entry</span>
@@ -830,14 +784,9 @@ a { text-decoration: none; color: inherit; }
 <section class="fb-compare">
     <div class="fb-compare-inner">
         <h2 data-en="How ARCHINODE Compares" data-ko="ARCHINODE와의 비교">How ARCHINODE Compares</h2>
-        <!-- A-460(2026-11-11): 360px 에서 표 폭 396px / 보이는 폭 312px → **84px 가 오른쪽으로 숨는다**
-             (390px 에서는 54px). 맨 오른쪽 `ARCHINODE` 열이 첫 화면에서 안 보이는데 **스크롤 힌트가 없다.**
-             `.fb-compare table { overflow:hidden; border-radius:8px }` 라 그림자·페이드 힌트도 못 생긴다.
-             그래서 글자로 알린다 — 넘칠 때만 보이게 (브론즈 28차 19번). -->
+        <!-- A-460 — 검수대장 -->
         <p class="fb-compare-hint" data-en="Swipe the table sideways to see the ARCHINODE column →" data-ko="표를 옆으로 밀면 ARCHINODE 열이 보입니다 →">Swipe the table sideways to see the ARCHINODE column &rarr;</p>
-        <!-- A-626(브론즈 46차 N46-6): A-616 에서 제가 여기에 안내를 하나 더 넣어
-             520px 이하에서 **두 줄이 겹쳐** 보였다. 위의 fb-compare-hint 로 하나만
-             쓰고, 그것을 창 크기가 아니라 **실제 넘침**으로 켠다(아래 스크립트). -->
+        <!-- A-616 · A-626 — 검수대장 -->
         <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;" role="region" tabindex="0"
              aria-label="Comparison table" data-en-aria-label="Comparison table" data-ko-aria-label="비교표">
         <table>
@@ -923,14 +872,10 @@ a { text-decoration: none; color: inherit; }
                     <div class="pt-highlight" data-en="Included — one plan, no upsell" data-ko="기본 제공 — 요금제 하나, 추가 요금 없음">Included — one plan, no upsell</div>
 </div>
 <div class="pt-row">
-<!-- A-663: 비교표에 **우리만 주는 것**을 한 줄 넣는다. 위의 두 줄(입점·노출)은
-     기존 디렉터리도 파는 것이고, 이 줄은 디렉터리가 줄 수 없는 것이다. -->
+<!-- A-663 — 검수대장 -->
 <div data-en="Korean demand record" data-ko="한국 수요 기록">한국 수요 기록</div>
 <div data-en="Not offered" data-ko="제공하지 않음">제공하지 않음</div>
-<!-- A-663: 보이는 글자는 **영문**이다 — 이 쪽은 `data-langs="en"` 전용이다.
-     그리고 `data-ko` 에 딜러 얘기를 넣지 않는다(A-342·343 승리님 결정: 딜러
-     스크리닝·감시 이야기는 한국어 화면에 노출하지 않는다). 같은 실수를 A-649 에서
-     한 번 했고 같은 검사기가 또 잡아 줬다. -->
+<!-- A-342 · A-649 · A-663 — 검수대장 -->
 <div class="pt-highlight" data-en="Monthly — enquiries, which products they ask about, and what they cannot find here" data-ko="매달 — 문의 수, 어느 품목을 묻는지, 그리고 한국에서 못 찾아 소싱을 요청한 것">Monthly — enquiries, which products they ask about, and what they cannot find here</div>
                 </div>
                 <div class="pt-row">
@@ -960,20 +905,10 @@ a { text-decoration: none; color: inherit; }
 </section>
 
 <!-- CONSULTING CTA -->
-<!-- A-649: index.html 에서 옮겨 왔다. 브랜드 유료 서비스라 게이트 안이 제자리다.
-     전에는 index 의 같은 격자가 영어에서는 이 4장을, 한국어에서는 바이어 서비스
-     4장을 보여 주었다(A-344) — 한 슬롯이 언어로 대상을 가르던 자리다. -->
+<!-- A-344 · A-649 — 검수대장 -->
 <section class="services" id="brand-services">
   <div class="container">
-    <!-- A-653(2026-11-21): `fade-in` 을 뺐다. A-649 에서 이 묶음을 index.html 에서
-         옮겨 올 때 클래스까지 함께 왔는데, **이 쪽에는 `.visible` 을 붙이는
-         관찰자가 없다**(index.html 은 인라인으로 갖고 있다). `.fade-in` 은
-         `opacity:0` 으로 시작하므로, 옮겨 온 네 장과 제목이 **영영 안 열렸다** —
-         실측 opacity 0.00 · 글자 526자 · 348,000px² 가 391px 흰 띠로 남았다.
-         A-649 이전 이 쪽의 `fade-in` 은 0개였다. 원래대로 되돌린다.
-         (관찰자를 여기 또 복사하는 길도 있지만, 85쪽이 같은 코드를 각자
-          갖고 있는 상태를 하나 더 늘릴 이유가 없다. 공용 js 로 모으는 건
-          별건으로 승리님 결정 목록에 올린다.) · 브론즈 51차 N51-5 발견 -->
+    <!-- A-649 · A-653 — 검수대장 -->
     <h2 class="section-title" data-en="Brand Services" data-ko="브랜드 서비스">Brand Services</h2>
     <div class="services-grid">
       <div class="service-item">
@@ -1022,8 +957,7 @@ a { text-decoration: none; color: inherit; }
         <div class="logo">ARCHINODE <span class="logo-sub" data-en="Bridging Architecture" data-ko="건축을 잇다">Bridging Architecture</span></div>
         <p data-en="The premier gateway for high-end European design brands entering Korea." data-ko="엄선된 해외 건축·디자인 브랜드와 한국 크리에이터를 위한 B2B 쇼케이스">The premier gateway for high-end European design brands entering Korea.</p>
         <div class="footer-contact">
-          <!-- A-316: 소셜 아이콘 4개가 전부 href="#" 였다 → 문의 한 줄로 교체(승리님 결정).
-               계정이 생기면 이 자리에 다시 넣는다. -->
+          <!-- A-316 — 검수대장 -->
           <a href="mailto:office@archinode.org" data-en="Brand listing &amp; partnership: office@archinode.org" data-ko="입점·제휴 문의 office@archinode.org">Brand listing &amp; partnership: office@archinode.org</a>
         </div>
       </div>
@@ -1051,8 +985,7 @@ a { text-decoration: none; color: inherit; }
         <h2 class="footer-col-title" data-en="Services" data-ko="서비스">Services</h2>
         <ul>
           <li><a href="sourcing-inquiry.html" data-en="Sourcing Inquiry" data-ko="자재 소싱 문의">Sourcing Inquiry</a></li>
-          <!-- A-340: 유럽 브랜드향 4줄을 한 칸으로 접는다. 사이트맵은 그대로이고
-               이름표가 누구를 위한 것인지 먼저 말해 준다. CSS 는 style.css 의 .footer-more. -->
+          <!-- A-340 — 검수대장 -->
           <li>
             <details class="footer-more">
               <summary data-en="For European brands" data-ko="유럽 브랜드를 위한 안내">For European brands</summary>
@@ -1128,8 +1061,7 @@ function toggleMobile() { const n = document.getElementById('mainNav'); if (n) n
 </script>
 <script src="lang.js?v=20261106a"></script>
 <script src="a11y-nav.js?v=20261113a"></script>
-<!-- 2026-11-03 A-047 확장(R-019 전수 점검): auth-ui.js 가 있어도 Firebase SDK 가 없어
-     typeof auth === "undefined" 로 조용히 종료 → 로그인해도 헤더가 비로그인 그대로였다. -->
+<!-- A-047 — 검수대장 -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -1161,10 +1093,7 @@ function toggleMobile() { const n = document.getElementById('mainNav'); if (n) n
 <script src="cookie-consent.js?v=20260630" defer></script>
 <script src="analytics-loader.js?v=20260630" defer></script>
 <script src="sentry-loader.js?v=20260630" defer></script>
-<!-- SCROLL TO TOP — A-458(2026-11-11): A-451 에서 네 페이지에 넣었는데 **더 긴 페이지들을
-     빠뜨렸다.** 매거진 기사 131편은 이 사이트에서 가장 긴 문서들이고, 제품 상세 ·
-     for-brands · list-your-brand 도 넣은 네 곳보다 길다. (브론즈 28차 11번)
-     A-451 과 같은 자급식 — 남의 변수에 기대지 않고, 두 번 실행돼도 안전하다. -->
+<!-- A-451 · A-458 — 검수대장 -->
 <button class="scroll-top" id="scrollTop" onclick="archiScrollTop(event)"
         aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로">
   <i class="fas fa-chevron-up"></i>

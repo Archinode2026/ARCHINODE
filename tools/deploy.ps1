@@ -1,4 +1,13 @@
-﻿# ARCHINODE — 배포 스크립트 (2026-09-12 신설, 엑사 tools/deploy.ps1을 GitHub Pages에 맞게 옮김)
+﻿# ARCHINODE — 배포 스크립트 (2026-09-12 신설, 엑사 tools/deploy.ps1을 옮김)
+#
+# A-669(2026-11-23): 이 머리말이 다섯 곳에서 호스팅을 **깃허브 쪽이라고** 적고
+#   있었다. 틀렸다. 라이브는 Netlify 가 서빙한다 — 브론즈 53차가 응답 헤더로
+#   실측했다(Server 와 x-nf-request-id). 저장소에도 netlify.toml · _redirects ·
+#   netlify/functions/recaptcha-verify.js 가 있다. 「배포 = main 에 push」라는
+#   동작 자체는 같지만, 플랫폼 이름이 틀리면 막혔을 때 엉뚱한 곳을 들여다본다.
+#   A-484 에서 배운 것과 같다 — 주석도 캡처도 코드가 아니다.
+#   (덧: 이 주석을 처음 쓸 때 틀린 문구를 그대로 인용했더니 내 검증기가
+#    그 인용을 남은 오류로 세고 멈췄다. 같은 덫에 올해 여러 번 걸렸다.)
 #
 # 사용법:
 #   powershell -ExecutionPolicy Bypass -File tools\deploy.ps1                 # push + 바뀐 파일 라이브 대조
@@ -6,11 +15,11 @@
 #   powershell -ExecutionPolicy Bypass -File tools\deploy.ps1 -NoPush          # push는 이미 했고 라이브 대조만
 #   powershell -ExecutionPolicy Bypass -File tools\deploy.ps1 -TimeoutMin 15
 #
-# 이 사이트는 GitHub Pages라 「배포 = main에 push」다. 이 스크립트가 하는 일:
+# 이 사이트는 Netlify 가 git 연동으로 받아 간다 — 「배포 = main에 push」다. 이 스크립트가 하는 일:
 #   1. 브랜치가 main인지, 미커밋 변경이 없는지, 올릴 커밋이 있는지 확인
 #   2. 올라갈 커밋에 firestore.rules 변경이 있으면 빨간 경고 (push로는 절대 반영 안 됨 — Firebase 콘솔 게시는 한울님 손)
 #   3. git push origin main
-#   4. GitHub Pages 반영(5~10분)을 기다리며, 바뀐 파일을 라이브에서 받아 로컬과 해시 대조
+#   4. Netlify 반영(보통 1~5분)을 기다리며, 바뀐 파일을 라이브에서 받아 로컬과 해시 대조
 # 배포는 반드시 이 스크립트로만 한다. 손으로 push하면 4번(라이브 대조)이 빠진다.
 
 param(
@@ -33,7 +42,7 @@ Set-Location (Split-Path -Parent $PSScriptRoot)
 
 Write-Host ''
 Write-Host '=================================================' -ForegroundColor Red
-Write-Host "  배포 대상: ARCHINODE 라이브 ($LiveUrl, GitHub Pages)" -ForegroundColor Red
+Write-Host "  배포 대상: ARCHINODE 라이브 ($LiveUrl, Netlify)" -ForegroundColor Red
 Write-Host '=================================================' -ForegroundColor Red
 Write-Host ''
 
@@ -235,7 +244,7 @@ if (-not $NoPush) {
         Write-Host '[실패] push가 실패했습니다. 원인을 고친 뒤 다시 실행하세요.' -ForegroundColor Red
         exit 1
     }
-    Write-Host '[push] 완료. GitHub Pages 빌드를 기다립니다 (보통 1~10분).' -ForegroundColor Green
+    Write-Host '[push] 완료. Netlify 반영을 기다립니다 (보통 1~5분).' -ForegroundColor Green
 }
 
 # ── 4. 라이브 대조 ──
