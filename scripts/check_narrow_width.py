@@ -65,6 +65,18 @@ PAGES = [
     #   **구멍은 진짜였고 결함은 아직 없었다.** 목록에 넣어 앞으로도 보게 한다.
     #   (목록에 없는데 쪽 단위 @media 가 3개 이상인 쪽은 전수에서 이 하나뿐이었다)
     'privacy-en.html',
+    # A-676(2026-11-24): 이 목록에 **매거진 기사가 한 쪽도 없었다.** 130편이고
+    #   사이트의 가장 큰 자산인데 좁은 폭을 한 번도 재 본 적이 없다.
+    #   A-673 에서 91편에 문(`.mg-door`)을 달았으니 더 그렇다 — 새 마크업이
+    #   한 번도 안 재진 쪽에 들어갔다. A-640·A-651·A-652·A-657·A-659 와 같은
+    #   **좁은 표본** 함정이다. 전수(130편 × 3폭)는 너무 느리므로 **근거를 적어**
+    #   다섯 쪽을 고른다. 기사 틀은 한 가지라 이 다섯이 나머지를 대표한다.
+    #   실측(2026-11-24, 컨테이너): 33쪽 × 322·360·390px 전부 통과 · 넘침 0.
+    'magazine/agm-thermroof-roofing-material-2026.html',          # 문 A · 본문 3,275자
+    'magazine/4th-basic-architecture-policy-plan-2026-2030.html', # 문 B
+    'magazine/aibim-platform-construction-ai-2026.html',          # 문 C
+    'magazine/pritzker-2026-smiljan-radic-korea-absence.html',    # 본문이 가장 길다(3,503자) · 문 없음
+    'magazine/auto-door-pet-door-convenipremium-2026.html',       # 문 없는 39편 대표
     'auth/login.html', 'auth/signup.html', 'auth/profile.html', 'auth/reset-password.html',
     'admin/dashboard.html', 'admin/articles.html', 'brand-portal/dashboard.html',
 ]
