@@ -55,11 +55,35 @@ function dmd_ms(v) {
 }
 
 /* ── 품목을 고른다. 소싱 문의는 category, 브랜드·제품 문의는 지도에서 끌어온다 ── */
-function dmd_catOf(d, catMap) {
-    if (d && d.category) return String(d.category);
-    if (d && d.productId && catMap && catMap['p:' + d.productId]) return catMap['p:' + d.productId];
-    if (d && d.brandId && catMap && catMap['b:' + d.brandId]) return catMap['b:' + d.brandId];
-    return '';
+/* A-680: 분류는 **여럿일 수 있다.** 브랜드 문서의 `category` 는 배열이다
+   (A-415 가 「언제나 배열로 쓴다」고 못 박았다 — 브랜드가 욕실과 마감재를
+   둘 다 고를 수 있다). 전에는 `String(x.category)` 로 묶어 `"Bathroom,Finishes"`
+   라는 **없는 분류**를 만들었다. 이제 목록으로 다룬다.
+   대소문자도 흡수한다 — 자료는 대문자지만 어딘가에서 소문자가 들어와도
+   같은 칸으로 세는 편이 낫다. 모르는 값은 **그대로 둔다**(화면에 그대로 떠서
+   눈에 띈다 — 조용히 「기타」로 삼키면 어휘가 갈라진 것을 아무도 모른다). */
+function dmd_canonCat(v) {
+    var t = String(v == null ? '' : v).trim();
+    if (!t) return '';
+    for (var k in DMD_CAT_KO) {
+        if (Object.prototype.hasOwnProperty.call(DMD_CAT_KO, k) &&
+            k.toLowerCase() === t.toLowerCase()) return k;
+    }
+    return t;
+}
+
+function dmd_catsOf(d, catMap) {
+    var raw = '';
+    if (d && d.category) raw = d.category;
+    else if (d && d.productId && catMap && catMap['p:' + d.productId]) raw = catMap['p:' + d.productId];
+    else if (d && d.brandId && catMap && catMap['b:' + d.brandId]) raw = catMap['b:' + d.brandId];
+    var list = (Object.prototype.toString.call(raw) === '[object Array]') ? raw : (raw ? [raw] : []);
+    var out = [], seen = {};
+    for (var i = 0; i < list.length; i++) {
+        var c = dmd_canonCat(list[i]);
+        if (c && !seen[c]) { seen[c] = 1; out.push(c); }
+    }
+    return out;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -82,6 +106,7 @@ function dmd_aggregate(leads, catMap, nowMs, days, onlyCategory) {
         total: 0,
         byCategory: {}, byIndustry: {}, bySource: {}, byMonth: {},
         unknownCategory: 0, unknownIndustry: 0,
+        multiCategory: 0,                      /* A-680: 분류를 여럿 가진 건 */
         excluded: {}, excludedTotal: 0,
         noDate: 0, outOfWindow: 0,
         /* A-667: 유형별(견적·브랜드 문의·소싱 ...). 「한국에서 못 찾아 들여와
@@ -110,13 +135,22 @@ function dmd_aggregate(leads, catMap, nowMs, days, onlyCategory) {
         if (ms === null) { out.noDate++; continue; }
         if (ms < from || ms > nowMs) { out.outOfWindow++; continue; }
 
-        var cat = dmd_catOf(d, catMap);
-        if (onlyCategory && cat !== onlyCategory) { out.otherCategory++; continue; }
+        /* A-680: 한 건이 분류를 여럿 가질 수 있으므로 **각 칸에 센다.**
+           그래서 byCategory 의 합은 total 보다 클 수 있다 — 화면이 그 사실을
+           말한다. 좁혀 보기(onlyCategory)는 「그 분류를 포함하는가」로 본다. */
+        var cats = dmd_catsOf(d, catMap);
+        if (onlyCategory) {
+            var hit = false;
+            for (var ci = 0; ci < cats.length; ci++) if (cats[ci] === onlyCategory) { hit = true; break; }
+            if (!hit) { out.otherCategory++; continue; }
+        }
 
         out.total++;
 
-        if (cat) out.byCategory[cat] = (out.byCategory[cat] || 0) + 1;
-        else out.unknownCategory++;
+        if (cats.length) {
+            for (var cj = 0; cj < cats.length; cj++) out.byCategory[cats[cj]] = (out.byCategory[cats[cj]] || 0) + 1;
+            if (cats.length > 1) out.multiCategory++;
+        } else out.unknownCategory++;
 
         var tp = d.type ? String(d.type) : 'unknown';
         out.byType[tp] = (out.byType[tp] || 0) + 1;
@@ -139,10 +173,26 @@ var DMD_SRC_EN = {
     'sourcing-page': 'Sourcing enquiry', 'brand-page': 'Brand page', 'product-page': 'Product page',
     'contact-page': 'Contact form', unknown: 'Source not recorded'
 };
+/* A-680: 이 지도를 **순수 함수 구역으로 올렸다.** 전에는 화면 구역(284행)에
+   있었는데 `dmd_canonCat` 이 그걸 보고, 내보내기 줄은 그보다 위에 있었다 —
+   그래서 `module.exports.DMD_CAT_KO` 가 **undefined** 였고 시험이 터졌다.
+   순수 함수가 기대는 자료는 순수 함수 옆에 있어야 한다. */
+/* A-680(2026-11-24): 키를 **자료의 꼴**로 바꿨다. 전에는 소문자였는데 사이트가
+   실제로 저장하는 값은 대문자다 — 소싱 폼의 `srcCategory`(Furniture …), 제품
+   문서의 `prodCategory`, 브랜드 문서의 체크박스 값, 그리고 공개 카테고리 쪽이
+   `where('category','==',…)` 로 묻는 값까지 전부. 소문자 지도로는 **한 건도
+   안 맞았다** — 어드민 화면에는 영문 키가 그대로 뜨고, 브랜드에게 보낼 한 장은
+   **모든 품목에서 0** 을 보고한다. 고리를 끝까지 따라가 보기 전에는 안 보였다. */
+var DMD_CAT_KO = {
+    Furniture: '가구', Bathroom: '욕실', Outdoor: '아웃도어', Lighting: '조명',
+    Kitchen: '주방', Office: '오피스', Finishes: '마감재', Wellness: '웰니스',
+    Decor: '데코', Construction: '건축자재'
+};
+
 var DMD_CAT_EN = {
-    furniture: 'Furniture', bathroom: 'Bathroom', outdoor: 'Outdoor', lighting: 'Lighting',
-    kitchen: 'Kitchen', office: 'Office', finishes: 'Finishes', wellness: 'Wellness',
-    decor: 'Decor', construction: 'Construction'
+    Furniture: 'Furniture', Bathroom: 'Bathroom', Outdoor: 'Outdoor', Lighting: 'Lighting',
+    Kitchen: 'Kitchen', Office: 'Office', Finishes: 'Finishes', Wellness: 'Wellness',
+    Decor: 'Decor', Construction: 'Construction'
 };
 
 /* ── 많은 것부터 정렬한 배열로 ── */
@@ -230,9 +280,9 @@ function dmd_sheetText(sheet, categoryEn) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { dmd_aggregate: dmd_aggregate, dmd_ms: dmd_ms, dmd_catOf: dmd_catOf, dmd_rank: dmd_rank,
+    module.exports = { dmd_aggregate: dmd_aggregate, dmd_ms: dmd_ms, dmd_catsOf: dmd_catsOf, dmd_canonCat: dmd_canonCat, dmd_rank: dmd_rank,
                        dmd_sheet: dmd_sheet, dmd_sheetText: dmd_sheetText, DMD_EXCLUDE: DMD_EXCLUDE,
-                       DMD_SRC_EN: DMD_SRC_EN, DMD_CAT_EN: DMD_CAT_EN };
+                       DMD_SRC_EN: DMD_SRC_EN, DMD_CAT_EN: DMD_CAT_EN, DMD_CAT_KO: DMD_CAT_KO };
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -241,11 +291,6 @@ if (typeof module !== 'undefined' && module.exports) {
    여기서는 **그린 것만** 한다. (tools/test-demand-aggregate.js 가 위를 검증한다)
    ═══════════════════════════════════════════════════════════════════════ */
 
-var DMD_CAT_KO = {
-    furniture: '가구', bathroom: '욕실', outdoor: '아웃도어', lighting: '조명',
-    kitchen: '주방', office: '오피스', finishes: '마감재', wellness: '웰니스',
-    decor: '데코', construction: '건축자재'
-};
 /* A-670(2026-11-24): 이 지도가 공개 폼의 어휘와 **달랐다** — distributor·contractor
    를 갖고 있고 landscape·furniture·construction 이 없었다. 그 세 값이 들어오면
    화면에 영문 키가 그대로 뜬다. 하나의 어휘는 세 곳에 같은 값으로 있어야 한다:
@@ -312,11 +357,11 @@ function dmd_load() {
 
     var catMap = {};
     var p1 = db.collection('brands').get().then(function (s) {
-        s.forEach(function (d) { var x = d.data() || {}; if (x.category) catMap['b:' + d.id] = String(x.category); });
+        s.forEach(function (d) { var x = d.data() || {}; if (x.category) catMap['b:' + d.id] = x.category;   /* A-680: 배열일 수 있다 — String() 으로 묶지 않는다 */ });
     }).catch(function () { /* 브랜드를 못 읽어도 소싱 문의는 category 를 갖고 있다 */ });
 
     var p2 = db.collection('products').get().then(function (s) {
-        s.forEach(function (d) { var x = d.data() || {}; if (x.category) catMap['p:' + d.id] = String(x.category); });
+        s.forEach(function (d) { var x = d.data() || {}; if (x.category) catMap['p:' + d.id] = x.category;   /* A-680 */ });
     }).catch(function () {});
 
     var p3 = db.collection('leads').orderBy('createdAt', 'desc').limit(DMD_READ_LIMIT).get()

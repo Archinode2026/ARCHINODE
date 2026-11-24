@@ -200,6 +200,63 @@ def main():
             if len(lyb) != 10:
                 problems.append('list-your-brand.html: 체크박스가 10개여야 하는데 %d개다' % len(lyb))
 
+    # ── A-680: 폼이 담는 분류 값과 **수요 리포트의 지도**가 같은가 ──
+    #    2026-11-24 에 어긋나 있었다. 소싱 폼은 `Furniture`(대문자)를 담는데
+    #    `view-demand.js` 의 지도는 소문자 키였다 — **한 건도 안 맞았고**,
+    #    브랜드에게 보낼 한 장이 모든 품목에서 0 을 보고했다. 고리를 끝까지
+    #    따라가 보기 전에는 안 보였다. 값이 사는 자리를 전부 모아 대조한다.
+    def opt_values(rel, select_id):
+        s2 = read(rel)
+        if not s2:
+            return None
+        m2 = re.search(r'id="' + select_id + r'"[\s\S]*?</select>', s2)
+        if not m2:
+            return None
+        return set(v for v in re.findall(r'<option[^>]*value="([^"]*)"', m2.group(0)) if v)
+
+    def map_keys(rel, name):
+        s2 = read(rel)
+        if not s2:
+            return None
+        m2 = re.search(name + r'\s*=\s*\{([\s\S]*?)\n\};', s2)
+        if not m2:
+            return None
+        return set(re.findall(r'(\w+)\s*:', m2.group(1)))
+
+    places = {}
+    v = opt_values('sourcing-inquiry.html', 'srcCategory')
+    if v: places['소싱 폼 #srcCategory'] = v
+    v = opt_values('brand-portal/dashboard.html', 'prodCategory')
+    if v: places['포털 제품 #prodCategory'] = v
+    for nm in ('DMD_CAT_KO', 'DMD_CAT_EN'):
+        v = map_keys('admin/js/view-demand.js', nm)
+        if v: places['수요 리포트 ' + nm] = v
+    # 브랜드 체크박스 — 포털의 editCategoryGroup 안 value
+    s2 = read('brand-portal/dashboard.html')
+    if s2:
+        m2 = re.search(r'id="editCategoryGroup"[\s\S]*?</(?:div|fieldset)>', s2)
+        if m2:
+            v = set(re.findall(r'value="([^"]*)"', m2.group(0)))
+            if v: places['포털 브랜드 체크박스'] = v
+
+    if len(places) >= 2:
+        names = sorted(places)
+        base = places[names[0]]
+        for n in names[1:]:
+            only_a = sorted(base - places[n])
+            only_b = sorted(places[n] - base)
+            if only_a or only_b:
+                problems.append('분류 값이 갈라졌다: 「%s」와 「%s」 — '
+                                '앞에만 %s · 뒤에만 %s'
+                                % (names[0], n, (', '.join(only_a) or '없음'),
+                                   (', '.join(only_b) or '없음')))
+        print('검사함  분류 값이 사는 자리 %d곳 — %s (어긋남 %d)'
+              % (len(places), ' · '.join('%s %d개' % (n, len(places[n])) for n in names),
+                 sum(1 for p in problems if p.startswith('분류 값이 갈라졌다'))))
+    else:
+        problems.append('분류 값이 사는 자리를 2곳 이상 못 읽었다 — 모양이 바뀌었나 (읽은 곳: %s)'
+                        % (', '.join(sorted(places)) or '없음'))
+
     print('')
     if problems:
         for p in problems:
