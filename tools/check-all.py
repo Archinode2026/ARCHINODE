@@ -55,6 +55,14 @@ CHECKS = [
      'A-407 — 세 곳의 대응표가 카테고리 페이지의 두 언어 h1 과 맞는지'),
     ('죽은 미디어 규칙',      'py',   'tools/check-css-cascade.py',
      'A-411 — @media 안의 수정이 뒤쪽 기본 규칙에 덮여 죽지 않았는지'),
+    ('죽은 미디어 규칙 검사기 자체', 'py', 'tools/test-css-cascade.py',
+     'A-683 — 위 검사기를 **임시 폴더의 가짜 CSS** 로 깨 본다. 진짜 style.css 를 '
+     '깨서 재다가 2026-11-23 에 timeout 에 잘려 저장소를 망가뜨렸으므로 원본을 '
+     '아예 안 건드린다. 6가지: 축약형 padding 이 뒤에서 padding-top 을 죽이는 것을 '
+     '잡는가(A-683 이 넣은 기능 — 그 전까지 검사기는 padding 과 padding-top 을 '
+     '**다른 속성으로 보고 놓쳤다**) · margin 도 같은가 · 순서가 반대면 조용한가 · '
+     '선택자가 다르면 조용한가 · 낱개끼리인 원래 꼴(A-411)도 그대로 잡는가 · '
+     '메시지가 「축약형」이라고 까닭을 말하는가'),
     ('포털 카테고리 왕복',    'node', 'tools/test-bp-category.js',
      'A-415 — brands.category 는 배열이다. 저장이 그걸 지우지 않는지'),
     ('로그인 갈림길',        'node', 'tools/test-login-gate.js',

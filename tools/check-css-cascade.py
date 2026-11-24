@@ -150,6 +150,39 @@ def width_gate_check():
     return out
 
 
+# A-683: 축약형은 낱개를 덮는다.
+# `body.home section.hero { padding: 0 0 60px }` 는 그 앞 미디어 규칙의
+# `padding-top` 을 **통째로 지운다**. 그런데 이 검사는 (선택자, 속성) 짝으로만
+# 색인해서 `padding` 과 `padding-top` 을 **다른 속성으로 봤다** — 즉 이 꼴을
+# 구조적으로 못 봤다. A-683 에서 내가 그 자리에 규칙을 넣으면서 주석에
+# 「이 검사가 자리를 지킨다」고 적었는데, 확인해 보니 지키지 않고 있었다.
+# 적어 둔 약속이 거짓이 되지 않게 검사기를 고친다.
+SHORTHAND = {
+    'padding': ['padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
+    'margin': ['margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
+    'inset': ['top', 'right', 'bottom', 'left'],
+    'overflow': ['overflow-x', 'overflow-y'],
+    'gap': ['row-gap', 'column-gap'],
+    'place-items': ['align-items', 'justify-items'],
+    'place-content': ['align-content', 'justify-content'],
+    'flex': ['flex-grow', 'flex-shrink', 'flex-basis'],
+    'outline': ['outline-width', 'outline-style', 'outline-color'],
+    'border-radius': ['border-top-left-radius', 'border-top-right-radius',
+                      'border-bottom-right-radius', 'border-bottom-left-radius'],
+    'border': ['border-top', 'border-right', 'border-bottom', 'border-left',
+               'border-width', 'border-style', 'border-color'],
+    'background': ['background-color', 'background-image', 'background-position',
+                   'background-size', 'background-repeat', 'background-attachment'],
+    'font': ['font-style', 'font-variant', 'font-weight', 'font-stretch',
+             'font-size', 'line-height', 'font-family'],
+    'transition': ['transition-property', 'transition-duration',
+                   'transition-timing-function', 'transition-delay'],
+    'animation': ['animation-name', 'animation-duration', 'animation-timing-function',
+                  'animation-delay', 'animation-iteration-count', 'animation-direction',
+                  'animation-fill-mode', 'animation-play-state'],
+}
+
+
 def main():
     problems = []
     notes = []
@@ -164,7 +197,10 @@ def main():
         for line, media, sels, decls in rs:
             for sel in sels:
                 for prop, val in decls.items():
-                    idx.setdefault((sel, prop), []).append((line, media, val))
+                    idx.setdefault((sel, prop), []).append((line, media, val, prop))
+                    # 축약형은 그것이 덮는 낱개 자리에도 들어간다 (A-683)
+                    for lh in SHORTHAND.get(prop, []):
+                        idx.setdefault((sel, lh), []).append((line, media, val, prop))
         checked = 0
         for (sel, prop), hits in sorted(idx.items()):
             if len(hits) < 2:
@@ -174,11 +210,15 @@ def main():
             if not media_hits or not base_hits:
                 continue
             checked += 1
-            for mline, mcond, mval in media_hits:
+            for mline, mcond, mval, mprop in media_hits:
                 later = [b for b in base_hits if b[0] > mline]
                 if not later:
                     continue
-                bline, _, bval = later[0]
+                bline, _, bval, bprop = later[0]
+                # 같은 줄에서 온 짝(한 규칙이 축약형과 낱개를 같이 적은 것)은
+                # 미디어·기본 문제가 아니다
+                if bline == mline:
+                    continue
                 if any(sel == k and prop == pr for k, pr, _ in KNOWN):
                     continue
                 # A-411 정정: 더 뒤에 **같은 조건의 미디어 규칙이 또 있으면**
@@ -194,11 +234,13 @@ def main():
                         '**결과는 의도대로다.** 앞쪽이 죽은 중복 코드다'
                         % (rel, sel, prop, mline, mcond, bline, revived[0][0]))
                     continue
+                via = ('' if bprop == prop
+                       else ' — 축약형 `%s` 가 `%s` 를 통째로 덮는다' % (bprop, prop))
                 problems.append(
                     '%s — `%s { %s }` 가 죽었다: %d행 `%s` 안의 %s 를 '
-                    '%d행 기본 규칙 `%s` 가 덮는다(특정도 같음, 뒤가 이긴다). '
+                    '%d행 기본 규칙 `%s` 가 덮는다(특정도 같음, 뒤가 이긴다)%s. '
                     '`body ` 접두로 특정도를 올리거나 블록을 뒤로 옮겨라'
-                    % (rel, sel, prop, mline, mcond, mval, bline, bval))
+                    % (rel, sel, prop, mline, mcond, mval, bline, bval, via))
         print('검사함  %s — 규칙 %d개, 미디어·기본이 같이 손대는 (선택자·속성) %d쌍'
               % (rel, len(rs), checked))
 
