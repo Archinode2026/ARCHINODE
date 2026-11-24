@@ -143,7 +143,47 @@ PROBE = """
       ctrlsAll: ctrls.length
     });
   });
-  return {vh, vw, items: out};
+  /* A-683/A-685: 여기까지는 **무엇이 가리는가**만 봤다 — `fixed` 와 `sticky`
+     요소, 그리고 그 안의 누를 거리. 그래서 **무엇이 잘리는가**를 못 봤다.
+     400% 확대에서 첫 쪽 `section.hero` 는 `height:100vh` + `overflow:hidden`
+     인데 안의 내용이 창보다 83px 커서 **위가 잘려 나갔다**. 잘린 것은 굴려도
+     안 돌아온다 — 쪽을 굴리면 상자째 움직일 뿐 자름선이 상자에 붙어 다닌다.
+     대표 문구와 윗꼬리가 그렇게 사라져 있었고 검사 62개가 전부 통과시켰다.
+     그래서 **세로로 잘려 나간 글·누를 거리**를 따로 센다.
+     - `overflow-y` 가 hidden/clip 인 것만 (auto/scroll 이면 굴려서 닿는다)
+     - `fixed` 는 위에서 이미 본다
+     - 글자를 **자기가 가진** 자손이나 누를 거리만 (꾸밈 상자는 잘려도 된다)
+     - `opacity:0` · `aria-hidden` 아래는 뺀다 — 슬라이드·탭처럼 **일부러**
+       치워 둔 것을 결함으로 세면 늑대를 외치게 된다 */
+  const clipped = [];
+  document.querySelectorAll('body *').forEach(e => {
+    const cs = getComputedStyle(e);
+    if (!/hidden|clip/.test(cs.overflowY)) return;
+    if (cs.position === 'fixed') return;
+    const r = e.getBoundingClientRect();
+    if (r.height < 40 || r.width < 40) return;
+    const lost = [];
+    e.querySelectorAll('*').forEach(d => {
+      const dcs = getComputedStyle(d);
+      if (dcs.display === 'none' || dcs.visibility === 'hidden' || dcs.opacity === '0') return;
+      if (d.closest('[aria-hidden="true"]')) return;
+      const b = d.getBoundingClientRect();
+      if (b.height <= 0 || b.width <= 0) return;
+      const own = (d.childNodes ? [...d.childNodes] : [])
+        .filter(n => n.nodeType === 3 && n.nodeValue.trim()).length > 0;
+      const ctrl = /^(a|button|input|select|textarea)$/i.test(d.tagName);
+      if (!own && !ctrl) return;
+      const over = Math.max(r.top - b.top, b.bottom - r.bottom);
+      if (over > 4) lost.push(((d.innerText || d.value || '').trim().slice(0, 24)
+                               || d.tagName.toLowerCase()) + ' (' + Math.round(over) + 'px)');
+    });
+    if (lost.length) clipped.push({
+      tag: e.tagName.toLowerCase(), id: e.id || '',
+      cls: (typeof e.className === 'string' ? e.className : '').split(' ')[0].slice(0, 24),
+      h: Math.round(r.height), lost: lost.slice(0, 4), n: lost.length
+    });
+  });
+  return {vh, vw, items: out, clipped};
 }
 """
 
@@ -187,11 +227,28 @@ def main():
                         still[it2['tag'] + '#' + it2['id']] = set(it2['ctrlsOut'])
                     for it1 in r['items']:
                         k = it1['tag'] + '#' + it1['id']
-                        if k in still:
-                            it1['ctrlsOut'] = [x for x in it1['ctrlsOut'] if x in still[k]]
+                        # A-686: 굴린 뒤 목록에 **없다**는 것은 「정보가 없다」가
+                        # 아니라 **「막힌 것이 하나도 없다」**는 뜻이다. PROBE 는
+                        # 막힌 것도 넘친 것도 없는 요소를 아예 안 담기 때문이다.
+                        # 그걸 「정보 없음」으로 읽고 굴리기 전 목록을 그대로 두어서,
+                        # **굴리면 닿는 링크를 「어느 굴림 위치에서도 안 닿는다」고
+                        # 16쪽에서 보고**했다 — 동의 고지의 「Privacy Policy」다.
+                        # 실측(427x341): 굴리기 전 두 줄 다 막힘(.cc-more/.cc-accept),
+                        # 배너를 끝까지 굴린 뒤 두 줄 다 9점 전부 닿음.
+                        # 비어 있는 집합과 교집합하면 비워지는 것이 맞다.
+                        it1['ctrlsOut'] = [x for x in it1['ctrlsOut']
+                                           if x in still.get(k, set())]
                 except Exception:
                     pass
                 seen += 1
+                for c in r.get('clipped', []):
+                    nm = '<%s%s%s>' % (c['tag'], ('#' + c['id']) if c['id'] else '',
+                                       (' .' + c['cls']) if c['cls'] else '')
+                    hard.append('%s %s %s 높이%dpx (창 %d) — **잘려서 영영 안 보이는 '
+                                '내용 %d개** (overflow-y 가 hidden 이라 굴려도 안 '
+                                '돌아온다): %s'
+                                % (label, page, nm, c['h'], r['vh'], c['n'],
+                                   ', '.join(c['lost'])))
                 for it in r['items']:
                     name = '<%s%s%s>' % (it['tag'], ('#' + it['id']) if it['id'] else '',
                                          (' .' + it['cls']) if it['cls'] else '')
