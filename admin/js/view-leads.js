@@ -49,11 +49,18 @@ var LEAD_INDUSTRIES = [
     { key: 'student',      en: 'Student',                ko: '학생' },
     { key: 'other',        en: 'Other',                  ko: '기타' }
 ];
+/* A-681(2026-11-24): 이 지도에 **`sourcing-page` 가 없었다.** 소싱 문의는 우리
+   주 유입 경로인데(`sourcing-inquiry.html` 이 그 값을 담는다) 리드 목록에서
+   경로가 영문 날글자로 떴다. 그리고 `contact` 는 아무도 담지 않는 추측 키인데
+   수요 리포트는 같은 것을 `contact-page` 로 적고 있었다 — 추측이 두 쪽에서
+   갈렸다. `-page` 로 통일한다(다른 셋이 그 꼴이다). 담는 값과 어드민의
+   이름표는 함께 고친다(A-498). */
 var LEAD_SOURCES = {
-    'admin-manual': { en: 'Manual (admin)', ko: '수동 등록(어드민)' },
-    'brand-page':   { en: 'Brand page',     ko: '브랜드 페이지' },
-    'product-page': { en: 'Product page',   ko: '제품 페이지' },
-    'contact':      { en: 'Contact form',   ko: '문의 폼' }
+    'admin-manual':  { en: 'Manual (admin)',   ko: '수동 등록(어드민)' },
+    'brand-page':    { en: 'Brand page',       ko: '브랜드 페이지' },
+    'product-page':  { en: 'Product page',     ko: '제품 페이지' },
+    'sourcing-page': { en: 'Sourcing enquiry', ko: '소싱 문의' },
+    'contact-page':  { en: 'Contact form',     ko: '문의 폼' }
 };
 var LEAD_COLUMNS = [
     { en: 'Date',           ko: '날짜' },

@@ -171,7 +171,7 @@ function dmd_aggregate(leads, catMap, nowMs, days, onlyCategory) {
 
 var DMD_SRC_EN = {
     'sourcing-page': 'Sourcing enquiry', 'brand-page': 'Brand page', 'product-page': 'Product page',
-    'contact-page': 'Contact form', unknown: 'Source not recorded'
+    'admin-manual': 'Entered by ARCHINODE', 'contact-page': 'Contact form', unknown: 'Source not recorded'
 };
 /* A-680: 이 지도를 **순수 함수 구역으로 올렸다.** 전에는 화면 구역(284행)에
    있었는데 `dmd_canonCat` 이 그걸 보고, 내보내기 줄은 그보다 위에 있었다 —
@@ -302,9 +302,16 @@ var DMD_IND_KO = {
     furniture: '가구 디자인', construction: '건설', dealer: '딜러 / 유통',
     developer: '부동산 개발', student: '학생', other: '기타'
 };
+/* A-681(2026-11-24): 이 지도에 **`admin-manual` 이 없었다.** 승리님이 전화·전시회
+   리드를 손으로 넣는 경로인데(`view-leads.js` 가 그 값을 담는다) 수요 리포트에는
+   영문 날글자로 떴다. 그리고 `contact-page` 는 **아무도 담지 않는 추측 키**인데
+   어드민 리드 화면은 같은 것을 `contact` 로 적고 있었다 — 추측이 두 쪽에서
+   다르게 갈렸다. 두 지도의 키를 같게 맞춘다(A-498 과 같은 규칙).
+   `unknown` 은 담기는 값이 아니라 **빈 값에 붙이는 이름**이다 — 그래서 이 하나만
+   어드민 쪽에 없어도 된다. */
 var DMD_SRC_KO = {
     'sourcing-page': '소싱 문의', 'brand-page': '브랜드 쪽', 'product-page': '제품 쪽',
-    'contact-page': '연락처', unknown: '경로 미상'
+    'admin-manual': '수동 등록(어드민)', 'contact-page': '문의 폼', unknown: '경로 미상'
 };
 
 function dmd_label(map, key) {
