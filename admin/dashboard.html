@@ -59,6 +59,19 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 /* STATS */
 .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
 .stat-card { background: var(--white); border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+/* A-690: 카드를 button 으로 바꿨으니 브라우저 기본 단추 꼴을 되돌린다.
+   text-align 과 font 를 안 되돌리면 숫자가 가운데로 가고 글꼴이 바뀐다. */
+button.stat-card {
+  display: block; width: 100%; text-align: left; font: inherit; color: inherit;
+  border: 1px solid transparent; cursor: pointer; transition: box-shadow .15s, border-color .15s, transform .15s;
+}
+button.stat-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.10); border-color: var(--gray-300, #e5e0d8); }
+button.stat-card:active { transform: translateY(1px); }
+/* 초점 고리는 두 겹으로 — 카드 배경이 흰색이라 바깥 흰 테를 먼저 깔아야
+   어두운 고리가 어디서든 3:1 을 넘긴다 (A-589 와 같은 어휘) */
+button.stat-card:focus-visible {
+  outline: 2px solid #141414; outline-offset: 2px; box-shadow: 0 0 0 6px rgba(255,255,255,0.92);
+}
 .stat-card .number { font-size: 2rem; font-weight: 700; color: var(--black); }
 .stat-card .label { font-size: 0.8rem; color: var(--ink-soft); margin-top: 4px; }
 .stat-card .icon { float: right; font-size: 1.5rem; color: var(--ink-soft); }
@@ -233,26 +246,32 @@ tr:hover { background: var(--gray-50); }
 
     <!-- STATS -->
     <div class="stats-row">
-        <div class="stat-card">
-            <i class="fas fa-building icon"></i>
+        <!-- A-690: 숫자를 눌러 그 목록으로 바로 간다. 전에는 숫자가 **죽은 글자**라
+             사이드바를 다시 찾아 눌러야 했다. div 가 아니라 **진짜 <button>** 으로
+             둔 까닭: Tab 으로 닿고 Enter·Space 로 눌리고 보조기기가 「단추」라고
+             읽는 것이 공짜로 따라온다. div 에 onclick 만 달면 그 셋을 전부 손으로
+             다시 만들어야 하고, 이 저장소는 그걸 빠뜨린 적이 있다(A-115 에서
+             슬라이드 점을 button 으로 바꾼 것과 같은 판단). -->
+        <button type="button" class="stat-card" data-go="brands">
+            <i class="fas fa-building icon" aria-hidden="true"></i>
             <div class="number" id="statTotalBrands">0</div>
             <div class="label" data-en="Total Brands" data-ko="총 브랜드">Total Brands</div>
-        </div>
-        <div class="stat-card">
-            <i class="fas fa-clock icon"></i>
+        </button>
+        <button type="button" class="stat-card" data-go="brands">
+            <i class="fas fa-clock icon" aria-hidden="true"></i>
             <div class="number" id="statPendingBrands">0</div>
             <div class="label" data-en="Pending Approval" data-ko="승인 대기 중">Pending Approval</div>
-        </div>
-        <div class="stat-card">
-            <i class="fas fa-box-open icon"></i>
+        </button>
+        <button type="button" class="stat-card" data-go="products">
+            <i class="fas fa-box-open icon" aria-hidden="true"></i>
             <div class="number" id="statPendingProducts">0</div>
             <div class="label" data-en="Products to Review" data-ko="검토할 제품">Products to Review</div>
-        </div>
-        <div class="stat-card">
-            <i class="fas fa-newspaper icon"></i>
+        </button>
+        <button type="button" class="stat-card" data-go="articles">
+            <i class="fas fa-newspaper icon" aria-hidden="true"></i>
             <div class="number" id="statPendingArticles">0</div>
             <div class="label" data-en="Articles to Review" data-ko="검토할 아티클">Articles to Review</div>
-        </div>
+        </button>
     </div>
 
     <!-- VIEW: DASHBOARD (1단계 셸 — view-dashboard.js 가 그린다) -->
@@ -403,6 +422,7 @@ tr:hover { background: var(--gray-50); }
 
 <script src="../firebase-config.js"></script>
 <script src="../loading-watchdog.js?v=20261111a"></script>
+<script src="js/modal-dismiss.js?v=20261125a"></script>
 <script src="js/admin-core.js?v=20261105b"></script>
 <script src="js/admin-nav.js?v=20261104g"></script>
 <script src="js/view-dashboard.js?v=20261105a"></script>
@@ -681,26 +701,54 @@ function openReasonModal(opts) {
         ta.addEventListener('input', () => { cnt.textContent = ta.value.length; });
         ta.focus();
 
-        // W2 fix: overlay 클릭 / Esc 키도 resolve(null) 처리
+        /* A-689: 바깥을 눌러도 안 닫힌다. Esc 는 **적은 글이 없을 때만** 듣는다.
+           닫을지 말지는 `reasonDismiss()` 한 곳이 정한다(js/modal-dismiss.js) —
+           어드민 화면은 로그인이 있어야 열려 노드가 눈으로 못 보므로, 판단을
+           순수 함수에 두고 시험으로 묶는다(A-657·A-680 과 같은 사각지대). */
+        const dlg = modal.querySelector('.modal');
+        if (dlg) {
+            dlg.setAttribute('role', 'dialog');
+            dlg.setAttribute('aria-modal', 'true');
+        }
         let resolved = false;
         const safeResolve = (val) => {
             if (resolved) return;
             resolved = true;
+            reasonModalGuard = null;
             modal.classList.remove('show');
-            modal.removeEventListener('click', onOverlayClick, true);
             document.removeEventListener('keydown', onKeydown, true);
+            if (dlg) { dlg.removeAttribute('role'); dlg.removeAttribute('aria-modal'); }
             resolve(val);
         };
-        const onOverlayClick = (e) => {
-            if (e.target === modal) { safeResolve(null); }
-        };
+        reasonModalGuard = safeResolve;
+
+        /* 바깥이 안 닫히니 **초점도 안에 둬야 한다.** 안 그러면 Tab 으로 뒤쪽
+           화면에 나가 버리고, 거기는 눌러도 아무 일이 안 나는 자리가 된다
+           (WCAG 2.1.2 는 「나갈 길이 있을 것」을 요구하는데, 취소 단추가 그 길이다). */
+        function focusables() {
+            return Array.prototype.filter.call(
+                modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'),
+                function (el) { return !el.disabled && el.offsetParent !== null; });
+        }
         const onKeydown = (e) => {
-            if (e.key === 'Escape') { safeResolve(null); }
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                if (window.reasonDismiss('escape', ta.value.trim().length > 0) === 'cancel') {
+                    safeResolve(null);
+                }
+                return;
+            }
+            if (e.key !== 'Tab') return;
+            const f = focusables();
+            if (!f.length) return;
+            const first = f[0], last = f[f.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            else if (!modal.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
         };
-        modal.addEventListener('click', onOverlayClick, true);
         document.addEventListener('keydown', onKeydown, true);
 
-        document.getElementById('reasonCancelBtn').onclick = () => { safeResolve(null); };
+        document.getElementById('reasonCancelBtn').onclick = () => { safeResolve(null); };   // 취소는 늘 듣는다
         document.getElementById('reasonConfirmBtn').onclick = () => {
             const v = ta.value.trim();
             if (opts.required && v.length === 0) {
@@ -1744,6 +1792,20 @@ function reloadTabData(key) {
     });
 }
 
+/* A-690: 통계 숫자를 눌러 그 목록으로 바로 간다.
+   해시(`location.hash`)로 보내지 않고 **탭을 직접 누른다** — 사이드바에는
+   `articles` 경로가 없어서(admin-nav.js 의 메뉴에 `articlesCards` = 별도 쪽만
+   있다) `#articles` 로 보내면 대시보드로 되튕긴다. 탭을 누르면 네 장이 모두
+   되고, admin-nav.js 가 문서 단위로 듣고 있어 사이드바 강조와 주소도 따라온다. */
+document.querySelector('.stats-row').addEventListener('click', (e) => {
+    const card = e.target.closest('.stat-card[data-go]');
+    if (!card) return;
+    const tab = document.querySelector('.tabs .tab[data-tab="' + card.dataset.go + '"]');
+    if (!tab) return;
+    tab.click();
+    tab.scrollIntoView({ block: 'nearest' });
+});
+
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1755,13 +1817,33 @@ document.querySelectorAll('.tab').forEach(tab => {
 });
 
 // ── 모달 ──
-document.getElementById('closeModal').addEventListener('click', closeModal);
-document.getElementById('modal').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal(); });
-function closeModal() { document.getElementById('modal').classList.remove('show'); }
+/* A-689: 사유 입력 창이 **다른 데를 누르면 적던 글째로 사라졌다**(승리님 보고).
+   더 나쁜 것도 있었다 — X 단추와 탭 이동은 `closeModal()` 만 불러 창을 숨길 뿐
+   **약속(Promise)을 안 풀었다.** 그래서 X 를 누르면 창은 사라지는데
+   `await openReasonModal(...)` 이 영영 안 돌아왔다. 어드민 눈에는 「아무 일도
+   안 일어난 것」으로 보인다. 적은 글이 날아가는 것보다 조용하고 더 나쁘다.
+   이제 닫는 길이 전부 여기를 지나고, 사유 창이 떠 있으면 `reasonDismiss()`(
+   js/modal-dismiss.js, 순수 함수라 시험으로 묶인다)가 닫을지 말지 정한다. */
+let reasonModalGuard = null;   // 사유 창이 떠 있는 동안의 safeResolve
+
+function closeModal(source) {
+    if (reasonModalGuard) {
+        const ta = document.getElementById('reasonInput');
+        const hasText = !!(ta && ta.value.trim().length);
+        const what = window.reasonDismiss(source || 'other', hasText);
+        if (what === 'cancel') reasonModalGuard(null);
+        return;   // 'ignore' — 창을 그대로 둔다
+    }
+    document.getElementById('modal').classList.remove('show');
+}
+document.getElementById('closeModal').addEventListener('click', () => closeModal('x'));
+document.getElementById('modal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal('backdrop');
+});
 // R-050: 뒤로가기(=주소의 #탭 이 바뀌는 것)를 누르면 뒤쪽 탭만 조용히 바뀌고 팝업은 그대로 떠
 // 있었다. 그러면 팝업에는 아까 보던 항목이, 뒤에는 다른 탭이 깔려 '지금 어디인지' 가 어긋난다.
 // 탭이 바뀌는 순간에는 팝업을 닫는 게 맞다 — 그 팝업은 떠나온 탭의 것이기 때문이다.
-window.addEventListener('hashchange', closeModal);
+window.addEventListener('hashchange', () => closeModal('hash'));
 
 // ── 로그아웃 ──
 document.getElementById('logoutBtn').addEventListener('click', async () => {
