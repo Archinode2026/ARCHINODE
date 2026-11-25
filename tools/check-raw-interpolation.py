@@ -20,15 +20,40 @@ import io, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
 
-# 같은 자료를 그리는 사본 전부
-FILES = [
-    'category-products.js',
-    'auth/profile.html',
-    'products/view.html',
-    'brands/view.html',
-    'brand-portal/dashboard.html',
-    'admin/dashboard.html',
-]
+# ★★ A-715(2026-11-25, 브론즈 57차 ⑦): 전에는 여기 **손으로 적은 목록 6개**가
+#   있었고 주석은 「같은 자료를 그리는 사본 전부」라고 말했다. **아니었다.**
+#   실제로 보간하는 파일을 세니 여섯인데, 그중 `brands.html`(6곳)과
+#   `magazine/view.html`(6곳)이 **목록에 없었고**, 목록에 있는
+#   `category-products.js`·`auth/profile.html` 은 **0곳**이었다(A-471 에서 고쳐진
+#   뒤 다른 꼴로 바뀌었다). 즉 **명부가 과거를 지키고 현재를 안 봤다.**
+#   공개 브랜드 디렉터리와 기사 본문 화면에서 누가 escapeHtml 하나를 빼도
+#   검사 70여 개가 전부 통과하는 상태였다.
+#   더 나쁜 것: **A-656 ② 가 이미 「목록에 magazine/view.html 이 없다」고 적어
+#   뒀는데 아직 안 들어가 있었다.** 적어 두는 것으로는 안 고쳐진다.
+#   그래서 목록을 버리고 **저장소에서 직접 찾는다.**
+SEARCH_SKIP_DIRS = {'.git', 'node_modules', 'docs', 'backup', 'tools', 'scripts',
+                    '옛사본-2026-04', 'archi-diary', 'sales', 'silvia'}
+
+
+def discover():
+    """FIELDS 를 템플릿에 보간하는 파일을 **전수로** 찾는다."""
+    found = []
+    for base, dirs, names in os.walk('.'):
+        dirs[:] = [d for d in dirs if d not in SEARCH_SKIP_DIRS]
+        for n in sorted(names):
+            if not (n.endswith('.html') or n.endswith('.js')):
+                continue
+            rel = os.path.join(base, n).replace(os.sep, '/')
+            rel = rel[2:] if rel.startswith('./') else rel
+            try:
+                src = io.open(rel, encoding='utf-8', errors='replace').read()
+            except OSError:
+                continue
+            src = re.sub(r'<!--[\s\S]*?-->', ' ', src)
+            src = re.sub(r'/\*[\s\S]*?\*/', ' ', src)
+            if DISCOVER.search(src):
+                found.append(rel)
+    return found
 
 # 바깥에서 들어오는 값들 — 사람이 입력하거나 브랜드가 쓴 것
 FIELDS = ('name', 'brandName', 'brandSlug', 'materials', 'title', 'slug', 'imageUrl',
@@ -71,16 +96,21 @@ TOKEN = re.compile(r'\b([A-Za-z_$][\w$]{0,12})\.(' + '|'.join(FIELDS) + r')\b')
 # (`b.koreanDealer.name ?` 처럼). 값 자리는 `}` 나 글자가 뒤따른다.
 COND_AFTER = re.compile(r'^(\.[\w$]+)*\s*(\?|&&|\|\||\)|===|!==|==|!=)')
 # 화면에 안 들어가는 자리
+DISCOVER = re.compile(r'\$\{[^}]*\b\w+\.(?:'
+                      + '|'.join(re.escape(f) for f in FIELDS) + r')\b[^}]*\}')
+
 SKIP_LINE = ('storage.ref(', '.ref(', 'db.collection(', 'console.')
 SKIP_VARS = ('sub',)          # 하드코딩된 SUBCATEGORIES 리터럴
 
 bad = []
 checked = 0
 
+FILES = discover()
+if len(FILES) < 5:
+    bad.append('보간하는 파일이 %d개만 보인다 — 전에 6개였다. 탐지가 멈췄는지 보라'
+               % len(FILES))
+
 for rel in FILES:
-    if not os.path.exists(rel):
-        bad.append('%s — 파일이 없다 (검사 목록을 고쳐라)' % rel)
-        continue
     s = io.open(rel, encoding='utf-8').read()
     if 'escapeHtml' not in s:
         bad.append('%s — escapeHtml 이 아예 없다' % rel)

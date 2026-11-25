@@ -410,7 +410,22 @@ document.getElementById('resetForm').addEventListener('submit', async (e) => {
         archiSay(successDiv, 'Password reset email sent!', '재설정 이메일을 전송했습니다!');
     } catch (error) {
         errorDiv.style.display = 'block';
-        archiSay(errorDiv, 'Could not send reset email. Please check the address.', '이메일 전송에 실패했습니다. 주소를 확인해 주세요.');
+        /* A-714: 전에는 **모든 실패**를 「주소를 확인해 주세요」로 말했다.
+           `auth/too-many-requests` 로 막힌 사람은 멀쩡한 주소를 계속 고쳐 보게 된다. */
+        var code = (error && error.code) || '';
+        if (code === 'auth/too-many-requests') {
+            archiSay(errorDiv,
+                'Too many requests. Please wait a few minutes before trying again.',
+                '요청이 너무 많았습니다. 몇 분 뒤에 다시 시도해 주세요.');
+        } else if (code === 'auth/network-request-failed') {
+            archiSay(errorDiv,
+                'Could not reach the server. Please check your connection and try again.',
+                '서버에 연결하지 못했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.');
+        } else {
+            archiSay(errorDiv,
+                'Could not send reset email. Please check the address.',
+                '이메일 전송에 실패했습니다. 주소를 확인해 주세요.');
+        }
     }
 });
 </script>
