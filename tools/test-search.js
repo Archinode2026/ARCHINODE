@@ -29,6 +29,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const SRC = fs.readFileSync(path.join(ROOT, 'search.js'), 'utf8');
+const GATE_SRC = fs.readFileSync(path.join(ROOT, 'brand-gate.js'), 'utf8');
 
 /* 한 경우가 비동기로 터져도 **뒤 시험이 계속 돌게** 한다. search.js 의 렌더는
    프라미스 콜백에서 불리므로, 거기서 던지면 기본값으로는 node 가 그 자리에서
@@ -126,8 +127,15 @@ function makeEnv(opts) {
          시험이 거짓으로 통과한다. 이름대로 돌려준다. */
       collection(name) {
         const rows = (name === 'products') ? (opts.products || []) : brands;
+        /* A-695: 문(brand-gate.js)은 **문서 id** 로 승인 명단을 만든다.
+           전에는 id 를 안 줘서 명단이 {undefined:true} 가 됐다 — 그러면
+           제품이 전부 걸러져 시험이 「결과 없음」으로 거짓 실패한다.
+           브랜드는 slug 를 id 로 쓴다(진짜는 uid 지만 짝만 맞으면 된다). */
         return { where() { return { get() {
-          return Promise.resolve({ forEach(cb) { rows.forEach(b => cb({ data: () => b })); } });
+          return Promise.resolve({
+            docs: rows.map((b, i) => ({ id: b.slug || ('id' + i), data: () => b })),
+            forEach(cb) { rows.forEach((b, i) => cb({ id: b.slug || ('id' + i), data: () => b })); }
+          });
         } }; } };
       }
     }
@@ -146,6 +154,11 @@ async function run(opts, query) {
   const ctx = vm.createContext(env.sandbox);
   const errs = [];
   try {
+    /* A-695: search.js 가 이제 window.archiBrandGate 를 **필요로 한다**(제품
+       색인에서 내려간 브랜드의 것을 뺀다). 문을 안 싣고 돌리면 search.js 가
+       제품 결과를 통째로 끄고, 이 시험이 「결과 없음」으로 거짓 실패한다 —
+       그리고 그것이 바로 **문을 안 실은 쪽에서 손님에게 생기는 일**이다. */
+    vm.runInContext(GATE_SRC, ctx);
     vm.runInContext(SRC, ctx);
   } catch (e) {
     errs.push('적재: ' + e.message);
@@ -325,31 +338,68 @@ const BRANDS_REAL = [
     ok('찾아 주지 못하는 것을 약속하지 않는다(디자이너)', !/designer|디자이너/i.test(all), all.slice(0, 140));
     const SJ2 = fs.readFileSync(path.join(ROOT, 'search.js'), 'utf8');
     ok('약속한 제품을 실제로 읽는다', /collection\('products'\)/.test(SJ2));
-    ok('약속한 브랜드를 실제로 읽는다', /collection\('brands'\)/.test(SJ2));
+    /* A-695: 브랜드 읽기는 이제 **문(brand-gate.js)** 이 한다 — 검색과 문이
+       같은 읽기를 나눠 쓴다(추가 읽기 0). search.js 안에서 찾으면 없다. */
+    const GATE2 = fs.readFileSync(path.join(ROOT, 'brand-gate.js'), 'utf8');
+    ok('약속한 브랜드를 실제로 읽는다(문을 거쳐)',
+       /collection\('brands'\)/.test(GATE2) && /archiBrandGate\.approvedBrands/.test(SJ2));
+    ok('제품 색인이 문을 지난다 (A-695)', /archiBrandGate\.keepLive/.test(SJ2));
   }
 
   console.log('\n[9] A-511 — 제품도 찾아지는가');
   /* 검색창은 늘 「브랜드, **제품**, 디자이너 검색」이라고 적혀 있었는데
      제품을 보는 코드가 **아예 없었다**. 없어서 0건이 아니라 안 봐서 0건이었다. */
-  const PRODUCTS = [
-    { name: 'Thermroof Panel', slug: 'thermroof-panel', brandName: 'AGM',
-      status: 'approved', category: 'Construction', materials: 'aluminium' },
-    { name: 'Oak Dining Table', slug: 'oak-dining-table', brandName: 'Nordic Nest',
-      status: 'approved', category: 'Furniture', materials: 'oak' },
-    { name: '이름만 있고 slug 가 없는 제품', brandName: 'X', status: 'approved' }
+  /* A-695: 제품은 이제 **주인이 승인돼 있어야** 검색에 걸린다. 그래서
+     자료에 brandId 를 주고, 아래 LIVE_BRANDS 와 짝을 맞춘다. 짝이 없으면
+     안 걸리는 것이 **맞는 동작**이다(그걸 따로 시험한다). */
+  const LIVE_BRANDS = [
+    { brandName: 'AGM', slug: 'agm', country: 'Korea', category: 'Construction' },
+    { brandName: 'Nordic Nest', slug: 'nordic-nest', country: 'Denmark', category: 'Furniture' }
   ];
-  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: [], products: PRODUCTS }, 'thermroof');
+  const PRODUCTS = [
+    { name: 'Thermroof Panel', slug: 'thermroof-panel', brandName: 'AGM', brandId: 'agm',
+      status: 'approved', category: 'Construction', materials: 'aluminium' },
+    { name: 'Oak Dining Table', slug: 'oak-dining-table', brandName: 'Nordic Nest', brandId: 'nordic-nest',
+      status: 'approved', category: 'Furniture', materials: 'oak' },
+    { name: '이름만 있고 slug 가 없는 제품', brandName: 'X', brandId: 'agm', status: 'approved' }
+  ];
+  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: LIVE_BRANDS, products: PRODUCTS }, 'thermroof');
   ok('제품 이름으로 찾아진다', r.count === 1, r.count + '건 — ' + r.text.slice(0, 70));
   ok('제품 결과에 Product 라벨이 붙는다', /Product/.test(r.text), r.text.slice(0, 90));
   ok('제품 주소는 제품 상세로 간다', /products\/view\.html\?id=thermroof-panel/.test(r.html));
   ok('부제에 브랜드 이름이 보인다', /AGM/.test(r.text), r.text.slice(0, 90));
-  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: [], products: PRODUCTS }, 'oak');
+  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: LIVE_BRANDS, products: PRODUCTS }, 'oak');
   ok('자재(materials)로도 찾아진다', r.count >= 1, r.count + '건');
-  r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: [], products: PRODUCTS }, 'thermroof');
+  r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: LIVE_BRANDS, products: PRODUCTS }, 'thermroof');
   ok('한국어 화면에서는 「제품」이라고 적는다', /제품/.test(r.text), r.text.slice(0, 90));
-  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: [], products: PRODUCTS }, 'slug');
+  r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: LIVE_BRANDS, products: PRODUCTS }, 'slug');
   ok('slug 없는 제품은 색인에 안 넣는다(눌러도 갈 곳이 없다)',
      !/이름만 있고/.test(r.text), r.text.slice(0, 80));
+
+  /* ── A-695: 내려간 브랜드의 제품이 검색에 새지 않는가 ────────────────────
+     A-688 이 분류 쪽과 제품 상세에 문을 달면서 **검색을 빼먹었다.** 그래서
+     내려간 브랜드의 제품이 그 브랜드 이름을 달고 검색에 걸렸고, 누르면
+     제품 상세가 「찾을 수 없습니다」를 띄웠다 — 문을 반만 달아 **전에 없던
+     막다른 길**을 만든 것이다. 범위가 컸다: search.js 는 235쪽에서 돈다. */
+  const GONE_PRODUCTS = [
+    { name: 'Thermroof Panel', slug: 'thermroof-panel', brandName: 'AGM', brandId: 'agm',
+      status: 'approved', category: 'Construction', materials: 'aluminium' },
+    { name: 'Ghost Sofa', slug: 'ghost-sofa', brandName: '내려간 브랜드', brandId: 'dropped-brand',
+      status: 'approved', category: 'Furniture', materials: 'linen' }
+  ];
+  r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: LIVE_BRANDS, products: GONE_PRODUCTS }, 'sofa');
+  ok('내려간 브랜드의 제품은 검색에 안 걸린다 (A-695)',
+     !/Ghost Sofa/.test(r.text), r.text.slice(0, 90));
+  ok('그 브랜드 이름도 결과에 안 나온다',
+     !/내려간 브랜드/.test(r.text), r.text.slice(0, 90));
+  r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: LIVE_BRANDS, products: GONE_PRODUCTS }, 'thermroof');
+  ok('살아 있는 브랜드의 제품은 그대로 걸린다 (문이 너무 조이지 않는다)',
+     /Thermroof/i.test(r.text), r.text.slice(0, 90));
+
+  /* 승인 브랜드가 하나도 없으면 제품도 하나도 안 걸려야 한다 —
+     「명단을 못 받았으면 아무것도 통과시키지 않는다」와 같은 판단 */
+  r = await run({ htmlLang: 'ko', staticIndex: STATIC, brands: [], products: GONE_PRODUCTS }, 'thermroof');
+  ok('승인 브랜드가 0이면 제품도 0이다', !/Thermroof/i.test(r.text), r.text.slice(0, 90));
   /* 제품을 읽다 실패해도 나머지 검색은 살아 있어야 한다 */
   r = await run({ htmlLang: 'en', staticIndex: STATIC, brands: BRANDS_REAL, products: [] }, 'bathroom');
   ok('제품이 0건이어도 다른 결과는 나온다', r.count >= 1, r.count + '건');

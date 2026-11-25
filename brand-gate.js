@@ -37,28 +37,39 @@
 (function (w) {
     'use strict';
 
-    var cache = null;      // { brandId: true }
-    var pending = null;    // 같은 쪽에서 여러 번 불러도 질의는 한 번
+    var cache = null;      // { map: {id:true}, docs: [...] }
+    var pending = null;    // 같은 쪽에서 여러 번 불러도 질의는 **한 번**
 
-    /** 승인된 브랜드 id 묶음을 준다. 실패는 그대로 던진다. */
-    function approvedBrandIds(db) {
+    /** 승인된 브랜드를 한 번만 읽어 둔다 — 묶음과 문서를 **함께** 준다.
+     *
+     *  A-695: 문서까지 주는 까닭은 `search.js` 때문이다. 검색은 브랜드 색인을
+     *  만들려고 **이미** `brands.where(status==approved)` 를 읽고 있었다. 문이
+     *  따로 또 읽으면 같은 자료를 두 번 읽는다. 한 번 읽어 둘이 나눠 쓴다 —
+     *  그래서 문을 검색에 다는 값이 **추가 읽기 0** 이다. */
+    function approvedBrands(db) {
         if (cache) return Promise.resolve(cache);
         if (pending) return pending;
         pending = db.collection('brands')
             .where('status', '==', 'approved')
             .get()
             .then(function (snap) {
+                var docs = snap.docs || [];
                 var m = {};
-                (snap.docs || []).forEach(function (d) { m[d.id] = true; });
-                cache = m;
+                docs.forEach(function (d) { m[d.id] = true; });
+                cache = { map: m, docs: docs };
                 pending = null;
-                return m;
+                return cache;
             })
             .catch(function (e) {
                 pending = null;
                 throw e;
             });
         return pending;
+    }
+
+    /** 승인된 브랜드 id 묶음만. 실패는 그대로 던진다. */
+    function approvedBrandIds(db) {
+        return approvedBrands(db).then(function (c) { return c.map; });
     }
 
     /**
@@ -85,6 +96,7 @@
     }
 
     w.archiBrandGate = {
+        approvedBrands: approvedBrands,
         approvedBrandIds: approvedBrandIds,
         keepLive: keepLive,
         keepLiveDocs: keepLiveDocs,

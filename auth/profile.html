@@ -281,6 +281,7 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
 </div>
 
 <script src="../firebase-config.js"></script>
+<script src="../brand-gate.js?v=20261125a"></script>
 <script src="../loading-watchdog.js?v=20261111a"></script>
 <script src="../lang.js?v=20261106a"></script>
 <script>
@@ -399,7 +400,25 @@ async function loadLikedProducts() {
     empty.style.display = 'none';
 
     let html = '';
-    const entries = await fetchSavedDocs('products', ids);
+    let entries = await fetchSavedDocs('products', ids);
+    /* ── A-695 ─────────────────────────────────────────────────────────────
+       저장한 제품도 **주인이 내려갔으면 안 건다.** 여기를 두면 카드는 남아
+       있는데 눌러 들어가면 「제품을 찾을 수 없습니다」가 뜬다 — 자기가 저장해
+       둔 것이 막다른 길이 되는 셈이다.
+       ★ 조용히 빼지 않고 **몇 개를 뺐는지 말한다.** 저장해 둔 것이 말없이
+         사라지면 손님은 자기가 지운 줄 알거나 고장난 줄 안다.
+       ★ 문을 못 열면 제품을 **안 건다** — 모를 때는 안 거는 쪽이 맞다. */
+    let hiddenCount = 0;
+    try {
+        const approved = await window.archiBrandGate.approvedBrandIds(db);
+        const before = entries.length;
+        entries = entries.filter(e => window.archiBrandGate.keepLive([e.data || {}], approved).length === 1);
+        hiddenCount = before - entries.length;
+    } catch (gateErr) {
+        console.warn('saved products: 브랜드 문을 못 열어 제품을 숨긴다 (A-695)', gateErr);
+        hiddenCount = entries.length;
+        entries = [];
+    }
     entries.forEach(entry => {
         const doc = { id: entry.id };
         const p = entry.data;
@@ -422,6 +441,13 @@ async function loadLikedProducts() {
                 </a>
             </div>`;
     });
+    if (hiddenCount > 0) {
+        const hko = '더 이상 제공되지 않는 제품 ' + hiddenCount + '개는 표시하지 않았습니다.';
+        const hen = hiddenCount + ' saved item(s) are no longer available and are not shown.';
+        html += '<p class="liked-hidden-note" data-ko="' + escapeHtml(hko) + '" data-en="' + escapeHtml(hen)
+              + '" style="grid-column:1/-1;font-size:0.82rem;color:#6b6459;margin:4px 0 0;">'
+              + escapeHtml(document.documentElement.lang === 'ko' ? hko : hen) + '</p>';
+    }
     grid.innerHTML = html || '';
     if (!html) empty.style.display = 'block';
     /* A-419: 이 카드들은 DOMContentLoaded 뒤에 만들어진다. lang.js 의 한 번뿐인

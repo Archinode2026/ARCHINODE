@@ -170,14 +170,19 @@
       setTimeout(function() { callback(); }, 300);
       return;
     }
-    if (typeof firebase === 'undefined' || typeof db === 'undefined') {
+    if (typeof firebase === 'undefined' || typeof db === 'undefined' || !window.archiBrandGate) {
       // Firebase not loaded on this page; degrade gracefully with no brand results.
+      // A-695: 브랜드 색인도 이제 문을 거쳐 읽으므로 문이 없으면 같이 물러난다.
       brandIndex = [];
       callback();
       return;
     }
     brandIndexLoading = true;
-    db.collection('brands').where('status', '==', 'approved').get().then(function(snapshot) {
+    /* A-695: 전에는 여기서 직접 읽었다. 이제 문(brand-gate.js)과 **같은 읽기**를
+       나눠 쓴다 — 제품 색인도 승인 브랜드 명단이 필요한데, 따로 읽으면 같은
+       자료를 두 번 읽게 된다. 문이 한 번 읽어 두고 둘이 쓴다. */
+    window.archiBrandGate.approvedBrands(db).then(function(cached) {
+      var snapshot = { forEach: function (f) { cached.docs.forEach(f); } };
       var list = [];
       snapshot.forEach(function(doc) {
         var b = doc.data();
@@ -214,17 +219,43 @@
   function loadProductIndex(callback) {
     if (productIndex !== null) { callback(); return; }
     if (productIndexLoading) { setTimeout(function() { callback(); }, 300); return; }
+    /* A-695: 문이 안 실린 쪽에서는 **제품을 아예 안 건다.** 그냥 통과시키면
+       내려간 브랜드의 물건을 전시하게 되고, 터지게 두면 검색 전체가 죽는다.
+       모를 때는 안 거는 쪽이 맞다 — brand-gate.js 가 적은 것과 같은 판단.
+       (tools/check-brand-gate.py 가 「안 실린 쪽이 없는지」를 지킨다. 이 보호막은
+        그 검사가 놓쳤을 때를 위한 것이다.) */
+    if (!window.archiBrandGate) {
+      console.warn('search: brand-gate.js 가 없어 제품 결과를 끈다 (A-695)');
+      productIndex = [];
+      productIndexLoading = false;
+      callback();
+      return;
+    }
     if (typeof firebase === 'undefined' || typeof db === 'undefined') {
       productIndex = [];
       callback();
       return;
     }
     productIndexLoading = true;
-    db.collection('products').where('status', '==', 'approved').get().then(function(snapshot) {
+    /* ── A-695 ─────────────────────────────────────────────────────────────
+       여기가 **문을 안 지나던 다섯째 길**이었다. A-688 이 분류 쪽·제품 상세에
+       문을 달았는데 검색은 빼먹었다. 그래서 내려간 브랜드의 제품이 검색에
+       그 브랜드 이름을 달고 걸렸고, 누르면 제품 상세가 「찾을 수 없습니다」를
+       띄웠다 — **문을 반만 달아 전에 없던 막다른 길을 만든 것**이다.
+       고치기 전에는 적어도 길이 이어져는 있었다.
+       범위가 컸다: `search.js` 는 235쪽에서 도는데 문은 80쪽에만 있었다. */
+    Promise.all([
+      db.collection('products').where('status', '==', 'approved').get(),
+      window.archiBrandGate.approvedBrandIds(db)
+    ]).then(function(both) {
+      var snapshot = both[0];
+      var approved = both[1];
       var list = [];
       snapshot.forEach(function(doc) {
         var p = doc.data();
         if (!p.name || !p.slug) return;
+        /* 주인이 내려간 물건은 안 건다 (A-688 의 약속) */
+        if (!window.archiBrandGate.keepLive([p], approved).length) return;
         list.push({
           type: 'product',
           /* 제품 이름은 브랜드가 한 가지로 적는다 — 두 언어 판이 없다.
