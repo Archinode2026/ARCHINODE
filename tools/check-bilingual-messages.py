@@ -28,7 +28,17 @@ SKIP_DIRS = {'node_modules', '.git', 'admin', 'tools', 'scripts', 'docs', 'backu
 HANGUL = re.compile(r'[가-힣]')
 LATIN = re.compile(r'[A-Za-z]{3}')
 ASSIGN = re.compile(r"\.(?:textContent|innerText)\s*=\s*\(?\s*'([^']{15,})'")
-HELPERS = ['lybSay(', 'rpSay(', 'rfqSay(']
+# ★★ A-710(2026-11-25, 브론즈 57차 ②): 위 `ASSIGN` 은 **글자 리터럴만** 본다.
+#   그래서 `errorDiv.textContent = error.message` 는 그물 밖이었고,
+#   로그인·가입이 막힌 손님에게 **파이어베이스 영문 원문**이 그대로 떴다.
+#   「번역이 빠졌나」를 글자로만 물으면, **번역할 글자가 애초에 없는** 자리는
+#   영원히 안 걸린다. 저장소 바깥에서 온 글을 화면에 바로 붙이는 꼴을 따로 본다.
+RAW_FOREIGN = re.compile(
+    r'\.(?:textContent|innerText|innerHTML)\s*=\s*'
+    r'(?:[A-Za-z_]\w*\.)?(?:err|error|e)\.(?:message|code)\b')
+# A-710: `auth/` 두 쪽이 쓰는 `archiSay` 가 등록돼 있지 않았다 — 등록되지 않은
+#   도움 함수를 쓰면 「두 언어 짝을 안 썼다」고 헛울 수 있으므로 함께 올린다.
+HELPERS = ['lybSay(', 'rpSay(', 'rfqSay(', 'archiSay(']
 errors = []
 found = []
 found_ko = []
@@ -63,6 +73,14 @@ for base, dirs, files in os.walk(ROOT):
             if not re.search(r'[A-Za-z]{3}.*\s.*[A-Za-z]', txt):
                 continue                      # 문장이 아니다(값·코드)
             found.append((rel, line, txt[:80]))
+
+        # A-710: 저장소 바깥에서 온 글(파이어베이스 오류)을 화면에 **바로** 붙이는 꼴.
+        #   A-492 규약은 「앞 문장은 손님의 말로, 원문은 뒤에 붙인다」다 — 즉
+        #   `archiSay('… : ' + error.message, '… : ' + error.message)` 꼴이어야 한다.
+        for m in RAW_FOREIGN.finditer(src):
+            line = src[:m.start()].count('\n') + 1
+            found.append((rel, line, m.group(0).strip()
+                          + '  ← 바깥에서 온 글을 그대로 붙인다(A-492 규약: 앞 문장을 손님의 말로)'))
 
 for rel, line, txt in found:
     errors.append('[영어만] %s:%d — 손님용 안내가 영어로만 심긴다\n        %s' % (rel, line, txt))

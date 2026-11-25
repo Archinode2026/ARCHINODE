@@ -500,8 +500,33 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
             archiSay(errorDiv, 'Password is too weak.', '비밀번호가 너무 약합니다.');
         } else if (error.code === 'auth/invalid-email') {
             archiSay(errorDiv, 'Invalid email address.', '유효하지 않은 이메일 주소입니다.');
+        } else if (error.code === 'auth/too-many-requests') {
+            /* ★ A-710(2026-11-25): 전에는 아래 마지막 가지가 **파이어베이스 영문
+               원문을 그대로** 찍었다. 비밀번호를 몇 번 틀린 한국 건축사가 보는 글이
+               `Firebase: Access to this account has been temporarily disabled due to
+               many failed login attempts… (auth/too-many-requests).` 였다 —
+               ① 영어뿐이고 ② `data-ko` 가 없으니 토글해도 안 바뀌고
+               ③ **무엇을 하면 되는지**를 말하지 않는다.
+               A-492 가 「앞 문장은 손님의 말로, 원문은 뒤에 붙인다」고 정해 뒀는데
+               이 두 자리(login·signup)만 그 규약 밖이었다. */
+            archiSay(errorDiv,
+                'Too many attempts. Please wait a few minutes, or reset your password.',
+                '시도가 너무 많았습니다. 몇 분 뒤에 다시 시도하시거나 비밀번호를 재설정해 주세요.');
+        } else if (error.code === 'auth/network-request-failed') {
+            archiSay(errorDiv,
+                'Could not reach the server. Please check your connection and try again.',
+                '서버에 연결하지 못했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.');
+        } else if (error.code === 'auth/user-disabled') {
+            /* 승리님이 정지시킨 계정이다. 손님은 왜인지 모르고 스스로 풀 수도 없으니
+               **연락할 곳**을 반드시 알려 준다. */
+            archiSay(errorDiv,
+                'This account has been suspended. Please contact office@archinode.org.',
+                '이 계정은 사용이 중지되었습니다. office@archinode.org 로 문의해 주세요.');
         } else {
-            errorDiv.textContent = error.message;
+            /* A-492 규약: 원문은 번역하지 않고 뒤에 붙인다(그게 검색에 쓰인다). */
+            archiSay(errorDiv,
+                'Something went wrong: ' + error.message,
+                '문제가 생겼습니다: ' + error.message);
         }
     }
 });

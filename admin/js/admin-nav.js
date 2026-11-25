@@ -65,7 +65,16 @@ var ADMIN_MENUS = [
         { id: 'consultations', en: 'Consultations',      ko: '자문 요청',     icon: 'fa-comments',           kind: 'page', target: 'consultations.html',          ready: true },
         { id: 'newsletter',    en: 'Newsletter',         ko: '뉴스레터',      icon: 'fa-envelope-open-text', kind: 'page', target: 'newsletter-subscribers.html', ready: true },
         { id: 'notify',        en: 'Digital Notify',     ko: '디지털 알림',   icon: 'fa-bell',               kind: 'page', target: 'notify-subscribers.html',     ready: true },
-        { id: 'articlesCards', en: 'Brand Articles',     ko: '브랜드 아티클', icon: 'fa-newspaper',          kind: 'page', target: 'articles.html',               ready: true }
+        { id: 'articlesCards', en: 'Brand Articles',     ko: '브랜드 아티클', icon: 'fa-newspaper',          kind: 'page', target: 'articles.html',               ready: true },
+        /* ★ A-711(2026-11-25, 브론즈 57차 ③): `admin/bim-requests.html` 은
+           **메뉴 17곳·대시보드 카드 9장 어디에도 없었다.** 저장소에서 그 쪽을
+           가리키는 자리는 알림 메일 본문 한 줄(`products/view.html:1100`)뿐이었다.
+           한국 건축사가 BIM·CAD 파일을 요청하면 승인 대기로 서는데, 승리님은
+           메뉴를 다 눌러도 그 목록에 닿을 수 없고 **주소를 손으로 쳐야** 했다.
+           A-624 가 적은 메일 실패가 재발하면 요청은 쌓이고 어느 화면도 그 사실을
+           말하지 않는다 — **닿을 수 없는 화면은 없는 화면과 같다.**
+           이 쪽은 이미 `admin-nav.js` 를 싣고 있으므로 한 줄로 닿게 된다. */
+        { id: 'bimRequests',   en: 'BIM Requests',      ko: 'BIM 요청',      icon: 'fa-cube',               kind: 'page', target: 'bim-requests.html',           ready: true }
     ] },
     { key: 'ops', en: 'Operations', ko: '운영', items: [
         { id: 'notices',     en: 'Notices',      ko: '공지사항',  icon: 'fa-bullhorn',        kind: 'view', target: 'notices',     ready: true },    // 5단계 ✓ view-notices.js

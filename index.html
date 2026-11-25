@@ -909,7 +909,14 @@ input, select, textarea { font-family: inherit; }
       <span class="hero-tag" id="heroTag" data-en="Milan Office × Seoul HQ · 12 years of European partnership" data-ko="Milan Office × Seoul HQ · 12년의 유럽 파트너십">Milan Office × Seoul HQ · 12 years of European partnership</span>
       <h1 id="heroTitle" data-en-html="Launch Korea.<br>We Scale You." data-ko-html="유럽의 감도를<br>한국의 도면 위로.">Launch Korea.<br>We Scale You.</h1>
       <p id="heroDesc" data-en="Bringing European design inspiration to the Korean market." data-ko="공간을 완성하는 모든 디자인 조각을 잇다.">Bringing European design inspiration to the Korean market.</p>
-      <a href="magazine.html" class="hero-btn" data-en="Read Brand Articles" data-ko="브랜드 아티클 보기">Read Brand Articles <i class="fas fa-arrow-right"></i></a>
+      <!-- A-709(2026-11-25): 여기가 **첫 쪽의 유일한 단추**인데 「브랜드 아티클」이라
+           말하면서 매거진(한국어 편집 기사 130편)으로 보냈다. 유럽 브랜드가 자기 기사가
+           실릴 자리를 보려고 누르면 한국어 정책·자재 기사 목록이 열렸다.
+           내비(849-850행)와 푸터(1325-1326행)가 두 쪽을 분명히 가른다 —
+           `trend-report.html` = 브랜드 아티클, `magazine.html` = 매거진.
+           같은 라벨을 쓰는 링크가 저장소에 **467곳**이고 전부 trend-report 로 간다.
+           즉 라벨이 맞고 목적지가 틀렸다. -->
+      <a href="trend-report.html" class="hero-btn" data-en="Read Brand Articles" data-ko="브랜드 아티클 보기">Read Brand Articles <i class="fas fa-arrow-right"></i></a>
     </div>
   </div>
   <div class="hero-dots">
