@@ -99,6 +99,22 @@ function lead_statusBadge(status) {
 /* A-701: `category` 는 글자 하나이거나 배열이다(공개 폼에 따라 다르다).
    어느 쪽이든 한 줄로 읽히게 한다. 값 자체는 이미 사람이 읽는 말이라
    (가구·욕실…) 따로 지도를 두지 않는다 — 지도를 두면 사본이 하나 더 는다. */
+/* A-712: 동의 기록 한 줄. 담긴 이름이 둘이므로 둘 다 받는다. */
+function lead_consentRow(it) {
+    var at = it.consentAt || it.privacyConsentAt || null;
+    if (it.privacyConsent === true) {
+        return dd('Privacy consent', '개인정보 동의',
+                  t('Agreed', '동의함') + (at ? ' · ' + fmtDate(at) : ''));
+    }
+    /* 동의 기록이 없는 줄은 **눈에 띄어야 한다** — 규칙이 요구하므로 공개 폼으로
+       들어온 것이라면 있어야 하고, 없다면 어드민이 손으로 넣은 리드이거나
+       규칙이 열려 있던 시절의 옛 줄이다. 어느 쪽인지 알아야 한다. */
+    return '<dt>' + escapeHtml(t('Privacy consent', '개인정보 동의')) + '</dt>'
+         + '<dd style="color:#8a2b2b;">'
+         + escapeHtml(t('No consent record on this lead.', '이 리드에는 동의 기록이 없습니다.'))
+         + '</dd>';
+}
+
 function lead_catLabel(v) {
     return (Array.isArray(v) ? v : [v])
         .map(function (x) { return String(x == null ? '' : x).trim(); })
@@ -506,6 +522,18 @@ async function lead_view(id) {
         + dd('Product', '제품', (it.productName || '') + (it.productId ? ' (' + it.productId + ')' : ''))
         + dd('Source', '출처', lead_sourceLabel(it.source) + (it.userId ? ' · uid ' + it.userId : ''))
         + dd('Received', '접수', fmtDate(it.createdAt))
+        /* ★ A-712(2026-11-25, 브론즈 57차 ④): 개인정보 **동의 기록**을 공개 폼
+           여섯 곳이 담는데(`privacyConsent`·`consentAt`), 그 값을 보여 주는 코드가
+           저장소에 **0곳**이었다. 규칙은 그 칸을 **요구**한다(`firestore.rules:346-347`) —
+           즉 없으면 접수가 거부된다. 받아 놓고 꺼내 볼 길만 없었다.
+           손님이 「동의한 적 없다」고 하거나 삭제를 요구할 때, 어드민 상세를 열어도
+           **동의했는지·언제 했는지가 없어** 콘솔이나 파이어스토어를 직접 봐야 했다.
+           A-535 가 이 칸을 넣으며 「받아 놓고 버리면 나중에 증명할 수 없다」고 적었는데,
+           지금은 **담아 놓고 못 꺼내는** 상태였다 — A-491(배송지)·A-701(품목)과 같은 꼴.
+           ※ 이름이 갈려 있다: 여섯 중 다섯은 `consentAt`, `list-your-brand.html:915` 만
+             `privacyConsentAt` 이다. 이름을 맞추는 것은 담긴 데이터를 손대는 일이라
+             승리님 결정이고(A-712b), **읽는 쪽은 둘 다 받게** 해 둔다. */
+        + lead_consentRow(it)
         + dd('Assigned brand', '배정 브랜드', it.brandName ? it.brandName + (it.assignedAt ? ' · ' + fmtDate(it.assignedAt) : '') : '')
         /* A-491(2026-11-12): 샘플 요청의 배송지(`shippingAddress`)는 **담기기만 하고
            아무 화면에도 안 나왔다** — 전수로 세니 저장소에서 그 키를 읽는 코드가 0곳,

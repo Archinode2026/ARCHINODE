@@ -225,6 +225,8 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
           <dt>Budget</dt><dd id="mBudget">—</dd>
           <dt>Submitted</dt><dd id="mCreatedAt">—</dd>
           <dt>Status</dt><dd id="mStatus">—</dd>
+          <!-- A-712: 개인정보 동의 기록 — 담기는데 보여 주는 자리가 없었다 -->
+          <dt data-en="Privacy consent" data-ko="개인정보 동의">Privacy consent</dt><dd id="mConsent">—</dd>
         </dl>
       </div>
 
@@ -416,6 +418,19 @@ window.openModal = function(id) {
      말광(`ADM_STATUS`)을 지나고 두 언어 속성도 함께 단다. */
   document.getElementById('mStatus').innerHTML = admStatusBadge(d.status || '');
   document.getElementById('mDescription').textContent = d.description || '(none)';
+
+  /* A-712: 동의 기록. 담긴 이름이 둘이므로(consentAt · privacyConsentAt) 둘 다 받는다. */
+  (function () {
+    var el = document.getElementById('mConsent');
+    var at = d.consentAt || d.privacyConsentAt || null;
+    if (d.privacyConsent === true) {
+      el.style.color = '';
+      el.textContent = t('Agreed', '동의함') + (at ? ' · ' + formatDate(at) : '');
+    } else {
+      el.style.color = '#8a2b2b';
+      el.textContent = t('No consent record on this request.', '이 요청에는 동의 기록이 없습니다.');
+    }
+  })();
 
   var triageBox = document.getElementById('mTriageBox');
   if (d.triageNote) {
