@@ -168,10 +168,10 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 
   <div class="page-head">
     <div>
-      <h1>Brand Articles Submissions</h1>
+      <h1 data-en="Brand Articles Submissions" data-ko="브랜드 아티클 제출">Brand Articles Submissions</h1>
       <div class="sub">유럽 브랜드가 제출한 브랜드 아티클 원고를 검토·번역·게시합니다.</div>
     </div>
-    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
+    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> <span data-en="Refresh" data-ko="새로 고침">Refresh</span></button>
   </div>
 
   <div class="stats-row">
@@ -211,7 +211,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
     <div class="modal-body">
 
       <div class="modal-section">
-        <h3>Submission Details</h3>
+        <h3 data-en="Submission Details" data-ko="제출 내용">Submission Details</h3>
         <dl class="detail-grid">
           <dt>Contact</dt><dd id="mContact">—</dd>
           <dt>Email</dt><dd id="mEmail">—</dd>
@@ -225,7 +225,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       </div>
 
       <div class="modal-section">
-        <h3>Body</h3>
+        <h3 data-en="Body" data-ko="본문">Body</h3>
         <div class="body-tabs">
           <button class="body-tab active" data-body="orig">Original (<span id="bOrigLang">—</span>)</button>
           <button class="body-tab" data-body="en">English</button>
@@ -237,7 +237,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       </div>
 
       <div class="modal-section">
-        <h3>Editor Inputs</h3>
+        <h3 data-en="Editor Inputs" data-ko="편집부 입력">Editor Inputs</h3>
         <label for="inEnglish" style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">English Translation (수정/생성)</label>
         <textarea class="editor-input" id="inEnglish" placeholder="If brand didn't provide English translation, write/paste it here..."></textarea>
         <div class="editor-hint">브랜드가 제공한 영어 번역이 있으면 자동으로 채워집니다. 수정하거나 새로 작성 가능.</div>
@@ -251,7 +251,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       </div>
 
       <div class="modal-section">
-        <h3>Images</h3>
+        <h3 data-en="Images" data-ko="이미지">Images</h3>
         <div class="images-grid" id="mImagesGrid"></div>
       </div>
 

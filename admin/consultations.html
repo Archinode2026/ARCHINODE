@@ -170,10 +170,10 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 
   <div class="page-head">
     <div>
-      <h1>Consultation Requests</h1>
+      <h1 data-en="Consultation Requests" data-ko="자문 요청">Consultation Requests</h1>
       <div class="sub">한국 시장 진출·파트너십·자재 소싱 자문 요청을 검토합니다. ARCHI 사전 진단 후 한울님이 미팅 가치 판단.</div>
     </div>
-    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
+    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> <span data-en="Refresh" data-ko="새로 고침">Refresh</span></button>
   </div>
 
   <div class="stats-row">
@@ -213,7 +213,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
     <div class="modal-body">
 
       <div class="modal-section">
-        <h3>Request Details</h3>
+        <h3 data-en="Request Details" data-ko="요청 내용">Request Details</h3>
         <dl class="detail-grid">
           <dt>Contact</dt><dd id="mContact">—</dd>
           <dt>Email</dt><dd id="mEmail">—</dd>
@@ -229,19 +229,19 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       </div>
 
       <div class="modal-section">
-        <h3>What they need</h3>
+        <h3 data-en="What they need" data-ko="필요로 하는 것">What they need</h3>
         <div class="body-content" id="mDescription">—</div>
       </div>
 
       <div class="modal-section">
         <h3>ARCHI Triage Note (사전 진단)</h3>
         <div class="triage-box empty" id="mTriageBox">archi-gold 에이전트 호출하면 사전 진단이 여기에 채워집니다. 회사 신뢰도, 진짜 needs, 미팅 가치 판단, 사전 답변 가능 부분.</div>
-        <label for="inTriage" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Edit Triage Note</label>
+        <label for="inTriage" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;" data-en="Edit Triage Note" data-ko="분류 메모 편집">Edit Triage Note</label>
         <textarea class="editor-input" id="inTriage" placeholder="ARCHI 사전 진단 결과 또는 한울님 자체 메모..."></textarea>
       </div>
 
       <div class="modal-section">
-        <h3>Reviewer Action</h3>
+        <h3 data-en="Reviewer Action" data-ko="검토자 처리">Reviewer Action</h3>
         <label for="inNote" style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Reviewer Note (내부 메모 / 거절·수정 사유)</label>
         <textarea class="editor-input short" id="inNote" placeholder="내부 메모 — 거절 사유, 사전 답변 본문, 미팅 결과 요약 등"></textarea>
 

@@ -134,18 +134,18 @@ td a:hover { text-decoration: underline; }
 
   <div class="page-head">
     <div>
-      <h1>BIM / CAD / Catalog Requests</h1>
+      <h1 data-en="BIM / CAD / Catalog Requests" data-ko="BIM · CAD · 카탈로그 요청">BIM / CAD / Catalog Requests</h1>
       <div class="sub">전문가가 신청한 BIM/CAD/카탈로그 데이터 요청입니다. 승인하면 7일간 유효한 다운로드 링크가 신청자에게, 리드 알림이 해당 브랜드에게 자동 발송됩니다.</div>
     </div>
     <div class="head-actions">
       <select class="filter-select" id="statusFilter">
-        <option value="pending" selected>Pending</option>
-        <option value="approved">Approved</option>
-        <option value="rejected">Rejected</option>
-        <option value="all">All</option>
+        <option value="pending" selected data-en="Pending" data-ko="대기 중">Pending</option>
+        <option value="approved" data-en="Approved" data-ko="승인됨">Approved</option>
+        <option value="rejected" data-en="Rejected" data-ko="거절됨">Rejected</option>
+        <option value="all" data-en="All" data-ko="전체">All</option>
       </select>
-      <button class="btn secondary" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
-      <button class="btn" id="csvBtn"><i class="fas fa-download"></i> Download CSV</button>
+      <button class="btn secondary" id="refreshBtn"><i class="fas fa-sync"></i> <span data-en="Refresh" data-ko="새로 고침">Refresh</span></button>
+      <button class="btn" id="csvBtn"><i class="fas fa-download"></i> <span data-en="Download CSV" data-ko="CSV 내려받기">Download CSV</span></button>
     </div>
   </div>
 

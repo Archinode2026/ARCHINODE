@@ -35,6 +35,31 @@ JS_LINE_COMMENT = re.compile(r'(?m)^\s*//[^\n]*$')
 # 화면에 찍히면 안 되는 영문 **작업** 낱말 (말광을 지나야 한다)
 ACT_WORDS = ['View', 'Approve', 'Reject', 'Suspend', 'Restore', 'Review',
              'Cancel', 'Confirm', 'Delete', 'Page']
+
+# ── 전수 훑기 (A-698) ────────────────────────────────────────────────────
+# 위 `ACT_WORDS` 는 **고친 낱말을 지키는** 목록이다. 그것만으로는 같은 종류를
+# 전부 못 찾는다 — 실제로 `Refresh`·`Download CSV` 단추 9개가 목록에 없어
+# 영원히 안 걸렸다(브론즈 2026-11-25). 「고친 것을 지키는 검사」와 「같은
+# 종류를 전부 찾는 검사」는 **다른 물건**이다. 그래서 거꾸로도 본다:
+# 화면에 글자를 내는 요소인데 **영문뿐이고 `data-ko` 가 없는** 것을 전부 센다.
+UI_TEXT = re.compile(
+    r'<(button|a|th|label|option|legend|summary|h1|h2|h3)\b([^>]*)>([^<>]+)</\1>', re.I)
+SCRIPT_BLOCK = re.compile(r'<script\b.*?</script>', re.S | re.I)
+ENTITY_ONLY = re.compile(r'^(&[a-zA-Z]+;|&#\d+;|[\s×✕✖·—–-])+$')
+HANGUL = re.compile(r'[가-힣]')
+LATIN = re.compile(r'[A-Za-z]')
+
+# 영문이 맞는 것들 — 까닭을 적어 둔다. 안 가르면 늑대를 외치는 검사가 된다.
+ENGLISH_OK = {
+    'ARCHINODE': '상표',
+    'ADMIN': '상표 옆 배지',
+    'KO': '언어 단추',
+    'EN': '언어 단추',
+    'English': '언어 **이름** — 본문 언어를 고르는 탭이라 영문이 맞다',
+    'CSV': '파일 형식 이름',
+    'BIM': '업계 용어 (한국 현장도 BIM 이라 부른다)',
+    'ID': '식별자',
+}
 BTN_TEXT = re.compile(r'>\s*(' + '|'.join(ACT_WORDS) + r')\s*</(?:button|a)>')
 
 # 저장값을 그대로 찍는 자리
@@ -95,6 +120,31 @@ def main():
         # 한 줄에 두 꼴이 겹쳐 잡히면(class 속성과 글자) **한 번만** 말한다.
         # 같은 결함을 두 번 말하는 검사기는 사람을 대충 보게 만든다.
         hit_lines = set()
+        # 전수: 영문뿐인데 두 언어 짝이 없는 UI 글자 (A-698)
+        # ★ `<script>` 안은 뺀다. 거기서 긁으면 `' + escapeHtml(x) + '` 같은
+        #   **JS 문자열 조각**이 「영문 글자」로 잡혀 거짓 양성이 쏟아진다.
+        #   대신 JS 가 만드는 UI 는 위의 ACT_WORDS·RAW_STATUS 가 본다 —
+        #   이 훑기는 **마크업에 박힌 글자**만 책임진다. 반쪽인 것을 적어 둔다.
+        # ★ `.js` 파일에는 걷어낼 `<script>` 가 없다. 거기 있는 HTML 조각은
+        #   `'<option…>' + escapeHtml(t(en, ko)) + '</option>'` 처럼 **이미 두 언어를
+        #   지나는 올바른 코드**인데, 글자로만 보면 「영문뿐」으로 잡혀 거짓 양성이
+        #   13건 쏟아졌다. 이 훑기는 **마크업(.html)** 만 책임진다.
+        markup = SCRIPT_BLOCK.sub('', s) if f.endswith('.html') else ''
+        for m in UI_TEXT.finditer(markup):
+            attrs, txt = m.group(2), m.group(3).strip()
+            if not txt or len(txt) > 40:
+                continue
+            if ENTITY_ONLY.match(txt):
+                continue            # &times; 같은 기호 단추는 글이 아니다
+            if not LATIN.search(txt) or HANGUL.search(txt):
+                continue
+            if txt in ENGLISH_OK:
+                continue
+            if 'data-ko' in attrs:
+                continue
+            line = markup[:m.start()].count('\n') + 1
+            problems.append('%s:%d — 영문뿐인데 두 언어 짝이 없다 「%s」' % (rel, line, txt))
+
         for pat in RAW_STATUS:
             for m in pat.finditer(s):
                 line = s[:m.start()].count('\n') + 1

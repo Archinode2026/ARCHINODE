@@ -176,10 +176,10 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       <!-- R-042: 제목·설명이 「트렌드 투고」 화면(trend-submissions.html)과 글자 하나까지 같았다.
            두 화면은 읽는 컬렉션부터 다르다 — 여기는 articles(브랜드가 포털에서 직접 쓴 글),
            저쪽은 trend-submissions(공개 투고 폼으로 들어온 원고). 사이드바 이름과도 맞춘다. -->
-      <h1>Articles (Cards)</h1>
+      <h1 data-en="Articles (Cards)" data-ko="브랜드 아티클 (카드)">Articles (Cards)</h1>
       <div class="sub">브랜드가 포털에서 직접 작성해 제출한 브랜드 아티클입니다. 승인하면 브랜드 아티클에 실립니다. 공개 투고 폼으로 들어온 원고는 「트렌드 투고」 화면에 있습니다.</div>
     </div>
-    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
+    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> <span data-en="Refresh" data-ko="새로 고침">Refresh</span></button>
   </div>
 
   <div class="stats-row">
@@ -219,7 +219,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
     <div class="modal-body">
 
       <div class="modal-section">
-        <h3>Submission Details</h3>
+        <h3 data-en="Submission Details" data-ko="제출 내용">Submission Details</h3>
         <dl class="detail-grid">
           <!-- A-204: Contact·Email·Country·Source 는 articles 문서에 없는 필드라 항상 "—" 였다.
                이 파일은 trend-submissions.html 을 복사해 만들어진 탓(A-042 와 같은 원인).
@@ -232,7 +232,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       </div>
 
       <div class="modal-section">
-        <h3>Body</h3>
+        <h3 data-en="Body" data-ko="본문">Body</h3>
         <div class="body-tabs">
           <button class="body-tab active" data-body="orig">Original (<span id="bOrigLang">—</span>)</button>
           <button class="body-tab" data-body="en">English</button>
@@ -244,7 +244,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       </div>
 
       <div class="modal-section">
-        <h3>Editor Inputs</h3>
+        <h3 data-en="Editor Inputs" data-ko="편집부 입력">Editor Inputs</h3>
         <!-- A-287: 이 칸은 englishBodyEdited 에 저장됐는데 **그 필드를 읽는 공개 화면이 0건**이다.
              매거진은 artSide() 가 고르는 koTitle/koBlocks·enTitle/enBlocks 만 본다. 즉 여기 적으면
              「저장됐습니다」가 떠도 매거진엔 영원히 안 떴다 — 조용한 실패이고, 하필 아래
@@ -279,7 +279,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       </div>
 
       <div class="modal-section">
-        <h3>Images</h3>
+        <h3 data-en="Images" data-ko="이미지">Images</h3>
         <div class="images-grid" id="mImagesGrid"></div>
       </div>
 
