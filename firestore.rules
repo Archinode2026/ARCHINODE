@@ -490,9 +490,18 @@ service cloud.firestore {
     // 방문자 이메일만 단순 수집. 출시 시 1회 알림 발송용.
     // ────────────────────────────────────────────────────────────────────
     match /digital-products-notify/{docId} {
+      /* ★ A-696(2026-11-25, 브론즈 2차): 전에는 **울타리가 없었다** — 담는 키를
+         제한하지 않아 아무 이름의 칸이나 얼마든지 넣을 수 있었고, `email` 도
+         「5자보다 길다」만 봤으니 **1MB 짜리 문자열도 통과**했다. 둘을 합치면
+         공개 폼 하나로 저장소를 불릴 수 있다 — 요금은 우리가 낸다.
+         A-477 이 `mail` 컬렉션에서 똑같은 것을 한 번 고쳤는데, **그때 같이
+         보지 않은 두 컬렉션이 이것들이다.** 담는 자리는 `digital-products.html:912`
+         하나뿐이고 키는 셋이다. */
       allow create: if passesHoneypot()
+                    && request.resource.data.keys().hasOnly(['email','hp','createdAt'])
                     && request.resource.data.email is string
                     && request.resource.data.email.size() > 5
+                    && request.resource.data.email.size() <= 254
                     && request.resource.data.createdAt == request.time;
       allow read, update, delete: if isAdmin();
     }
@@ -504,10 +513,18 @@ service cloud.firestore {
     // 한울님이 6/15에 Firebase Console에 직접 게시한 룰을 이 파일에 동기화 (2026-06-23).
     // ────────────────────────────────────────────────────────────────────
     match /newsletter-subscribers/{docId} {
+      /* ★ A-696: 위 `digital-products-notify` 와 같은 건. 담는 자리가 셋인데
+         (`index.html:1698`·`magazine.html:1995`·`trend-report.html:611`) 모두
+         같은 꼴로 키 넷을 담는다. `source` 는 `source || 'unknown'` 이라
+         값을 못 정하지만 길이는 정할 수 있다.
+         ※ 254 는 이메일 주소의 실질 한계다(RFC 5321 의 경로 길이). */
       allow create: if passesHoneypot()
+                    && request.resource.data.keys().hasOnly(['email','source','hp','createdAt'])
                     && request.resource.data.email is string
                     && request.resource.data.email.size() > 5
+                    && request.resource.data.email.size() <= 254
                     && request.resource.data.source is string
+                    && request.resource.data.source.size() <= 60
                     && request.resource.data.createdAt == request.time;
       allow read, update, delete: if isAdmin();
     }
@@ -635,9 +652,31 @@ service cloud.firestore {
     // read: 본인 ∪ 어드민 (포털 조회는 where('fromUid','==',uid) 만) / update·delete 어드민
     // ────────────────────────────────────────────────────────────────────
     match /inquiries/{inquiryId} {
+      /* ★ A-706(2026-11-25): `check-public-write-limits.py` 를 전수로 바꾸자
+         **한 번도 검사받은 적 없던 이 컬렉션**이 나왔다 — 울타리가 없었다.
+         담는 자리는 `brand-portal/dashboard.html:2451` 하나뿐이고 키는 13개다.
+         울타리가 없으니 ① 아무 이름의 칸이나 끼워 넣을 수 있었고,
+         ② **브랜드가 자기 문의에 답변을 미리 박아 넣을 수 있었다** —
+         `answer`·`answeredBy`·`answeredAt` 를 규칙이 보지 않았기 때문이다.
+         어드민 화면은 그 값을 그대로 「우리가 답한 것」으로 보여 준다.
+         ③ `subject`·`body` 는 상한이 있었지만 `fromName`·`fromEmail` 은 없었다. */
       allow create: if isSignedIn()
+                    && request.resource.data.keys().hasOnly([
+                         'fromUid','fromRole','fromEmail','fromName',
+                         'subject','body','status',
+                         'answer','answeredAt','answeredBy',
+                         'createdAt','updatedAt','history'])
                     && request.resource.data.fromUid == request.auth.uid
                     && request.resource.data.fromEmail == request.auth.token.email   // 작성자 이메일은 로그인 계정과 같아야(2026-09-12 블랙 지적)
+                    && request.resource.data.fromEmail.size() <= 254
+                    && request.resource.data.fromName is string
+                    && request.resource.data.fromName.size() <= 200
+                    && request.resource.data.fromRole is string
+                    && request.resource.data.fromRole.size() <= 20
+                    && request.resource.data.answer == ''
+                    && request.resource.data.answeredBy == ''
+                    && request.resource.data.answeredAt == null
+                    && request.resource.data.history.size() == 1
                     && request.resource.data.status == 'open'
                     && request.resource.data.subject is string && request.resource.data.subject.size() > 0 && request.resource.data.subject.size() < 200
                     && request.resource.data.body is string && request.resource.data.body.size() > 0 && request.resource.data.body.size() < 5000

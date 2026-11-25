@@ -53,7 +53,11 @@ WRITERS = {
                                 ('products/view.html', 'var', 'data')],
     'consultations':           [('request-consultation.html', 'var', 'consultDoc')],
     'bim-requests':            [('products/view.html', 'var', 'bimDoc')],
-    'newsletter-subscribers':  [('index.html', 'var', 'subDoc')],
+    # A-706: 셋이 쓴다. 전에는 `index.html` 하나만 적어 둬서, 나머지 둘이
+    #   빠뜨리는 요구가 생겨도 조용했다.
+    'newsletter-subscribers':  [('index.html', 'var', 'subDoc'),
+                                ('magazine.html', 'var', 'subDoc'),
+                                ('trend-report.html', 'var', 'subDoc')],
     'digital-products-notify': [('digital-products.html', 'var', 'ntDoc')],
     'users':                   [('auth/signup.html', 'inline', "collection('users').doc(uid).set(")],
     # 공개 코드가 만들지 않는 컬렉션 — 비워 두되 **까닭을 적는다**
@@ -61,7 +65,13 @@ WRITERS = {
     'mail':                    [],   # 여러 곳이 쓴다. mailKeysOk 가 따로 지킨다(A-570)
     'articles':                [],   # 브랜드 포털·어드민에서만 만든다
     'products':                [],   # 브랜드 포털·어드민에서만 만든다
-    'inquiries':               [],   # 로그인한 손님이 만든다 (auth 뒤)
+    # ★ A-706: 전에는 비워 두고 「로그인한 손님이 만든다 (auth 뒤)」고 적어 뒀다.
+    #   **그 주석이 틀렸다** — 담는 자리는 브랜드 포털의 공개 코드다. 로그인이
+    #   필요한 것과 「우리 코드가 담지 않는 것」은 다른 말인데 그걸 섞어 적었고,
+    #   그래서 이 컬렉션의 요구는 **아무와도 대조되지 않았다.** 빈 명부는
+    #   「볼 것이 없다」가 아니라 「안 본다」는 뜻이다 — A-684 와 같은 모양의
+    #   거짓 약속이다.
+    'inquiries':               [('brand-portal/dashboard.html', 'var', 'doc')],
     'likes':                   [],
     'reviewIssues':            [],
 }

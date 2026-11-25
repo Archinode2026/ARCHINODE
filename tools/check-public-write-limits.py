@@ -64,8 +64,122 @@ def create_clause(coll):
 #   `consultations` 처럼 **비로그인도 쓸 수 있는** 자리가 검사 밖이었고,
 #   `mail` 에는 키 울타리가 없어 bcc·from·첨부를 끼워 넣을 수 있었다(A-569).
 #   누구나 쓸 수 있는 컬렉션은 전부 여기 적는다.
-for coll, label in [('leads', '리드'), ('bim-requests', '자료 신청'),
-                    ('mail', '메일 큐'), ('consultations', '자문 요청')]:
+# ★★ A-696(2026-11-25, 브론즈 2차): **명부를 또 놓쳤다.** A-570 이 둘에서 넷으로
+#   늘렸는데, 그 뒤 생긴 `newsletter-subscribers`·`digital-products-notify` 가
+#   다시 검사 밖이었다 — 둘 다 울타리도 길이 상한도 없었다.
+#   **손으로 적는 명부는 늘 낡는다.** 두 번 같은 자리에서 틀렸으니 명부를
+#   한 줄 더 늘리는 것으로는 세 번째를 막을 수 없다. 그래서 **규칙 파일에서
+#   공개 쓰기를 전수로 찾아낸다**: `allow create` 가 있으면서 그 조건이 로그인·
+#   어드민을 요구하지 **않는** 컬렉션은 전부 누구나 쓸 수 있는 자리다.
+#   아래 이름표는 보고를 읽기 쉽게 하는 것일 뿐, **범위를 정하지 않는다.**
+LABELS = {'leads': '리드', 'bim-requests': '자료 신청', 'mail': '메일 큐',
+          'consultations': '자문 요청', 'newsletter-subscribers': '뉴스레터 구독',
+          'digital-products-notify': '출시 알림 신청'}
+
+
+def _split_top(text, op):
+    """**맨 바깥** `op` 로만 가른다. 괄호 안의 같은 기호는 가르지 않는다."""
+    out, depth, cur = [], 0, []
+    i, n = 0, len(text)
+    while i < n:
+        ch = text[i]
+        if ch == '(':
+            depth += 1
+        elif ch == ')':
+            depth -= 1
+        if depth == 0 and text.startswith(op, i):
+            out.append(''.join(cur)); cur = []; i += len(op); continue
+        cur.append(ch); i += 1
+    out.append(''.join(cur))
+    return [b for b in out if b.strip()]
+
+
+def _strip_parens(t):
+    t = t.strip()
+    while t.startswith('(') and t.endswith(')'):
+        inner = t[1:-1]
+        d = 0
+        for ch in inner:
+            if ch == '(':
+                d += 1
+            elif ch == ')':
+                d -= 1
+            if d < 0:
+                return t
+        t = inner.strip()
+    return t
+
+
+def _requires_vetted(expr):
+    """이 식이 **반드시** 검증된 신분을 요구하는가. 되걸이로 푼다.
+
+    ★★ A-696: 두 번 틀렸다. ① 글자 안에 `isAdmin(` 이 있으면 검증된 것으로
+    봤더니, 칸 하나에 붙은 조건까지 신분 문으로 읽혀 공개 쓰기인 `leads` 가
+    검사 밖으로 나갔다. ② 그래서 「맨 바깥 `&&` 조각이 신분 문으로 **시작**하면」
+    으로 바꿨는데, `(isAdmin() || 동의했으면)` 이 `isAdmin()` 으로 시작하므로
+    또 검증된 것으로 읽혔다 — **그건 「또는」이다.** 어드민이 아니어도
+    동의만 하면 쓸 수 있으니 공개 쓰기가 맞다.
+    두 번 다 **글자의 생김새**로 뜻을 재려 한 탓이다. 조건은 나무이므로
+    나무로 읽는다: 「또는」은 **모두** 요구해야 요구하는 것이고, 「그리고」는
+    **하나라도** 요구하면 요구하는 것이다.
+    """
+    expr = _strip_parens(expr)
+    alts = _split_top(expr, '||')
+    if len(alts) > 1:
+        return all(_requires_vetted(x) for x in alts)
+    conjs = _split_top(expr, '&&')
+    if len(conjs) > 1:
+        return any(_requires_vetted(x) for x in conjs)
+    return bool(VETTED.match(expr))
+
+
+# 「검증된 신분」을 요구하는 문들. 로그인(isSignedIn)은 **여기 넣지 않는다** —
+# 가입은 누구나 스스로 하니 로그인은 걸러 주는 것이 아니다(A-570 이 그래서
+# `bim-requests` 를 명부에 넣었다).
+VETTED = re.compile(r'\bisAdmin\s*\(|\bisApprovedBrand\s*\(|\bisOwner\s*\(|\bisBrandOwner\s*\(')
+
+
+def public_write_collections():
+    """규칙에서 **어드민·승인 브랜드가 아니어도 쓸 수 있는** 컬렉션을 전수로 찾는다.
+
+    갈래(`||`) 가 하나라도 검증된 신분을 요구하지 않으면 그 컬렉션은 공개 쓰기다.
+    `mail` 이 그 꼴이다 — 어드민 갈래와 로그인 갈래 말고 **아무나 쓰는 갈래**가
+    하나 있어서, 갈래를 보지 않고 통째로 보면 「어드민 전용」으로 잘못 읽힌다.
+    """
+    out, seen = [], set()
+    for m in re.finditer(r'match\s+/([A-Za-z0-9_-]+)/\{\w+\}\s*\{', rules_code):
+        coll = m.group(1)
+        if coll in seen:
+            continue
+        # ★ 분류는 **조건만** 보고 한다. `create_clause()` 는 울타리를 도우미
+        #   함수에 담아 둔 경우까지 보려고 함수 본문을 덧붙여 돌려주는데,
+        #   그 본문에 `isAdmin(` 이 들어 있으면 공개 쓰기인 `leads`·`consultations`
+        #   가 「어드민 전용」으로 잘못 읽힌다. **무엇을 재는지에 따라 볼 글이 다르다** —
+        #   울타리를 셀 때는 함수까지, 공개인지 가릴 때는 조건만.
+        blk = match_block(coll)
+        c = re.search(r'allow create:(.*?);', blk or '', re.S)
+        if not c:
+            continue
+        clause = re.sub(r'\s+', ' ', c.group(1)).strip()
+        # ★ `allow create: if …` 의 `if` 를 걷는다. 안 걷으면 첫 조각이
+        #   「if isOwner(userId)」가 되어 신분 문을 **맨 앞에 둔 규칙만**
+        #   공개로 잘못 읽힌다 — brands·products·users·articles 가 그랬다.
+        clause = re.sub(r'^if\b\s*', '', clause)
+        if _requires_vetted(clause):
+            continue
+        seen.add(coll)
+        out.append((coll, LABELS.get(coll, coll)))
+    return out
+
+
+_found = public_write_collections()
+if len(_found) < 7:
+    errors.append('[검사] 공개 쓰기 컬렉션이 %d 개만 보인다 — 전에 7개였다. '
+                  '탐지가 멈췄는지 보라' % len(_found))
+print('  공개 쓰기 컬렉션 %d개를 전수로 찾았다: %s'
+      % (len(_found), ', '.join(c for c, _ in _found)))
+
+for coll, label in _found:
     cl = create_clause(coll)
     if cl is None:
         errors.append('[규칙] %s 의 create 조건을 못 찾았다 — 탐지가 멈췄다' % coll)
