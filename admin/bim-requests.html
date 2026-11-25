@@ -254,11 +254,11 @@ function render() {
       + '<td>' + escapeHtml(d.productName || '-') + '<br><small style="color:#6b6459;">' + escapeHtml(d.brandName || '-') + '</small></td>'
       + '<td>' + escapeHtml(fileLabel) + '</td>'
       + '<td>' + escapeHtml(d.projectName || '-') + '<br><small style="color:#6b6459;">' + escapeHtml(d.projectType || '-') + '</small></td>'
-      + '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(d.status || 'pending') + '</span></td>'
+      + '<td>' + admStatusBadge(d.status || 'pending') + '</td>'
       + '<td>' + formatDate(d.createdAt) + '</td>'
       + '<td style="text-align:right;">'
-      + '<button class="act-btn act-view" data-action="view" data-id="' + escapeAttr(d.id) + '">View</button>'
-      + (d.status === 'pending' ? '<button class="act-btn act-approve" data-action="approve" data-id="' + escapeAttr(d.id) + '">Approve</button><button class="act-btn act-reject" data-action="reject" data-id="' + escapeAttr(d.id) + '">Reject</button>' : '')
+      + '<button class="act-btn act-view" ' + admActAttr('view') + ' data-action="view" data-id="' + escapeAttr(d.id) + '">' + admActText('view') + '</button>'
+      + (d.status === 'pending' ? '<button class="act-btn act-approve" ' + admActAttr('approve') + ' data-action="approve" data-id="' + escapeAttr(d.id) + '">' + admActText('approve') + '</button><button class="act-btn act-reject" ' + admActAttr('reject') + ' data-action="reject" data-id="' + escapeAttr(d.id) + '">' + admActText('reject') + '</button>' : '')
       + '</td>'
       + '</tr>';
   });
@@ -293,7 +293,7 @@ function viewRequest(id) {
     + '<div class="detail-row"><div class="detail-label">Project Type</div>' + escapeHtml(d.projectType || '-') + '</div>'
     + '<div class="detail-row"><div class="detail-label">Timeline</div>' + escapeHtml(d.projectTimeline || '-') + '</div>'
     + '<div class="detail-row"><div class="detail-label">Scale</div>' + escapeHtml(d.projectScale || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Status</div><span class="status-badge status-' + escapeHtml(d.status || 'pending') + '">' + escapeHtml(d.status || 'pending') + '</span></div>'
+    + '<div class="detail-row"><div class="detail-label">Status</div>' + admStatusBadge(d.status || 'pending') + '</div>'
     + '<div class="detail-row"><div class="detail-label">Requested</div>' + formatDate(d.createdAt) + '</div>'
     + (d.expiresAt ? '<div class="detail-row"><div class="detail-label">Link Expires</div>' + formatDate(d.expiresAt) + '</div>' : '');
   document.getElementById('detailModal').classList.add('active');

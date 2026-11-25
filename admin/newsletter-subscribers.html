@@ -227,7 +227,7 @@ function render() {
     html += '<tr>'
       + '<td><a href="mailto:' + escapeAttr(d.email || '') + '">' + escapeHtml(d.email || '—') + '</a></td>'
       + '<td>' + formatDate(d.createdAt) + '</td>'
-      + '<td style="text-align:right;"><button class="del-btn" data-id="' + escapeAttr(d.id || '') + '" data-email="' + escapeAttr(d.email || '') + '">Delete</button></td>'
+      + '<td style="text-align:right;"><button class="del-btn" data-id="' + escapeAttr(d.id || '') + '" data-email="' + escapeAttr(d.email || '') + '" ' + admActAttr('delete') + '>' + admActText('delete') + '</button></td>'
       + '</tr>';
   });
   html += '</tbody></table></div>';

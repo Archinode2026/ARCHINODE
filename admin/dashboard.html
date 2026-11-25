@@ -483,37 +483,37 @@ async function loadAll() {
 
 // ── 브랜드 상태별 액션 버튼 ──
 function brandActionButtons(b, docId) {
-    const viewBtn = `<button class="act-btn act-view" onclick="viewBrand('${docId}')">View</button>`;
+    const viewBtn = `<button class="act-btn act-view" ${admActAttr('view')} onclick="viewBrand('${docId}')">${admActText('view')}</button>`;
     const pageBtn = (b.status === 'approved' && b.slug)
-        ? `<a class="act-btn" href="../brands/view.html?id=${escapeHtml(b.slug)}" target="_blank" style="text-decoration:none;background:#e0f2fe;color:#0369a1;" rel="noopener noreferrer">Page</a>`   /* A-471: 이 한 줄만 날값이었다 */
+        ? `<a class="act-btn" href="../brands/view.html?id=${escapeHtml(b.slug)}" target="_blank" style="text-decoration:none;background:#e0f2fe;color:#0369a1;" rel="noopener noreferrer" ${admActAttr('page')}>${admActText('page')}</a>`   /* A-471: 이 한 줄만 날값이었다 */
         : '';
 
     if (b.status === 'pending') {
         return `
             ${viewBtn}
-            <button class="act-btn act-approve" onclick="updateBrand('${docId}','approved')">Approve</button>
-            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')">Reject</button>
+            <button class="act-btn act-approve" ${admActAttr('approve')} onclick="updateBrand('${docId}','approved')">${admActText('approve')}</button>
+            <button class="act-btn act-reject" ${admActAttr('reject')} onclick="updateBrand('${docId}','rejected')">${admActText('reject')}</button>
         `;
     }
     if (b.status === 'approved') {
         return `
             ${viewBtn}
             ${pageBtn}
-            <button class="act-btn act-suspend" onclick="updateBrand('${docId}','suspended')">Suspend</button>
-            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')">Reject</button>
+            <button class="act-btn act-suspend" ${admActAttr('suspend')} onclick="updateBrand('${docId}','suspended')">${admActText('suspend')}</button>
+            <button class="act-btn act-reject" ${admActAttr('reject')} onclick="updateBrand('${docId}','rejected')">${admActText('reject')}</button>
         `;
     }
     if (b.status === 'suspended') {
         return `
             ${viewBtn}
-            <button class="act-btn act-restore" onclick="updateBrand('${docId}','approved')">Restore</button>
-            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')">Reject</button>
+            <button class="act-btn act-restore" ${admActAttr('restore')} onclick="updateBrand('${docId}','approved')">${admActText('restore')}</button>
+            <button class="act-btn act-reject" ${admActAttr('reject')} onclick="updateBrand('${docId}','rejected')">${admActText('reject')}</button>
         `;
     }
     if (b.status === 'rejected') {
         return `
             ${viewBtn}
-            <button class="act-btn act-restore" onclick="updateBrand('${docId}','approved')">Restore</button>
+            <button class="act-btn act-restore" ${admActAttr('restore')} onclick="updateBrand('${docId}','approved')">${admActText('restore')}</button>
         `;
     }
     return viewBtn;
@@ -544,7 +544,7 @@ async function loadBrands() {
                 <td class="adm-col-sub">${escapeHtml(catText(b.category) || '-')}</td>
                 <td class="adm-col-sub">${escapeHtml(b.contactName || '-')}<br><small style="color:#6b6459;">${escapeHtml(b.email)}</small></td>
                 <td class="adm-col-sub">${b.koreanDealer && b.koreanDealer.name ? `<strong>${escapeHtml(b.koreanDealer.name)}</strong><br><small style="color:#6b6459;">${escapeHtml(b.koreanDealer.contact || '')}</small>` : '<span style="color:#ddd5c7;">—</span>'}</td>
-                <td><span class="status status-${b.status}">${b.status}</span></td>
+                <td>${admStatusBadge(b.status)}</td>
                 <td>${brandActionButtons(b, doc.id)}</td>
             </tr>`;
     });
@@ -713,8 +713,8 @@ function openReasonModal(opts) {
                 <textarea id="reasonInput" maxlength="200" placeholder="${placeholderText}"></textarea>
                 <div class="char-count"><span id="reasonCount">0</span>/200</div>
                 <div class="reason-actions">
-                    <button class="btn-cancel" id="reasonCancelBtn">Cancel</button>
-                    <button class="btn-confirm" id="reasonConfirmBtn" style="background:${opts.confirmBg};color:${opts.confirmColor};">Confirm</button>
+                    <button class="btn-cancel" id="reasonCancelBtn" ${admActAttr('cancel')}>${admActText('cancel')}</button>
+                    <button class="btn-confirm" id="reasonConfirmBtn" ${admActAttr('confirm')} style="background:${opts.confirmBg};color:${opts.confirmColor};">${admActText('confirm')}</button>
                 </div>
             </div>
         `;
@@ -827,7 +827,7 @@ async function viewBrand(docId) {
     // 2단계: 상태 이력 (brands/{id}/internal/moderation 의 history[] — 최신 위로, reviewIssues 와 같은 패턴). 없으면 안내 한 줄. 값은 전부 escapeHtml/escapeAttr.
     const hist = Array.isArray(mod.history) ? mod.history.slice().reverse() : [];
     const histRows = hist.length
-        ? hist.map(h => `<li><span class="status status-${escapeAttr(h.status || '')}">${escapeHtml(h.status || '')}</span> · ${escapeHtml(h.by || '')} · ${escapeHtml(fmtDate(h.at))}${h.note ? '<small>' + escapeHtml(h.note) + '</small>' : ''}</li>`).join('')
+        ? hist.map(h => `<li>${admStatusBadge(h.status)} · ${escapeHtml(h.by || '')} · ${escapeHtml(fmtDate(h.at))}${h.note ? '<small>' + escapeHtml(h.note) + '</small>' : ''}</li>`).join('')
         : `<li class="adm-muted">${tSpan('No history yet', '이력 없음')}</li>`;
     statusHistoryHtml += `<div class="detail-row"><div class="detail-label">${tSpan('History', '이력')}</div><div class="detail-value"><ul class="rv-history brand-history">${histRows}</ul></div></div>`;
 
@@ -836,7 +836,7 @@ async function viewBrand(docId) {
     const safeWebsite = (b.website && /^https?:\/\//i.test(b.website)) ? b.website : '#';
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(b.brandName)}</h2>
-        <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value"><span class="status status-${b.status}">${b.status}</span></div></div>
+        <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">${admStatusBadge(b.status)}</div></div>
         ${statusHistoryHtml}
         <div class="detail-row"><div class="detail-label">Country</div><div class="detail-value">${escapeHtml(b.country || '-')}</div></div>
         <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${escapeHtml(catText(b.category) || '-')}</div></div>
@@ -856,25 +856,25 @@ function brandActionButtonsForModal(b, docId) {
     const close = ';closeModal();';
     if (b.status === 'pending') {
         return `
-            <button class="act-btn act-approve" onclick="updateBrand('${docId}','approved')${close}">Approve</button>
-            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')${close}">Reject</button>
+            <button class="act-btn act-approve" ${admActAttr('approve')} onclick="updateBrand('${docId}','approved')${close}">${admActText('approve')}</button>
+            <button class="act-btn act-reject" ${admActAttr('reject')} onclick="updateBrand('${docId}','rejected')${close}">${admActText('reject')}</button>
         `;
     }
     if (b.status === 'approved') {
         return `
-            <button class="act-btn act-suspend" onclick="updateBrand('${docId}','suspended')${close}">Suspend</button>
-            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')${close}">Reject</button>
+            <button class="act-btn act-suspend" ${admActAttr('suspend')} onclick="updateBrand('${docId}','suspended')${close}">${admActText('suspend')}</button>
+            <button class="act-btn act-reject" ${admActAttr('reject')} onclick="updateBrand('${docId}','rejected')${close}">${admActText('reject')}</button>
         `;
     }
     if (b.status === 'suspended') {
         return `
-            <button class="act-btn act-restore" onclick="updateBrand('${docId}','approved')${close}">Restore</button>
-            <button class="act-btn act-reject" onclick="updateBrand('${docId}','rejected')${close}">Reject</button>
+            <button class="act-btn act-restore" ${admActAttr('restore')} onclick="updateBrand('${docId}','approved')${close}">${admActText('restore')}</button>
+            <button class="act-btn act-reject" ${admActAttr('reject')} onclick="updateBrand('${docId}','rejected')${close}">${admActText('reject')}</button>
         `;
     }
     if (b.status === 'rejected') {
         return `
-            <button class="act-btn act-restore" onclick="updateBrand('${docId}','approved')${close}">Restore</button>
+            <button class="act-btn act-restore" ${admActAttr('restore')} onclick="updateBrand('${docId}','approved')${close}">${admActText('restore')}</button>
         `;
     }
     return '';
@@ -919,13 +919,13 @@ async function loadProducts() {
                 <td class="adm-col-sub">${escapeHtml(p.category || '-')}<br><small style="color:#6b6459;">${escapeHtml(p.subcategory || '')}</small></td>
                 <td class="adm-col-sub">${escapeHtml(p.materials || '-')}</td>
                 <td class="adm-col-sub">${p.imageUrl ? `<img alt="" loading="lazy" src="${escapeHtml(p.imageUrl)}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">` : '-'}</td>
-                <td><span class="status status-${p.status}">${p.status}</span></td>
+                <td>${admStatusBadge(p.status)}</td>
                 <td>
-                    <button class="act-btn act-view" onclick="viewProduct('${doc.id}')">View</button>
+                    <button class="act-btn act-view" ${admActAttr('view')} onclick="viewProduct('${doc.id}')">${admActText('view')}</button>
                     ${p.status === 'pending' ? `
-                        <button class="act-btn act-approve" onclick="approveDoc('products','${doc.id}')">Approve</button>
-                        <button class="act-btn act-reject" onclick="rejectDoc('products','${doc.id}')">Reject</button>
-                    ` : `<span style="font-size:0.78rem;color:#6b6459;">${p.status}</span>`}
+                        <button class="act-btn act-approve" ${admActAttr('approve')} onclick="approveDoc('products','${doc.id}')">${admActText('approve')}</button>
+                        <button class="act-btn act-reject" ${admActAttr('reject')} onclick="rejectDoc('products','${doc.id}')">${admActText('reject')}</button>
+                    ` : `<span style="font-size:0.78rem;color:#6b6459;" ${admStatusAttr(p.status)}>${admStatusText(p.status)}</span>`}
                 </td>
             </tr>`;
     });
@@ -975,13 +975,13 @@ async function viewProduct(docId) {
     }).join('');
 
     const actionsHtml = p.status === 'pending' ? `
-        <button class="act-btn act-approve" onclick="approveDoc('products','${docId}')">Approve</button>
-        <button class="act-btn act-reject" onclick="rejectDoc('products','${docId}')">Reject</button>
+        <button class="act-btn act-approve" ${admActAttr('approve')} onclick="approveDoc('products','${docId}')">${admActText('approve')}</button>
+        <button class="act-btn act-reject" ${admActAttr('reject')} onclick="rejectDoc('products','${docId}')">${admActText('reject')}</button>
     ` : '';
 
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(p.name)}</h2>
-        <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(p.brandName || '-')} · <span class="status status-${escapeHtml(p.status || '')}">${escapeHtml(p.status || '')}</span></p>
+        <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(p.brandName || '-')} · ${admStatusBadge(p.status)}</p>
         ${galleryHtml}
         <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${escapeHtml(p.category || '-')}${p.subcategory ? ' / ' + escapeHtml(p.subcategory) : ''}</div></div>
         <div class="detail-row"><div class="detail-label">Designer</div><div class="detail-value">${escapeHtml(p.designer || '-')}</div></div>
@@ -1012,13 +1012,13 @@ async function loadArticles() {
                 <td><strong>${escapeHtml(a.title)}</strong></td>
                 <td>${escapeHtml(a.brandName)}</td>
                 <td class="adm-col-sub"><span style="color:#7a5c32;font-size:0.8rem;">${escapeHtml(a.tag || '')}</span></td>
-                <td><span class="status status-${a.status}">${a.status}</span></td>
+                <td>${admStatusBadge(a.status)}</td>
                 <td>
                     ${a.status === 'pending' ? `
-                        <button class="act-btn act-view" onclick="viewArticle('${doc.id}')">Review</button>
-                        <button class="act-btn act-approve" onclick="approveDoc('articles','${doc.id}')">Approve</button>
-                        <button class="act-btn act-reject" onclick="rejectDoc('articles','${doc.id}')">Reject</button>
-                    ` : `<span style="font-size:0.78rem;color:#6b6459;">${a.status}</span>`}
+                        <button class="act-btn act-view" ${admActAttr('review')} onclick="viewArticle('${doc.id}')">${admActText('review')}</button>
+                        <button class="act-btn act-approve" ${admActAttr('approve')} onclick="approveDoc('articles','${doc.id}')">${admActText('approve')}</button>
+                        <button class="act-btn act-reject" ${admActAttr('reject')} onclick="rejectDoc('articles','${doc.id}')">${admActText('reject')}</button>
+                    ` : `<span style="font-size:0.78rem;color:#6b6459;" ${admStatusAttr(a.status)}>${admStatusText(a.status)}</span>`}
                 </td>
             </tr>`;
     });
@@ -1047,8 +1047,8 @@ async function viewArticle(docId) {
         ${admArticleHero(a) ? `<img alt="" loading="lazy" src="${escapeHtml(admArticleHero(a))}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
         ${admArticleBody(a)}
         <div style="margin-top:24px;">
-            <button class="act-btn act-approve" onclick="approveDoc('articles','${docId}')">Approve</button>
-            <button class="act-btn act-reject" onclick="rejectDoc('articles','${docId}')">Reject</button>
+            <button class="act-btn act-approve" ${admActAttr('approve')} onclick="approveDoc('articles','${docId}')">${admActText('approve')}</button>
+            <button class="act-btn act-reject" ${admActAttr('reject')} onclick="rejectDoc('articles','${docId}')">${admActText('reject')}</button>
         </div>`;
     document.getElementById('modal').classList.add('show');
 }

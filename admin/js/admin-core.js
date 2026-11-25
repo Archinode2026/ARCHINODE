@@ -29,6 +29,60 @@ function t(en, ko) { return admLang() === 'ko' ? ko : en; }
 function tAttr(en, ko) { return 'data-en="' + escapeAttr(en) + '" data-ko="' + escapeAttr(ko) + '"'; }
 function tSpan(en, ko) { return '<span ' + tAttr(en, ko) + '>' + escapeHtml(t(en, ko)) + '</span>'; }
 
+/* ── 상태 딱지 (A-692) ───────────────────────────────────────────────────
+   어드민이 **파이어스토어에 저장된 날글자를 그대로 화면에 찍고 있었다** —
+   한국어 화면에 `rejected` 가 그냥 떴다(2026-11-25 라이브 실측).
+   A-681 과 같은 병이다: 그때는 주 유입 경로가 어드민 목록에 날글자로 떴다.
+   저장하는 말과 **보여 주는 말**은 다른 것인데, 한 번 같아지면 아무도 안
+   고친다 — 고장이 아니라 「원래 그런 것」처럼 보이기 때문이다.
+
+   값은 넷뿐이다(firestore.rules:155 가 그렇게 묶어 둔다).
+   ★ 모르는 값이 오면 **날글자를 그대로 보여 준다.** 빈칸이나 「-」로 숨기면
+     나중에 상태를 하나 더 만들었을 때 화면에서 조용히 사라진다 —
+     모르는 것은 숨기지 말고 드러내야 누군가 고친다. */
+var ADM_STATUS = {
+    pending:   { en: 'Pending',   ko: '대기 중' },
+    approved:  { en: 'Approved',  ko: '승인됨' },
+    suspended: { en: 'Suspended', ko: '정지됨' },
+    rejected:  { en: 'Rejected',  ko: '거절됨' }
+};
+
+function admStatusBadge(status) {
+    var key = String(status === null || status === undefined ? '' : status).trim().toLowerCase();
+    var m = ADM_STATUS[key];
+    var en = m ? m.en : (key || '-');
+    var ko = m ? m.ko : (key || '-');
+    return '<span class="status status-' + escapeAttr(key) + '" ' + tAttr(en, ko) + '>'
+         + escapeHtml(t(en, ko)) + '</span>';
+}
+
+/* 작업 단추 — 영문 글자가 24곳에 박혀 있었다. 말은 여기 한 곳에 둔다. */
+var ADM_ACT = {
+    view:    { en: 'View',    ko: '보기' },
+    page:    { en: 'Page',    ko: '쪽 보기' },
+    approve: { en: 'Approve', ko: '승인' },
+    reject:  { en: 'Reject',  ko: '거절' },
+    suspend: { en: 'Suspend', ko: '정지' },
+    restore: { en: 'Restore', ko: '되살리기' },
+    review:  { en: 'Review',  ko: '검토' },
+    cancel:  { en: 'Cancel',  ko: '취소' },
+    confirm: { en: 'Confirm', ko: '확인' },
+    delete:  { en: 'Delete',  ko: '삭제' }
+};
+function admActText(key) { var m = ADM_ACT[key]; return m ? escapeHtml(t(m.en, m.ko)) : escapeHtml(key); }
+/* 딱지가 아니라 **맨글자**로 상태를 적는 자리용 (작업 칸의 흐린 글씨) */
+function admStatusText(status) {
+    var key = String(status === null || status === undefined ? '' : status).trim().toLowerCase();
+    var m = ADM_STATUS[key];
+    return escapeHtml(t(m ? m.en : (key || '-'), m ? m.ko : (key || '-')));
+}
+function admStatusAttr(status) {
+    var key = String(status === null || status === undefined ? '' : status).trim().toLowerCase();
+    var m = ADM_STATUS[key];
+    return tAttr(m ? m.en : (key || '-'), m ? m.ko : (key || '-'));
+}
+function admActAttr(key) { var m = ADM_ACT[key]; return m ? tAttr(m.en, m.ko) : ''; }
+
 // ── 어드민 초기 언어 (2026-09-12, 검수대장 A-035) — 「저장된 선택 > 기본 한국어」. lang.js 본체는 공개 페이지 공통이라 손대지 않는다.
 //    lang.js pickInitialLang 순서 = 저장값('archinode-lang') > IP 캐시('archinode-lang-auto') > ko 이고, IP 조회(detectCountryAndApply)는
 //    저장값이 있을 때만 건너뛴다. html/body 의 data-langs 는 언어 «목록»만 줄일 수 있어(ko 단일 = 토글 불가) 초기값·IP 조회를 못 막는다.
