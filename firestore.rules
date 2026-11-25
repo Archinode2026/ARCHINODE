@@ -142,11 +142,27 @@ service cloud.firestore {
                   || isAdmin();
 
       // 생성: 인증된 사용자가 본인 UID 문서만, status는 'pending' 강제
+      /* ── A-699 (2026-11-25) ───────────────────────────────────────────────
+         여기가 **브랜드가 들어오는 유일한 문이었고, 닫혀 있었다.**
+         A-480 이 담당자 개인정보 8개를 공개 `brands/{uid}` 문서에서 빼
+         `brands/{uid}/internal/contact` 로 옮겼다 — 옳은 일이었다. 그런데
+         같은 커밋이 이 줄의 `email is string` **요구는 안 걷었다.**
+         그래서 `list-your-brand.html:879` 이 담는 13개 키에 `email` 이 없고,
+         생성이 permission-denied 로 거부된다.
+         손님에게는 이렇게 보인다: Auth 계정은 **먼저 만들어지고**(875행),
+         brands 쓰기에서 막혀 성공 화면(983행)에 못 가므로 **임시 비밀번호를
+         한 번도 못 본다.** 다시 누르면 `auth/email-already-in-use`. 즉
+         **고아 계정만 남기고 영구히 막힌다.**
+         연락처는 바로 다음 줄(903행)에서 `internal/contact` 에 쓴다 — 거기
+         `email` 이 있다. 공개 문서에 요구할 일이 아니다. 그래서 걷는다.
+         대신 공개 문서가 **실제로 담는** 것 중 목록에 꼭 있어야 하는
+         `slug` 를 요구한다 — 없으면 디렉터리에서 주소를 만들 수 없다.
+         ★ 이 파일은 git push 로 올라가지 않는다. **따로 게시해야 효력이 생긴다.** */
       allow create: if isOwner(brandId)
                     && isNewStatusPending()
                     && passesHoneypot()
                     && request.resource.data.brandName is string
-                    && request.resource.data.email is string;
+                    && request.resource.data.slug is string;
 
       // 수정:
       //   - 어드민: status를 4값 중 하나로만 변경 가능
