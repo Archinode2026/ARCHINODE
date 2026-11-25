@@ -221,7 +221,7 @@ function render() {
     return;
   }
   var html = '<div class="section-card"><table><thead><tr>'
-    + '<th>Email</th><th style="width:200px;">Registered</th><th style="width:120px;text-align:right;">Actions</th>'
+    + '<th data-en="Email" data-ko="이메일">Email</th><th style="width:200px;" data-en="Registered" data-ko="등록일">Registered</th><th style="width:120px;text-align:right;" data-en="Actions" data-ko="작업">Actions</th>'
     + '</tr></thead><tbody>';
   allDocs.forEach(function(d) {
     html += '<tr>'

@@ -33,24 +33,33 @@ const code = [
   grab('function dpPreviewUrl', '\n}'),
   grab('function dpPick', '\n}'),
   grab('var DP_CAT_LABEL', '};'),
+  /* A-719: 가격 띠를 상품 목록에서 계산하는 함수. 뽑는 목록에 없으면
+     `dpRenderProducts` 가 그걸 부르는 순간 터진다 — 실제로 터져서 알았다. */
+  grab('function dpPaintPriceRange', '\n}'),
   grab('function dpRenderProducts', '\n}')
 ].join('\n');
 
 let grid, empty;
+let band;
 function reset(lang) {
   grid = { style: {}, innerHTML: '' };
   empty = { style: {} };
+  /* A-719: 가격 띠 칸. `setAttribute` 로 두 언어 속성을 쓰므로 받아 둔다 —
+     손님이 언어를 바꿔도 다시 그리지 않아도 되는 꼴이어야 한다. */
+  band = { attrs: {}, textContent: '', setAttribute(k, v) { this.attrs[k] = v; } };
   global.document = {
     documentElement: { lang: lang || 'ko' },
-    getElementById: (id) => (id === 'dpGrid' ? grid : (id === 'dpEmpty' ? empty : null))
+    getElementById: (id) => (id === 'dpGrid' ? grid
+                            : (id === 'dpEmpty' ? empty
+                            : (id === 'dpPriceRange' ? band : null)))
   };
   global.window = {};
 }
 reset('ko');
 /* 'use strict' 안의 eval 은 **제 스코프**에 함수를 만든다 — 바깥에서 그냥 부를 수 없다.
    그래서 끝에 한 줄을 붙여 밖으로 꺼낸다(DP_PRODUCTS 는 배열이라 참조로 따라온다). */
-eval(code + '\n;globalThis.__dp = { dpEsc, dpPayUrl, dpPreviewUrl, dpPick, dpRenderProducts, DP_PRODUCTS };');
-const { dpEsc, dpPayUrl, dpPreviewUrl, dpPick, dpRenderProducts, DP_PRODUCTS } = globalThis.__dp;
+eval(code + '\n;globalThis.__dp = { dpEsc, dpPayUrl, dpPreviewUrl, dpPick, dpRenderProducts, dpPaintPriceRange, DP_PRODUCTS };');
+const { dpEsc, dpPayUrl, dpPreviewUrl, dpPick, dpRenderProducts, dpPaintPriceRange, DP_PRODUCTS } = globalThis.__dp;
 
 // ── 1) 결제 주소 검사 ──────────────────────────────────────────────────
 [['https://www.paypal.com/ncp/payment/ABC', true],
@@ -246,6 +255,39 @@ for (const [f, src] of [['terms.html', TERMS], ['digital-products.html', SRC]]) 
      !/[가-힣]/.test((src.match(/data-en-html='([^']*)'/) || ['',''])[1]));
 }
 ok('약관 최종 수정일이 개정일과 같다', /최종 수정일: 2026년 11월 13일/.test(TERMS));
+
+// ── 4) A-719 가격 띠는 **상품 목록에서** 온다 ───────────────────────────
+//    여기 손으로 「EUR 29 — EUR 49」가 박혀 있었다. 상품은 0개였고 `49` 라는
+//    값은 저장소 어디에도 없었다 — 값을 보고 온 손님에게 살 것이 없었다.
+//    **없는 값을 말하지 않는 것**이 이 묶음의 요점이다.
+reset('ko');
+DP_PRODUCTS.length = 0;
+dpPaintPriceRange();
+ok('상품 0개면 값을 말하지 않는다 (한국어)', band.attrs['data-ko'] === '출시 알림 신청 가능');
+ok('상품 0개면 값을 말하지 않는다 (영문)', band.attrs['data-en'] === 'Notify me when available');
+ok('상품 0개면 띠에 숫자가 없다', !/\d/.test(band.textContent));
+reset('ko');
+DP_PRODUCTS.length = 0;
+DP_PRODUCTS.push({ priceEur: 29 });
+dpPaintPriceRange();
+ok('상품 1개면 그 값 하나만 말한다', band.attrs['data-ko'] === '1건 EUR 29');
+ok('한 개일 때 범위로 말하지 않는다', band.attrs['data-ko'].indexOf('—') === -1);
+reset('en');
+DP_PRODUCTS.length = 0;
+DP_PRODUCTS.push({ priceEur: 49 }, { priceEur: 29 }, { priceEur: 39 });
+dpPaintPriceRange();
+ok('여러 개면 최저~최고로 말한다', band.attrs['data-en'] === 'EUR 29 — EUR 49 per item');
+ok('영문 화면이면 영문을 찍는다', band.textContent === 'EUR 29 — EUR 49 per item');
+reset('ko');
+DP_PRODUCTS.length = 0;
+DP_PRODUCTS.push({ priceEur: 0 }, { priceEur: null }, { priceEur: 'x' }, { priceEur: 29 });
+dpPaintPriceRange();
+ok('값이 없거나 0인 상품은 셈에서 뺀다', band.attrs['data-ko'] === '1건 EUR 29');
+reset('ko');
+DP_PRODUCTS.length = 0;
+dpPaintPriceRange();
+ok('두 언어 속성이 **둘 다** 달린다 (언어를 바꿔도 다시 안 그려야 한다)',
+   !!band.attrs['data-en'] && !!band.attrs['data-ko']);
 
 console.log('\n디지털 상품 — 시험 ' + (pass + fail) + '개, 실패 ' + fail + '개');
 process.exit(fail ? 1 : 0);

@@ -366,7 +366,11 @@
            data-en-aria-label="Search brands, products, categories"
            data-ko-aria-label="브랜드, 제품, 카테고리 검색"
            data-en-placeholder="Search brands, products, categories..." data-ko-placeholder="브랜드, 제품, 카테고리 검색...">
-    <button onclick=""><i class="fas fa-arrow-right"></i></button>
+    <!-- A-718(2026-11-25, 브론즈 58차 ③): 검색 가리개가 있는 231쪽 가운데
+         **이 하나만** 접근 가능한 이름이 없었다. 화면 읽기로는 그냥 「단추」로
+         읽혔다 — 카테고리 쪽은 제품 흐름의 입구다. 나머지 230쪽의 꼴에 맞춘다.
+         빈 `onclick=""` 도 걷었다(저장소에서 그 꼴은 이 한 곳뿐이었다). -->
+    <button type="button" aria-label="Search" data-en-aria-label="Search" data-ko-aria-label="검색"><i class="fas fa-arrow-right"></i></button>
   </div>
 </div>
 

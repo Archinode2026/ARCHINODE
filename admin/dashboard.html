@@ -333,12 +333,12 @@ tr:hover { background: var(--gray-50); }
                     <thead>
                         <tr>
                             <th data-en="Brand" data-ko="브랜드">Brand</th>
-                            <th class="adm-col-sub" data-en="Country" data-ko="국가">Country</th>
+                            <th class="adm-col-sub" data-en="Country" data-ko="국가" data-en="Country" data-ko="국가">Country</th>
                             <th class="adm-col-sub" data-en="Category" data-ko="카테고리">Category</th>
-                            <th class="adm-col-sub" data-en="Contact" data-ko="연락처">Contact</th>
+                            <th class="adm-col-sub" data-en="Contact" data-ko="연락처" data-en="Contact" data-ko="담당자">Contact</th>
                             <th class="adm-col-sub" data-en="KR Dealer" data-ko="한국 딜러">KR Dealer</th>
-                            <th data-en="Status" data-ko="상태">Status</th>
-                            <th data-en="Actions" data-ko="작업">Actions</th>
+                            <th data-en="Status" data-ko="상태" data-en="Status" data-ko="상태">Status</th>
+                            <th data-en="Actions" data-ko="작업" data-en="Actions" data-ko="작업">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="brandsTable"></tbody>
@@ -354,13 +354,13 @@ tr:hover { background: var(--gray-50); }
     <table>
                     <thead>
                         <tr>
-                            <th data-en="Product" data-ko="제품">Product</th>
+                            <th data-en="Product" data-ko="제품" data-en="Product" data-ko="제품">Product</th>
                             <th data-en="Brand" data-ko="브랜드">Brand</th>
                             <th class="adm-col-sub" data-en="Category" data-ko="카테고리">Category</th>
-                            <th class="adm-col-sub" data-en="Materials" data-ko="소재">Materials</th>
+                            <th class="adm-col-sub" data-en="Materials" data-ko="소재" data-en="Materials" data-ko="자재">Materials</th>
                             <th class="adm-col-sub" data-en="Image" data-ko="이미지">Image</th>
-                            <th data-en="Status" data-ko="상태">Status</th>
-                            <th data-en="Actions" data-ko="작업">Actions</th>
+                            <th data-en="Status" data-ko="상태" data-en="Status" data-ko="상태">Status</th>
+                            <th data-en="Actions" data-ko="작업" data-en="Actions" data-ko="작업">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="productsTable"></tbody>
@@ -376,11 +376,11 @@ tr:hover { background: var(--gray-50); }
     <table>
                     <thead>
                         <tr>
-                            <th data-en="Title" data-ko="제목">Title</th>
+                            <th data-en="Title" data-ko="제목" data-en="Title" data-ko="직책">Title</th>
                             <th data-en="Brand" data-ko="브랜드">Brand</th>
                             <th class="adm-col-sub" data-en="Tag" data-ko="태그">Tag</th>
-                            <th data-en="Status" data-ko="상태">Status</th>
-                            <th data-en="Actions" data-ko="작업">Actions</th>
+                            <th data-en="Status" data-ko="상태" data-en="Status" data-ko="상태">Status</th>
+                            <th data-en="Actions" data-ko="작업" data-en="Actions" data-ko="작업">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="articlesTable"></tbody>
@@ -417,10 +417,10 @@ tr:hover { background: var(--gray-50); }
                             <th class="adm-col-sub" data-en="Screen" data-ko="화면">Screen</th>
                             <th data-en="Problem" data-ko="문제">Problem</th>
                             <th class="adm-col-sub-xs" data-en="Priority" data-ko="우선">Priority</th>
-                            <th data-en="Status" data-ko="상태">Status</th>
+                            <th data-en="Status" data-ko="상태" data-en="Status" data-ko="상태">Status</th>
                             <th class="adm-col-sub" data-en="Reported" data-ko="등록일">Reported</th>
                             <th class="adm-col-sub" data-en="By" data-ko="등록자">By</th>
-                            <th data-en="Actions" data-ko="작업">Actions</th>
+                            <th data-en="Actions" data-ko="작업" data-en="Actions" data-ko="작업">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="reviewTable"></tbody>
@@ -760,7 +760,7 @@ function openReasonModal(opts) {
             <h2>${escapeHtml(opts.title)}</h2>
             ${opts.brandName ? `<p style="color:#6b6459;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(opts.brandName)} → <strong>${escapeHtml(opts.newStatus)}</strong></p>` : ''}
             <div class="reason-modal-content">
-                <label for="reasonInput">Reason ${opts.required ? '<span style="color:#b91c1c;">*</span>' : '<span style="color:#6b6459;font-weight:400;">(optional)</span>'}</label>
+                <label for="reasonInput">Reason ${opts.required ? '<span style="color:#b91c1c;">*</span>' : '<span style="color:#6b6459;font-weight:400;" data-en="(optional)" data-ko="(선택)">' + escapeHtml(t('(optional)', '(선택)')) + '</span>'}</label>
                 <textarea id="reasonInput" maxlength="200" placeholder="${placeholderText}"></textarea>
                 <div class="char-count"><span id="reasonCount">0</span>/200</div>
                 <div class="reason-actions">
@@ -865,13 +865,13 @@ async function viewBrand(docId) {
 
     let statusHistoryHtml = '';
     if (b.statusReason) {
-        statusHistoryHtml += `<div class="detail-row"><div class="detail-label">Last Reason</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(b.statusReason)}</div></div>`;
+        statusHistoryHtml += `<div class="detail-row"><div class="detail-label" data-en="Last Reason" data-ko="최근 사유">Last Reason</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(b.statusReason)}</div></div>`;
     }
     if (b.statusChangedAt) {
         try {
             // R-052: 여기도 같은 함수로. 라벨("Changed At")이 영문 전용인 것은 이 모달 전체가
             // 그러해서 따로 적어 뒀다(장부 A-226 「이력」 참고) — 이번 건은 날짜 쪽이다.
-            statusHistoryHtml += `<div class="detail-row"><div class="detail-label">Changed At</div><div class="detail-value">${rvDateTimeSpan(b.statusChangedAt)}</div></div>`;
+            statusHistoryHtml += `<div class="detail-row"><div class="detail-label" data-en="Changed At" data-ko="변경 시각">Changed At</div><div class="detail-value">${rvDateTimeSpan(b.statusChangedAt)}</div></div>`;
         } catch (e) {}
     }
 
@@ -887,22 +887,22 @@ async function viewBrand(docId) {
     const safeWebsite = (b.website && /^https?:\/\//i.test(b.website)) ? b.website : '#';
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(b.brandName)}</h2>
-        <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">${admStatusBadge(b.status)}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Status" data-ko="상태">Status</div><div class="detail-value">${admStatusBadge(b.status)}</div></div>
         ${statusHistoryHtml}
-        <div class="detail-row"><div class="detail-label">Country</div><div class="detail-value">${escapeHtml(b.country || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Country" data-ko="국가">Country</div><div class="detail-value">${escapeHtml(b.country || '-')}</div></div>
         <div class="detail-row"><div class="detail-label" data-en="Category" data-ko="카테고리">Category</div><div class="detail-value">${admCatBadge(b.category)}</div></div>
         <!-- A-712(2026-11-25): 「productType」 은 브랜드가 자기가 무엇을 만드는지
              적어 넣는 칸인데(list-your-brand.html:891) 저장소 어느 화면도 읽지 않았다.
              승인 심사에서 바로 그걸 보고 판단해야 하는데 화면에 없었다.
              ※ 템플릿 문자열 안이라 역따옴표를 쓰면 템플릿이 닫힌다 — 「」 로 적는다. -->
         <div class="detail-row"><div class="detail-label" data-en="Product type" data-ko="제품 유형">Product type</div><div class="detail-value">${escapeHtml(b.productType || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Website</div><div class="detail-value"><a href="${escapeHtml(safeWebsite)}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.website || '-')}</a></div></div>
-        <div class="detail-row"><div class="detail-label">Contact</div><div class="detail-value">${escapeHtml(b.contactName || '-')} (${escapeHtml(b.position || '-')})</div></div>
-        <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${escapeHtml(b.email || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-value">${escapeHtml(b.phone || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(b.description || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Referral</div><div class="detail-value">${escapeHtml(b.referral || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Referral Source</div><div class="detail-value">${escapeHtml(b.referralSource || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Website" data-ko="웹사이트">Website</div><div class="detail-value"><a href="${escapeHtml(safeWebsite)}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.website || '-')}</a></div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Contact" data-ko="담당자">Contact</div><div class="detail-value">${escapeHtml(b.contactName || '-')} (${escapeHtml(b.position || '-')})</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Email" data-ko="이메일">Email</div><div class="detail-value">${escapeHtml(b.email || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Phone" data-ko="전화">Phone</div><div class="detail-value">${escapeHtml(b.phone || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Description" data-ko="소개">Description</div><div class="detail-value">${escapeHtml(b.description || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Referral" data-ko="소개 경로">Referral</div><div class="detail-value">${escapeHtml(b.referral || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Referral Source" data-ko="소개 출처">Referral Source</div><div class="detail-value">${escapeHtml(b.referralSource || '-')}</div></div>
         <!-- ★ A-712: 약관 제9조(기술자료 제공·보증·면책) 동의 기록이 담기는데
              (list-your-brand.html:911-912) 보여 주는 화면이 0곳이었다.
              「ADM_CONTACT_FIELDS」 가 병합까지 해 두고도 아무도 속성으로 읽지 않았다 —
@@ -1022,7 +1022,7 @@ async function viewProduct(docId) {
         ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">${gallery.map(url =>
               `<img alt="" loading="lazy" src="${escapeHtml(url)}" style="width:120px;height:120px;object-fit:cover;border-radius:6px;border:1px solid #ede7dc;">`
           ).join('')}</div>`
-        : `<p style="color:#6b6459;font-size:0.85rem;margin-bottom:16px;">No images uploaded.</p>`;
+        : `<p style="color:#6b6459;font-size:0.85rem;margin-bottom:16px;" data-en="No images uploaded." data-ko="올린 이미지가 없습니다.">${escapeHtml(t('No images uploaded.', '올린 이미지가 없습니다.'))}</p>`;
 
     // A-498(2026-11-12): 저장된 값은 `$`·`$$`·`$$$`·`$$$$` 다(이미 올라간 제품이 쓰는 열쇠라
     // 그대로 둔다). 보이는 글자만 유로 기호로 바꾼다 — 승리님 결정으로 우리 화면의 통화는 전부 유로다.
@@ -1052,14 +1052,14 @@ async function viewProduct(docId) {
         <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(p.brandName || '-')} · ${admStatusBadge(p.status)}</p>
         ${galleryHtml}
         <div class="detail-row"><div class="detail-label" data-en="Category" data-ko="카테고리">Category</div><div class="detail-value">${admCatBadge(p.category)}${p.subcategory ? ' / ' + escapeHtml(p.subcategory) : ''}</div></div>
-        <div class="detail-row"><div class="detail-label">Designer</div><div class="detail-value">${escapeHtml(p.designer || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Materials</div><div class="detail-value">${escapeHtml(p.materials || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Dimensions</div><div class="detail-value">${escapeHtml(p.dimensions || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Price Range</div><div class="detail-value">${escapeHtml(priceLabel)}</div></div>
-        <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(p.description || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">MOQ / Lead Time</div><div class="detail-value">${escapeHtml(p.moq || '-')} / ${escapeHtml(p.leadTime || '-')}</div></div>
-        <div class="detail-row"><div class="detail-label">Supply Type</div><div class="detail-value">${escapeHtml(supplyLabel)}</div></div>
-        <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value">${filesHtml}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Designer" data-ko="디자이너">Designer</div><div class="detail-value">${escapeHtml(p.designer || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Materials" data-ko="자재">Materials</div><div class="detail-value">${escapeHtml(p.materials || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Dimensions" data-ko="치수">Dimensions</div><div class="detail-value">${escapeHtml(p.dimensions || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Price Range" data-ko="가격대">Price Range</div><div class="detail-value">${escapeHtml(priceLabel)}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Description" data-ko="소개">Description</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(p.description || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="MOQ / Lead Time" data-ko="최소수량 / 납기">MOQ / Lead Time</div><div class="detail-value">${escapeHtml(p.moq || '-')} / ${escapeHtml(p.leadTime || '-')}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Supply Type" data-ko="공급 형태">Supply Type</div><div class="detail-value">${escapeHtml(supplyLabel)}</div></div>
+        <div class="detail-row"><div class="detail-label" data-en="Files" data-ko="파일">Files</div><div class="detail-value">${filesHtml}</div></div>
         <div style="margin-top:20px;">${actionsHtml}</div>`;
     document.getElementById('modal').classList.add('show');
 }
@@ -1477,9 +1477,9 @@ function openReviewForm() {
                 <div>
                     <label for="rvPriority">${rvSpan('Priority', '우선순위')}</label>
                     <select id="rvPriority">
-                        <option value="High">High</option>
-                        <option value="Medium" selected>Medium</option>
-                        <option value="Low">Low</option>
+                        <option value="High" data-en="High" data-ko="높음">High</option>
+                        <option value="Medium" selected data-en="Medium" data-ko="보통">Medium</option>
+                        <option value="Low" data-en="Low" data-ko="낮음">Low</option>
                     </select>
                 </div>
                 <div>${field('rvPageUrl', 'Repro URL (optional)', '재현 주소 (선택)', 'input', ' placeholder="https://"')}</div>

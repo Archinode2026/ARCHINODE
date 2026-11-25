@@ -363,7 +363,12 @@ function renderCards() {
   var container = document.getElementById('cardsContainer');
   var filtered = allDocs.filter(function(d) { return d.status === currentStatus; });
   if (filtered.length === 0) {
-    container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No submissions in <strong>' + currentStatus + '</strong> status.</p></div>';
+    container.innerHTML = /* A-717: 어순이 달라 문장을 통째로 고른다. */
+      '<div class="empty-state"><i class="fas fa-inbox"></i><p>'
+      + (admLang() === 'ko'
+          ? '<strong>' + escapeHtml(admStatusText(currentStatus)) + '</strong> 상태의 투고가 없습니다.'
+          : 'No submissions in <strong>' + escapeHtml(currentStatus) + '</strong> status.')
+      + '</p></div>';
     return;
   }
   var grid = '<div class="cards">';
@@ -372,8 +377,8 @@ function renderCards() {
       ? '<div class="card-thumb" style="background-image:url(\'' + escapeAttr(d.imageUrl) + '\');"><span class="lang-badge">' + (d.originalLang || '?').toUpperCase() + '</span></div>'
       : '<div class="card-thumb no-img"><i class="fas fa-image"></i><span class="lang-badge">' + (d.originalLang || '?').toUpperCase() + '</span></div>';
     var enFlag = (d.englishBody && d.englishBody.trim()) || d.originalLang === 'en'
-      ? '<span class="flag flag-en-present">EN ✓</span>'
-      : '<span class="flag flag-en-missing">EN missing</span>';
+      ? '<span class="flag flag-en-present" data-en="EN ✓" data-ko="영문 있음">EN ✓</span>'
+      : '<span class="flag flag-en-missing" data-en="EN missing" data-ko="영문 없음">EN missing</span>';
     var preview = escapeHtml((d.originalBody || '').substring(0, 200));
     grid += '<div class="card" onclick="openModal(\'' + d.id + '\')">' + thumb
       + '<div class="card-body">'
@@ -421,7 +426,7 @@ window.openModal = function(id) {
   if (Array.isArray(d.extraImages)) imgs = imgs.concat(d.extraImages);
   var imgGrid = document.getElementById('mImagesGrid');
   if (imgs.length === 0) {
-    imgGrid.innerHTML = '<div style="color:#6b6459;font-size:0.85rem;grid-column:1/-1;">(no images submitted)</div>';
+    imgGrid.innerHTML = '<div style="color:#6b6459;font-size:0.85rem;grid-column:1/-1;" data-en="(no images submitted)" data-ko="(올린 이미지가 없습니다)">' + escapeHtml(t('(no images submitted)', '(올린 이미지가 없습니다)')) + '</div>';
   } else {
     imgGrid.innerHTML = imgs.map(function(u){
       return '<a href="' + escapeAttr(u) + '" target="_blank" rel="noopener"><img alt="" src="' + escapeAttr(u) + '" loading="lazy" onerror="this.style.opacity=0.3"></a>';

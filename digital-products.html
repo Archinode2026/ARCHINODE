@@ -370,7 +370,15 @@
     <h1 data-en="ARCHINODE Digital Products" data-ko="ARCHINODE 디지털 상품">ARCHINODE Digital Products</h1>
     <p data-en="Curated PDFs, CAD libraries, BIM families, material spec sheets, and market intelligence — built for Korean architects, interior designers, and specifiers who want European depth without European overhead." data-ko="한국 건축가·인테리어 디자이너·스펙라이터를 위해 큐레이팅된 PDF, CAD 라이브러리, BIM 패밀리, 자재 스펙시트, 시장 인텔리전스 자료 — 유럽의 깊이를 한국에 맞춰 정리.">Curated PDFs, CAD libraries, BIM families, material spec sheets, and market intelligence — built for Korean architects, interior designers, and specifiers who want European depth without European overhead.</p>
     <!-- A-498 — 검수대장 -->
-    <div class="price-range" data-en="EUR 29 — EUR 49 per item · Notify me when available" data-ko="1건 EUR 29 — EUR 49 · 출시 알림 신청 가능">EUR 29 — EUR 49 per item · Notify me when available</div>
+    <!-- ★ A-719(2026-11-25, 브론즈 58차 ④): 여기 「EUR 29 — EUR 49」가 **손으로**
+         박혀 있었다. 그런데 `DP_PRODUCTS` 는 **비어 있고**, `49` 라는 값은
+         저장소 어디에도 없다(`priceEur: 29` 하나가 설명 주석 속 틀에 있을 뿐).
+         값을 보고 내려온 손님은 「콘텐츠 큐레이션 진행 중」 빈 화면을 만났다 —
+         **살 것이 하나도 없다.** A-697(「3,500+ 브랜드가 지금 있다」고 했는데
+         입점 0)과 같은 모양이다.
+         그래서 **숫자를 손으로 적지 않는다** — 상품 목록에서 계산한다(A-498 의
+         「숫자는 한 곳에서 와야 한다」). 상품이 없으면 값을 말하지 않는다. -->
+    <div class="price-range" id="dpPriceRange" data-en="Notify me when available" data-ko="출시 알림 신청 가능">Notify me when available</div>
   </div>
 </section>
 
@@ -726,7 +734,30 @@ var DP_CAT_LABEL = {
   'market-intel': ['Market Intelligence', '시장 인텔리전스']
 };
 
+/* A-719: 가격 띠를 **상품 목록에서** 만든다. 없으면 값을 말하지 않는다. */
+function dpPaintPriceRange() {
+  var el = document.getElementById('dpPriceRange');
+  if (!el) return;
+  var prices = (DP_PRODUCTS || [])
+      .map(function (p) { return Number(p && p.priceEur); })
+      .filter(function (v) { return isFinite(v) && v > 0; });
+  var en, ko;
+  if (!prices.length) {
+    en = 'Notify me when available';
+    ko = '출시 알림 신청 가능';
+  } else {
+    var lo = Math.min.apply(null, prices), hi = Math.max.apply(null, prices);
+    var band = lo === hi ? ('EUR ' + lo) : ('EUR ' + lo + ' — EUR ' + hi);
+    en = band + ' per item';
+    ko = '1건 ' + band;
+  }
+  el.setAttribute('data-en', en);
+  el.setAttribute('data-ko', ko);
+  el.textContent = (document.documentElement.lang === 'ko') ? ko : en;
+}
+
 function dpRenderProducts() {
+  dpPaintPriceRange();
   var grid = document.getElementById('dpGrid');
   var empty = document.getElementById('dpEmpty');
   if (!grid) return;

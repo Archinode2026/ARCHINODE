@@ -244,7 +244,7 @@ function render() {
   }
 
   var html = '<div class="section-card"><table><thead><tr>'
-    + '<th>Requester</th><th>Product</th><th>File</th><th>Project</th><th>Status</th><th>Date</th><th style="text-align:right;">Actions</th>'
+    + '<th data-en="Requester" data-ko="신청자">Requester</th><th data-en="Product" data-ko="제품">Product</th><th data-en="File" data-ko="파일">File</th><th data-en="Project" data-ko="프로젝트">Project</th><th data-en="Status" data-ko="상태">Status</th><th data-en="Date" data-ko="날짜">Date</th><th style="text-align:right;" data-en="Actions" data-ko="작업">Actions</th>'
     + '</tr></thead><tbody>';
   list.forEach(function(d) {
     var statusClass = 'status-' + (d.status || 'pending');
@@ -284,18 +284,18 @@ function viewRequest(id) {
   var fileLabel = { catalog: 'PDF Catalog', bim: 'BIM File', model3d: '3D Model' }[d.fileType] || (d.fileType || '-');
   document.getElementById('detailModalContent').innerHTML =
     '<h3>' + escapeHtml(d.name || '-') + ' — ' + escapeHtml(d.company || '-') + '</h3>'
-    + '<div class="detail-row"><div class="detail-label">Title</div>' + escapeHtml(d.title || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Email</div>' + escapeHtml(d.email || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Phone</div>' + escapeHtml(d.phone || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Product / Brand</div>' + escapeHtml(d.productName || '-') + ' / ' + escapeHtml(d.brandName || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">File Requested</div>' + escapeHtml(fileLabel) + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Project Name</div>' + escapeHtml(d.projectName || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Project Type</div>' + escapeHtml(d.projectType || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Timeline</div>' + escapeHtml(d.projectTimeline || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Scale</div>' + escapeHtml(d.projectScale || '-') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Status</div>' + admStatusBadge(d.status || 'pending') + '</div>'
-    + '<div class="detail-row"><div class="detail-label">Requested</div>' + formatDate(d.createdAt) + '</div>'
-    + (d.expiresAt ? '<div class="detail-row"><div class="detail-label">Link Expires</div>' + formatDate(d.expiresAt) + '</div>' : '');
+    + '<div class="detail-row"><div class="detail-label" data-en="Title" data-ko="직책">Title</div>' + escapeHtml(d.title || '-') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Email" data-ko="이메일">Email</div>' + escapeHtml(d.email || '-') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Phone" data-ko="전화">Phone</div>' + escapeHtml(d.phone || '-') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Product / Brand" data-ko="제품 / 브랜드">Product / Brand</div>' + escapeHtml(d.productName || '-') + ' / ' + escapeHtml(d.brandName || '-') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="File Requested" data-ko="요청 파일">File Requested</div>' + escapeHtml(fileLabel) + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Project Name" data-ko="프로젝트명">Project Name</div>' + escapeHtml(d.projectName || '-') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Project Type" data-ko="프로젝트 유형">Project Type</div>' + escapeHtml(d.projectType || '-') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Timeline" data-ko="일정">Timeline</div>' + escapeHtml(d.projectTimeline || '-') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Scale" data-ko="규모">Scale</div>' + escapeHtml(d.projectScale || '-') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Status" data-ko="상태">Status</div>' + admStatusBadge(d.status || 'pending') + '</div>'
+    + '<div class="detail-row"><div class="detail-label" data-en="Requested" data-ko="신청일">Requested</div>' + formatDate(d.createdAt) + '</div>'
+    + (d.expiresAt ? '<div class="detail-row"><div class="detail-label" data-en="Link Expires" data-ko="링크 만료">Link Expires</div>' + formatDate(d.expiresAt) + '</div>' : '');
   document.getElementById('detailModal').classList.add('active');
 }
 

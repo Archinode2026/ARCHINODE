@@ -35,7 +35,8 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.textContent = act==='up'?'↑':(act==='down'?'↓':'×');
-        btn.title = act==='up'?'Move up':(act==='down'?'Move down':'Delete');
+        /* A-718: 단추 설명이 영문 고정이었다 — 포털은 두 언어다. */
+        btn.title = act==='up'?pT('Move up','위로'):(act==='down'?pT('Move down','아래로'):pT('Delete','삭제'));
         btn.disabled = (act==='up'&&i===0) || (act==='down'&&i===blocks.length-1);
         btn.style.cssText = 'background:#f0f0f0;border:1px solid #ddd;border-radius:3px;padding:2px 10px;margin-left:4px;cursor:pointer;font-weight:700;'+(act==='del'?'color:#c00;':'');
         btn.addEventListener('click', async () => {
@@ -67,9 +68,13 @@
         const drop = document.createElement('div');
         drop.style.cssText = 'border:2px dashed #ccc;border-radius:6px;padding:24px;text-align:center;background:#fafafa;cursor:pointer;transition:background 0.2s;';
         if (b.url) {
-          drop.innerHTML = '<img src="'+b.url+'" style="max-width:100%;max-height:300px;border-radius:4px;display:block;margin:0 auto;"><div style="margin-top:10px;font-size:0.78rem;color:#888;">Click or drop to replace</div>';
+          drop.innerHTML = /* A-718(브론즈 58차 ⑤): `alt` 이 없어서 브랜드 담당자가 화면 읽기로 원고를
+       쓰면 **자기가 방금 올린 사진이 무엇인지 안 읽혔다.** 여러 장이면 가릴 수도
+       없다. 정적 마크업 쪽은 248쪽 전수에서 `alt` 누락 0인데 **JS 가 만드는
+       자리만** 샜다 — A-717 과 같은 사각지대다. */
+      '<img src="'+b.url+'" alt="'+pT('Uploaded image preview','올린 이미지 미리보기')+'" style="max-width:100%;max-height:300px;border-radius:4px;display:block;margin:0 auto;"><div style="margin-top:10px;font-size:0.78rem;color:#888;">'+pT('Click or drop to replace','눌러서 고르거나 끌어다 놓아 바꿉니다')+'</div>';
         } else if (b.uploading) {
-          drop.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:1.6rem;color:#666;"></i><div style="margin-top:8px;color:#666;">Uploading...</div>';
+          drop.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:1.6rem;color:#666;"></i><div style="margin-top:8px;color:#666;">'+pT('Uploading...','올리는 중...')+'</div>';
         } else {
           drop.innerHTML = '<i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:#bbb;"></i><div style="margin-top:10px;color:#666;">Click or drag an image here</div><div style="margin-top:6px;font-size:0.72rem;color:#999;">JPG / PNG / WebP, max 5MB after compression</div>';
         }
@@ -217,8 +222,8 @@
     return i ? i.url : '';
   }
   function validate(title) {
-    if (!title) return 'Title is required';
-    if (blocks.length === 0) return 'Add at least one block';
+    if (!title) return pT('Title is required', '제목을 입력해 주세요.');
+    if (blocks.length === 0) return pT('Add at least one block', '블록을 하나 이상 넣어 주세요.');
     const hasContent = blocks.some(b => (b.type === 'text' && b.content && b.content.trim()) || (b.type === 'image' && b.url));
     if (!hasContent) return 'Add text or image content';
     if (blocks.some(b => b.type === 'image' && b.uploading)) return 'Wait for images to finish uploading';

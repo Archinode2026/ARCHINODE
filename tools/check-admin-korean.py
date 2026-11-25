@@ -95,6 +95,26 @@ class _UiText(HTMLParser):
             self.stack[-1][2].append(data)
 
 
+CODEY = re.compile(r"""['"+]|\b(?:escapeHtml|escapeAttr|formatDate|fmtDate"""
+                   r"""|admActText|admStatusText|admStatusBadge|admCatBadge|t)\s*\(""")
+
+INLINE_SCRIPT = re.compile(r'<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)</script>')
+
+
+def script_ui_texts(src):
+    """인라인 스크립트 **안**이 만드는 UI 글자. 줄 번호는 파일 기준으로 돌린다."""
+    out = []
+    src = HTML_COMMENT.sub(_blank, src)
+    for m in INLINE_SCRIPT.finditer(src):
+        offset = src[:m.start(1)].count('\n')
+        body = JS_BLOCK_COMMENT.sub(_blank, m.group(1))
+        body = '\n'.join('' if l.lstrip().startswith('//') else l
+                         for l in body.split('\n'))
+        for line, at, txt in ui_texts(body):
+            out.append((offset + line, at, txt))
+    return out
+
+
 def ui_texts(markup):
     p = _UiText()
     try:
@@ -235,6 +255,32 @@ def main():
         #   (상태 거르개처럼 **짧은** 목록은 그대로 본다 — 거기 영문이 남으면
         #    진짜 결함이다.)
         markup = BIG_SELECT.sub(markup)
+
+        # ★★ A-717(2026-11-25, 브론즈 58차 ①): 위에서 `<script>` 를 **통째로
+        #   지우고** 본다. 그런데 **어드민 화면의 표·상세·빈 상태는 거의 전부
+        #   인라인 스크립트가 만든다.** 즉 가장 큰 구역을 안 보고 있었다.
+        #   주석(:222-229)에 「반쪽이다」라고 스스로 고백해 뒀지만
+        #   **그 반쪽에 무엇이 들어 있는지 센 사람이 없었다** — 57곳이었다.
+        #   BIM 요청 표 머리가 `Requester · Product · File · Project · Status ·
+        #   Date · Actions` 영문이었고, 브랜드 상세 13줄도 영문이었다.
+        #   결정적 증거: `admin/dashboard.html` 한 템플릿 안에서 A-694·A-712 가
+        #   **손으로 고친 두 줄만** 짝이 있고 위아래는 없었다.
+        #   ☆ 다만 스크립트 안에는 **코드 조각**이 섞인다
+        #     (`' + escapeHtml(d.name) + '`). 그걸 글로 세면 거짓 양성이
+        #     126건 중 69건이다. 따옴표·더하기·호출이 든 것은 글이 아니다.
+        for _line, _at, txt in script_ui_texts(s):
+            if len(txt) > 40 or ENTITY_ONLY.match(txt) or NOT_TEXT.search(txt):
+                continue
+            if CODEY.search(txt):
+                continue            # JS 이어붙이기 조각 — 글이 아니다
+            if not LATIN.search(txt) or HANGUL.search(txt):
+                continue
+            if txt in ENGLISH_OK:
+                continue
+            if 'data-ko' in _at:
+                continue
+            problems.append('%s:%d — 스크립트가 만드는 영문 UI 에 두 언어 짝이 없다 「%s」'
+                            % (rel, _line, txt))
         for _line, _at, txt in ui_texts(markup):
             attrs = ' '.join('%s="%s"' % (k, v or '') for k, v in _at.items())
             if not txt or len(txt) > 40:
