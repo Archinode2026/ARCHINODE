@@ -79,9 +79,14 @@ def truth():
     return cats, subs
 
 
-def parse_cat_ko(src, label):
-    """'Furniture': '가구' 꼴을 읽는다."""
-    m = re.search(r'const CAT_KO = \{(.*?)\n\s*\};', src, re.S)
+def parse_cat_ko(src, label, name='CAT_KO'):
+    """'Furniture': '가구' 꼴을 읽는다.
+
+    A-694: 이름과 선언 낱말을 받게 했다 — 어드민 쪽은 `var ADM_CAT_KO` 이고
+    공개 쪽은 `const CAT_KO` 다. `const` 로만 찾으면 어드민 사본을 못 읽는데,
+    **못 읽으면 조용히 통과**하는 것이 아니라 울게 해 뒀다(아래 호출부).
+    """
+    m = re.search(r'(?:const|let|var)\s+' + re.escape(name) + r'\s*=\s*\{(.*?)\n\s*\};', src, re.S)
     if not m:
         return None
     return dict(re.findall(r"'([^']+)'\s*:\s*'([^']*)'", m.group(1)))
@@ -142,6 +147,20 @@ def main():
             bad, miss = compare('brands/view.html CAT_KO', c, cats, '상위')
             problems += bad
             print('검사함  brands/view.html CAT_KO — %d개 (정본과 어긋남 %d)' % (len(c), len(bad)))
+
+    # ★ A-694(2026-11-25): 어드민이 카테고리를 영문 날값으로 보여 줬다.
+    #   말광을 `admin/js/admin-core.js` 의 `ADM_CAT_KO` 로 옮기면서 **사본이
+    #   넷째가 됐다.** 늘리는 것은 좋지 않지만, 늘리면서 **명부에 올리지 않는
+    #   것**이 A-348·A-367·A-393 에서 되풀이된 실패다. 그래서 여기 등록한다.
+    src = read('admin/js/admin-core.js')
+    if src:
+        c = parse_cat_ko(src, 'admin/js/admin-core.js', name='ADM_CAT_KO')
+        if c is None:
+            problems.append('admin/js/admin-core.js: ADM_CAT_KO 를 읽지 못했다 — 모양이 바뀌었나')
+        else:
+            bad, miss = compare('admin-core.js ADM_CAT_KO', c, cats, '상위')
+            problems += bad
+            print('검사함  admin/js/admin-core.js ADM_CAT_KO — %d개 (정본과 어긋남 %d)' % (len(c), len(bad)))
 
     src = read('products/view.html')
     if src:

@@ -56,6 +56,53 @@ function admStatusBadge(status) {
          + escapeHtml(t(en, ko)) + '</span>';
 }
 
+/* ── A-694(2026-11-25): 카테고리 이름 ────────────────────────────────────
+   어드민이 카테고리를 **영문 날값 그대로** 보여 줬다 — `Furniture`,
+   `Bathroom · Finishes`. `admin/dashboard.html:939` 의 `catText()` 가
+   값을 이어 붙이기만 하고 말광을 지나지 않았다.
+
+   공개 화면은 이미 제대로 한다(`brands/view.html:719` 가 `CAT_KO` 를 지나
+   `data-en`/`data-ko` 짝으로 찍는다). **운영자만 영문을 보고 있었다** —
+   A-692 가 적은 「로그인 사각지대」가 여기서도 반복됐다. 손님 화면은
+   누구나 보지만 어드민 화면은 승리님만 보니 아무도 지적하지 않는다.
+
+   ※ 사본이 또 하나 늘었다(이로써 넷). 한 파일로 합치는 것이 맞지만 그건
+     화면 넷을 같이 손대는 일이라 승리님 판단이다(A-407). **합치기 전까지
+     어긋남은 검사가 잡는다** — `tools/check-category-labels.py` 명부에
+     이 지도를 등록해 정본(`<h1 data-en data-ko>`)과 대조하게 해 뒀다.
+     사본을 늘리면서 명부에 올리지 않는 것이 A-348·A-367·A-393 에서
+     되풀이된 실패다. 늘릴 수밖에 없다면 **반드시 같이 등록한다.** */
+var ADM_CAT_KO = {
+    'Furniture': '가구', 'Bathroom': '욕실', 'Outdoor': '아웃도어',
+    'Lighting': '조명', 'Kitchen': '주방', 'Office': '오피스',
+    'Finishes': '마감재', 'Wellness': '웰니스', 'Decor': '데코',
+    'Construction': '건축자재'
+};
+
+/* 값이 배열일 때와 쉼표로 이어진 글자일 때가 다르다(A-415) — 둘 다 받는다. */
+function admCatList(v) {
+    return (Array.isArray(v) ? v : String(v === null || v === undefined ? '' : v).split(','))
+        .map(function (x) { return String(x === null || x === undefined ? '' : x).trim(); })
+        .filter(Boolean);
+}
+
+/* 두 언어 짝을 단 조각을 돌려준다 — 언어를 바꿔도 다시 그리지 않아도 된다. */
+function admCatBadge(v) {
+    var list = admCatList(v);
+    if (!list.length) return '<span>-</span>';
+    var en = list.join(' \u00b7 ');
+    var ko = list.map(function (c) { return ADM_CAT_KO[c] || c; }).join(' \u00b7 ');
+    return '<span ' + tAttr(en, ko) + '>' + escapeHtml(t(en, ko)) + '</span>';
+}
+
+/* 글자만 필요한 자리(제목 속성, CSV 등) */
+function admCatText(v) {
+    var list = admCatList(v);
+    if (!list.length) return '';
+    return t(list.join(' \u00b7 '),
+             list.map(function (c) { return ADM_CAT_KO[c] || c; }).join(' \u00b7 '));
+}
+
 /* 작업 단추 — 영문 글자가 24곳에 박혀 있었다. 말은 여기 한 곳에 둔다. */
 var ADM_ACT = {
     view:    { en: 'View',    ko: '보기' },
@@ -330,7 +377,7 @@ var ADM_SEARCH_SOURCES = [
       hay:   function (d) { return [d.brandName, d.country, admCatText(d.category), d.contactName, d.email, d.slug, d.status].join(' '); } },
     { key: 'products',     en: 'Product', ko: '제품',   cls: 'adm-kind-product', menu: 'products', view: '',
       label: function (d) { return d.name || d.id; },
-      sub:   function (d) { return [d.brandName, d.category].filter(Boolean).join(' · '); },
+      sub:   function (d) { return [d.brandName, admCatText(d.category)].filter(Boolean).join(' · '); },
       hay:   function (d) { return [d.name, d.brandName, d.category, d.subcategory, d.collection, d.materials, d.status].join(' '); } },
     { key: 'articles',     en: 'Article', ko: '아티클', cls: 'adm-kind-article', menu: 'articles', view: 'viewArticle',
       label: function (d) { return d.title || d.id; },
