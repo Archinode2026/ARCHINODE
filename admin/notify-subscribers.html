@@ -111,7 +111,7 @@ td a:hover { text-decoration: underline; }
 
 <div class="loading" id="loadingScreen">
   <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#7a5c32;"></i>
-  <p style="margin-top:12px;" data-en="Authenticating..." data-ko="인증 중...">Authenticating...</p>
+  <p style="margin-top:12px;" data-en="Authenticating..." data-ko="인증 중..." data-en="Authenticating..." data-ko="로그인 확인 중...">Authenticating...</p>
 </div>
 
 <div class="admin" id="adminContent" style="display:none;">
@@ -133,13 +133,13 @@ td a:hover { text-decoration: underline; }
   </div>
 
   <div class="stats-row">
-    <div class="stat-card total"><div class="number" id="statTotal">0</div><div class="label">Total Subscribers</div></div>
-    <div class="stat-card week"><div class="number" id="statWeek">0</div><div class="label">Last 7 Days</div></div>
-    <div class="stat-card today"><div class="number" id="statToday">0</div><div class="label">Today</div></div>
+    <div class="stat-card total"><div class="number" id="statTotal">0</div><div class="label" data-en="Total Subscribers" data-ko="총 구독자">Total Subscribers</div></div>
+    <div class="stat-card week"><div class="number" id="statWeek">0</div><div class="label" data-en="Last 7 Days" data-ko="최근 7일">Last 7 Days</div></div>
+    <div class="stat-card today"><div class="number" id="statToday">0</div><div class="label" data-en="Today" data-ko="오늘">Today</div></div>
   </div>
 
   <div id="contentArea">
-    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;">Loading subscribers...</p></div>
+    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;" data-en="Loading subscribers..." data-ko="구독자를 불러오는 중...">Loading subscribers...</p></div>
   </div>
 
 </div><!-- /.adm-main -->
@@ -181,7 +181,7 @@ document.getElementById('csvBtn').addEventListener('click', downloadCSV);
 
 function loadSubscribers() {
   const container = document.getElementById('contentArea');
-  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;">Loading subscribers...</p></div>';
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;" data-en="Loading subscribers..." data-ko="구독자를 불러오는 중...">Loading subscribers...</p></div>';
 
   db.collection('digital-products-notify').orderBy('createdAt', 'desc').get()
     .then(function(snap) {

@@ -158,7 +158,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 
 <div class="loading" id="loadingScreen">
   <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#7a5c32;"></i>
-  <p style="margin-top:12px;" data-en="Authenticating..." data-ko="인증 중...">Authenticating...</p>
+  <p style="margin-top:12px;" data-en="Authenticating..." data-ko="인증 중..." data-en="Authenticating..." data-ko="로그인 확인 중...">Authenticating...</p>
 </div>
 
 <div class="admin" id="adminContent" style="display:none;">
@@ -177,23 +177,23 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
   </div>
 
   <div class="stats-row">
-    <div class="stat-card pending"><div class="number" id="statPending">0</div><div class="label">Pending</div></div>
-    <div class="stat-card triaged"><div class="number" id="statTriaged">0</div><div class="label">Triaged</div></div>
-    <div class="stat-card scheduled"><div class="number" id="statScheduled">0</div><div class="label">Scheduled</div></div>
-    <div class="stat-card completed"><div class="number" id="statCompleted">0</div><div class="label">Completed</div></div>
-    <div class="stat-card rejected"><div class="number" id="statRejected">0</div><div class="label">Rejected</div></div>
+    <div class="stat-card pending"><div class="number" id="statPending">0</div><div class="label" data-en="Pending" data-ko="대기 중">Pending</div></div>
+    <div class="stat-card triaged"><div class="number" id="statTriaged">0</div><div class="label" data-en="Triaged" data-ko="사전 진단">Triaged</div></div>
+    <div class="stat-card scheduled"><div class="number" id="statScheduled">0</div><div class="label" data-en="Scheduled" data-ko="일정 확정">Scheduled</div></div>
+    <div class="stat-card completed"><div class="number" id="statCompleted">0</div><div class="label" data-en="Completed" data-ko="완료됨">Completed</div></div>
+    <div class="stat-card rejected"><div class="number" id="statRejected">0</div><div class="label" data-en="Rejected" data-ko="거절됨">Rejected</div></div>
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-status="pending">Pending <span class="count" id="cntPending">0</span></button>
-    <button class="tab" data-status="triaged">Triaged <span class="count" id="cntTriaged">0</span></button>
-    <button class="tab" data-status="scheduled">Scheduled <span class="count" id="cntScheduled">0</span></button>
-    <button class="tab" data-status="completed">Completed <span class="count" id="cntCompleted">0</span></button>
-    <button class="tab" data-status="rejected">Rejected <span class="count" id="cntRejected">0</span></button>
+    <button class="tab active" data-status="pending"><span data-en="Pending" data-ko="대기 중">Pending</span> <span class="count" id="cntPending">0</span></button>
+    <button class="tab" data-status="triaged"><span data-en="Triaged" data-ko="사전 진단">Triaged</span> <span class="count" id="cntTriaged">0</span></button>
+    <button class="tab" data-status="scheduled"><span data-en="Scheduled" data-ko="일정 확정">Scheduled</span> <span class="count" id="cntScheduled">0</span></button>
+    <button class="tab" data-status="completed"><span data-en="Completed" data-ko="완료됨">Completed</span> <span class="count" id="cntCompleted">0</span></button>
+    <button class="tab" data-status="rejected"><span data-en="Rejected" data-ko="거절됨">Rejected</span> <span class="count" id="cntRejected">0</span></button>
   </div>
 
   <div id="cardsContainer">
-    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;">Loading consultations...</p></div>
+    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;" data-en="Loading consultations..." data-ko="자문 요청을 불러오는 중...">Loading consultations...</p></div>
   </div>
 
 </div><!-- /.adm-main -->
@@ -334,7 +334,7 @@ document.querySelectorAll('.tab').forEach(function(t) {
 
 function loadConsultations() {
   const container = document.getElementById('cardsContainer');
-  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;">Loading consultations...</p></div>';
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;" data-en="Loading consultations..." data-ko="자문 요청을 불러오는 중...">Loading consultations...</p></div>';
 
   db.collection('consultations').orderBy('createdAt', 'desc').get()
     .then(function(snap) {

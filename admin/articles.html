@@ -161,7 +161,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 
 <div class="loading" id="loadingScreen">
   <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#7a5c32;"></i>
-  <p style="margin-top:12px;" data-en="Authenticating..." data-ko="인증 중...">Authenticating...</p>
+  <p style="margin-top:12px;" data-en="Authenticating..." data-ko="인증 중..." data-en="Authenticating..." data-ko="로그인 확인 중...">Authenticating...</p>
 </div>
 
 <div class="admin" id="adminContent" style="display:none;">
@@ -183,23 +183,23 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
   </div>
 
   <div class="stats-row">
-    <div class="stat-card pending"><div class="number" id="statPending">0</div><div class="label">Pending</div></div>
-    <div class="stat-card reviewing"><div class="number" id="statReviewing">0</div><div class="label">Reviewing</div></div>
-    <div class="stat-card revision"><div class="number" id="statRevision">0</div><div class="label">Revision Req</div></div>
-    <div class="stat-card approved"><div class="number" id="statApproved">0</div><div class="label">Approved</div></div>
-    <div class="stat-card rejected"><div class="number" id="statRejected">0</div><div class="label">Rejected</div></div>
+    <div class="stat-card pending"><div class="number" id="statPending">0</div><div class="label" data-en="Pending" data-ko="대기 중">Pending</div></div>
+    <div class="stat-card reviewing"><div class="number" id="statReviewing">0</div><div class="label" data-en="Reviewing" data-ko="검토 중">Reviewing</div></div>
+    <div class="stat-card revision"><div class="number" id="statRevision">0</div><div class="label" data-en="Revision Req" data-ko="수정 요청">Revision Req</div></div>
+    <div class="stat-card approved"><div class="number" id="statApproved">0</div><div class="label" data-en="Approved" data-ko="승인됨">Approved</div></div>
+    <div class="stat-card rejected"><div class="number" id="statRejected">0</div><div class="label" data-en="Rejected" data-ko="거절됨">Rejected</div></div>
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-status="pending">Pending <span class="count" id="cntPending">0</span></button>
-    <button class="tab" data-status="reviewing">Reviewing <span class="count" id="cntReviewing">0</span></button>
-    <button class="tab" data-status="revision-requested">Revision Req <span class="count" id="cntRevision">0</span></button>
-    <button class="tab" data-status="approved">Approved <span class="count" id="cntApproved">0</span></button>
-    <button class="tab" data-status="rejected">Rejected <span class="count" id="cntRejected">0</span></button>
+    <button class="tab active" data-status="pending"><span data-en="Pending" data-ko="대기 중">Pending</span> <span class="count" id="cntPending">0</span></button>
+    <button class="tab" data-status="reviewing"><span data-en="Reviewing" data-ko="검토 중">Reviewing</span> <span class="count" id="cntReviewing">0</span></button>
+    <button class="tab" data-status="revision-requested"><span data-en="Revision Req" data-ko="수정 요청">Revision Req</span> <span class="count" id="cntRevision">0</span></button>
+    <button class="tab" data-status="approved"><span data-en="Approved" data-ko="승인됨">Approved</span> <span class="count" id="cntApproved">0</span></button>
+    <button class="tab" data-status="rejected"><span data-en="Rejected" data-ko="거절됨">Rejected</span> <span class="count" id="cntRejected">0</span></button>
   </div>
 
   <div id="cardsContainer">
-    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;">Loading submissions...</p></div>
+    <div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;" data-en="Loading submissions..." data-ko="투고를 불러오는 중...">Loading submissions...</p></div>
   </div>
 
 </div><!-- /.adm-main -->
@@ -234,7 +234,7 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
       <div class="modal-section">
         <h3 data-en="Body" data-ko="본문">Body</h3>
         <div class="body-tabs">
-          <button class="body-tab active" data-body="orig">Original (<span id="bOrigLang">—</span>)</button>
+          <button class="body-tab active" data-body="orig"><span data-en="Original" data-ko="원문">Original</span> (<span id="bOrigLang">—</span>)</button>
           <button class="body-tab" data-body="en">English</button>
           <button class="body-tab" data-body="ko">한국어 (편집부)</button>
         </div>
@@ -359,7 +359,7 @@ document.querySelectorAll('.body-tab').forEach(function(t) {
 // ─────────────── 데이터 로딩 ───────────────
 function loadSubmissions() {
   const container = document.getElementById('cardsContainer');
-  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;">Loading submissions...</p></div>';
+  container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:#7a5c32;"></i><p style="margin-top:12px;" data-en="Loading submissions..." data-ko="투고를 불러오는 중...">Loading submissions...</p></div>';
 
   db.collection('articles').orderBy('createdAt', 'desc').get()
     .then(function(snap) {

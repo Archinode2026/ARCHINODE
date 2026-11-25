@@ -40,11 +40,25 @@ function tSpan(en, ko) { return '<span ' + tAttr(en, ko) + '>' + escapeHtml(t(en
    ★ 모르는 값이 오면 **날글자를 그대로 보여 준다.** 빈칸이나 「-」로 숨기면
      나중에 상태를 하나 더 만들었을 때 화면에서 조용히 사라진다 —
      모르는 것은 숨기지 말고 드러내야 누군가 고친다. */
+/* ★★ A-716(2026-11-25): 여기 **넷뿐**이었는데 화면에 실제로 쓰이는 상태는
+   **여덟**이다(`data-status` 속성을 전수로 세서 확인). 빠진 다섯은
+   `reviewing`·`revision-requested`(기사·투고 심사)과
+   `triaged`·`scheduled`·`completed`(자문 요청)이다.
+   `admStatusBadge()` 는 모르는 값을 **날글자 그대로** 보여 주므로, 기사 심사
+   화면에서 상태가 `Reviewing`·`revision-requested` 로 떴다.
+   A-703 이 이 화면들을 말광으로 지나게 했는데, **말광 자체가 반쪽**이었던 것이다 —
+   고쳐 놓은 길이 맞아도 그 길의 지도가 모자라면 같은 곳에 도착한다.
+   아래 `check-value-vocab.py` 명부에 등록해 화면이 쓰는 값과 어긋나면 울게 해 뒀다. */
 var ADM_STATUS = {
-    pending:   { en: 'Pending',   ko: '대기 중' },
-    approved:  { en: 'Approved',  ko: '승인됨' },
-    suspended: { en: 'Suspended', ko: '정지됨' },
-    rejected:  { en: 'Rejected',  ko: '거절됨' }
+    pending:                { en: 'Pending',       ko: '대기 중' },
+    reviewing:              { en: 'Reviewing',     ko: '검토 중' },
+    'revision-requested':   { en: 'Revision Req',  ko: '수정 요청' },
+    approved:               { en: 'Approved',      ko: '승인됨' },
+    suspended:              { en: 'Suspended',     ko: '정지됨' },
+    rejected:               { en: 'Rejected',      ko: '거절됨' },
+    triaged:                { en: 'Triaged',       ko: '사전 진단' },
+    scheduled:              { en: 'Scheduled',     ko: '일정 확정' },
+    completed:              { en: 'Completed',     ko: '완료됨' }
 };
 
 function admStatusBadge(status) {

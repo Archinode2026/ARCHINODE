@@ -143,6 +143,23 @@ VOCAB = [
          readers={'LEAD_TYPES': lambda: arr_keys('admin/js/view-leads.js', 'LEAD_TYPES'),
                   'INBOX_TYPES(포털)': lambda: obj_keys('brand-portal/dashboard.html', 'INBOX_TYPES')},
          fallback=set()),
+    # ★ A-716: `ADM_STATUS` 에 **넷뿐**이었는데 화면이 쓰는 상태는 **여덟**이었다.
+    #   `admStatusBadge()` 는 모르는 값을 날글자로 보여 주므로 기사 심사 화면에
+    #   `Reviewing`·`revision-requested` 가 그대로 떴다. A-703 이 그 화면들을
+    #   말광으로 지나게 했는데 **말광 자체가 반쪽**이었다 — 길을 고쳐도
+    #   그 길의 지도가 모자라면 같은 곳에 도착한다.
+    #   담는 쪽을 **화면의 `data-status` 속성**으로 둔다: 거르개 탭이 거는 값이
+    #   곧 저장소에 있는 값이고, 그게 늘면 말광도 늘어야 한다.
+    dict(name='상태(status)',
+         writers={
+             '어드민 거르개 탭': lambda: set(re.findall(
+                 r'data-status="([a-z-]+)"', ''.join(
+                     read(f) or '' for f in (
+                         'admin/articles.html', 'admin/trend-submissions.html',
+                         'admin/consultations.html', 'admin/bim-requests.html')))),
+         },
+         readers={'ADM_STATUS': lambda: obj_keys('admin/js/admin-core.js', 'ADM_STATUS')},
+         fallback={'suspended'}),
     dict(name='업종(industry)',
          writers={
              '가입 #signupIndustry':     lambda: opt_values('auth/signup.html', 'signupIndustry'),

@@ -22,6 +22,7 @@ A-681 과 같은 병이다 — 그때는 주 유입 경로가 어드민 목록�
 import io
 import os
 import re
+from html.parser import HTMLParser
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -47,8 +48,60 @@ ACT_WORDS = ['View', 'Approve', 'Reject', 'Suspend', 'Restore', 'Review',
 # 영원히 안 걸렸다(브론즈 2026-11-25). 「고친 것을 지키는 검사」와 「같은
 # 종류를 전부 찾는 검사」는 **다른 물건**이다. 그래서 거꾸로도 본다:
 # 화면에 글자를 내는 요소인데 **영문뿐이고 `data-ko` 가 없는** 것을 전부 센다.
-UI_TEXT = re.compile(
-    r'<(button|a|th|label|option|legend|summary|h1|h2|h3)\b([^>]*)>([^<>]+)</\1>', re.I)
+# ★★ A-716(2026-11-25, 브론즈 57차 ⑤): 전에는 아래 정규식이 그물이었다 —
+#   `<(button|a|th|…)…>([^<>]+)</\1>`. **자식 태그가 하나라도 있으면 통째로
+#   못 봤다.** 그런데 A-698 이 쓴 고치는 방법이 바로 「글자를 `<span>` 으로
+#   감싸기」였다. 즉 **고친 자리는 보이고 안 고친 자리는 안 보이는** 그물이었다.
+#   게다가 `<div>`·`<p>` 는 태그 명부에 아예 없었다.
+#   그물 밖에 **71곳**이 있었다 — 한국어 어드민인데 기사 심사 화면의 상태
+#   거르개 탭이 `Pending`·`Reviewing`·`Revision Req` 영문이었고, 통계 카드
+#   이름표·머리글 링크·「불러오는 중」 문구도 전부 영문이었다. 포털에서는
+#   브랜드가 KR 로 토글해도 제목 넷이 영문으로 남았다.
+#   **정규식으로 중첩된 마크업을 읽으려 한 것이 틀렸다.** 파서로 바꿨다 —
+#   요소마다 **자기 직속 글자**만 모으므로 자식 태그가 있어도 보인다.
+TAGS = {'button', 'a', 'th', 'td', 'label', 'option', 'legend', 'summary',
+        'h1', 'h2', 'h3', 'h4', 'div', 'p', 'li', 'strong', 'em', 'span'}
+VOID = {'br', 'img', 'input', 'hr', 'meta', 'link', 'source', 'col'}
+
+
+class _UiText(HTMLParser):
+    """요소마다 **직속 텍스트 노드**만 모은다(자식 태그의 글자는 그 자식 것)."""
+
+    def __init__(self):
+        HTMLParser.__init__(self, convert_charrefs=False)
+        self.stack = []
+        self.out = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in VOID:
+            return
+        self.stack.append([tag, dict(attrs), [], self.getpos()[0]])
+
+    def handle_startendtag(self, tag, attrs):
+        return
+
+    def handle_endtag(self, tag):
+        for i in range(len(self.stack) - 1, -1, -1):
+            if self.stack[i][0] == tag:
+                el = self.stack.pop(i)
+                del self.stack[i:]
+                txt = ''.join(el[2]).strip()
+                if el[0] in TAGS and txt:
+                    self.out.append((el[3], el[1], txt))
+                return
+
+    def handle_data(self, data):
+        if self.stack:
+            self.stack[-1][2].append(data)
+
+
+def ui_texts(markup):
+    p = _UiText()
+    try:
+        p.feed(markup)
+    except Exception:
+        pass            # 깨진 마크업이면 본 것까지만 쓴다
+    return p.out
 SCRIPT_BLOCK = re.compile(r'<script\b.*?</script>', re.S | re.I)
 
 
@@ -182,8 +235,8 @@ def main():
         #   (상태 거르개처럼 **짧은** 목록은 그대로 본다 — 거기 영문이 남으면
         #    진짜 결함이다.)
         markup = BIG_SELECT.sub(markup)
-        for m in UI_TEXT.finditer(markup):
-            attrs, txt = m.group(2), m.group(3).strip()
+        for _line, _at, txt in ui_texts(markup):
+            attrs = ' '.join('%s="%s"' % (k, v or '') for k, v in _at.items())
             if not txt or len(txt) > 40:
                 continue
             if ENTITY_ONLY.match(txt):
@@ -196,8 +249,7 @@ def main():
                 continue
             if 'data-ko' in attrs:
                 continue
-            line = markup[:m.start()].count('\n') + 1
-            problems.append('%s:%d — 영문뿐인데 두 언어 짝이 없다 「%s」' % (rel, line, txt))
+            problems.append('%s:%d — 영문뿐인데 두 언어 짝이 없다 「%s」' % (rel, _line, txt))
 
         for pat in RAW_STATUS:
             for m in pat.finditer(s):
