@@ -73,7 +73,7 @@ has('㉓ 창에 role=dialog 를 준다', /setAttribute\('role', 'dialog'\)/);
    승리님: 「숫자 누르면 해당 카테고리로 바로 가게. 메뉴로 클릭하니 불편하다」
    div 에 onclick 만 달면 Tab 으로 닿지도, Enter 로 눌리지도, 보조기기가
    「단추」라고 읽지도 않는다. 진짜 <button> 인지를 센다. */
-const cards = (DASH.match(/<button type="button" class="stat-card" data-go="[a-z]+">/g) || []);
+const cards = (DASH.match(/<button type="button" class="stat-card" data-go="[a-z]+"[^>]*>/g) || []);
 if (cards.length !== 4) bad.push('㉔ 통계 카드 넷이 모두 button 이 아니다 (실제 ' + cards.length + ')');
 ['brands', 'products', 'articles'].forEach(function (t) {
     if (DASH.indexOf('data-go="' + t + '"') < 0) bad.push('㉕ data-go="' + t + '" 가 없다');
@@ -100,15 +100,35 @@ if (!/setAttribute\('data-ko', ko\)/.test(strip) || !/setAttribute\('data-en', e
 if (!/approved !== total/.test(strip)) bad.push('㉞ 총계와 공개 수가 어긋날 때 짚지 않는다');
 if (!/\.stat-card \.sub/.test(DASH)) bad.push('㉟ 공개 수 줄의 꼴이 없다');
 
+/* ── A-693: 브랜드 상태 거르개 ──────────────────────────────────────────
+   승리님: 「상태거르개 해줘」. 거절된 것까지 한 줄에 섞여 있어 「지금 공개
+   중인 것만」 보기가 어려웠다. */
+if (!/id="brandFilter"/.test(DASH)) bad.push('㊱ 거르개가 없다');
+['all','pending','approved','suspended','rejected'].forEach(function (v) {
+    if (DASH.indexOf('<option value="' + v + '"') < 0) bad.push('㊲ 거르개에 「' + v + '」 선택지가 없다');
+});
+if (!/getElementById\('brandFilter'\)\.addEventListener\('change', renderBrands\)/.test(strip))
+    bad.push('㊳ 거르개를 바꿔도 다시 안 그린다');
+if (!/function renderBrands\(\)/.test(strip)) bad.push('㊴ 그리기를 따로 떼지 않았다');
+/* 거르개를 쓸 때 **다시 읽으면** 거를 때마다 파이어스토어를 때린다 */
+if (!/brandRows = rows/.test(strip)) bad.push('㊵ 받아 온 것을 들고 있지 않다 — 거를 때마다 다시 읽게 된다');
+/* 0건일 때 빈 표만 보이면 「고장났나」가 된다 (A-506 의 교훈) */
+if (!/if \(!shown\)/.test(strip)) bad.push('㊶ 걸러서 0건일 때 아무 말이 없다');
+/* 「승인 대기 중」 카드는 그 상태로 걸러서 보낸다 */
+if (!/data-go="brands" data-filter="pending"/.test(DASH))
+    bad.push('㊷ 「승인 대기 중」 카드가 pending 으로 걸러 보내지 않는다');
+if (!/card\.dataset\.filter/.test(strip)) bad.push('㊸ 카드의 거름값을 쓰지 않는다');
+
 if (bad.length) {
     console.log('사유 창 닫기 규칙 — ' + bad.length + '건 어긋남');
     bad.forEach(b => console.log('  - ' + b));
     console.log('결과: 실패');
     process.exit(1);
 }
-console.log('어드민 대시보드 — 35가지 모두 뜻대로');
+console.log('어드민 대시보드 — 44가지 모두 뜻대로');
 console.log('  바깥·탭이동은 안 닫고 · 취소와 X 는 닫고 · Esc 는 적은 글이 없을 때만');
 console.log('  그리고 dashboard.html 이 그 규칙을 실제로 쓰고 있다');
 console.log('  통계 숫자 넷이 진짜 button 이고 각자 갈 탭이 있다 (A-690)');
 console.log('  「총 브랜드」가 공개 중인 수를 같이 말한다 (A-691)');
+console.log('  브랜드 상태 거르개가 있고 「승인 대기 중」이 그리로 걸러 보낸다 (A-693)');
 console.log('결과: 통과');

@@ -261,7 +261,7 @@ tr:hover { background: var(--gray-50); }
             <div class="label" data-en="Total Brands" data-ko="총 브랜드">Total Brands</div>
             <div class="sub" id="statApprovedBrands"></div>
         </button>
-        <button type="button" class="stat-card" data-go="brands">
+        <button type="button" class="stat-card" data-go="brands" data-filter="pending">
             <i class="fas fa-clock icon" aria-hidden="true"></i>
             <div class="number" id="statPendingBrands">0</div>
             <div class="label" data-en="Pending Approval" data-ko="승인 대기 중">Pending Approval</div>
@@ -312,6 +312,22 @@ tr:hover { background: var(--gray-50); }
     <!-- TAB: BRANDS -->
     <div class="tab-content active" id="tab-brands">
         <div class="section-card">
+            <!-- A-693: 상태 거르개. 검수관리 탭과 **같은 어휘**(.rv-toolbar)를 쓴다 —
+                 한 화면 안에서 같은 일을 두 가지 꼴로 보이면 쓰는 사람이 매번 다시 배운다.
+                 기본값은 「전체」다. 기본으로 무언가를 숨기면 **없는 줄 알고 넘어간다** —
+                 A-506 에서 목록이 24개에서 말없이 끊기던 것과 같은 위험이다. -->
+            <div class="rv-toolbar">
+                <label for="brandFilter" data-en="Status" data-ko="상태" style="font-size:0.82rem;color:var(--ink-soft);">Status</label>
+                <select id="brandFilter">
+                    <option value="all" data-en="All" data-ko="전체">All</option>
+                    <option value="pending" data-en="Pending" data-ko="대기 중">Pending</option>
+                    <option value="approved" data-en="Approved" data-ko="승인됨">Approved</option>
+                    <option value="suspended" data-en="Suspended" data-ko="정지됨">Suspended</option>
+                    <option value="rejected" data-en="Rejected" data-ko="거절됨">Rejected</option>
+                </select>
+                <span class="rv-spacer"></span>
+                <span id="brandFilterNote" style="font-size:0.8rem;color:var(--ink-soft);"></span>
+            </div>
             <div class="adm-table-wrap">
     <table>
                     <thead>
@@ -528,15 +544,28 @@ async function loadBrands() {
        병합해 넘긴다(admin-core.js 의 admMergeBrandContacts). */
     const rows = await admMergeBrandContacts(snap.docs.map(d => Object.assign({ id: d.id }, d.data())));
     admRegisterCache('brands', rows);   // 6단계 통합 검색 캐시 (admin-core.js) — 병합된 것을 담는다
+    brandRows = rows;                   // A-693: 거르개가 다시 그릴 수 있게 들고 있는다
+    renderBrands();
+}
+
+/* A-693: 받아 온 것을 **거르개에 맞춰 그린다.** 다시 읽지 않는다 —
+   브랜드 수가 적고, 다시 읽으면 거를 때마다 파이어스토어를 때린다. */
+let brandRows = [];
+function renderBrands() {
+    const rows = brandRows;
+    const sel = document.getElementById('brandFilter');
+    const want = sel ? sel.value : 'all';
     const tbody = document.getElementById('brandsTable');
     tbody.innerHTML = '';
-    let total = 0, pending = 0, approved = 0;
+    let total = 0, pending = 0, approved = 0, shown = 0;
 
     rows.forEach(b => {
-        const doc = { id: b.id };
         total++;
         if (b.status === 'pending') pending++;
         if (b.status === 'approved') approved++;
+        if (want !== 'all' && b.status !== want) return;
+        shown++;
+        const doc = { id: b.id };
         tbody.innerHTML += `
             <tr>
                 <td><strong>${escapeHtml(b.brandName)}</strong></td>
@@ -548,6 +577,27 @@ async function loadBrands() {
                 <td>${brandActionButtons(b, doc.id)}</td>
             </tr>`;
     });
+
+    /* A-693: 걸러서 **한 줄도 안 남았을 때 빈 표만 보이면** 「고장났나」가 된다.
+       무엇으로 걸렀는지와 전체가 몇인지를 같이 말한다 — A-506 의 교훈이다. */
+    if (!shown) {
+        const label = sel ? sel.options[sel.selectedIndex] : null;
+        const name = label ? (label.getAttribute(document.documentElement.lang === 'ko' ? 'data-ko' : 'data-en') || label.textContent) : '';
+        tbody.innerHTML = `<tr><td colspan="7" style="padding:28px;text-align:center;color:#6b6459;font-size:0.85rem;">`
+            + escapeHtml(t('No brands with this status.', '이 상태인 브랜드가 없습니다.'))
+            + ` <strong>${escapeHtml(name)}</strong> · `
+            + escapeHtml(t('Total ' + total, '전체 ' + total + '개'))
+            + `</td></tr>`;
+    }
+    (function () {
+        const note = document.getElementById('brandFilterNote');
+        if (!note) return;
+        const ko = (want === 'all') ? (total + '개') : (shown + ' / ' + total + '개');
+        const en = (want === 'all') ? (total + ' total') : (shown + ' of ' + total);
+        note.setAttribute('data-ko', ko);
+        note.setAttribute('data-en', en);
+        note.textContent = (document.documentElement.lang === 'ko') ? ko : en;
+    })();
 
     document.getElementById('statTotalBrands').textContent = total;
     /* A-691: 「총 브랜드」는 **상태와 무관하게 전부** 센다(위 질의에 거르개가 없다).
@@ -1779,6 +1829,8 @@ async function importReviewSeed() {
 }
 
 document.getElementById('reviewFilter').addEventListener('change', renderReview);
+/* A-693 */
+document.getElementById('brandFilter').addEventListener('change', renderBrands);
 document.getElementById('reviewAddBtn').addEventListener('click', openReviewForm);
 document.getElementById('reviewImportBtn').addEventListener('click', importReviewSeed);
 
@@ -1827,6 +1879,14 @@ document.querySelector('.stats-row').addEventListener('click', (e) => {
     const tab = document.querySelector('.tabs .tab[data-tab="' + card.dataset.go + '"]');
     if (!tab) return;
     tab.click();
+    /* A-693: 「승인 대기 중」을 누르면 **그 상태로 걸러서** 보낸다. 숫자를 보고
+       눌렀는데 전체 목록이 나오면 다시 손으로 찾아야 한다 — 그 한 걸음을 없애려고
+       숫자를 누를 수 있게 만든 것이다(A-690). 거르개가 없는 탭에서는 그냥 넘어간다. */
+    const f = card.dataset.filter;
+    if (f) {
+        const sel = document.getElementById('brandFilter');
+        if (sel && sel.value !== f) { sel.value = f; renderBrands(); }
+    }
     tab.scrollIntoView({ block: 'nearest' });
 });
 
