@@ -93,6 +93,7 @@
        올려야 한다(콘솔에 남긴다). 너무 크게 잡으면 첫 화면이 느려진다. */
     const CP_NOINDEX_CAP = 200;
     let cpAll = null;        // 색인 없는 길에서 받아 둔 전체(정렬된 것)
+    let cpApproved = null;   // A-688: 승인된 브랜드 id 묶음 { id: true }
     let lastDoc = null;      // 다음 쪽의 시작점
     let shown = 0;           // 지금까지 그린 개수
     let gridEl = null;       // 카드가 들어가는 자리(이어 붙인다)
@@ -153,9 +154,14 @@
                 const snap = await baseQuery().startAfter(lastDoc).limit(PAGE + 1).get();
                 docs = snap.docs || [];
                 hasMore = docs.length > PAGE;
-                page = docs.slice(0, PAGE);
+                /* A-688: 시작점은 **거르기 전** 마지막 문서다. 그리고 그리는 것은
+                   거른 것이다 — 이 쪽에서 한 장도 안 남을 수 있는데(전부 내려간
+                   브랜드), 그래도 「더 보기」는 살아 있어 다음 쪽으로 갈 수 있다. */
+                var cpRawPage = docs.slice(0, PAGE);
+                if (cpRawPage.length) lastDoc = cpRawPage[cpRawPage.length - 1];
+                page = window.archiBrandGate.keepLiveDocs(cpRawPage, cpApproved);
             }
-            if (page.length) lastDoc = page[page.length - 1];
+            if (cpAll && page.length) lastDoc = page[page.length - 1];
             let add = '';
             page.forEach(d => { add += cardHtml(d.data()); });
             if (gridEl) gridEl.insertAdjacentHTML('beforeend', add);
@@ -187,6 +193,14 @@
         }
 
         try {
+            /* A-688: 제품 상태만 보면 **내려간 브랜드의 물건이 그대로 걸린다.**
+               먼저 승인된 브랜드 명단을 받아 둔다. 여기서 터지면 아래 catch 로
+               가서 **오류 화면**이 뜬다 — 빈 화면이 뜨면 제품이 있는데도
+               「아직 없습니다」라고 거짓말을 하게 되고, 그냥 통과시키면 내려간
+               브랜드를 계속 전시하게 된다. 둘 다 약속을 깨는 쪽이다. */
+            cpApproved = await cpWithTimeout(
+                window.archiBrandGate.approvedBrandIds(db), 12000);
+
             let query = db.collection('products')
                 .where('status', '==', 'approved')
                 .where('category', '==', category);
@@ -220,7 +234,13 @@
                 }
             }
 
-            if (snap.empty) {
+            /* A-688: 빈지 아닌지는 **거른 뒤**에 판단해야 한다. 안 그러면
+               내려간 브랜드의 제품만 있는 분류에서 카드가 0장인 채로 빈
+               문구도 없는 화면이 나온다. */
+            var cpRaw0 = snap.docs || [];
+            var cpLive0 = window.archiBrandGate.keepLiveDocs(cpRaw0, cpApproved);
+            var cpMoreRaw0 = cpRaw0.length > PAGE;
+            if (!cpLive0.length && !cpMoreRaw0) {
                 /* ── A-510(브론즈 34차 N34-4): 이 자리는 **손님에게 브랜드 이야기를
                    하고 있었다.** 69개 소분류 중 67개가 이 화면인데, 자재를 찾아 들어온
                    건축가·디자이너에게 「브랜드 포털을 통해 제품을 등록할 수 있습니다」와
@@ -241,7 +261,8 @@
                 return;
             }
 
-            const docs = snap.docs || [];
+            /* 아래 길은 전부 **거른 것** 위에서 돈다 (A-688) */
+            const docs = cpLive0;
             /* A-617: 색인 없이 받아 왔으면 새것부터 보이도록 여기서 정렬한다.
                createdAt 은 Timestamp 이거나(toMillis) 문자열이거나 없을 수 있다. */
             if (cpNoIndex) {
@@ -265,10 +286,17 @@
                 hasMore = cpAll.length > PAGE;
                 page = cpAll.slice(0, PAGE);
             } else {
-                hasMore = docs.length > PAGE;
+                /* A-688: 「더 있나」와 「다음 시작점」은 **거르기 전** 것으로 잡는다.
+                   거른 것으로 잡으면, 한 쪽이 통째로 내려간 브랜드의 제품일 때
+                   page 가 비어 lastDoc 이 null 이 되고 **다음 더 보기가 맨 앞으로
+                   되돌아간다.** startAfter 는 그 질의에 속한 문서면 되므로
+                   거르기 전 문서를 그대로 써도 된다. */
+                hasMore = cpMoreRaw0;
                 page = docs.slice(0, PAGE);
+                var cpRawPage0 = cpRaw0.slice(0, PAGE);
+                lastDoc = cpRawPage0.length ? cpRawPage0[cpRawPage0.length - 1] : null;
             }
-            lastDoc = page.length ? page[page.length - 1] : null;
+            if (cpNoIndex) lastDoc = page.length ? page[page.length - 1] : null;
             shown = page.length;
 
             let html = '<div class="cp-grid">';

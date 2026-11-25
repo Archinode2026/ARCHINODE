@@ -478,6 +478,7 @@
 </footer>
 
 <script src="../firebase-config.js"></script>
+<script src="../brand-gate.js?v=20261125a"></script>
 <script src="../loading-watchdog.js?v=20261111a"></script>
 <script src="../lead-notify.js?v=20261105d"></script>
 <script src="../search.js?v=20261106a"></script>
@@ -538,6 +539,29 @@ async function loadProduct() {
         if (!docSnap) { showError('Product not found', '제품을 찾을 수 없습니다', 'That product does not exist, or it is still under review.', '요청하신 제품이 존재하지 않거나 아직 검토 중입니다.'); return; }
         if ((docSnap.data() || {}).status !== 'approved') { showError('Product not found', '제품을 찾을 수 없습니다', 'That product does not exist, or it is still under review.', '요청하신 제품이 존재하지 않거나 아직 검토 중입니다.'); return; }
 
+        /* A-688: 제품이 승인돼 있어도 **그 브랜드가 내려갔으면** 걸지 않는다.
+           여기를 안 막으면 분류 쪽에서 안 보이게 해 놔도 **주소를 아는 사람은
+           그대로 열 수 있다** — 검색엔진에 남은 링크, 보내 둔 링크, 북마크.
+           A-688 을 찾던 날 라이브에서 `?id=r26` 과 `?id=e5-product` 가 바로
+           그렇게 열렸다.
+           ★ 명단을 못 받으면 **걸지 않는다.** 여기서 통과시키면 내려간 브랜드의
+             제품을 계속 전시하게 된다 — 모를 때는 안 거는 쪽이 맞다. */
+        try {
+            var pvApproved = await window.archiBrandGate.approvedBrandIds(db);
+            if (!window.archiBrandGate.keepLive([docSnap.data() || {}], pvApproved).length) {
+                showError('Product not found', '제품을 찾을 수 없습니다',
+                          'That product does not exist, or it is still under review.',
+                          '요청하신 제품이 존재하지 않거나 아직 검토 중입니다.');
+                return;
+            }
+        } catch (gateErr) {
+            console.error('brand gate failed:', gateErr);
+            showError('Unable to load', '불러올 수 없습니다',
+                      'We could not confirm this listing. Please try again.',
+                      '이 제품을 확인할 수 없습니다. 잠시 후 다시 시도해 주세요.');
+            return;
+        }
+
         const doc = docSnap;
         const product = doc.data();
         currentProductDocId = doc.id;
@@ -577,6 +601,10 @@ async function loadProduct() {
             relSnap.forEach(d => {
                 if (d.id !== doc.id) related.push(d.data());
             });
+            /* A-688: 관련 제품도 같은 문을 지나야 한다. 본 제품만 막고 여기를
+               두면, 내려간 브랜드의 물건이 **남의 제품 쪽 아래에 추천으로**
+               다시 걸린다 — 가장 눈에 안 띄는 자리라 오래 남는다. */
+            related = window.archiBrandGate.keepLive(related, pvApproved);
             related = related.slice(0, 4);
         }
 

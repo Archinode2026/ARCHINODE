@@ -52,12 +52,18 @@ function fakeEl(html) {
   };
 }
 
-function makeDb(total) {
+function makeDb(total, opts) {
   /* total 개가 있는 컬렉션 흉내. where/orderBy 는 자기를 돌려주고,
-     startAfter 가 시작점을, limit 이 개수를 정한다. */
+     startAfter 가 시작점을, limit 이 개수를 정한다.
+     A-688: 이제 `brands` 컬렉션도 흉내 내야 한다 — 로더가 제품을 긁기 전에
+     **승인된 브랜드 명단**을 먼저 받기 때문이다. opts 로 그 상태를 바꾼다:
+       { deadFrom: n }   n 번째부터는 내려간 브랜드의 제품
+       { brandsFail: true } 명단 받기가 실패하는 길 */
+  opts = opts || {};
   const all = [];
   for (let i = 0; i < total; i++) {
-    all.push({ id: 'p' + i, data: () => ({ name: 'Product ' + i, slug: 'p' + i, brandName: 'B', materials: 'oak', imageUrl: 'https://x/y.jpg' }) });
+    const bid = (opts.deadFrom !== undefined && i >= opts.deadFrom) ? 'brandGONE' : 'brandOK';
+    all.push({ id: 'p' + i, data: () => ({ name: 'Product ' + i, slug: 'p' + i, brandId: bid, brandName: 'B', materials: 'oak', imageUrl: 'https://x/y.jpg' }) });
   }
   function q(from) {
     return {
@@ -72,10 +78,19 @@ function makeDb(total) {
       }
     };
   }
-  return { collection: () => q(0), _all: all };
+  function brandsQ() {
+    return {
+      where() { return this; },
+      get() {
+        if (opts.brandsFail) return Promise.reject(new Error('brands unreachable'));
+        return Promise.resolve({ docs: [{ id: 'brandOK', data: () => ({ status: 'approved' }) }] });
+      }
+    };
+  }
+  return { collection: (name) => (name === 'brands' ? brandsQ() : q(0)), _all: all };
 }
 
-async function runCategory(total) {
+async function runCategory(total, opts) {
   const container = fakeEl('');
   container.dataset = { category: 'Furniture', subcategory: 'chairs-stools' };
   global.document = {
@@ -92,10 +107,28 @@ async function runCategory(total) {
     addEventListener() {}
   };
   global.window = { location: { pathname: '/categories/furniture/chairs-stools.html' }, applyLang: null };
-  global.db = makeDb(total);
+  global.db = makeDb(total, opts);
+  /* A-688: 로더는 이제 `window.archiBrandGate` 에 기대므로 진짜 문을 싣는다.
+     문을 안 싣고 돌리면 로더가 그 자리에서 터져 오류 화면이 뜬다 — 이 시험이
+     처음에 그렇게 넘어졌고, 그게 **쪽 79개에 문을 빠뜨리면 생기는 일**이다.
+     brand-gate.js 는 node 에서 module.exports 도 건드리므로 되돌려 둔다. */
+  const keepExports = module.exports;
+  eval(fs.readFileSync(path.join(ROOT, 'brand-gate.js'), 'utf8'));
+  module.exports = keepExports;
+  if (global.window.archiBrandGate) global.window.archiBrandGate._reset();
   const src = fs.readFileSync(path.join(ROOT, 'category-products.js'), 'utf8');
-  eval(src);
-  await new Promise((r) => setTimeout(r, 0));
+  /* 일부러 실패시키는 길에서는 로더가 console.error 로 스택을 찍는다.
+     그건 **설계대로 도는 모습**인데, 통과한 시험이 스택을 뱉으면 읽는 사람이
+     실패로 읽고 다음부터 출력을 안 본다. 그 한 번만 입을 막고 되돌린다. */
+  const quiet = !!(opts && (opts.brandsFail || opts.quiet));
+  const realErr = console.error;
+  if (quiet) console.error = function () {};
+  try {
+    eval(src);
+    await new Promise((r) => setTimeout(r, 0));
+  } finally {
+    if (quiet) console.error = realErr;
+  }
   return container;
 }
 
@@ -191,6 +224,34 @@ async function runCategory(total) {
   ok('안내줄 자리가 있다', /search-result-more/.test(sstrip));
   const CSS = fs.readFileSync(path.join(ROOT, 'style.css'), 'utf8');
   ok('안내줄 처방이 style.css 에 있다', /\.search-result-more\s*\{/.test(CSS));
+
+  // ── 8) 브랜드 문 — 내려간 브랜드의 제품이 새어 나가지 않는가 (A-688) ──────
+  /* 2026-11-25 라이브: 가구 카테고리의 **전체 재고**가 내려간 테스트 브랜드의
+     제품 둘이었다. `brands.html` 은 브랜드 상태로 거르는데 분류 쪽은 제품
+     상태만 봤기 때문이다. 아래는 그 자리를 **로더를 실제로 돌려** 본다 —
+     순수 함수 시험(tools/test-brand-gate.js)과 달리 여기서는 문·로더·화면이
+     이어져 있는지까지 본다. */
+  c = await runCategory(10, { deadFrom: 6 });
+  cards = (c.innerHTML.match(/class="cp-card"/g) || []).length;
+  ok('내려간 브랜드의 제품은 안 그린다 (10개 중 6개만)', cards === 6, '실제 ' + cards);
+  ok('살아 있는 마지막 것은 그린다', c.innerHTML.indexOf('Product 5') >= 0);
+  ok('내려간 첫 것은 안 그린다', c.innerHTML.indexOf('Product 6') < 0);
+
+  c = await runCategory(10, { deadFrom: 0 });
+  cards = (c.innerHTML.match(/class="cp-card"/g) || []).length;
+  ok('전부 내려간 브랜드면 카드가 0장', cards === 0, '실제 ' + cards);
+  ok('그리고 **빈 문구**가 뜬다 — 카드만 사라지고 아무 말 없으면 안 된다',
+     /cp-empty/.test(c.innerHTML));
+  ok('빈 문구가 소싱 문의로 보낸다', /sourcing-inquiry\.html/.test(c.innerHTML));
+
+  /* ★ 명단을 못 받았을 때 **빈 문구가 아니라 오류**여야 한다.
+     빈 문구로 떨어지면 제품이 있는데도 「아직 없습니다」라고 거짓말을 하고,
+     그냥 통과시키면 내려간 브랜드를 계속 전시한다. 둘 다 약속을 깬다. */
+  c = await runCategory(10, { brandsFail: true });
+  ok('명단을 못 받으면 오류 화면이다', /cp-error/.test(c.innerHTML), c.innerHTML.slice(0, 80));
+  ok('명단을 못 받았을 때 빈 문구로 **거짓말하지 않는다**', !/cp-empty/.test(c.innerHTML));
+  ok('명단을 못 받았을 때 카드를 그리지 않는다',
+     (c.innerHTML.match(/class="cp-card"/g) || []).length === 0);
 
   console.log('\n목록 끊김 — 시험 ' + (pass + fail) + '개, 실패 ' + fail + '개');
   process.exit(fail ? 1 : 0);
