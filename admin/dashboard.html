@@ -74,6 +74,9 @@ button.stat-card:focus-visible {
 }
 .stat-card .number { font-size: 2rem; font-weight: 700; color: var(--black); }
 .stat-card .label { font-size: 0.8rem; color: var(--ink-soft); margin-top: 4px; }
+/* A-691: 총계 아래 「공개 중 N개」. 어긋날 때만 색으로 짚는다 */
+.stat-card .sub { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; opacity: 0.85; }
+.stat-card .sub.stat-sub-warn { color: #9a3412; opacity: 1; font-weight: 600; }
 .stat-card .icon { float: right; font-size: 1.5rem; color: var(--ink-soft); }
 
 /* TABS */
@@ -256,6 +259,7 @@ tr:hover { background: var(--gray-50); }
             <i class="fas fa-building icon" aria-hidden="true"></i>
             <div class="number" id="statTotalBrands">0</div>
             <div class="label" data-en="Total Brands" data-ko="총 브랜드">Total Brands</div>
+            <div class="sub" id="statApprovedBrands"></div>
         </button>
         <button type="button" class="stat-card" data-go="brands">
             <i class="fas fa-clock icon" aria-hidden="true"></i>
@@ -526,12 +530,13 @@ async function loadBrands() {
     admRegisterCache('brands', rows);   // 6단계 통합 검색 캐시 (admin-core.js) — 병합된 것을 담는다
     const tbody = document.getElementById('brandsTable');
     tbody.innerHTML = '';
-    let total = 0, pending = 0;
+    let total = 0, pending = 0, approved = 0;
 
     rows.forEach(b => {
         const doc = { id: b.id };
         total++;
         if (b.status === 'pending') pending++;
+        if (b.status === 'approved') approved++;
         tbody.innerHTML += `
             <tr>
                 <td><strong>${escapeHtml(b.brandName)}</strong></td>
@@ -545,6 +550,25 @@ async function loadBrands() {
     });
 
     document.getElementById('statTotalBrands').textContent = total;
+    /* A-691: 「총 브랜드」는 **상태와 무관하게 전부** 센다(위 질의에 거르개가 없다).
+       그래서 브랜드 셋이 모두 거절 상태이던 2026-11-25 에, 공개 사이트의 브랜드는
+       0인데 대시보드는 **3** 이라고 말했다. 거짓은 아니지만 한눈에 읽으면 틀린
+       그림이 된다 — `categories.html` 이 「2,910+ 브랜드」라고 적었던 것과 같은
+       계열이다(A-688 에서 그 교훈을 적었다).
+       총계는 그대로 두고 **손님이 실제로 보는 수**를 옆에 같이 적는다.
+       비동기로 넣는 글이므로 두 언어 속성을 함께 달아 lang.js 가 칠하게 한다
+       (A-062 와 같은 약속). */
+    (function () {
+        var el = document.getElementById('statApprovedBrands');
+        if (!el) return;
+        var ko = '공개 중 ' + approved + '개';
+        var en = approved + ' live';
+        el.setAttribute('data-ko', ko);
+        el.setAttribute('data-en', en);
+        el.textContent = (document.documentElement.lang === 'ko') ? ko : en;
+        /* 총계와 공개 수가 어긋날 때만 눈에 띄게 — 같으면 군더더기다 */
+        el.classList.toggle('stat-sub-warn', approved !== total);
+    })();
     document.getElementById('statPendingBrands').textContent = pending;
     document.getElementById('brandCount').textContent = pending > 0 ? pending : '';
     document.getElementById('brandCount').style.display = pending > 0 ? 'inline' : 'none';

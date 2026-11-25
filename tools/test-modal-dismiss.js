@@ -86,14 +86,29 @@ if (!/button\.stat-card \{[^}]*text-align: left/.test(DASH)) bad.push('㉘ 단�
     if (DASH.indexOf('data-tab="' + t + '"') < 0) bad.push('㉙ data-go="' + t + '" 가 가리키는 탭이 없다');
 });
 
+/* ── A-691: 「총 브랜드」가 공개 수를 같이 말하는가 ──────────────────────
+   총계는 상태와 무관하게 전부 센다. 브랜드 셋이 모두 거절이던 날, 공개
+   사이트의 브랜드는 0인데 대시보드는 3 이라고 말했다. 거짓은 아니지만
+   한눈에 읽으면 틀린 그림이다 — categories.html 의 「2,910+ 브랜드」와
+   같은 계열. 총계는 두고 **손님이 실제로 보는 수**를 옆에 적는다. */
+if (!/id="statApprovedBrands"/.test(DASH)) bad.push('㉚ 공개 수를 적을 자리가 없다');
+if (!/data-ko="총 브랜드">[\s\S]{0,120}id="statApprovedBrands"/.test(DASH))
+    bad.push('㉛ 공개 수가 「총 브랜드」 카드 안에 있지 않다');
+if (!/if \(b\.status === 'approved'\) approved\+\+/.test(strip)) bad.push('㉜ 승인 수를 세지 않는다');
+if (!/setAttribute\('data-ko', ko\)/.test(strip) || !/setAttribute\('data-en', en\)/.test(strip))
+    bad.push('㉝ 두 언어 속성을 안 달았다 — 언어를 바꾸면 안 바뀐다 (A-062)');
+if (!/approved !== total/.test(strip)) bad.push('㉞ 총계와 공개 수가 어긋날 때 짚지 않는다');
+if (!/\.stat-card \.sub/.test(DASH)) bad.push('㉟ 공개 수 줄의 꼴이 없다');
+
 if (bad.length) {
     console.log('사유 창 닫기 규칙 — ' + bad.length + '건 어긋남');
     bad.forEach(b => console.log('  - ' + b));
     console.log('결과: 실패');
     process.exit(1);
 }
-console.log('어드민 대시보드 누름 동작 — 29가지 모두 뜻대로');
+console.log('어드민 대시보드 — 35가지 모두 뜻대로');
 console.log('  바깥·탭이동은 안 닫고 · 취소와 X 는 닫고 · Esc 는 적은 글이 없을 때만');
 console.log('  그리고 dashboard.html 이 그 규칙을 실제로 쓰고 있다');
 console.log('  통계 숫자 넷이 진짜 button 이고 각자 갈 탭이 있다 (A-690)');
+console.log('  「총 브랜드」가 공개 중인 수를 같이 말한다 (A-691)');
 console.log('결과: 통과');
