@@ -96,6 +96,14 @@ function lead_statusBadge(status) {
     return m ? '<span class="status ' + m.cls + '" ' + tAttr(m.en, m.ko) + '>' + escapeHtml(t(m.en, m.ko)) + '</span>'
              : '<span class="status">' + escapeHtml(status || '-') + '</span>';
 }
+/* A-701: `category` 는 글자 하나이거나 배열이다(공개 폼에 따라 다르다).
+   어느 쪽이든 한 줄로 읽히게 한다. 값 자체는 이미 사람이 읽는 말이라
+   (가구·욕실…) 따로 지도를 두지 않는다 — 지도를 두면 사본이 하나 더 는다. */
+function lead_catLabel(v) {
+    return (Array.isArray(v) ? v : [v])
+        .map(function (x) { return String(x == null ? '' : x).trim(); })
+        .filter(Boolean).join(' · ');
+}
 function lead_industryLabel(key) { var m = lead_industryMeta(key); return m ? t(m.en, m.ko) : String(key || ''); }
 function lead_sourceLabel(key)   { var m = LEAD_SOURCES[key];     return m ? t(m.en, m.ko) : String(key || ''); }
 
@@ -486,6 +494,15 @@ async function lead_view(id) {
         + dd('Email', '이메일', it.email)
         + dd('Phone', '전화', it.phone)
         + dd('Industry', '업종', lead_industryLabel(it.industry))
+        /* ── A-701(2026-11-25) ──────────────────────────────────────────────
+           **손님이 무엇을 찾는지**가 어느 화면에도 안 나왔다. 소싱 폼은
+           `category` 를 받는데(`sourcing-inquiry.html:484·534`), 그 값을 읽어
+           **보여 주는** 코드가 저장소 전체에 0곳이었다 — 접수 알림 메일 한 통과
+           수요 집계에만 있었다. 그 메일을 지나치거나 며칠 뒤 인박스에서 처리하면
+           **어느 품목 문의인지 알 길이 없다.** 배정할 브랜드를 고르는 바로 그
+           판단의 근거가 화면에 없었던 셈이다.
+           A-491(배송지)과 같은 종류다 — 받아 놓고 아무도 못 보는 칸. */
+        + (it.category ? dd('Category', '품목', lead_catLabel(it.category)) : '')
         + dd('Product', '제품', (it.productName || '') + (it.productId ? ' (' + it.productId + ')' : ''))
         + dd('Source', '출처', lead_sourceLabel(it.source) + (it.userId ? ' · uid ' + it.userId : ''))
         + dd('Received', '접수', fmtDate(it.createdAt))

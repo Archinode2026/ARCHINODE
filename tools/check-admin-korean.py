@@ -26,6 +26,11 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ADMIN = os.path.join(ROOT, 'admin')
+# A-703: 전에는 `admin/` 안만 걸었다. 그래서 **브랜드 포털**은 범위 밖이었고,
+#   거기 브랜드 자기 상태가 파이어스토어 날글자로 그대로 떠 있었다.
+#   A-692 가 「로그인 사각지대가 낳은 결함」이라고 적은 그 사각지대가
+#   포털에는 그대로 남아 있었다 — 검사의 **범위**도 사각지대를 만든다.
+PORTAL = os.path.join(ROOT, 'brand-portal')
 CORE = os.path.join(ADMIN, 'js', 'admin-core.js')
 
 HTML_COMMENT = re.compile(r'<!--.*?-->', re.S)
@@ -45,6 +50,24 @@ ACT_WORDS = ['View', 'Approve', 'Reject', 'Suspend', 'Restore', 'Review',
 UI_TEXT = re.compile(
     r'<(button|a|th|label|option|legend|summary|h1|h2|h3)\b([^>]*)>([^<>]+)</\1>', re.I)
 SCRIPT_BLOCK = re.compile(r'<script\b.*?</script>', re.S | re.I)
+
+
+def _drop_big_selects(text):
+    out, i = [], 0
+    for m in re.finditer(r'<select\b.*?</select>', text, re.S | re.I):
+        if m.group(0).lower().count('<option') > 30:
+            out.append(text[i:m.start()])
+            out.append('\n' * m.group(0).count('\n'))   # 줄 번호를 지킨다
+            i = m.end()
+    out.append(text[i:])
+    return ''.join(out)
+
+
+class _BigSelect(object):
+    sub = staticmethod(lambda text: _drop_big_selects(text))
+
+
+BIG_SELECT = _BigSelect()
 ENTITY_ONLY = re.compile(r'^(&[a-zA-Z]+;|&#\d+;|[\s×✕✖·—–-])+$')
 HANGUL = re.compile(r'[가-힣]')
 LATIN = re.compile(r'[A-Za-z]')
@@ -59,27 +82,49 @@ ENGLISH_OK = {
     'CSV': '파일 형식 이름',
     'BIM': '업계 용어 (한국 현장도 BIM 이라 부른다)',
     'ID': '식별자',
+    'KR / EN': '포털의 언어 토글 — 언어 **코드**다',
 }
+
+# 글이 아닌 것들 — 번역 대상이 아니다
+NOT_TEXT = re.compile(r'\$\{|@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|^https?://')
 BTN_TEXT = re.compile(r'>\s*(' + '|'.join(ACT_WORDS) + r')\s*</(?:button|a)>')
 
 # 저장값을 그대로 찍는 자리
 RAW_STATUS = [
     re.compile(r'\$\{\s*[A-Za-z_]\w*\.status\s*\}'),              # ${b.status}
     re.compile(r'escapeHtml\(\s*[A-Za-z_]\w*\.status\b[^)]*\)'),  # escapeHtml(d.status || 'pending')
+    # A-703: 포털은 **대입**으로 찍었다 — `badge.textContent = brandData.status;`
+    #   위 두 꼴만 보다가 깨뜨리기 시험이 **안 울어서** 알았다. 패턴으로 찾는
+    #   검사는 **내가 본 꼴만** 찾는다. 깨뜨려 보지 않으면 그걸 모른다.
+    re.compile(r'\.(?:textContent|innerHTML|innerText)\s*=\s*[A-Za-z_]\w*\.status\b'),
 ]
 
 
+def _blank(m):
+    """지운 자리에 **줄바꿈만 남긴다.**
+
+    A-703: 전에는 통째로 지웠다. 그래서 주석이나 `<script>` 뒤에 있는 모든
+    보고의 **줄 번호가 밀렸다** — `admin/articles.html:439` 를 `:418` 이라고
+    말했다. 21줄 어긋난 자리를 열면 엉뚱한 코드가 있으니, 승리님은 「검사기가
+    헛소리한다」고 여기고 보고를 믿지 않게 된다. **틀린 줄 번호는 못 찾은 것보다
+    나쁘다** — 찾았다고 말하면서 엉뚱한 데를 가리키기 때문이다.
+    줄 수를 지키면 보고한 자리가 곧 파일의 그 자리다.
+    """
+    return '\n' * m.group(0).count('\n')
+
+
 def strip(text, is_js):
-    text = HTML_COMMENT.sub('', text)
-    text = JS_BLOCK_COMMENT.sub('', text)
+    text = HTML_COMMENT.sub(_blank, text)
+    text = JS_BLOCK_COMMENT.sub(_blank, text)
     if is_js:
-        text = JS_LINE_COMMENT.sub('', text)
+        text = JS_LINE_COMMENT.sub(_blank, text)
     return text
 
 
 def files():
     out = []
-    for base, dirs, names in os.walk(ADMIN):
+    for root in (ADMIN, PORTAL):
+      for base, dirs, names in os.walk(root):
         dirs[:] = [d for d in dirs if d not in ('.git', 'node_modules')]
         for n in names:
             if n.endswith('.html') or n.endswith('.js'):
@@ -129,13 +174,22 @@ def main():
         #   `'<option…>' + escapeHtml(t(en, ko)) + '</option>'` 처럼 **이미 두 언어를
         #   지나는 올바른 코드**인데, 글자로만 보면 「영문뿐」으로 잡혀 거짓 양성이
         #   13건 쏟아졌다. 이 훑기는 **마크업(.html)** 만 책임진다.
-        markup = SCRIPT_BLOCK.sub('', s) if f.endswith('.html') else ''
+        markup = SCRIPT_BLOCK.sub(_blank, s) if f.endswith('.html') else ''
+        # ★ **긴 선택 목록은 자료이지 UI 글이 아니다.** 포털까지 걷게 하자
+        #   나라 이름 85개가 쏟아졌다(`Croatia`·`Cuba`…) — 그건 영문이 맞고,
+        #   번역하면 오히려 브랜드가 자기 나라를 못 찾는다. 선택지가 30개를
+        #   넘는 `<select>` 는 자료 목록으로 보고 통째로 뺀다.
+        #   (상태 거르개처럼 **짧은** 목록은 그대로 본다 — 거기 영문이 남으면
+        #    진짜 결함이다.)
+        markup = BIG_SELECT.sub(markup)
         for m in UI_TEXT.finditer(markup):
             attrs, txt = m.group(2), m.group(3).strip()
             if not txt or len(txt) > 40:
                 continue
             if ENTITY_ONLY.match(txt):
                 continue            # &times; 같은 기호 단추는 글이 아니다
+            if NOT_TEXT.search(txt):
+                continue            # 템플릿 자리표시자 · 이메일 주소 · 주소는 글이 아니다
             if not LATIN.search(txt) or HANGUL.search(txt):
                 continue
             if txt in ENGLISH_OK:

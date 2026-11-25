@@ -401,7 +401,13 @@ window.openModal = function(id) {
   document.getElementById('mOriginalLang').textContent = (d.originalLang || '—').toUpperCase();
   document.getElementById('mSource').textContent = d.source || '—';
   document.getElementById('mCreatedAt').textContent = formatDate(d.createdAt);
-  document.getElementById('mStatus').textContent = d.status || '—';
+  /* A-703: 저장값을 그대로 찍고 있었다. 패턴을 넓히다 이 자리가 같이 나왔다 —
+     내가 아는 꼴만 찾는 검사는 **내가 본 자리만** 지킨다. `admStatusText()` 는
+     `admin-core.js` 의 말광을 지나고 두 언어 속성도 함께 단다. */
+  (function () {
+    var el = document.getElementById('mStatus');
+    el.innerHTML = admStatusBadge(d.status || '');
+  })();
   document.getElementById('bOrigLang').textContent = (d.originalLang || '?').toUpperCase();
   document.getElementById('bOrigContent').textContent = d.originalBody || '(none)';
   document.getElementById('bEnContent').textContent = d.englishBody || d.englishBodyEdited || '(not provided)';

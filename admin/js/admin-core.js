@@ -339,7 +339,10 @@ var ADM_SEARCH_SOURCES = [
     { key: 'leads',        en: 'Lead',    ko: '리드',   cls: 'adm-kind-lead',    menu: 'leads',    view: 'lead_view',
       label: function (d) { return (d.name || '-') + (d.company ? ' / ' + d.company : ''); },
       sub:   function (d) { return [d.type, d.status].filter(Boolean).join(' / '); },
-      hay:   function (d) { return [d.name, d.company, d.email, d.phone, d.productName, d.brandName, d.type, d.status].join(' '); } },
+      /* A-701: 건초더미에 `category` 가 없어서 「조명 문의」를 검색으로 못 찾았다.
+         품목은 운영자가 가장 자주 묻는 것이다 — 「이 품목 문의가 몇 건이었지?」 */
+      hay:   function (d) { return [d.name, d.company, d.email, d.phone, d.productName, d.brandName, d.type, d.status,
+                                    [].concat(d.category || []).join(' ')].join(' '); } },
     { key: 'users',        en: 'Member',  ko: '회원',   cls: 'adm-kind-user',    menu: 'members',  view: 'usr_view',
       label: function (d) { return d.displayName || d.id; },
       sub:   function (d) { return d.company || ''; },

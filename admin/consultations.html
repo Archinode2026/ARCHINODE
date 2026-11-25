@@ -412,7 +412,9 @@ window.openModal = function(id) {
   document.getElementById('mTiming').textContent = d.timing || '—';
   document.getElementById('mBudget').textContent = BUDGET_LABEL[d.budget] || d.budget || '—';
   document.getElementById('mCreatedAt').textContent = formatDate(d.createdAt);
-  document.getElementById('mStatus').textContent = d.status || '—';
+  /* A-703: 저장값을 그대로 찍고 있었다. `admStatusBadge()` 는 `admin-core.js` 의
+     말광(`ADM_STATUS`)을 지나고 두 언어 속성도 함께 단다. */
+  document.getElementById('mStatus').innerHTML = admStatusBadge(d.status || '');
   document.getElementById('mDescription').textContent = d.description || '(none)';
 
   var triageBox = document.getElementById('mTriageBox');

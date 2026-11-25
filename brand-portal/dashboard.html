@@ -1148,7 +1148,26 @@ function populateDashboard() {
 
     // Status badge
     const badge = document.getElementById('statusBadge');
-    badge.textContent = brandData.status;
+    /* A-703: 파이어스토어 날글자(`pending`·`approved`…)가 그대로 떴다.
+       같은 파일이 제품 상태(1941행)와 아티클 상태(2033행)에는 두 말 지도를
+       두고 있는데 **브랜드 자기 상태만** 빠져 있었다. A-692 가 어드민에서
+       고친 것과 같은 병이고, 그때 만든 검사기는 `admin/` 안만 걷는다. */
+    (function () {
+        var BRAND_STATUS = {
+            pending:   { en: 'Pending review', ko: '검토 대기' },
+            approved:  { en: 'Approved',       ko: '승인됨' },
+            suspended: { en: 'Suspended',      ko: '정지됨' },
+            rejected:  { en: 'Rejected',       ko: '거절됨' }
+        };
+        var k = String(brandData.status == null ? '' : brandData.status).trim().toLowerCase();
+        var m = BRAND_STATUS[k];
+        /* 모르는 값은 **숨기지 않고 그대로 보여 준다** — 빈칸으로 두면 상태를
+           하나 더 만들었을 때 화면에서 조용히 사라진다 */
+        var en = m ? m.en : (k || '-'), ko = m ? m.ko : (k || '-');
+        badge.setAttribute('data-en', en);
+        badge.setAttribute('data-ko', ko);
+        badge.textContent = (document.documentElement.lang === 'ko') ? ko : en;
+    })();
     badge.className = 'status-badge status-' + brandData.status;
 
     // Status banner — suspended/rejected만 노출
@@ -2092,7 +2111,43 @@ function showSaveMsg(id) {
 // 전역은 var/function 만, 접두어 inbox_. 위 인라인 스크립트의 currentUser·db·auth·firebase 를 쓴다.
 // ══════════════════════════════════════════════════════════════════════
 var inbox_state = { items: [], current: null, saving: false };
-var INBOX_TYPES = { 'quote': { en: 'Quote request', ko: '견적 요청' }, 'brand-inquiry': { en: 'Brand inquiry', ko: '브랜드 문의' }, 'dealer': { en: 'Dealer connection', ko: '딜러 연결' } };
+/* A-700: 유형이 **셋뿐이었다.** 빠진 둘이 하필 `sourcing`(우리 주 유입 경로)과
+   `sample-request`(브랜드가 **실제로 물건을 보내야** 하는 요청)다. 폴백이 원문을
+   그대로 뱉어서 터지지 않고 조용히 `sourcing` 이라는 영문 키가 떴다 — 브랜드
+   눈에는 「우리가 모르는 값」으로 보인다. 어드민 화면에서는 멀쩡하므로 운영자는
+   이 상태를 볼 일이 없다. `firestore.rules:338` 과 `admin/js/view-leads.js:25`
+   의 다섯 값에 맞춘다. 말도 어드민과 **같게** 쓴다 — 같은 것을 두 말로 부르면
+   운영자와 브랜드가 서로 다른 물건을 말하게 된다. */
+var INBOX_TYPES = {
+  'quote':          { en: 'Quote request',     ko: '견적 요청' },
+  'sample-request': { en: 'Sample request',    ko: '샘플 요청' },
+  'brand-inquiry':  { en: 'Brand inquiry',     ko: '브랜드 문의' },
+  'sourcing':       { en: 'Sourcing inquiry',  ko: '소싱 문의' },
+  'dealer':         { en: 'Dealer connection', ko: '딜러 연결' }
+};
+/* A-701/A-704: 어드민(`view-leads.js`)과 **같은 말**을 쓴다. 운영자와 브랜드가
+   같은 문의를 두 말로 부르면 전화로 맞춰 볼 때 서로 다른 물건을 말하게 된다.
+   ☆ 사본이 둘이 됐다 — 한곳에 모으는 쪽이 옳지만 어드민 JS 는 포털이 안 싣는다.
+      `tools/check-value-vocab.py` 명부에 등록해 어긋나면 울게 해 뒀다. */
+var INBOX_INDUSTRIES = {
+    architect: { en: 'Architecture', ko: '건축' },
+    interior: { en: 'Interior Design', ko: '인테리어 디자인' },
+    landscape: { en: 'Landscape Architecture', ko: '조경' },
+    furniture: { en: 'Furniture Design', ko: '가구 디자인' },
+    construction: { en: 'Construction', ko: '건설' },
+    dealer: { en: 'Dealer / Distributor', ko: '딜러 / 유통' },
+    developer: { en: 'Real Estate Developer', ko: '부동산 개발' },
+    student: { en: 'Student', ko: '학생' },
+    other: { en: 'Other', ko: '기타' }
+};
+var inbox_industryLabel = function (k) {
+    var m = INBOX_INDUSTRIES[String(k == null ? '' : k).trim()];
+    return m ? inbox_t(m.en, m.ko) : String(k || '');   // 모르는 값은 그대로 — 숨기지 않는다
+};
+var inbox_catLabel = function (v) {
+    return (Array.isArray(v) ? v : [v]).filter(Boolean).join(' · ');
+};
+
 var INBOX_STATUSES = { assigned: { en: 'Assigned', ko: '배정됨' }, contacted: { en: 'Contacted', ko: '연락함' }, closed: { en: 'Closed', ko: '종료' } };
 var INBOX_NEXT = { assigned: ['assigned', 'contacted', 'closed'], contacted: ['contacted', 'closed'], closed: ['closed'] };   // 앞으로만
 
@@ -2127,7 +2182,13 @@ function inbox_load(uid) {
         console.error('[inbox] leads read failed', err);
         var code = (err && err.code) || (err && err.message) || '';
         inbox_msg(code === 'permission-denied'
-            ? inbox_t('Could not load your inbox (permission-denied) — the leads rule may not be published yet. Please contact office@archinode.org.', '인박스를 불러오지 못했습니다(permission-denied) — leads 규칙이 아직 게시되지 않았을 수 있습니다. office@archinode.org 로 문의해 주세요.')
+            ? /* A-702: 전에는 「leads 규칙이 아직 게시되지 않았을 수 있습니다」라고 했다.
+             거의 모든 경우 원인은 **그 브랜드가 아직 승인 전**이다(규칙의 브랜드
+             가지는 `isApprovedBrand()` 를 요구한다). 즉 받는 쪽은 자기 상태 때문에
+             못 보는 것인데 「ARCHINODE 쪽 설정이 덜 됐다」로 읽게 된다. 게다가
+             우리 배포 상태를 **외부에 말하고 있었다.** 입점 직후 처음 로그인하는
+             모든 브랜드가 이 문장을 봤다 — 오픈 직후 첫인상이 그것이다. */
+          inbox_t('Your inbox opens once your brand is approved. Enquiries assigned to you will appear here. Questions? office@archinode.org', '브랜드가 승인되면 인박스가 열립니다. 배정된 문의가 여기에 보입니다. 궁금하시면 office@archinode.org 로 문의해 주세요.')
             : inbox_t('Could not load your inbox: ', '인박스를 불러오지 못했습니다: ') + code, true);
         inbox_draw();
     });
@@ -2168,10 +2229,24 @@ function inbox_open(id) {
     var hist = Array.isArray(it.history) ? it.history.slice().reverse() : [], histHtml = '';
     for (var h = 0; h < hist.length; h++) { var e = hist[h] || {}; histHtml += '<li>' + inbox_statusBadge(e.status) + ' <small>' + inbox_esc(inbox_fmtDate(e.at)) + ' · ' + inbox_esc(e.byRole === 'admin' ? 'ARCHINODE' : (e.by || e.byRole || '-')) + '</small>' + (e.note ? '<div>' + inbox_esc(e.note) + '</div>' : '') + '</li>'; }
     document.getElementById('inboxModalContent').innerHTML = '<h2>' + inbox_esc(it.name || '-') + ' ' + inbox_typeBadge(it.type) + ' ' + inbox_statusBadge(it.status) + '</h2>'
-        + '<dl class="inbox-dl">' + dd('Company', '회사', it.company) + dd('Email', '이메일', it.email) + dd('Phone', '전화', it.phone) + dd('Industry', '업종', it.industry)
-        + dd('Product', '제품', it.productName) + dd('Received', '접수', inbox_fmtDate(it.createdAt)) + dd('Assigned', '배정', inbox_fmtDate(it.assignedAt)) + dd('Message', '본문', it.message) + '</dl>'
-        /* A-491: 샘플 요청의 배송지 — 샘플을 보내는 쪽이 브랜드다. 전에는 어디에도 안 나왔다. */
+        + '<dl class="inbox-dl">' + dd('Company', '회사', it.company) + dd('Email', '이메일', it.email) + dd('Phone', '전화', it.phone)
+        /* A-704: 전에는 `it.industry` 를 **날글자 키 그대로** 찍었다 — 브랜드는
+           `architect`·`interior` 를 봤다. 어드민은 `lead_industryLabel()` 로 바꿔
+           보여 준다. A-670 이 공개 폼 셋에 업종 칸을 새로 넣은 뒤로 **값이 실제로
+           들어오기 시작했다** — 그전에는 전부 빈 문자열이라 눈에 띌 일이 없었다. */
+        + dd('Industry', '업종', inbox_industryLabel(it.industry))
+        /* A-701: **손님이 무엇을 찾는지**가 어느 화면에도 안 나왔다. 소싱 폼이
+           받는 `category` 를 읽어 보여 주는 코드가 0곳이었다(메일 한 통과 집계에만
+           있었다). 브랜드는 배정받고도 품목을 본문으로 짐작해야 했다. A-491(배송지)과
+           같은 종류 — 받아 놓고 아무도 못 보는 칸이다. */
+        + (it.category ? dd('Category', '품목', inbox_catLabel(it.category)) : '')
+        + dd('Product', '제품', it.productName) + dd('Received', '접수', inbox_fmtDate(it.createdAt)) + dd('Assigned', '배정', inbox_fmtDate(it.assignedAt)) + dd('Message', '본문', it.message)
+        /* A-491: 샘플 요청의 배송지 — 샘플을 보내는 쪽이 브랜드다. 전에는 어디에도 안 나왔다.
+           A-705: 이 줄이 `</dl>` **밖**에 있었다. 꾸밈이 `.inbox-dl dt`/`dd` 로 자손에만
+           걸려 있어서(180행) 작은 대문자 라벨 꼴을 잃고 기본 들여쓰기로 떨어졌다.
+           값은 보였으니 자료 손실은 아니고 모양만 깨져 있었다. 안으로 넣는다. */
         + (it.shippingAddress ? dd('Shipping address', '배송지', it.shippingAddress) : '')
+        + '</dl>'
         + '<div class="inbox-bar"><label for="inboxStatus" ' + inbox_attr('Status', '상태') + '>' + inbox_esc(inbox_t('Status', '상태')) + '</label><select id="inboxStatus">' + opts + '</select>'
         + '<input type="text" id="inboxNote" maxlength="200" value="' + inbox_attrEsc(it.brandNote || '') + '" placeholder="' + inbox_attrEsc(inbox_t('Your note (one line, optional)', '메모 한 줄 (선택)')) + '" data-en-placeholder="Your note (one line, optional)" data-ko-placeholder="메모 한 줄 (선택)"></div>'
         + '<div class="inbox-err" id="inboxErr"></div>'

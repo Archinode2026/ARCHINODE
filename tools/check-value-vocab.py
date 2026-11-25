@@ -135,7 +135,13 @@ VOCAB = [
                  r"'([a-z-]+)'", (re.search(r"type in \[([^\]]*)\]", read('firestore.rules') or '') or
                                   type('x', (), {'group': lambda self, n: ''})()).group(1))),
          },
-         readers={'LEAD_TYPES': lambda: arr_keys('admin/js/view-leads.js', 'LEAD_TYPES')},
+         # A-700: 읽는 지도가 **둘**이다. 전에는 어드민 것만 등록해 두어
+         #   「읽는 지도 1개」로 통과했고, 그 사이 포털의 `INBOX_TYPES` 는
+         #   다섯 중 **셋**만 들고 있었다 — 빠진 둘이 하필 `sourcing`(주 유입
+         #   경로)과 `sample-request`(브랜드가 물건을 보내야 하는 요청)였다.
+         #   지도를 하나만 등록하면 「그 하나와 맞는가」만 묻게 된다.
+         readers={'LEAD_TYPES': lambda: arr_keys('admin/js/view-leads.js', 'LEAD_TYPES'),
+                  'INBOX_TYPES(포털)': lambda: obj_keys('brand-portal/dashboard.html', 'INBOX_TYPES')},
          fallback=set()),
     dict(name='업종(industry)',
          writers={
@@ -147,6 +153,9 @@ VOCAB = [
          readers={
              'LEAD_INDUSTRIES': lambda: arr_keys('admin/js/view-leads.js', 'LEAD_INDUSTRIES'),
              'DMD_IND_KO':      lambda: obj_keys('admin/js/view-demand.js', 'DMD_IND_KO'),
+             # A-704: 포털도 업종을 읽는다(전에는 **날글자 키를 그대로** 찍었다).
+             #   A-670 이 공개 폼 셋에 업종 칸을 넣은 뒤로 값이 실제로 들어온다.
+             'INBOX_INDUSTRIES(포털)': lambda: obj_keys('brand-portal/dashboard.html', 'INBOX_INDUSTRIES'),
          },
          fallback=set()),
 ]
