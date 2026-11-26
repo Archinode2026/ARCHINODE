@@ -857,7 +857,10 @@
             <ul>
                 <li><strong>Google LLC (Firebase):</strong> Authentication, database storage, and file storage</li>
                 <li><strong>Google LLC (reCAPTCHA):</strong> Spam and automated sign-up prevention</li>
-                <li><strong>Google LLC (Gmail SMTP):</strong> Delivery of notification and confirmation email</li>
+                <!-- A-730: this said "Google LLC (Gmail SMTP)" but that path was never used.
+                     A-139 records the live setting: smtps://resend@smtp.resend.com:465.
+                     Legal entity confirmed from Resend's own enterprise terms: Plus Five Five, Inc. -->
+                <li><strong>Plus Five Five, Inc. (Resend):</strong> Delivery of notification and confirmation email</li>
                 <li><strong>Google LLC (Google Fonts):</strong> Delivery of web fonts</li>
                 <li><strong>Google LLC (Google Analytics):</strong> Website usage statistics</li>
                 <li><strong>Formspree, Inc.:</strong> Receipt and forwarding of contact form submissions</li>
@@ -877,6 +880,7 @@
                 <li><strong>Google LLC:</strong> all items listed in Section 3 — for authentication, storage, email delivery and spam prevention — retained until the processing agreement ends</li>
                 <li><strong>Google LLC (Google Fonts):</strong> IP address, browser and device information, and the address of the page you are viewing — for delivering web fonts — processed at the time of the request and not separately retained</li>
                 <li><strong>Google LLC (Google Analytics):</strong> IP address (last octet masked), browser and device information, pages visited, time on page and referral source — for usage statistics — event data retained 2 months, user data 14 months (reset on new activity) — collected only if you consent to "Analytics" in the cookie banner</li>
+                <li><strong>Plus Five Five, Inc. (Resend):</strong> the fields carried in the message body (name, company, email, phone, enquiry or request text and, for sample requests, shipping address) — for delivering notification and confirmation email — retained according to the processor's own retention policy after delivery</li>
                 <li><strong>Formspree, Inc.:</strong> name, email address, message content — for receiving and forwarding enquiries — retained until the processing agreement ends</li>
                 <li><strong>Netlify, Inc.:</strong> IP address and access logs — for hosting and security — retained until the processing agreement ends</li>
                 <li><strong>Stripe, Inc.:</strong> payment information — for consultation fee processing — retained for the period required by applicable law</li>

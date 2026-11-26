@@ -187,7 +187,16 @@
     <p style="line-height:1.8;color:#444;">회사는 원활한 서비스 제공을 위해 다음과 같이 개인정보 처리업무를 위탁하고 있습니다:<br><br>
     <strong>Google LLC (Firebase):</strong> 회원 인증, 데이터 보관, 파일 보관<br>
     <strong>Google LLC (reCAPTCHA):</strong> 자동 가입·스팸 방지<br>
-    <strong>Google LLC (Gmail SMTP):</strong> 안내·알림 메일 발송<br>
+    <!-- A-730(브론즈 60차 ①, 2026-11-26): 여기가 「Google LLC (Gmail SMTP)」였는데
+         **그 경로는 쓴 적이 없다.** A-139 실측 기록이 실제 설정을 적고 있다 —
+         `SMTP smtps://resend@smtp.resend.com:465, FROM noreply@archinodekr.com`.
+         Gmail SMTP 는 2026-11-02 설치 **계획안**에만 있었고 실제 설치는 Resend 로 갔는데,
+         A-500 이 그 계획 문서를 사실로 읽어 방침에 심었다. 그래서 **두 방향의 거짓말**이
+         있었다: 아무것도 안 받는 Gmail 이 수탁자로 올라가 있고, 실제로 개인정보를 받는
+         Resend 는 명단에 없었다. 명단에 없는 수탁자는 손님이 거부권을 행사할 수도 없다.
+         ★ 법인명은 추측하지 않고 Resend 자신의 기업 약관에서 확인했다 —
+           계약 당사자는 「Plus Five Five, Inc.」이고 Resend 는 그 서비스 이름이다. -->
+    <strong>Plus Five Five, Inc. (Resend):</strong> 안내·알림 메일 발송<br>
     <!-- A-583(브론즈 42차 I): 모든 쪽이 글꼴을 구글에서 받아 오는데 이 표에 없었다.
          글꼴 요청에는 접속 IP·브라우저 정보·접속한 쪽 주소가 실려 미국으로 나간다.
          lang.js 는 같은 이유로 국가 추정 서비스를 **빼면서** 「되살리려면 국외이전
@@ -206,6 +215,7 @@
     <strong>Google LLC:</strong> 제3조의 수집 항목 전체 — 인증·보관·메일 발송·스팸 방지 목적 — 위탁계약 종료 시까지<br>
     <strong>Google LLC (Google Fonts):</strong> 접속 IP, 브라우저·기기 정보, 접속한 페이지 주소 — 웹폰트 제공 목적 — 전송 시점에 처리되며 별도 보관하지 않음<br>
     <strong>Google LLC (Google Analytics):</strong> 접속 IP(마지막 자리를 가린 형태), 브라우저·기기 정보, 방문한 페이지 주소, 머문 시간, 유입 경로 — 이용 통계 분석 목적 — 이벤트 데이터 2개월 · 사용자 데이터 14개월(새 활동 시 재설정) — 쿠키 동의 배너에서 「분석」에 동의한 경우에만 수집<br>
+    <strong>Plus Five Five, Inc. (Resend):</strong> 메일 본문에 담기는 항목(이름, 회사명, 이메일, 전화번호, 문의·요청 내용, 샘플 요청 시 배송지 주소) — 안내·알림 메일 발송 목적 — 발송 처리 후 수탁자의 보관 정책에 따른 기간<br>
     <strong>Formspree, Inc.:</strong> 이름, 이메일, 문의 내용 — 문의 접수·전달 목적 — 위탁계약 종료 시까지<br>
     <strong>Netlify, Inc.:</strong> 접속 IP, 접속 로그 — 호스팅·보안 목적 — 위탁계약 종료 시까지<br>
     <strong>Stripe, Inc.:</strong> 결제 정보 — 자문 요금 결제 처리 목적 — 관련 법령에 따른 기간<br>

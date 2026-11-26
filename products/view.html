@@ -1215,9 +1215,12 @@ async function submitRfq(e) {
             data.shippingAddress = shipping;
             /* A-722: 브랜드가 실제 설계 건인지 보고 판단할 수 있게. 필수는 아니다 —
                막으면 진짜 손님도 같이 막힌다. 비어 있으면 그 자체가 신호다. */
-            data.projectName     = (document.getElementById('rfqProjectName')     || {}).value || '';
-            data.projectType     = (document.getElementById('rfqProjectType')     || {}).value || '';
-            data.projectTimeline = (document.getElementById('rfqProjectTimeline') || {}).value || '';
+            /* A-730(브론즈 60차 ④): 같은 폼의 다른 칸은 전부 `.trim()` 되는데 A-722 가
+               더한 이 셋만 빠져 있었다. 공백만 넣으면 `" "` 가 저장되고, 어드민·포털이
+               `it.projectName ? … : ''` 로 보므로 **내용 없는 줄**이 그려진다. */
+            data.projectName     = ((document.getElementById('rfqProjectName')     || {}).value || '').trim();
+            data.projectType     = ((document.getElementById('rfqProjectType')     || {}).value || '').trim();
+            data.projectTimeline = ((document.getElementById('rfqProjectTimeline') || {}).value || '').trim();
         }
 
         /* A-490(2026-11-12): 접수와 알림을 **한 묶음**으로. 묶음이 거부되면 접수만

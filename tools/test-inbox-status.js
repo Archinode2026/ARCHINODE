@@ -51,6 +51,30 @@ ok('유형이 없으면 발송함이 안 뜬다',
    inbox_allowedNext({ status: 'assigned' }).indexOf('shipped') === -1);
 ok('it 가 없어도 터지지 않는다', Array.isArray(inbox_allowedNext(null)));
 
+/* ★ A-730(브론즈 60차 ②ⓐ): **지금 상태가 선택지에 남아 있는가** 를 묻는 시험이
+   없었다. 위 시험들이 전부 `status: 'assigned'` 로만 물어서, 「샘플이 아닌데 이미
+   shipped 인 문서」라는 조합을 아무도 안 봤다.
+   그 조합에서 거르개가 `shipped` 를 빼 버리면 선택지에 지금 값이 없고, 그러면
+   `selected` 가 안 붙어 브라우저가 첫 선택지(`closed`)를 고른다 — 메모만 고치고
+   저장해도 **상태가 조용히 종료로 넘어간다.** 앞으로만 가므로 되돌릴 수도 없다.
+   조용한 고장이라 시험이 지킨다. */
+['sample-request', 'quote', 'sourcing', 'brand-inquiry', 'dealer'].forEach(function (t) {
+  Object.keys(INBOX_NEXT).forEach(function (st) {
+    var list = inbox_allowedNext({ type: t, status: st });
+    ok('지금 상태(' + st + ')가 ' + t + ' 의 선택지에 남아 있다', list.indexOf(st) !== -1);
+    ok('선택지가 비지 않는다 (' + t + '/' + st + ')', list.length > 0);
+  });
+});
+
+/* 어드민과 포털이 **같은 규칙**을 쓰는가 — A-728 이 어드민에만 예외를 넣었고
+   A-730 이 포털에 같은 것을 넣었다. 글자로 확인한다(사본이 갈라지는 것이 지병이다). */
+(function () {
+  const vl = fs.readFileSync(path.join(ROOT, 'admin/js/view-leads.js'), 'utf8');
+  ok('어드민도 「지금 상태가 shipped 면 남긴다」 예외를 쓴다',
+     /it\.status\s*!==\s*'shipped'/.test(vl));
+  ok('포털도 같은 예외를 쓴다', /it\.status\s*!==\s*'shipped'/.test(SRC));
+})();
+
 // ── ② 앞으로만 ────────────────────────────────────────────────────────
 const ORDER = ['assigned', 'contacted', 'shipped', 'closed'];
 Object.keys(INBOX_NEXT).forEach(function (from) {
