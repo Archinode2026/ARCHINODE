@@ -25,10 +25,13 @@ var SET_DEFAULTS = {
         freeUntilText_ko: '처음 3개월 무료, 이후 월 EUR 10 또는 연 EUR 100',
         founderText_en:   'Included — one plan, no upsell',
         founderText_ko:   '기본 제공 — 요금제 하나, 추가 요금 없음',
-        // 이 필드는 폐기된 정책(「Free through December 2026」)에서 왔다.
-        //   현행 정책은 「브랜드별 입점 후 3개월 무료」라 전역 날짜 하나로 표현할 수 없다.
-        //   모델을 바꾸는 것은 사업 결정이므로 값은 그대로 둔다 — 승리님 확정 후 정리. (A-281)
-        freeUntil:        '2026-12-31',
+        // A-726(2026-11-26): `freeUntil` 전역 날짜를 **없앴다**. A-281 이 「전역 날짜 하나로
+        //   표현할 수 없다」고 적어 두고 값은 남겨 뒀는데, 그 2026-12-31 이 이미 어긋나
+        //   있었다 — 12월에 들어온 브랜드는 무료가 며칠뿐이고, 그날이 지나면 전원이
+        //   한꺼번에 유료가 된다. 승리님 결정(2026-11-26): **승인일 + 3개월**, 브랜드마다.
+        //   계산은 /free-period.js 한 곳에 있고 어드민 상세·브랜드 포털이 그것만 쓴다.
+        //   어드민이 손으로 고칠 날짜가 더는 없으므로 입력 칸도 함께 뺐다 —
+        //   고쳐도 아무 데도 안 쓰이는 칸을 남겨 두면 고친 사람이 속는다.
         pendingIssue:     '안건 1'
     },
     site: {
@@ -50,7 +53,6 @@ var SET_FIELDS = {
         { key: 'listing.freeUntilText_ko', en: 'Free-period text (KO)',   ko: '무료 기간 문구 (KO)',  type: 'text',  pending: true },
         { key: 'listing.founderText_en',   en: 'Founding-fee text (EN)',  ko: '창립 요금 문구 (EN)',  type: 'text',  pending: true },
         { key: 'listing.founderText_ko',   en: 'Founding-fee text (KO)',  ko: '창립 요금 문구 (KO)',  type: 'text',  pending: true },
-        { key: 'listing.freeUntil',        en: 'Free until (date)',       ko: '무료 종료일',          type: 'date',  pending: true },
         { key: 'listing.pendingIssue',     en: 'Pending rulebook issue',  ko: '미결 안건 (규정집 2부)', type: 'text',  pending: false,
           hint: { en: 'Leave empty once the issue is decided — the red marks disappear.', ko: '안건이 결정되면 비운다 — 빨간 표시가 사라진다.' } }
     ],

@@ -443,7 +443,8 @@ tr:hover { background: var(--gray-50); }
 <script src="../firebase-config.js"></script>
 <script src="../loading-watchdog.js?v=20261111a"></script>
 <script src="js/modal-dismiss.js?v=20261125a"></script>
-<script src="js/admin-core.js?v=20261105b"></script>
+<script src="../free-period.js?v=20261126"></script>
+    <script src="js/admin-core.js?v=20261105b"></script>
 <script src="js/admin-nav.js?v=20261104g"></script>
 <script src="js/view-dashboard.js?v=20261105a"></script>
 <script src="js/view-logs.js?v=20261105a"></script>
@@ -629,10 +630,12 @@ function renderBrands() {
 async function updateBrand(docId, newStatus) {
     let brandName = '';
     let prevStatus = '';   // 2단계: 활동 로그 from 값 (같은 get() 재사용)
+    let prevApprovedAt = null;  // A-726: 이미 승인된 적 있으면 무료 기간 시작일을 안 건드린다
     try {
         const doc = await db.collection('brands').doc(docId).get();
         brandName = (doc.data() && doc.data().brandName) || '';
         prevStatus = (doc.data() && doc.data().status) || '';
+        prevApprovedAt = (doc.data() && doc.data().approvedAt) || null;
     } catch (e) {}
 
     const reasonRequired = (newStatus !== 'approved');
@@ -668,7 +671,11 @@ async function updateBrand(docId, newStatus) {
         statusChangedAt: firebase.firestore.FieldValue.serverTimestamp(),
         statusChangedBy: (auth.currentUser && auth.currentUser.uid) || ''
     };
-    if (newStatus === 'approved') {
+    if (newStatus === 'approved' && !prevApprovedAt) {
+        /* A-726(2026-11-26): 무료 기간이 승인일 기준 3개월이 되면서, 이 한 줄이
+           기간을 되돌리는 자리가 됐다. 전에는 approved 가 될 때마다 덮어썼는데
+           — 정지됐다 다시 승인되면 무료 3개월이 **처음부터 다시** 시작된다.
+           첫 승인에만 찍는다. A-723 의 비밀번호 메일과 같은 꼴의 조건이다. */
         updateData.approvedAt = firebase.firestore.FieldValue.serverTimestamp();
     }
     const moderationUpdate = {
@@ -885,7 +892,18 @@ async function viewBrand(docId) {
         if (modDoc.exists) mod = modDoc.data();
     } catch (e) { console.warn('[viewBrand] moderation 조회 실패', e); }
 
+    /* A-726(2026-11-26): 무료 기간은 승인일 + 3개월. 계산은 free-period.js 한 곳에서만
+       한다(어드민과 포털이 각자 세면 언젠가 다른 답을 낸다). 끝나도 아무것도 막지
+       않는다 — 승리님 결정: 표시만 하고 연락은 사람이 한다. 결제 시스템이 없는데
+       화면이 먼저 막으면 멀쩡한 브랜드가 잠긴다. */
     let statusHistoryHtml = '';
+    try {
+        const fpSt = fpStatus(b.approvedAt, new Date());
+        const fpL  = fpLabel(fpSt);
+        const fpColor = fpSt.state === 'expired' ? '#991b1b' : (fpSt.state === 'active' ? '#065f46' : '#5d564c');
+        statusHistoryHtml += `<div class="detail-row"><div class="detail-label">${tSpan('Free period', '무료 기간')}</div>` +
+            `<div class="detail-value" style="color:${fpColor}"><span data-en="${escapeAttr(fpL.en)}" data-ko="${escapeAttr(fpL.ko)}">${escapeHtml(fpL.en)}</span></div></div>`;
+    } catch (e) { console.warn('[viewBrand] 무료 기간 계산 실패', e); }
     if (b.statusReason) {
         statusHistoryHtml += `<div class="detail-row"><div class="detail-label" data-en="Last Reason" data-ko="최근 사유">Last Reason</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(b.statusReason)}</div></div>`;
     }
