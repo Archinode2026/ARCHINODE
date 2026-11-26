@@ -700,7 +700,14 @@ async function updateBrand(docId, newStatus) {
                     lines.push('You can now log in to the Brand Portal:');
                     lines.push('https://archinodekr.com/auth/login.html');
                     lines.push('');
-                    lines.push('Use the email and temporary password you received when you first applied.');
+                    /* ★ A-723(2026-11-26): 전에는 「처음 신청할 때 받으신 임시 비밀번호를
+                       쓰세요」라고 했는데 **그 비밀번호를 준 메일이 없었다.** 임시 비밀번호는
+                       가입 성공 화면에만 떴고, 탭을 닫으면 영영 사라졌다. 접수 확인 메일은
+                       「승인되면 받게 됩니다」라고 하고 이 메일은 「전에 받으셨죠」라고 해서
+                       **두 메일이 서로를 가리키는데 둘 다 주지 않았다.**
+                       이제 승인 순간 파이어베이스가 비밀번호 설정 메일을 따로 보낸다. */
+                    lines.push('We have sent you a separate email to set your password — look for "' + (window.location.hostname || 'ARCHINODE') + '" in your inbox.');
+                    lines.push('If it does not arrive, open the login page and use "Forgot / set password".');
                     lines.push('');
                     lines.push('Next steps — our short Brand Guide walks you through login, profile setup, product upload, and receiving Korean specifier inquiries:');
                     lines.push('https://archinodekr.com/brand-guide.html');
@@ -730,6 +737,21 @@ async function updateBrand(docId, newStatus) {
                         text: lines.join('\n')
                     }
                 });
+            }
+            /* ★ A-723: **첫 승인일 때만** 비밀번호 설정 메일을 보낸다.
+               되살리기(정지→승인)는 이미 비밀번호가 있는 브랜드이므로 보내면 엉뚱하다.
+               파이어베이스가 **직접** 보내므로 Trigger Email 확장을 거치지 않는다 —
+               확장이 멈춰도 이 길은 살아 있다(경로가 둘이 된다). */
+            if (prevStatus === 'pending' && newStatus === 'approved' && b && b.email) {
+                try {
+                    await firebase.auth().sendPasswordResetEmail(b.email);
+                } catch (pwErr) {
+                    console.warn('Password-set email skipped:', pwErr);
+                    showToast((typeof t === 'function'
+                        ? t('Approved, but the password-set email could not be sent. Ask the brand to use "Forgot / set password" on the login page.',
+                            '승인했지만 비밀번호 설정 메일을 보내지 못했습니다. 브랜드에게 로그인 화면의 「비밀번호 설정·재설정」을 안내해 주세요.')
+                        : '비밀번호 설정 메일을 보내지 못했습니다.'), true);
+                }
             }
         } catch (mailErr) {
             /* A-577(브론즈 41차 ⑧): 여기만 조용했다. 같은 상황에서 리드 배정과

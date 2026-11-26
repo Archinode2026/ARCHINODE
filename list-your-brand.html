@@ -561,7 +561,10 @@
             <p><span data-en="Login Email: " data-ko="로그인 이메일: ">Login Email: </span><strong id="credEmail"></strong> <button type="button" class="copy-btn" onclick="copyCred('credEmail', this)" data-en="Copy" data-ko="복사">Copy</button></p>
             <p><span data-en="Temp Password: " data-ko="임시 비밀번호: ">Temp Password: </span><strong id="credPassword"></strong> <button type="button" class="copy-btn" onclick="copyCred('credPassword', this)" data-en="Copy" data-ko="복사">Copy</button></p>
         </div>
-        <p style="color:#b91c1c;font-weight:600;"><i class="fas fa-exclamation-triangle"></i> <span data-en="Please save these credentials. You will also receive them by email." data-ko="이 정보를 안전한 곳에 저장해 주세요. 이메일로도 발송됩니다.">Please save these credentials. You will also receive them by email.</span></p>
+        <p style="color:#b91c1c;font-weight:600;"><i class="fas fa-exclamation-triangle"></i> <!-- ★ A-723(2026-11-26): 「이메일로도 발송됩니다」는 **거짓이었다.** 임시 비밀번호를
+             보내는 메일이 어디에도 없었다 — 이 화면이 유일한 자리였고, 탭을 닫으면 끝이었다.
+             이제 승인될 때 비밀번호 설정 메일이 따로 가므로, 사실대로 적고 그 길을 알려 준다. -->
+            <span data-en="Save these for now. When your listing is approved we email you a link to set your own password — you can also use &quot;Set or reset password&quot; on the login page at any time." data-ko="우선 저장해 두세요. 입점이 승인되면 비밀번호를 직접 정하는 링크를 메일로 보내 드립니다 — 로그인 화면의 「비밀번호 설정 · 재설정」으로도 언제든 하실 수 있습니다.">Save these for now. When your listing is approved we email you a link to set your own password — you can also use "Set or reset password" on the login page at any time.</span></p>
         <p data-en="Our team will review your application within 1–3 business days. Once approved, your brand page will go live on ARCHINODE." data-ko="저희 팀이 1~3 영업일 내에 신청을 검토합니다. 승인되면 브랜드 페이지가 ARCHINODE에 공개됩니다.">Our team will review your application within 1–3 business days. Once approved, your brand page will go live on ARCHINODE.</p>
         <a href="auth/login.html" class="portal-btn" data-en="Go to Brand Portal " data-ko="브랜드 포털 바로가기 ">Go to Brand Portal <i class="fas fa-arrow-right"></i></a>
         <p style="margin-top:28px;font-size:0.9rem;color:#5d564c;">
@@ -932,7 +935,7 @@ form.addEventListener('submit', async function(e) {
                         '',
                         'What happens next:',
                         '- Our team reviews the details you provided',
-                        '- Once approved, you will receive login access to the Brand Portal',
+                        '- Once approved, we email you a link to set your Brand Portal password',
                         '- You can then upload products, publish articles, and manage your presence',
                         '',
                         'While you wait, our short Brand Guide walks through everything you can do once approved:',

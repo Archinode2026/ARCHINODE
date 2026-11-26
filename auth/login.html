@@ -154,7 +154,11 @@ html[lang="ko"] .welcome h1 { letter-spacing: -0.005em; }
             </form>
 
             <div class="auth-links">
-                <a href="#" id="showReset" data-en="Forgot password?" data-ko="비밀번호를 잊으셨나요?">Forgot password?</a><br>
+                <!-- A-723(2026-11-26): 「잊으셨나요?」는 **비밀번호를 가진 적 있는 사람**의 말이다.
+                     승인된 브랜드는 비밀번호를 **정한 적이 없고** 이 링크로 처음 정한다 —
+                     승리님이 「재설정이라는 부분이 없다」고 하신 것도 글자가 달라서였다.
+                     두 경우를 다 담는 말로 바꾼다. -->
+                <a href="#" id="showReset" data-en="Set or reset password" data-ko="비밀번호 설정 · 재설정">Set or reset password</a><br>
                 <span data-en="Don't have an account?" data-ko="계정이 없으신가요?">Don't have an account?</span>
                 <a href="signup.html" data-en="Sign up for free" data-ko="무료 회원가입">Sign up for free</a><br>
                 <!-- 2026-11-03 A-152: 로그인 창 통합 — 브랜드도 이 창에서 로그인한다.
