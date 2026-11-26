@@ -917,6 +917,10 @@ h1, h2, .section-card h2 {
 <script src="../brand-gate.js?v=20261125a"></script>
 <script src="../search.js?v=20261106a"></script>
 <script src="../lang.js?v=20261106a"></script>
+<!-- A-728: 1181행이 fpLabelFor 를 쓰는데 이 태그가 2512행에 있었다.
+     지금은 비동기 콜백 덕에 우연히 맞지만, 호출을 동기로 바꾸는 날 깨진다.
+     쓰는 자리보다 **앞**에 둔다 — 순서를 운에 맡기지 않는다. -->
+<script src="../free-period.js?v=20261126"></script>
 <script>
 let currentUser = null;
 let brandDataUid = null;   // brandData 를 '어느 계정으로' 불러왔는지 (R-031 = A-213)
@@ -1178,7 +1182,7 @@ function populateDashboard() {
     try {
         var fpHost = document.getElementById('freePeriodNote');
         if (fpHost && brandData.status === 'approved') {
-            var fpL = fpLabel(fpStatus(brandData.approvedAt, new Date()));
+            var fpL = fpLabelFor(brandData.status, brandData.approvedAt, new Date());
             fpHost.setAttribute('data-en', fpL.en);
             fpHost.setAttribute('data-ko', fpL.ko);
             fpHost.textContent = (document.documentElement.lang === 'ko') ? fpL.ko : fpL.en;
@@ -2509,8 +2513,7 @@ document.getElementById('noticeAllBtn').addEventListener('click', pn_openAll);
 document.getElementById('noticeClose').addEventListener('click', pn_close);
 document.getElementById('noticeModal').addEventListener('click', function (e) { if (e.target === e.currentTarget) pn_close(); });
 </script>
-<script src="../free-period.js?v=20261126"></script>
-    <script src="portal-ui.js?v=20261116a"></script>
+<script src="portal-ui.js?v=20261116a"></script>
 <script src="article-editor.js?v=20261106a"></script>
 <script src="../form-throttle.js?v=20260630" defer></script>
 </body>

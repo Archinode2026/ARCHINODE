@@ -93,8 +93,28 @@ function fpLabel(st) {
              ko: ds + '까지 무료 (' + st.daysLeft + '일 남음)' };
 }
 
+/* 브랜드 상태까지 보고 문구를 고른다.
+   ★ A-728(브론즈 59차 ③): `fpLabel` 만 쓰면 **승인됐는데 `approvedAt` 이 없는 문서**에
+     「승인 시 무료 기간 시작」이 뜬다 — 상태 딱지는 「승인됨」인데 바로 밑줄이
+     「승인 시 시작」이라 **스스로 모순되는 두 줄**이 붙는다. 그런 문서가 실제로 있다:
+     `tools/make-qa-user.js` 가 만드는 QA 브랜드가 `status:'approved'` 인데 승인일이 없다.
+     옛 문서도 마찬가지다(A-726 전에는 그 필드를 안 찍은 길이 있었다).
+   ★ 메우는 길: 어드민에서 그 브랜드를 **한 번 더 승인**하면 승인일이 찍힌다
+     (`admin/dashboard.html` 의 `prevRead && !prevApprovedAt`). 그때까지는
+     **모른다고 말한다** — 날짜를 지어내지 않는다. */
+function fpLabelFor(status, approvedAt, now) {
+    var st = fpStatus(approvedAt, now);
+    if (st.state === 'none' && String(status || '').toLowerCase() === 'approved') {
+        return { state: 'unknown',
+                 en: 'Free period start date missing — please contact us',
+                 ko: '무료 기간 시작일이 기록되지 않았습니다 — 문의해 주세요' };
+    }
+    return fpLabel(st);
+}
+
 /* 시험에서도 쓰도록 */
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { FP_MONTHS: FP_MONTHS, fpToDate: fpToDate, fpFreeUntil: fpFreeUntil,
-                       fpStatus: fpStatus, fpDateText: fpDateText, fpLabel: fpLabel };
+                       fpStatus: fpStatus, fpDateText: fpDateText, fpLabel: fpLabel,
+                       fpLabelFor: fpLabelFor };
 }

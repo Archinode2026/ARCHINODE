@@ -631,12 +631,24 @@ async function updateBrand(docId, newStatus) {
     let brandName = '';
     let prevStatus = '';   // 2단계: 활동 로그 from 값 (같은 get() 재사용)
     let prevApprovedAt = null;  // A-726: 이미 승인된 적 있으면 무료 기간 시작일을 안 건드린다
+    let prevRead = false;       // A-728: 위 get 이 **실제로 읽혔는지**. 못 읽었으면 승인일을 안 건드린다
     try {
         const doc = await db.collection('brands').doc(docId).get();
         brandName = (doc.data() && doc.data().brandName) || '';
         prevStatus = (doc.data() && doc.data().status) || '';
         prevApprovedAt = (doc.data() && doc.data().approvedAt) || null;
-    } catch (e) {}
+        prevRead = true;
+    } catch (e) {
+        /* ★ A-728(브론즈 59차 ②): 전에는 `catch (e) {}` 로 **통째로 조용**했다.
+           이 get 이 한 번 실패하면 `prevApprovedAt` 이 null 로 남고, 그러면
+           `!prevApprovedAt` 이 참이 되어 **이미 승인됐던 브랜드의 무료 기간이
+           오늘부터 다시 시작**된다 — A-726 이 고치려던 바로 그 증상이 조건만
+           바꿔 되살아난다. 브랜드는 끝났던 무료가 되살아난 걸 보고, 어드민은
+           알 길이 없다. `prevRead` 로 **읽었는지 자체**를 들고 간다:
+           못 읽었으면 approvedAt 을 **건드리지 않는다**(모를 때는 안 쓰는 쪽이 맞다).
+           같은 get 이 실어 오는 brandName·prevStatus 도 함께 비므로 소리도 낸다. */
+        console.warn('[updateBrand] 브랜드 문서를 못 읽었다 — 승인일·이전 상태를 모른다', e);
+    }
 
     const reasonRequired = (newStatus !== 'approved');
     const titleMap = {
@@ -671,7 +683,7 @@ async function updateBrand(docId, newStatus) {
         statusChangedAt: firebase.firestore.FieldValue.serverTimestamp(),
         statusChangedBy: (auth.currentUser && auth.currentUser.uid) || ''
     };
-    if (newStatus === 'approved' && !prevApprovedAt) {
+    if (newStatus === 'approved' && prevRead && !prevApprovedAt) {
         /* A-726(2026-11-26): 무료 기간이 승인일 기준 3개월이 되면서, 이 한 줄이
            기간을 되돌리는 자리가 됐다. 전에는 approved 가 될 때마다 덮어썼는데
            — 정지됐다 다시 승인되면 무료 3개월이 **처음부터 다시** 시작된다.
@@ -693,6 +705,12 @@ async function updateBrand(docId, newStatus) {
             const brandDoc = await db.collection('brands').doc(docId).get();
             // A-480: email 은 이제 internal/contact 에 있다 — 병합해서 본다
             const b = await admMergeBrandContact(docId, brandDoc.data() || {});
+            /* ★ A-728(브론즈 59차 ⑤-A): 「비밀번호 설정 메일을 따로 보냈습니다」를
+               **무조건** 적으면서 실제 발송은 `prevStatus === 'pending'` 일 때만 했다.
+               정지→승인·거절→승인에서는 **오지 않는 메일을 기다리게** 만든다.
+               A-723 이 고치려던 병(두 메일이 서로를 가리키는데 둘 다 주지 않는 것)이
+               조건만 바뀌어 남아 있었다. 말과 행동이 **같은 변수**를 보게 한다. */
+            const willSendPwdEmail = !!(prevStatus === 'pending' && newStatus === 'approved' && b && b.email);
             if (b && b.email) {
                 const statusText = {
                     approved:  'approved',
@@ -713,8 +731,20 @@ async function updateBrand(docId, newStatus) {
                        「승인되면 받게 됩니다」라고 하고 이 메일은 「전에 받으셨죠」라고 해서
                        **두 메일이 서로를 가리키는데 둘 다 주지 않았다.**
                        이제 승인 순간 파이어베이스가 비밀번호 설정 메일을 따로 보낸다. */
-                    lines.push('We have sent you a separate email to set your password — look for "' + (window.location.hostname || 'ARCHINODE') + '" in your inbox.');
-                    lines.push('If it does not arrive, open the login page and use "Forgot / set password".');
+                    /* ⑤-C: 전에는 `window.location.hostname` 을 메일에 넣었다 — **어드민이
+                       어디서 승인을 눌렀느냐**가 손님이 받는 글자를 바꾼다(로컬에서 누르면
+                       「look for "localhost"」가 박힌다). 받는 쪽 메일에 뭐가 적혀 있는지는
+                       코드가 추측할 수 없다. 보낸 사람을 짚어 주는 대신 **어디서 찾는지**만 적는다.
+                       ⑤-B: 링크 이름을 로그인 화면과 **글자까지** 맞춘다 — 전에는
+                       「Forgot / set password」라고 적었는데 화면에 없는 글자였다.
+                       A-723 자신의 논거(글자가 다르면 자기 것으로 안 읽는다)가 메일에
+                       그대로 되돌아왔다. 화면은 `auth/login.html` 의 "Set or reset password". */
+                    if (willSendPwdEmail) {
+                        lines.push('We have just sent you a separate email to set your password. It may take a few minutes, and it can land in spam.');
+                        lines.push('If it does not arrive, open the login page and use "Set or reset password".');
+                    } else {
+                        lines.push('Sign in with the password you already have. If you do not have it, open the login page and use "Set or reset password".');
+                    }
                     lines.push('');
                     lines.push('Next steps — our short Brand Guide walks you through login, profile setup, product upload, and receiving Korean specifier inquiries:');
                     lines.push('https://archinodekr.com/brand-guide.html');
@@ -749,13 +779,13 @@ async function updateBrand(docId, newStatus) {
                되살리기(정지→승인)는 이미 비밀번호가 있는 브랜드이므로 보내면 엉뚱하다.
                파이어베이스가 **직접** 보내므로 Trigger Email 확장을 거치지 않는다 —
                확장이 멈춰도 이 길은 살아 있다(경로가 둘이 된다). */
-            if (prevStatus === 'pending' && newStatus === 'approved' && b && b.email) {
+            if (willSendPwdEmail) {
                 try {
                     await firebase.auth().sendPasswordResetEmail(b.email);
                 } catch (pwErr) {
                     console.warn('Password-set email skipped:', pwErr);
                     showToast((typeof t === 'function'
-                        ? t('Approved, but the password-set email could not be sent. Ask the brand to use "Forgot / set password" on the login page.',
+                        ? t('Approved, but the password-set email could not be sent. Ask the brand to use "Set or reset password" on the login page.',
                             '승인했지만 비밀번호 설정 메일을 보내지 못했습니다. 브랜드에게 로그인 화면의 「비밀번호 설정·재설정」을 안내해 주세요.')
                         : '비밀번호 설정 메일을 보내지 못했습니다.'), true);
                 }
@@ -899,10 +929,15 @@ async function viewBrand(docId) {
     let statusHistoryHtml = '';
     try {
         const fpSt = fpStatus(b.approvedAt, new Date());
-        const fpL  = fpLabel(fpSt);
-        const fpColor = fpSt.state === 'expired' ? '#991b1b' : (fpSt.state === 'active' ? '#065f46' : '#5d564c');
+        const fpL  = fpLabelFor(b.status, b.approvedAt, new Date());
+        const fpColor = (fpL.state === 'expired' || fpL.state === 'unknown') ? '#991b1b'
+                      : (fpL.state === 'active' ? '#065f46' : '#5d564c');
+        /* A-728(브론즈 59차 ①-A): 라벨은 `tSpan` 으로 현재 언어를 찍는데 **값만
+           늘 영문**이었다. `admin-core.js` 의 규약은 「현재 언어 텍스트 + 속성 짝을
+           같이 찍는다」인데(lang.js 가 동적 요소를 다시 훑지 않으므로) 이 한 줄이
+           그것을 어겼다 — 한국어 어드민에 「무료 기간 | Free until …」이 떴다. */
         statusHistoryHtml += `<div class="detail-row"><div class="detail-label">${tSpan('Free period', '무료 기간')}</div>` +
-            `<div class="detail-value" style="color:${fpColor}"><span data-en="${escapeAttr(fpL.en)}" data-ko="${escapeAttr(fpL.ko)}">${escapeHtml(fpL.en)}</span></div></div>`;
+            `<div class="detail-value" style="color:${fpColor}">${tSpan(fpL.en, fpL.ko)}</div></div>`;
     } catch (e) { console.warn('[viewBrand] 무료 기간 계산 실패', e); }
     if (b.statusReason) {
         statusHistoryHtml += `<div class="detail-row"><div class="detail-label" data-en="Last Reason" data-ko="최근 사유">Last Reason</div><div class="detail-value" style="white-space:pre-wrap;">${escapeHtml(b.statusReason)}</div></div>`;

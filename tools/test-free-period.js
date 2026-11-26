@@ -86,23 +86,52 @@ const USERS = ['admin/dashboard.html', 'brand-portal/dashboard.html'];
    script 태그를 통째로 빼도 시험이 통과했다 — 깨뜨리기가 울지 않아서야
    알았다. A-668·A-672·A-678 이 같은 덫을 적어 뒀는데 또 밟았다. */
 function stripComments(src) {
+    /* ★ A-728: 두 번 틀렸다.
+       ① 처음엔 HTML 에도 `/* … *\/` 를 걷었다 — **속성 안의 `image/*` 가 블록 주석
+          시작으로 읽혀** brand-portal 의 680~926행 16,865자가 통째로 지워졌고,
+          923행의 script 태그가 사라져 시험이 거짓으로 실패했다.
+          (같은 덫이 tools/check-stale-dates.py 에도 있었다 — 그쪽은 **거짓 통과**였다.)
+       ② 그래서 `<script>…</script>` 를 통째로 지웠더니 이번엔 **`<script src=…>` 태그
+          자체**가 사라졌다. 찾으려던 바로 그것을 지운 꼴이다.
+       답: HTML 주석을 걷고, JS 주석은 **script 블록 안에서만** 걷는다. 태그는 남는다. */
     return src
-        .replace(/<!--[\s\S]*?-->/g, ' ')   // HTML 주석
-        .replace(/\/\*[\s\S]*?\*\//g, ' ')  // 블록 주석
-        .replace(/^\s*\/\/.*$/gm, ' ');      // 줄 주석
+        .replace(/<!--[\s\S]*?-->/g, ' ')
+        .replace(/(<script\b[^>]*>)([\s\S]*?)(<\/script\s*>)/g,
+            (m, open, body, close) => open +
+                body.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ') +
+                close);
 }
+
 
 USERS.forEach(rel => {
     const raw  = fs.readFileSync(path.join(ROOT, rel), 'utf8');
     const code = stripComments(raw);
     /* 싣는지는 **script 태그**로 본다 — 이름이 어디 적혀 있는지가 아니라 */
-    ok(/<script[^>]+src=["'][^"']*free-period\.js[^"']*["']/.test(code),
-       rel + ' 가 free-period.js 를 script 태그로 싣는다');
-    ok(/fpStatus\s*\(/.test(code) && /fpLabel\s*\(/.test(code),
-       rel + ' 가 그 함수를 실제로 쓴다');
+    const tagRe = /<script[^>]+src=["'][^"']*free-period\.js[^"']*["']/;
+    ok(tagRe.test(code), rel + ' 가 free-period.js 를 script 태그로 싣는다');
+    /* ★ A-728(브론즈 59차 ①-C): 전에는 **있는지**만 봤다. 포털은 그 태그가 쓰는 자리보다
+       **뒤**에 있는데, 지금은 `auth.onAuthStateChanged` 콜백(비동기)에서만 불려서 우연히
+       맞는다. 누가 그 호출을 동기로 바꾸면 **시험은 통과한 채로 포털이 깨진다.**
+       태그가 뒤라면, 쓰는 자리가 전부 비동기 콜백 안인지까지 본다. */
+    if (tagRe.test(code)) {
+        /* ★ A-728(브론즈 59차 ①-C): 전에는 태그가 **있는지**만 봤다. 포털은 그 태그가
+           쓰는 자리보다 **뒤**(2512행)에 있는데 1181행에서 썼다 — 지금은 호출이
+           비동기 콜백 안이라 우연히 맞았다. 누가 동기로 바꾸면 **시험은 통과한 채로
+           포털이 깨진다.** 타이밍을 따지지 않고 **순서 자체**를 센다. */
+        const tagAt = code.search(tagRe);
+        const firstUse = code.search(/fpLabelFor\s*\(/);
+        ok(firstUse === -1 || tagAt < firstUse,
+           rel + ' 의 script 태그가 쓰는 자리보다 앞이다');
+    }
+
+    /* 상태까지 보는 함수를 거치는가 — `fpLabel` 만 쓰면 승인됐는데 승인일 없는
+       문서에 「승인 시 시작」이 떠서 상태 딱지와 모순된다 (A-728 ③) */
+    ok(/fpLabelFor\s*\(/.test(code), rel + ' 가 fpLabelFor 를 쓴다');
+    ok(!/[^A-Za-z.]fpLabel\s*\(/.test(code), rel + ' 가 fpLabel 을 직접 부르지 않는다');
+
     /* ★ 자기 손으로 날짜를 더하지 않는다 — 그 순간 두 답이 생긴다.
-       지금 두 쪽 다 setMonth 를 한 번도 안 쓴다(확인함). 날짜 산술이 필요하면
-       free-period.js 에 함수를 더하는 것이 맞고, 여기서 하면 안 된다. */
+       지금 두 쪽 다 setMonth 를 한 번도 안 쓴다. 날짜 산술이 필요하면
+       free-period.js 에 함수를 더하는 것이 맞고 여기서 하면 안 된다. */
     ok(!/\bsetMonth\s*\(/.test(code), rel + ' 가 직접 setMonth 로 달을 더하지 않는다');
     ok(!/\bsetFullYear\s*\(/.test(code), rel + ' 가 직접 setFullYear 를 쓰지 않는다');
     ok(!/90\s*\*\s*24\s*\*\s*60/.test(code), rel + ' 가 직접 90일을 세지 않는다');

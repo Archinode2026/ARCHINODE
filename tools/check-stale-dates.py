@@ -47,6 +47,8 @@ SKIP_PATHS = {'magazine.html'}
 SKIP_PREFIX = ('magazine/', 'trend-report/')
 
 # 앞날을 약속하는 말. 이 말과 **같은 문장**에 날짜가 있어야 운다.
+# ── 약속하는 말 두 겹 ──
+# 강: 이 말이 있으면 날짜 하나로 충분하다. 「출시 2026년 6월」은 그 달이 지나면 거짓이다.
 PROMISE = re.compile(
     r'(coming|launch|launching|will\s+(?:be|open|start|go)|available\s+from|'
     r'until|through|by\s+(?:the\s+)?(?:end|mid)|starts?|begins?|opens?|'
@@ -55,13 +57,44 @@ PROMISE = re.compile(
     r'공개\s*예정|종료\s*예정|신청\s*마감)',
     re.I)
 
+# 약: 「시행일」·「Effective」는 **기록일 수도 있다.** 지금 시행 중인 방침의 머리글
+#   「시행일: 2026년 4월」은 영원히 맞는 말이다. 그래서 이 말만으로는 울지 않고,
+#   가까이에 **앞날의 선택지를 주는 말**(아래 OFFER)이 있을 때만 운다.
+#   ★ A-728: 처음엔 이 말을 강 쪽에 넣었다가 거짓 양성이 절반이었다 —
+#     약관·처리방침 머리글과 개정 **이력**이 전부 울었다.
+EFFECTIVE = re.compile(r'(effective(?:\s+(?:date|from|on))?|takes?\s+effect)|(시행일|시행\s*예정|효력\s*발생)', re.I)
+
+# 앞날의 선택지를 주는 말. 이 말이 있는데 그 날이 지났으면 **이미 닫힌 문을 열려 있다고**
+# 안내하는 것이다 — 브론즈 59차 ④-B 가 찾은 약관 개정 띠가 그 꼴이었다.
+# ★ A-728: 처음엔 `before it takes effect` 도 넣었다가 **부칙**이 울었다 —
+#   「제4조제2항에 따라 시행 7일 전에 공지합니다」는 **규칙 서술**이지 선택지가 아니다.
+#   부칙은 영구히 남아야 할 기록이므로 울면 안 된다. 선택지를 **주는** 말만 남긴다.
+OFFER = re.compile(
+    r'(may\s+(?:stop|cancel|discontinue|terminate)|if\s+you\s+do\s+not\s+agree)'
+    r'|(시행일\s*전에|전에\s*(?:서비스\s*)?이용을\s*중단|동의하지\s*않으시면)',
+    re.I)
+OFFER_WINDOW = 400   # 글자. 띠 하나 안에서 문장이 갈려 있어도 같이 본다
+
 # 열쇠 이름 자체가 기한인 설정값
 DEADLINE_KEY = re.compile(
     r'\b([A-Za-z_]*(?:freeUntil|validUntil|expiresAt|expiryDate|deadline|'
     r'endsAt|endDate|closesAt|cutoff|launchDate|releaseDate)[A-Za-z_]*)\s*:\s*'
     r'[\'"]((?:20\d{2})[-/.]\d{1,2}[-/.]\d{1,2})[\'"]', re.I)
 
-KNOWN: dict[str, str] = {}
+KNOWN: dict[str, str] = {
+    # A-728(브론즈 59차 ④-B): 약관 개정 띠가 「시행일: 2026년 11월 20일 … 동의하지
+    #   않으시면 시행일 전에 이용을 중단하실 수 있습니다」인데 그날이 지났다.
+    #   **고치려다 되돌렸다** — 그 문장은 A-523 이 법적 요구(제4조제2항의 거부권 고지)로
+    #   넣은 것이고 `tools/test-digital-products.js:251` 이 **글자 그대로** 지킨다.
+    #   띠 자체도 「시행일이 지나도 기록으로 남긴다(무엇을 언제 고쳤는지가 증거다)」는
+    #   결정 위에 서 있다(terms.html:113 주석).
+    #   ★ 지난 공지를 **현재형으로 두는 것**이 맞는지는 법률 판단이라 승리님·변호사 몫이다.
+    #     변호사 묶음에 올렸다. 그 답이 오면 이 두 줄을 지운다.
+    'terms.html':
+        '약관 개정 공지 띠 — A-523 의 거부권 고지. 지난 공지를 기록으로 남기는 결정. 변호사 확인 대기',
+    'digital-products.html':
+        '같은 개정 공지 띠(구매 길목 사본). terms.html 과 함께 결정된다',
+}
 TODAY = datetime.date.today()
 MONTHS = {m: i + 1 for i, m in enumerate(
     ['january', 'february', 'march', 'april', 'may', 'june',
@@ -75,14 +108,23 @@ def blank_keep_lines(src: str, pattern: str) -> str:
     return re.sub(pattern, f, src)
 
 
-def visible_only(src: str) -> str:
-    """손님에게 보이는 자리만 남긴다. script·style 속은 지운다(줄은 지킨다)."""
-    s = blank_keep_lines(src, r'<!--[\s\S]*?-->')
-    s = blank_keep_lines(s, r'/\*[\s\S]*?\*/')
-    s = blank_keep_lines(s, r'(?m)^\s*//.*$')
-    s = blank_keep_lines(s, r'<script\b[^>]*>[\s\S]*?</script\s*>')
-    s = blank_keep_lines(s, r'<style\b[^>]*>[\s\S]*?</style\s*>')
-    return s
+def visible_only(src: str, is_html: bool) -> str:
+    """손님에게 보이는 자리만 남긴다. script·style 속은 지운다(줄은 지킨다).
+
+    ★ A-728(브론즈 59차를 재현하다 발견): 전에는 HTML 에도 `/* … */` 를 걷었다.
+      그런데 **HTML 속성 안의 `image/*` 가 블록 주석 시작으로 읽혀**
+      `brand-portal/dashboard.html` 의 680~926행 **16,865자**가 통째로 지워졌다.
+      그 범위 안에 날짜가 있었다면 이 검사는 조용히 못 봤을 것이다 —
+      즉 「통과」가 못 믿을 답이었다.
+      HTML 에서는 `<script>`·`<style>` 을 **먼저** 통째로 지우므로 JS·CSS 주석을
+      따로 걷을 까닭이 없다. 남는 것은 마크업뿐이고 거기엔 블록 주석이 없다.
+    """
+    if is_html:
+        s = blank_keep_lines(src, r'<script\b[^>]*>[\s\S]*?</script\s*>')
+        s = blank_keep_lines(s, r'<style\b[^>]*>[\s\S]*?</style\s*>')
+        return blank_keep_lines(s, r'<!--[\s\S]*?-->')
+    s = blank_keep_lines(src, r'/\*[\s\S]*?\*/')
+    return blank_keep_lines(s, r'(?m)^\s*//.*$')
 
 
 def end_of(y, m=None, d=None, half=None, q=None) -> datetime.date:
@@ -113,6 +155,20 @@ DATE_PATS = [
      lambda m: end_of(int(m.group(1)), int(m.group(2)))),
     (re.compile(r'\b(' + '|'.join(MONTHS) + r')\s+(20\d{2})\b', re.I),
      lambda m: end_of(int(m.group(2)), MONTHS[m.group(1).lower()])),
+    # ★ A-728(브론즈 59차 ④-D): 「November 20, 2026」 꼴을 못 봤다 — 위 패턴은 월과
+    #   연도가 **붙어** 있어야 해서 사이에 일(日)이 끼면 빠진다. 그래서 같은 줄의
+    #   국문(「2026년 11월」)만 울고 **영문은 조용한 비대칭**이 있었다. 하필 지금
+    #   거짓인 자리가 영문 쪽이었다(terms.html·privacy-en.html).
+    (re.compile(r'\b(' + '|'.join(MONTHS) + r')\s+(\d{1,2})(?:st|nd|rd|th)?\s*,?\s*(20\d{2})\b', re.I),
+     lambda m: end_of(int(m.group(3)), MONTHS[m.group(1).lower()], int(m.group(2)))),
+    # 「2026년 말」·「late 2026」·「end of 2026」·「연내」
+    (re.compile(r'(20\d{2})\s*년\s*말'),
+     lambda m: end_of(int(m.group(1)))),
+    (re.compile(r'\b(?:late|end\s+of)\s+(20\d{2})\b', re.I),
+     lambda m: end_of(int(m.group(1)))),
+    # 국문 분기 「2027년 2분기」
+    (re.compile(r'(20\d{2})\s*년\s*([1-4])\s*분기'),
+     lambda m: end_of(int(m.group(1)), q=int(m.group(2)))),
 ]
 
 
@@ -130,12 +186,20 @@ SENT = re.compile(r'[^.!?。\n<>]{0,400}')
 
 
 def scan_copy(rel: str, src: str):
-    """① 보이는 글: 약속하는 말과 날짜가 같은 문장에 있을 때"""
-    vis = visible_only(src)
+    """① 보이는 글. 강한 약속 말은 같은 문장, 「시행일」류는 선택지 말이 가까이 있을 때."""
+    vis = visible_only(src, rel.endswith('.html'))
     out = []
     for m in SENT.finditer(vis):
         chunk = m.group(0)
-        if not chunk.strip() or not PROMISE.search(chunk):
+        if not chunk.strip():
+            continue
+        strong = bool(PROMISE.search(chunk))
+        weak = False
+        if not strong and EFFECTIVE.search(chunk):
+            lo = max(0, m.start() - OFFER_WINDOW)
+            hi = min(len(vis), m.end() + OFFER_WINDOW)
+            weak = bool(OFFER.search(vis[lo:hi]))
+        if not (strong or weak):
             continue
         for frag, end, off in dates_in(chunk):
             line = vis.count('\n', 0, m.start() + off) + 1
@@ -145,9 +209,19 @@ def scan_copy(rel: str, src: str):
 
 def scan_config(rel: str, src: str):
     """② 열쇠 이름이 기한인 설정값"""
-    code = blank_keep_lines(src, r'/\*[\s\S]*?\*/')
-    code = blank_keep_lines(code, r'(?m)^\s*//.*$')
-    code = blank_keep_lines(code, r'<!--[\s\S]*?-->')
+    # ★ HTML 에 `/* … */` 를 걷으면 속성 안의 `image/*` 가 주석 시작으로 읽힌다(위 참고).
+    #   설정값은 `<script>` 안에 있으므로, HTML 이면 **script 블록 안에서만** 주석을 걷는다.
+    if rel.endswith('.html'):
+        code = blank_keep_lines(src, r'<!--[\s\S]*?-->')
+
+        def _inner(m):
+            body = blank_keep_lines(m.group(2), r'/\*[\s\S]*?\*/')
+            body = blank_keep_lines(body, r'(?m)^\s*//.*$')
+            return m.group(1) + body + m.group(3)
+        code = re.sub(r'(<script\b[^>]*>)([\s\S]*?)(</script\s*>)', _inner, code)
+    else:
+        code = blank_keep_lines(src, r'/\*[\s\S]*?\*/')
+        code = blank_keep_lines(code, r'(?m)^\s*//.*$')
     out = []
     for m in DEADLINE_KEY.finditer(code):
         key, val = m.group(1), m.group(2)

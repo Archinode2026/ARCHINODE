@@ -29,7 +29,9 @@ var LEAD_TYPES = [
     { key: 'sourcing',       en: 'Sourcing inquiry',  ko: '소싱 문의',   cls: 'adm-type-sourcing' },
     { key: 'dealer',         en: 'Dealer connection', ko: '딜러 연결',   cls: 'adm-type-dealer' }
 ];
-// 상태 5종. 브랜드 포털은 assigned→contacted→closed 만 바꿀 수 있다(규칙 update 조건)
+// 상태 6종. 브랜드 포털은 assigned→contacted→shipped→closed 를 바꿀 수 있다(규칙 update 조건).
+// A-728(브론즈 59차 ⓐ): A-722 가 `shipped` 를 배열에 끼우면서 이 줄을 두고 갔다.
+//   다음에 읽는 사람이 규칙을 안 보고 주석을 믿는다 — 정본은 `firestore.rules:384·389·391`.
 var LEAD_STATUSES = [
     { key: 'new',       en: 'New',       ko: '신규',   cls: 'status-new' },
     { key: 'assigned',  en: 'Assigned',  ko: '배정됨', cls: 'status-assigned' },
@@ -501,9 +503,16 @@ async function lead_view(id) {
             + (h.note ? '<div>' + escapeHtml(h.note) + '</div>' : '') + '</li>';
     }
     if (!histHtml) histHtml = '<li class="adm-muted">' + tSpan('No history yet', '이력 없음') + '</li>';
+    /* ★ A-728(브론즈 59차 ⓑ): 포털은 **샘플 요청이 아니면 `shipped` 를 뺀다**
+       (`brand-portal/dashboard.html` 의 `inbox_allowedNext`). 어드민만 거르개 없이
+       전부 돌려서, 「딜러 연결」 리드에 「발송함」을 걸 수 있었다 — 규칙상 어드민
+       쓰기는 막히지 않는다. 그러면 그 리드는 포털에서 `shipped → ['shipped','closed']`
+       에 갇혀 **「종료」 말고는 못 간다.** 「발송」이라는 말이 없는 유형에 발송 상태가
+       붙는 쪽이 먼저 이상하다. 두 화면이 같은 규칙을 보게 한다. */
     var statusOpts = '';
     for (var s = 0; s < LEAD_STATUSES.length; s++) {
         var sm = LEAD_STATUSES[s];
+        if (sm.key === 'shipped' && it.type !== 'sample-request' && it.status !== 'shipped') continue;
         statusOpts += '<option value="' + escapeAttr(sm.key) + '"' + (sm.key === it.status ? ' selected' : '') + ' ' + tAttr(sm.en, sm.ko) + '>' + escapeHtml(t(sm.en, sm.ko)) + '</option>';
     }
     var html = '<h2 class="adm-lead-h2">' + escapeHtml(it.name || '-') + ' ' + lead_typeBadge(it.type) + ' ' + lead_statusBadge(it.status) + '</h2>'

@@ -39,7 +39,10 @@ const email = arg('--email', 'qa-bronze@archinodekr.com');
       await ref.set({
         brandName: '[테스트-브론즈] QA Brand', slug: 'test-bronze-qa-brand',
         country: 'Korea', category: 'Furniture', website: 'https://archinodekr.com', description: '[테스트-브론즈] 자동 검수용 브랜드. 지우지 마세요 — 오픈 전 일괄 정리 대상.',
+        // A-728: 승인 상태로 만들면서 approvedAt 을 안 찍어, 포털에 「승인됨 /
+        //   승인 시 무료 기간 시작」이라는 모순된 두 줄이 떴다(브론즈 59차 ③).
         status: 'approved', statusReason: '[테스트-브론즈] 검증용 승인', createdAt: now, updatedAt: now,
+        approvedAt: now,
         history: [{ status: 'approved', by: 'make-qa-user.js', at: new Date().toISOString(), note: '[테스트-브론즈] 검증용 생성' }],
       });
       await ref.collection('internal').doc('contact').set({
