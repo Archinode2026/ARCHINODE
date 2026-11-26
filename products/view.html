@@ -251,6 +251,24 @@
           <label for="rfqEmail" data-en="Email" data-ko="이메일">Email</label>
           <input type="email" id="rfqEmail" maxlength="254" required autocomplete="email">
         </div>
+        <!-- ★ A-722(2026-11-26): 샘플 요청에만 뜨는 프로젝트 칸.
+             승리님 결정 — 샘플은 **브랜드가 운임을 내고 직접** 보낸다. 그러면
+             구경하는 사람의 요청이 섞일 때 브랜드가 응답을 멈춘다. 우리가 쥔
+             지렛대는 물류가 아니라 **요청의 질**이다.
+             BIM 요청(`bimProjectName` 등)이 이미 같은 것을 받고 있으므로 꼴을 맞췄다 —
+             브랜드가 「실제 설계 건인가」를 보고 판단할 수 있어야 한다. -->
+        <div class="rfq-field" id="rfqProjectField" style="display:none;">
+          <label for="rfqProjectName" data-en="Project name" data-ko="프로젝트명">Project name</label>
+          <input type="text" id="rfqProjectName" maxlength="200">
+        </div>
+        <div class="rfq-field" id="rfqProjectTypeField" style="display:none;">
+          <label for="rfqProjectType" data-en="Project type" data-ko="프로젝트 유형">Project type</label>
+          <input type="text" id="rfqProjectType" maxlength="200" placeholder="e.g. Neighborhood facility, single-family house, office" data-en-placeholder="e.g. Neighborhood facility, single-family house, office" data-ko-placeholder="예: 근린생활, 단독주택, 오피스">
+        </div>
+        <div class="rfq-field" id="rfqTimelineField" style="display:none;">
+          <label for="rfqProjectTimeline" data-en="When do you need it" data-ko="언제 필요하신가요">When do you need it</label>
+          <input type="text" id="rfqProjectTimeline" maxlength="200" placeholder="e.g. design phase ends in March" data-en-placeholder="e.g. design phase ends in March" data-ko-placeholder="예: 3월에 설계 마감">
+        </div>
         <div class="rfq-field" id="rfqShippingField" style="display:none;">
           <label for="rfqShipping" data-en="Shipping Address" data-ko="배송지 주소">Shipping Address</label>
           <input type="text" id="rfqShipping" autocomplete="street-address" maxlength="500">
@@ -964,6 +982,12 @@ function openRfqModal(type) {
     document.getElementById('rfqMessageLabel').setAttribute('data-ko', copy.msgLabelKo);
     document.getElementById('rfqMessage').required = (type === 'quote');
     document.getElementById('rfqShippingField').style.display = copy.showShipping ? 'block' : 'none';
+    /* A-722: 프로젝트 칸은 샘플 요청에만. 배송지와 같은 조건을 쓴다 —
+       조건을 따로 두면 언젠가 둘이 갈라진다. */
+    ['rfqProjectField', 'rfqProjectTypeField', 'rfqTimelineField'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = copy.showShipping ? 'block' : 'none';
+    });
     document.getElementById('rfqFormWrap').style.display = 'block';
     document.getElementById('rfqSuccessWrap').style.display = 'none';
     document.getElementById('rfqErrorMsg').style.display = 'none';
@@ -1187,7 +1211,14 @@ async function submitRfq(e) {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             assignedAt: null
         };
-        if (rfqType === 'sample-request') data.shippingAddress = shipping;
+        if (rfqType === 'sample-request') {
+            data.shippingAddress = shipping;
+            /* A-722: 브랜드가 실제 설계 건인지 보고 판단할 수 있게. 필수는 아니다 —
+               막으면 진짜 손님도 같이 막힌다. 비어 있으면 그 자체가 신호다. */
+            data.projectName     = (document.getElementById('rfqProjectName')     || {}).value || '';
+            data.projectType     = (document.getElementById('rfqProjectType')     || {}).value || '';
+            data.projectTimeline = (document.getElementById('rfqProjectTimeline') || {}).value || '';
+        }
 
         /* A-490(2026-11-12): 접수와 알림을 **한 묶음**으로. 묶음이 거부되면 접수만
            따로 하고 `notifyPending` 을 박아 어드민 화면에 뜨게 한다. */

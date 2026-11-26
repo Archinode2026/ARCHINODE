@@ -2148,8 +2148,22 @@ var inbox_catLabel = function (v) {
     return (Array.isArray(v) ? v : [v]).filter(Boolean).join(' · ');
 };
 
-var INBOX_STATUSES = { assigned: { en: 'Assigned', ko: '배정됨' }, contacted: { en: 'Contacted', ko: '연락함' }, closed: { en: 'Closed', ko: '종료' } };
-var INBOX_NEXT = { assigned: ['assigned', 'contacted', 'closed'], contacted: ['contacted', 'closed'], closed: ['closed'] };   // 앞으로만
+/* ★ A-722(2026-11-26): `shipped`(발송함)를 더했다. 승리님 결정 — 샘플은 브랜드가
+   한국 설계사에게 **직접** 보내고 아키노드는 마진을 안 받는다. 그런데 「보냈다」를
+   적을 자리가 없어서, 기다리는 건축사에게 우리가 할 말이 없었다.
+   ※ 이 상태는 **샘플 요청에만** 뜬다(`inbox_allowedNext`) — 견적·소싱 문의에
+     「발송함」은 뜻이 없다. 상태 값을 늘리는 것과 **아무 데나 보여 주는 것**은 다르다. */
+var INBOX_STATUSES = { assigned: { en: 'Assigned', ko: '배정됨' }, contacted: { en: 'Contacted', ko: '연락함' }, shipped: { en: 'Shipped', ko: '발송함' }, closed: { en: 'Closed', ko: '종료' } };
+var INBOX_NEXT = { assigned: ['assigned', 'contacted', 'shipped', 'closed'], contacted: ['contacted', 'shipped', 'closed'], shipped: ['shipped', 'closed'], closed: ['closed'] };   // 앞으로만
+
+/* 샘플 요청이 아니면 `shipped` 를 뺀다. */
+function inbox_allowedNext(it) {
+    var list = INBOX_NEXT[it && it.status] || ['assigned', 'contacted', 'shipped', 'closed'];
+    if (!it || it.type !== 'sample-request') {
+        list = list.filter(function (k) { return k !== 'shipped'; });
+    }
+    return list;
+}
 
 function inbox_esc(s) { var d = document.createElement('div'); d.textContent = String(s == null ? '' : s); return d.innerHTML; }
 function inbox_attrEsc(s) { return inbox_esc(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
@@ -2171,7 +2185,9 @@ function inbox_find(id) { for (var i = 0; i < inbox_state.items.length; i++) if 
 // ── 읽기 — where brandId==uid + status in [assigned,contacted,closed](규칙 read 분기와 동일 — 2026-09-12 블랙 지적), orderBy 없음. 실패는 숨기지 않는다(규칙 미게시면 permission-denied 안내) ──
 function inbox_load(uid) {
     inbox_msg(inbox_t('Loading…', '불러오는 중…'), false);
-    db.collection('leads').where('brandId', '==', uid).where('status', 'in', ['assigned', 'contacted', 'closed']).get().then(function (snap) {
+    /* A-722: 이 목록은 firestore.rules 의 목록과 **정확히 같아야** 한다 —
+       다르면 list 판정이 통과하지 않아 인박스가 통째로 비어 보인다. */
+    db.collection('leads').where('brandId', '==', uid).where('status', 'in', ['assigned', 'contacted', 'shipped', 'closed']).get().then(function (snap) {
         var items = [];
         snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
         items.sort(function (a, b) { return inbox_millis(b.createdAt) - inbox_millis(a.createdAt); });   // 클라이언트 정렬 (복합 색인 회피)
@@ -2222,7 +2238,7 @@ function inbox_draw() {
 function inbox_open(id) {
     var it = inbox_find(id); if (!it) return;
     inbox_state.current = it;
-    var allowed = INBOX_NEXT[it.status] || ['assigned', 'contacted', 'closed'];
+    var allowed = inbox_allowedNext(it);
     var opts = '';
     for (var i = 0; i < allowed.length; i++) { var m = INBOX_STATUSES[allowed[i]]; opts += '<option value="' + allowed[i] + '"' + (allowed[i] === it.status ? ' selected' : '') + ' ' + inbox_attr(m.en, m.ko) + '>' + inbox_esc(inbox_t(m.en, m.ko)) + '</option>'; }
     var dd = function (en, ko, val) { return '<dt ' + inbox_attr(en, ko) + '>' + inbox_esc(inbox_t(en, ko)) + '</dt><dd>' + inbox_esc(val || '-') + '</dd>'; };
@@ -2240,6 +2256,11 @@ function inbox_open(id) {
            있었다). 브랜드는 배정받고도 품목을 본문으로 짐작해야 했다. A-491(배송지)과
            같은 종류 — 받아 놓고 아무도 못 보는 칸이다. */
         + (it.category ? dd('Category', '품목', inbox_catLabel(it.category)) : '')
+        /* A-722: 샘플 요청의 프로젝트 칸. 브랜드가 **직접 운임을 내고 보내므로**
+           실제 설계 건인지 여기서 판단한다. 비어 있으면 그 자체가 신호다. */
+        + (it.projectName     ? dd('Project name', '프로젝트명',   it.projectName)     : '')
+        + (it.projectType     ? dd('Project type', '프로젝트 유형', it.projectType)     : '')
+        + (it.projectTimeline ? dd('Needed by',    '필요 시기',     it.projectTimeline) : '')
         + dd('Product', '제품', it.productName) + dd('Received', '접수', inbox_fmtDate(it.createdAt)) + dd('Assigned', '배정', inbox_fmtDate(it.assignedAt)) + dd('Message', '본문', it.message)
         /* A-491: 샘플 요청의 배송지 — 샘플을 보내는 쪽이 브랜드다. 전에는 어디에도 안 나왔다.
            A-705: 이 줄이 `</dl>` **밖**에 있었다. 꾸밈이 `.inbox-dl dt`/`dd` 로 자손에만
@@ -2264,7 +2285,7 @@ function inbox_save() {
     var it = inbox_state.current; if (!it || inbox_state.saving) return;
     var status = document.getElementById('inboxStatus').value, note = document.getElementById('inboxNote').value.trim();
     var err = document.getElementById('inboxErr'), btn = document.getElementById('inboxSaveBtn');
-    var allowed = INBOX_NEXT[it.status] || ['assigned', 'contacted', 'closed'];
+    var allowed = inbox_allowedNext(it);
     if (allowed.indexOf(status) === -1) { err.textContent = inbox_t('That status is not allowed.', '허용되지 않는 상태입니다.'); err.style.display = 'block'; return; }
     if (status === it.status && note === String(it.brandNote || '')) { err.textContent = inbox_t('Nothing changed.', '바뀐 것이 없습니다.'); err.style.display = 'block'; return; }
     err.style.display = 'none';

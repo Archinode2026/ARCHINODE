@@ -34,6 +34,9 @@ var LEAD_STATUSES = [
     { key: 'new',       en: 'New',       ko: '신규',   cls: 'status-new' },
     { key: 'assigned',  en: 'Assigned',  ko: '배정됨', cls: 'status-assigned' },
     { key: 'contacted', en: 'Contacted', ko: '연락함', cls: 'status-approved' },
+    /* A-722: 샘플을 브랜드가 직접 보내므로 「발송함」이 필요하다. 어드민은 모든
+       유형에서 이 값을 **볼 수** 있어야 한다 — 거르개에도 뜬다. */
+    { key: 'shipped',   en: 'Shipped',   ko: '발송함', cls: 'status-approved' },
     { key: 'closed',    en: 'Closed',    ko: '종료',   cls: 'status-closed' },
     { key: 'spam',      en: 'Spam',      ko: '스팸',   cls: 'status-rejected' }
 ];
@@ -520,6 +523,12 @@ async function lead_view(id) {
            A-491(배송지)과 같은 종류다 — 받아 놓고 아무도 못 보는 칸. */
         + (it.category ? dd('Category', '품목', lead_catLabel(it.category)) : '')
         + dd('Product', '제품', (it.productName || '') + (it.productId ? ' (' + it.productId + ')' : ''))
+        /* A-722: 샘플 요청의 프로젝트 칸. 브랜드가 운임을 내고 직접 보내므로
+           **실제 설계 건인지**를 어드민도 보고 배정해야 한다. 비어 있으면 안 그린다 —
+           샘플 요청이 아닌 건에는 뜻이 없는 줄이다. */
+        + (it.projectName     ? dd('Project name', '프로젝트명',   it.projectName)     : '')
+        + (it.projectType     ? dd('Project type', '프로젝트 유형', it.projectType)     : '')
+        + (it.projectTimeline ? dd('Needed by',    '필요 시기',     it.projectTimeline) : '')
         + dd('Source', '출처', lead_sourceLabel(it.source) + (it.userId ? ' · uid ' + it.userId : ''))
         + dd('Received', '접수', fmtDate(it.createdAt))
         /* ★ A-712(2026-11-25, 브론즈 57차 ④): 개인정보 **동의 기록**을 공개 폼
