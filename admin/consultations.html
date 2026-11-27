@@ -247,9 +247,13 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
         <label for="inNote" style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Reviewer Note (내부 메모 / 거절·수정 사유)</label>
         <textarea class="editor-input short" id="inNote" placeholder="내부 메모 — 거절 사유, 사전 답변 본문, 미팅 결과 요약 등"></textarea>
 
-        <label for="inPaymentLink" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Stripe Payment Link (결제 링크)</label>
-        <input type="url" class="editor-input short" id="inPaymentLink" placeholder="https://buy.stripe.com/..." style="min-height:unset;padding:11px 14px;">
-        <div class="editor-hint">Stripe 대시보드에서 Payment Link 생성 후 여기에 붙여넣기. "Send Payment Link" 버튼 누르면 자동으로 client 이메일에 발송 (브랜드에서 직접 처리 — 지금은 수동 발송 기록만).</div>
+        <!-- A-731(2026-11-27): 전에는 「Stripe Payment Link」였다. 승리님 확인 — **Stripe 계정이 없다**
+             (2026-05-14 일지: 한국 사업자는 가입 불가 → 페이팔 + Toss 로 결정). 가질 수 없는 값을
+             요구하는 칸이었고, 아래 「결제+미팅 잡기」가 그 값 없이는 아예 안 돌아 **자문 유료
+             전환이 구조적으로 막혀 있었다**. 결제사에 매이지 않게 일반화한다. -->
+        <label for="inPaymentLink" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Payment Link (결제 링크)</label>
+        <input type="url" class="editor-input short" id="inPaymentLink" placeholder="https://… (페이팔·Toss 등 결제 링크)" style="min-height:unset;padding:11px 14px;">
+        <div class="editor-hint">페이팔·Toss 등에서 결제 링크를 만들어 여기에 붙여넣기. "Send Payment Link" 버튼 누르면 자동으로 client 이메일에 발송 (브랜드에서 직접 처리 — 지금은 수동 발송 기록만).</div>
 
         <label for="inMeetingAt" style="font-size:0.85rem;font-weight:600;display:block;margin:18px 0 6px;">Meeting Schedule (미팅 일정)</label>
         <input type="datetime-local" class="editor-input short" id="inMeetingAt" style="min-height:unset;padding:11px 14px;">
@@ -482,7 +486,7 @@ document.getElementById('btnWritten').addEventListener('click', async function()
 document.getElementById('btnSchedule').addEventListener('click', function() {
   var link = document.getElementById('inPaymentLink').value.trim();
   var meetingAt = document.getElementById('inMeetingAt').value;
-  if (!link) { showToast('Stripe Payment Link를 입력하세요.', 'error'); return; }
+  if (!link) { showToast('결제 링크를 입력하세요.', 'error'); return; }
   doAction('scheduled', { paymentLink: link, meetingAt: meetingAt ? new Date(meetingAt) : null });
 });
 document.getElementById('btnComplete').addEventListener('click', function() {

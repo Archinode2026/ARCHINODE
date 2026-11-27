@@ -88,13 +88,6 @@ POLICY_EXEMPT = {
     'Google LLC':
         '국외이전 표의 **총괄 항목** — Firebase(인증·보관·Cloud Functions)가 사이트의 바탕이다. '
         '세부 서비스는 같은 표에 따로 적혀 있고, 호스트는 www.gstatic.com 으로 잡힌다',
-    'Stripe, Inc.':
-        '⚠️ **승리님 확인 대기(2026-11-27, A-731)**. 코드에 Stripe 로 나가는 경로가 **0곳**이고, '
-        'archi-diary/2026-05-14.md 는 「한국 사업자는 Stripe 정식 계정 불가」를 적고 결제를 '
-        '페이팔+Toss 로 바꿨다고 기록한다. 그런데 `admin/consultations.html:485` 가 '
-        'Stripe 링크 없이는 「결제+미팅 잡기」를 **막는다** — 가질 수 없는 값을 요구하는 화면이다. '
-        '**계정이 없다면 방침 네 줄과 어드민 칸을 함께 걷어야 하고, 그때 이 줄도 지운다.** '
-        '변호사 묶음 10번 참고',
     'Netlify, Inc.':
         '호스팅. 사이트 자체가 그 위에서 돌므로 코드에 호출이 없는 것이 맞다 — 근거: netlify.toml',
     'PayPal Holdings, Inc.':
