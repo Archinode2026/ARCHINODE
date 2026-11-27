@@ -434,8 +434,14 @@ def main():
         print('          ※ 기본 표본이 전수가 아니다 — 쪽마다 20~40초다. 쪽 단위 <style> 이 focus·outline 을 건드리는 쪽 17개 + 폴더 대표 7개 = 24쪽을 자동으로 고른다.')
         print('          ※ 로그인이 필요한 화면(admin/dashboard · brand-portal/dashboard · auth/profile)은 Loading 에서 멈춰 **승리님만 확인할 수 있다** — brand-portal/dashboard 는 초점 요소 86개 중 4개만 닿는다.')
         print('          ※ A-669(2026-11-23) 정정: 폴더 **뿌리**(admin/ · brand-portal/ · auth/)는 멈추는 게 아니라 **404** 다 — index.html 이 아예 없다(확인함). 전에 이 줄이 뿌리까지 멈춘다고 적어 브론즈 53차를 헛짚게 했다.')
+    # ★ A-733(2026-11-27): 마지막 줄이 「검사 N개 전부 통과」였다. 건너뛴 목록은 위에
+    #   적히는데, **요약 한 줄만 읽으면 완전해 보인다** — 그리고 사람은 요약을 옮겨 적는다.
+    #   실제로 그 한 줄을 그대로 보고하면서 13개가 안 돈다는 말을 빠뜨린 일이 있었다.
+    #   「전부」라는 말은 **정말 전부일 때만** 쓴다.
+    dormant = len(skipped_browser)
+    tail = '' if not dormant else '  ·  **%d개는 이 기계에서 못 돈다**(크로미움 없음 — 위 목록)' % dormant
     if bad:
-        print('어긋난 검사 %d개 / 통과 %d개' % (len(bad), okn))
+        print('어긋난 검사 %d개 / 통과 %d개%s' % (len(bad), okn, tail))
         for name, state, rel in bad:
             print('   · %-18s %s  (%s)' % (name, state, rel))
         print('')
@@ -443,7 +449,12 @@ def main():
         for name, state, rel in bad:
             print('   python3 %s' % rel if rel.endswith('.py') else '   node %s' % rel)
         return 1
-    print('검사 %d개 전부 통과' % okn)
+    if dormant:
+        print('돌 수 있는 검사 %d개 통과  ·  **%d개는 이 기계에서 못 돌았다**' % (okn, dormant))
+        print('   (%s)' % ' · '.join(skipped_browser))
+        print('   → 「전부 통과」가 아니다. 저 %d개는 크로미움이 있는 기계에서 따로 돌려야 한다.' % dormant)
+    else:
+        print('검사 %d개 전부 통과 (건너뛴 것 없음)' % okn)
     return 0
 
 
