@@ -741,6 +741,21 @@ service cloud.firestore {
                     && request.resource.data.get('projectType', '').size() <= 100
                     && request.resource.data.get('projectTimeline', '').size() <= 100
                     && request.resource.data.get('projectScale', '').size() <= 100
+                    /* ★ A-734(브론즈 62차 B62-16·17): 이 다섯 키에 **상한이 없었다** —
+                       `productName`·`brandName`·`fileType`·`productId`·`brandId`.
+                       형제인 `leads` 는 `leadFieldsWithinLimits()` 로 16개를 전부 막는데,
+                       여기는 주석이 「A-485: leads 와 같은 이유」라고 적어 놓고 값이 안 따라왔다.
+                       ① 문서 하나가 1MiB 까지 부풀 수 있고(A-485·A-477 이 막으려던 것)
+                       ② 승인 메일 제목이 200자를 넘어 **규칙에 거부**된다(B62-4 와 맞물린다).
+                       그리고 공개 생성 여섯 중 **여기만 허니팟을 안 거쳤다** — `hp` 를
+                       키 목록에 받아 두고 비었는지는 안 봤다. 폼은 `bim_hp` 를 보내지만
+                       SDK 직접 호출은 그 검사를 지나간다. */
+                    && request.resource.data.get('productName', '').size() <= 200
+                    && request.resource.data.get('brandName', '').size() <= 200
+                    && request.resource.data.get('fileType', '').size() <= 50
+                    && request.resource.data.productId.size() <= 128
+                    && request.resource.data.get('brandId', '').size() <= 128
+                    && passesHoneypot()
                     && request.resource.data.requesterUid == request.auth.uid
                     && request.resource.data.agreedDataTerms == true
                     && request.resource.data.agreedThirdPartyShare == true

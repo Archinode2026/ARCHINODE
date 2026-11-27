@@ -65,7 +65,11 @@ def obj_keys(rel, name):
     """
     s = read(rel)
     if s is None: return None
-    m = re.search(re.escape(name) + r'\s*=\s*\{([\s\S]*?)\n\};', s)
+    # ★ A-734(브론즈 62차 B62-19): 전에는 `\n\};` 로 **열 0에서 끝나는** 지도만 읽었다.
+    #   `articles-lang.js` 의 `ART_TAG_KO` 는 IIFE 안이라 `  };` 로 끝나고, 그래서
+    #   「모양이 바뀌었나」로 떨어졌다. 들여쓰기를 받아들인다 — 지도가 어디에 살든
+    #   읽을 수 있어야 명부에 올릴 수 있다.
+    m = re.search(re.escape(name) + r'\s*=\s*\{([\s\S]*?)\n[ \t]*\};', s)
     if not m: return None
     body = m.group(1)
     body = re.sub(r'/\*[\s\S]*?\*/', ' ', body)
@@ -104,6 +108,21 @@ def literal_values(rel, field):
 # writers: 값을 **담는** 자리 / readers: 그 값을 **읽어 이름을 붙이는** 지도
 # fallback: 담기는 값이 아니라 빈 값에 붙이는 이름 — 읽는 쪽에만 있어도 된다
 VOCAB = [
+    dict(name='기사 태그(tag)',
+         # ★ A-734(브론즈 62차 B62-19): A-731 이 태그 지도를 `articles-lang.js` 한 곳으로
+         #   모으고 다섯 쪽이 같이 쓰게 했는데, **이 명부에 등록하는 걸음을 빠뜨렸다.**
+         #   A-716 은 `ADM_STATUS` 를 더할 때 「명부에 등록해 어긋나면 울게 해 뒀다」고
+         #   적었다 — 그 규율이 이번엔 안 지켜졌다.
+         #   지금은 다섯 대 다섯으로 맞는다. **맞는 상태로 등록해 두는 것이 요점**이다:
+         #   누가 선택칸에 여섯 번째 값을 더하면, 한국어 화면에 영어 날글자가 뜨는데
+         #   터지지 않고 조용히 튼다(A-410 이 「잠복 결함」이라 적은 바로 그 병의 재발 경로).
+         writers={
+             '포털 아티클 #artTag': lambda: opt_values('brand-portal/dashboard.html', 'artTag'),
+         },
+         readers={
+             'ART_TAG_KO': lambda: obj_keys('articles-lang.js', 'ART_TAG_KO'),
+         },
+         fallback=set()),
     dict(name='분류(category)',
          writers={
              '소싱 폼 #srcCategory':      lambda: opt_values('sourcing-inquiry.html', 'srcCategory'),

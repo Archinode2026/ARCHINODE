@@ -78,9 +78,12 @@
 .pp-specs-title { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:16px; }
 .pp-specs-table { width:100%; }
 .pp-specs-table tr { border-bottom:1px solid var(--gray-100); }
-.pp-specs-table td { padding:12px 0; font-size:0.88rem; vertical-align:top; }
-.pp-specs-table td:first-child { font-weight:600; color:var(--gray-700); width:140px; }
-.pp-specs-table td:last-child { color:var(--gray-700); }
+/* A-734: 왼쪽 칸이 `td` → `th[scope=row]` 로 바뀌었다(B62-15). 꾸밈이 `td` 에만
+   걸려 있어서 같이 넓혀야 모양이 그대로다 — 안 그러면 접근성을 고치면서 화면을 깬다.
+   `th` 는 기본이 가운데 정렬·굵게라 `text-align:left` 를 명시한다. */
+.pp-specs-table td, .pp-specs-table th { padding:12px 0; font-size:0.88rem; vertical-align:top; }
+.pp-specs-table th[scope="row"] { font-weight:600; color:var(--gray-700); width:140px; text-align:left; }
+.pp-specs-table td { color:var(--gray-700); }
 
 /* CTA Buttons */
 .pp-cta { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:32px; }
@@ -804,7 +807,10 @@ function renderProduct(p, related) {
         <div class="pp-specs">
             <div class="pp-specs-title" data-en="Specifications" data-ko="제품 사양">Specifications</div>
             <table class="pp-specs-table">
-                ${specs.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
+                <!-- A-734(브론즈 62차 B62-15): 왼쪽 칸이 **항목 이름**이라는 것을 말해 주지
+                     않아, 화면 읽기 도구가 「행 3: 재질, 오크」로만 읽었다. 사양이 20줄이면
+                     어느 값이 무엇인지 따라갈 수 없다. BIM 을 신청하는 한국 설계사가 읽는 자리다. -->
+                ${specs.map(([k,v]) => `<tr><th scope="row">${k}</th><td>${v}</td></tr>`).join('')}
             </table>
         </div>` : '';
 

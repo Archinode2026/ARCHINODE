@@ -367,8 +367,12 @@ async function approveRequest(id) {
            라이선스 고지는 읽혀야 효력이 있다.
            신청서에 언어를 담아 두지 않아 어느 쪽인지 알 길이 없으므로, 둘 다
            보낸다. (나중에 신청 때 언어를 함께 담으면 한쪽만 보낼 수 있다.) */
-        subject: '[archinodekr] ' + (d.brandName || '') + ' - ' + (d.productName || '')
-                 + ' 기술 데이터 승인 / Technical data approved',
+        /* A-734(브론즈 62차 B62-4): 메일 13곳 중 이 둘만 180자 자르기가 없었다.
+           규칙은 `subject.size() < 200` 을 요구하는데 고정부가 63자고, `bim-requests` 는
+           `productName`·`brandName` 에 길이 상한이 없다(B62-16 — 같이 고쳤다).
+           길면 **승인은 됐는데 다운로드 안내 메일이 규칙에 거부**된다. */
+        subject: ('[archinodekr] ' + (d.brandName || '') + ' - ' + (d.productName || '')
+                 + ' 기술 데이터 승인 / Technical data approved').substring(0, 180),
         text: [
           '안녕하세요, ' + (d.name || '') + ' ' + (d.title || '') + '님.',
           '유럽 프리미엄 건축 플랫폼 archinodekr입니다.',
@@ -425,7 +429,8 @@ async function approveRequest(id) {
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),  // 2026-11-02 QA: 발송 추적용 생성시각
           to: brandEmail,
           message: {
-            subject: '[archinodekr Lead Alert] New BIM & Spec Request for ' + (d.productName || '') + ' in South Korea',
+            /* A-734 B62-4: 위와 같은 까닭 */
+            subject: ('[archinodekr Lead Alert] New BIM & Spec Request for ' + (d.productName || '') + ' in South Korea').substring(0, 180),
             text: [
               'Dear ' + (d.brandName || '') + ' team,',
               '',

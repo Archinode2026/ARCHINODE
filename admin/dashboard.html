@@ -789,7 +789,13 @@ async function updateBrand(docId, newStatus) {
                     showToast((typeof t === 'function'
                         ? t('Approved, but the password-set email could not be sent. Ask the brand to use "Set or reset password" on the login page.',
                             '승인했지만 비밀번호 설정 메일을 보내지 못했습니다. 브랜드에게 로그인 화면의 「비밀번호 설정·재설정」을 안내해 주세요.')
-                        : '비밀번호 설정 메일을 보내지 못했습니다.'), true);
+                        /* A-734(브론즈 62차 B62-8): 여기만 `true` 를 넘겼다. `showToast(msg, kind)`
+                           의 둘째 인자는 **CSS 클래스 이름**이라(`admin-core.js`), `true` 가
+                           클래스가 되어 `.error` 가 안 붙고 **평범한 검정 토스트**로 떴다.
+                           A-723 이 세운 마지막 안전망 — 「승인했는데 비밀번호 메일이 안 갔다」 —
+                           가 평범한 알림처럼 보이고 3초 뒤 사라졌다. 바로 세 줄 아래는 'error' 다.
+                           (`rvMsg(en, ko, isErr)` 가 boolean 을 받아 두 서명이 섞인 것으로 보인다.) */
+                        : '비밀번호 설정 메일을 보내지 못했습니다.'), 'error');
                 }
             }
         } catch (mailErr) {
@@ -846,6 +852,13 @@ function openReasonModal(opts) {
             dlg.setAttribute('role', 'dialog');
             dlg.setAttribute('aria-modal', 'true');
         }
+        /* ★ A-734(브론즈 62차 B62-13): A-689 가 초점을 창 안에 **가두는** 것까지는
+           꼼꼼히 만들었는데(Tab 올가미·role·aria-modal·Esc 규칙), **닫을 때 돌려주는**
+           코드가 없었다. 어드민이 키보드로 23번째 줄의 「거절」까지 Tab 해서 창을 열고
+           닫으면 초점이 `<body>` 로 떨어져, 다음 Tab 이 **쪽 맨 위부터** 다시 시작한다.
+           화면 읽기 도구를 쓰는 사람에게는 「내가 어디 있었는지」가 통째로 사라진다
+           (WCAG 2.4.3). 검사기 일곱 중 「닫은 뒤 초점이 어디로 가는가」를 묻는 것은 없다. */
+        const opener = document.activeElement;
         let resolved = false;
         const safeResolve = (val) => {
             if (resolved) return;
@@ -854,6 +867,9 @@ function openReasonModal(opts) {
             modal.classList.remove('show');
             document.removeEventListener('keydown', onKeydown, true);
             if (dlg) { dlg.removeAttribute('role'); dlg.removeAttribute('aria-modal'); }
+            /* A-734: 연 자리로 초점을 돌려준다. 그 요소가 사라졌을 수도 있으니 방어한다. */
+            try { if (opener && typeof opener.focus === 'function' && document.contains(opener)) opener.focus(); }
+            catch (e) { /* 돌려줄 자리가 없으면 그냥 둔다 */ }
             resolve(val);
         };
         reasonModalGuard = safeResolve;

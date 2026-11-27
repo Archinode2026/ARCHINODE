@@ -654,7 +654,11 @@
 </footer>
 
 <!-- SCROLL TO TOP -->
-<a href="#" class="scroll-top" id="scrollTop" onclick="scrollToTop(event)"><i class="fas fa-arrow-up"></i></a>
+<!-- A-734(브론즈 62차 B62-14): 이 쪽만 옛 세대였다 — 228쪽 중 227쪽은 `<button>` +
+     `aria-label` + `fa-chevron-up` 인데 여기만 `<a href="#">` + 이름 없음 + 다른 아이콘.
+     화면 읽기 도구가 「링크」라고만 말한다. 대분류 입구이고 사이트맵에 있는 공개 쪽이다. -->
+<button class="scroll-top" id="scrollTop" onclick="scrollToTop(event)"
+        aria-label="Top" data-en-aria-label="Top" data-ko-aria-label="맨 위로"><i class="fas fa-chevron-up"></i></button>
 
 <!-- LANGUAGE SCRIPT -->
 <script src="brand-gate.js?v=20261125a"></script>

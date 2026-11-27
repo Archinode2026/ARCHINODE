@@ -1308,7 +1308,10 @@ function renderCertList(certs) {
                 <a href="${escapeHtml(bpSafeUrl(cert.fileUrl))}" target="_blank" style="font-weight:600;color:#332e27;text-decoration:none;" rel="noopener noreferrer"><i class="fas fa-file-certificate" style="margin-right:6px;color:#7a5c32;"></i>${escapeHtml(cert.name)}</a>
                 ${cert.issuer ? `<span style="color:#6b6459;font-size:0.8rem;margin-left:8px;">${escapeHtml(cert.issuer)}</span>` : ''}
             </div>
-            <button type="button" onclick="deleteCertification(${i})" style="background:none;border:none;color:#b91c1c;cursor:pointer;font-size:0.9rem;"><i class="fas fa-trash"></i></button>
+            <!-- A-734(B62-14): 이름이 없는 **지우는** 단추였다. 「button」이라고만 읽힌다. -->
+                <button type="button" onclick="deleteCertification(${i})"
+                        aria-label="Delete certificate" data-en-aria-label="Delete certificate" data-ko-aria-label="인증서 삭제"
+                        title="Delete certificate" style="background:none;border:none;color:#b91c1c;cursor:pointer;font-size:0.9rem;"><i class="fas fa-trash"></i></button>
         </div>
     `).join('');
 }

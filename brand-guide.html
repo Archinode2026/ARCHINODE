@@ -193,7 +193,11 @@
         <p>Go to <a href="auth/login.html" target="_blank" rel="noopener noreferrer">archinodekr.com/auth/login.html</a> and sign in with:</p>
         <ul>
           <li><strong>Email:</strong> the address you submitted during listing</li>
-          <li><strong>Temporary password:</strong> the one shown on the success screen right after your application, also included in the confirmation email</li>
+          <!-- A-734(브론즈 62차 B62-3): 「also included in the confirmation email」은 **거짓이었다.**
+               A-723 이 `list-your-brand.html` 의 같은 거짓을 고치면서 주석에 「임시 비밀번호를
+               보내는 메일이 어디에도 없었다」고 적어 뒀는데, **그 화면이 직접 링크하는 이 쪽**에
+               같은 말이 남아 있었다. 지금은 승인 시 비밀번호 **설정 링크**가 따로 간다. -->
+          <li><strong>Temporary password:</strong> the one shown on the success screen right after your application. It is <strong>not</strong> sent by email — if you lost it, use <strong>Set or reset password</strong> on the login page.</li>
         </ul>
         <p>Once inside, use the settings menu to change your password to something you will remember. This is your brand's dedicated workspace on ARCHINODE.</p>
         <div class="step-tip">
