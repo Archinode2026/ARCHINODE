@@ -188,9 +188,16 @@
   }
 
   // ── 파생값 ──
+  /* A-731(브론즈 61차 ④ⓑ): 첫 줄이 `[^a-z0-9\s-]` 라 **한글을 통째로 지웠다.**
+       '2026 밀라노 가구 박람회 리뷰' → '2026'
+       숫자 없는 한국어 제목      → ''  →  'untitled'
+     즉 한국어 원문 기사의 slug 가 **전부 `untitled`** 가 된다. 그런데 그걸 막으려고
+     쓰여 있는 `getUniqueSlug()` 는 **한 번도 안 불렸다**(정의만 있고 호출 0곳).
+     브랜드 slug 는 이미 한글을 쓰고 있으므로(`테스트-ymiij2-…`) 지울 까닭이 없다.
+     글자·숫자를 유니코드로 남긴다 — 주소에서는 퍼센트 인코딩되지만 제대로 돈다. */
   function generateSlug(title) {
-    return title.toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
+    return String(title || '').toLowerCase()
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
@@ -392,7 +399,11 @@
           brandId: bpId.uid,                 // A-213 — 둘을 한 객체에서 함께
           brandName: bpId.brandName,
           title: title,
-          slug: generateSlug(title),
+          /* A-731: 전에는 `generateSlug(title)` 를 바로 썼다 — `getUniqueSlug()` 가
+             바로 옆에 정의돼 있는데 **아무도 안 불렀다**. 같은 제목이 둘이면 두 글이
+             같은 slug 를 갖고, `magazine/view.html` 이 `where('slug','==',key).limit(1)`
+             로 **아무 한 건**을 집어 공유된 주소가 엉뚱한 기사를 연다. */
+          slug: await getUniqueSlug(generateSlug(title)),
           tag: $('artTag').value,
           blocks: cleanBlocks,
           coverImage: getCoverImage(),

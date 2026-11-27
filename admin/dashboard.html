@@ -443,7 +443,9 @@ tr:hover { background: var(--gray-50); }
 <script src="../firebase-config.js"></script>
 <script src="../loading-watchdog.js?v=20261111a"></script>
 <script src="js/modal-dismiss.js?v=20261125a"></script>
-<script src="../free-period.js?v=20261126"></script>
+<!-- A-731: 기사 태그의 두 말 지도가 여기 있다 (브론즈 61차 ④ⓐ) -->
+    <script src="../articles-lang.js?v=20261127"></script>
+    <script src="../free-period.js?v=20261126"></script>
     <script src="js/admin-core.js?v=20261105b"></script>
 <script src="js/admin-nav.js?v=20261104g"></script>
 <script src="js/view-dashboard.js?v=20261105a"></script>
@@ -1154,7 +1156,7 @@ async function loadArticles() {
             <tr>
                 <td><strong>${escapeHtml(a.title)}</strong></td>
                 <td>${escapeHtml(a.brandName)}</td>
-                <td class="adm-col-sub"><span style="color:#7a5c32;font-size:0.8rem;">${escapeHtml(a.tag || '')}</span></td>
+                <td class="adm-col-sub"><span style="color:#7a5c32;font-size:0.8rem;">${escapeHtml(a.tag ? artTagText(a.tag) : '')}</span></td>
                 <td>${admStatusBadge(a.status)}</td>
                 <td>
                     ${a.status === 'pending' ? `
@@ -1186,7 +1188,7 @@ async function viewArticle(docId) {
     const a = doc.data();
     document.getElementById('modalContent').innerHTML = `
         <h2>${escapeHtml(a.title)}</h2>
-        <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(a.tag || '')} · ${escapeHtml(a.brandName)}</p>
+        <p style="color:#7a5c32;font-size:0.85rem;margin-bottom:16px;">${escapeHtml(a.tag ? artTagText(a.tag) : '')} · ${escapeHtml(a.brandName)}</p>
         ${admArticleHero(a) ? `<img alt="" loading="lazy" src="${escapeHtml(admArticleHero(a))}" style="width:100%;border-radius:8px;margin-bottom:16px;">` : ''}
         ${admArticleBody(a)}
         <div style="margin-top:24px;">

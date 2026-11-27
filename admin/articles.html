@@ -305,6 +305,9 @@ body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--gray-
 <script src="../loading-watchdog.js?v=20261111a"></script>
 <script src="js/admin-core.js?v=20261105b"></script>
 <script src="js/admin-nav.js?v=20261104g"></script>
+<!-- A-731: 기사 태그의 두 말 지도. 이 쪽은 주석에서만 언급하고 **싣지 않고 있었다** —
+     그래서 `artTagText` 가 없어 되돌이(fallback)로 영어가 그대로 떴다. -->
+<script src="../articles-lang.js?v=20261127"></script>
 <script src="../lang.js?v=20261106a"></script>
 <script>
 // ADMIN_EMAILS, isAdmin() 는 firebase-config.js 에서 제공
@@ -438,7 +441,10 @@ window.openModal = function(id) {
   currentDoc = d;
   document.getElementById('mTitle').textContent = d.title || '—';
   document.getElementById('mBrandMeta').textContent = d.brandName || '—';   // A-204 — country 는 articles 에 없다
-  document.getElementById('mCategory').textContent = d.tag || '—';            // 스키마 필드는 tag
+  /* A-731: 한국어 어드민에 영어 날글자가 뜨던 자리 — A-692 와 같은 병이다.
+     textContent 라 두 언어 속성을 못 다므로 지금 언어 글자를 찍는다. */
+  document.getElementById('mCategory').textContent =
+      d.tag ? ((typeof artTagText === 'function') ? artTagText(d.tag) : d.tag) : '—';   // 스키마 필드는 tag
   document.getElementById('mOriginalLang').textContent = (d.lang || '—').toUpperCase();   // 스키마 필드는 lang
   document.getElementById('mCreatedAt').textContent = formatDate(d.createdAt);
   /* A-703: 저장값을 그대로 찍고 있었다. `admStatusBadge()` 는 `admin-core.js` 의

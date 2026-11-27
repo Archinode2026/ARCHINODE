@@ -226,7 +226,7 @@
 <script src="../search.js?v=20261106a"></script>
 <script src="../lang.js?v=20261106a"></script>
 <script src="../a11y-nav.js?v=20261113a"></script>
-<script src="../articles-lang.js?v=20261105a"></script>
+<script src="../articles-lang.js?v=20261127"></script>
 <script src="../auth-ui.js?v=20260630"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
@@ -344,25 +344,18 @@ function renderBlocks(blocks) {
 }
 
 function renderArticle(a) {
-    /* ── A-410(2026-11-09): 태그가 저장된 영어 값 그대로 찍혔다 ───────────────
-       `a.tag` 는 브랜드가 포털의 선택칸에서 고른 값이고 **영어로 저장된다**
-       (`value="Brand Spotlight"` 등). 이 화면은 그 값을 그대로 찍으므로
-       한국어 화면에서도 영어로 남는다 — A-407 과 같은 꼴이다.
-
-       지금은 `articles` 컬렉션이 비어 있어 **드러나지 않는 잠복 결함**이다.
-       첫 브랜드 기사가 올라오는 순간 보인다. 아래 다섯 쌍은 지어낸 것이
-       아니라 **포털 선택칸의 `data-en`/`data-ko`**(A-395)에서 그대로 가져왔다.
-       모르는 값이면 양쪽을 같게 둔다 — 영어로 보여 주는 게 빈칸보다 낫다. */
-    const TAG_KO = {
-        'Brand Spotlight': '브랜드 스포트라이트',
-        'Trend': '트렌드',
-        'Project': '프로젝트',
-        'Interview': '인터뷰',
-        'Guide': '가이드'
-    };
+    /* ── 태그의 두 말 ───────────────────────────────────────────────
+       A-410(2026-11-09)이 여기에 다섯 쌍을 넣어 고쳤고, 그 주석이 「지금은
+       articles 가 비어 있어 드러나지 않는 **잠복 결함**이다」라고 적어 두었다.
+       맞는 진단이었는데 **고친 자리가 여기 하나뿐**이었다 — 브론즈 61차가
+       세어 보니 같은 값을 찍는 자리가 여섯이었다.
+       A-731(2026-11-27): 지도를 `articles-lang.js` 로 옮기고 여섯이 같이 쓴다.
+       여기 사본을 남겨 두면 그게 다음 갈라짐의 씨앗이다. */
     const tagRaw = a.tag || '';
-    const tagEn = escapeHtml(tagRaw || 'Article');
-    const tagKo = escapeHtml(TAG_KO[tagRaw] || tagRaw || '기사');
+    const _tagL  = (typeof artTagLabel === 'function') ? artTagLabel(tagRaw)
+                                                      : { en: tagRaw || 'Article', ko: tagRaw || '기사' };
+    const tagEn = escapeHtml(_tagL.en);
+    const tagKo = escapeHtml(_tagL.ko);
 
     // A-259: 보는 사람 언어에 맞는 판을 고른다. 번역판이 없으면 원문을 주되 side.fellBack 이 선다.
     const side = (typeof window.artSide === 'function') ? window.artSide(a) : {

@@ -352,7 +352,7 @@ fadeEls.forEach(el => fadeObserver.observe(el));
 <!-- A-347(2026-11-06): 목록 카드도 보는 사람 언어로. A-259 는 기사 **본문**만 갈랐고
      이 화면의 카드 제목·요약은 늘 원문 그대로였다 — 한국어로 보다가 영어 제목을 누르면
      본문만 한국어로 나왔다. artSide() 는 articles-lang.js 에 있다. -->
-<script src="articles-lang.js?v=20261105a"></script>
+<script src="articles-lang.js?v=20261127"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -382,7 +382,15 @@ fadeEls.forEach(el => fadeObserver.observe(el));
     // A-347: 날짜도 보는 언어를 따른다 — 전에는 늘 ko-KR 이라 영어로 봐도 한국식이었다(A-252 와 같은 결).
     var date = a.publishedAt && a.publishedAt.toDate
              ? a.publishedAt.toDate().toLocaleDateString(viewLang === 'ko' ? 'ko-KR' : 'en-US') : '';
-    var tagHtml = a.tag ? '<span class="article-card-tag">' + esc(a.tag) + '</span>' : '';
+    /* A-731(브론즈 61차 ④ⓐ): 저장된 영어 값을 그대로 찍어 **한국어 화면에서도
+       영어**로 남았다. 같은 카드의 날짜는 ko-KR 로 지역화되는데 태그만 영어라
+       한 카드 안에서 언어가 갈렸고, 기사를 열면(magazine/view) 한국어로 바뀌어
+       **목록과 본문이 같은 글을 다르게 불렀다.** 지도는 articles-lang.js 한 곳. */
+    var tagL = (typeof artTagLabel === 'function') ? artTagLabel(a.tag) : { en: a.tag || '', ko: a.tag || '' };
+    var tagHtml = a.tag
+        ? '<span class="article-card-tag" data-en="' + esc(tagL.en) + '" data-ko="' + esc(tagL.ko) + '">'
+          + esc(document.documentElement.lang === 'ko' ? tagL.ko : tagL.en) + '</span>'
+        : '';
     return '<a href="magazine/view.html?id=' + esc(id) + '" class="article-card">' +
       /* A-514: 대체글이 바로 아래 `<h3>` 와 **글자까지 같았다** — 읽어 주는 도구가
           제목을 두 번 말한다. 한 고리(`<a>`) 안에 이름이 이미 있으면 그림은 장식이다. */

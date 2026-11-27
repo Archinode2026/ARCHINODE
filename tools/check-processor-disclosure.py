@@ -15,7 +15,7 @@ A-139 실측은 `smtps://resend@smtp.resend.com:465` 였다. 두 방향의 거�
 갔고 그 문서가 안 따라왔다. A-500 이 계획을 사실로 읽어 방침에 심었고,
 A-721(같은 날)이 **바로 그 목록에** GA4 한 줄을 더하면서도 이 줄은 다시 안 봤다.
 
-## 묻는 것 둘
+## 묻는 것 셋 — **양방향**
 
 ① **저장소가 실제로 부르는 바깥 호스트**가 전부 방침에 올라 있는가 (전수, 코드에서 긁는다)
    — 모르는 호스트가 새로 생기면 **사람이 판단하라고 울린다.** 조용히 들어오지 못하게.
@@ -25,6 +25,15 @@ A-721(같은 날)이 **바로 그 목록에** GA4 한 줄을 더하면서도 이
    A-721 이 GA4 에서 겪은 그대로다: **방침에 없는 것을 먼저 켜면 그게 위반이다.**
    `sentry-loader.js` 는 지금 꺼져 있지만 231쪽이 싣고 있고 파일 자신이
    「한울님이 채워야 함」이라고 적어 두었다 — 채우는 날 아무도 방침을 안 본다.
+
+③ **방침에 적힌 이름이 실제로 쓰이는가** (역방향, A-731 에서 더함)
+   — A-730 은 커밋 메시지에 「**두 방향의 거짓말**」이라고 적었는데 자동화한 것은
+     한 방향뿐이었다. 그래서 브론즈 61차가 **고친 날 두 줄 아래**에서 같은 종류를
+     또 찾았다: `Stripe, Inc.` 가 수탁자·국외이전에 적혀 있는데 코드에 **Stripe 로
+     나가는 경로가 0곳**이고, 2026-05-14 일지는 「한국 사업자는 Stripe 가입 불가」를
+     적고 결제를 페이팔+Toss 로 바꿨다고 기록한다.
+   — 과잉 고지라 덜 위험해 보이지만, **거부권(제28조의8)의 대상을 틀리게 알려 주는 것**이라
+     방향이 다르다. 손님은 안 가는 곳에 대해 거부권을 행사하고, 실제로 가는 곳은 못 막는다.
 
 ## 안 보는 것
 - 주석 안의 주소. ★ HTML 은 `<script>` 안에서만 JS 주석을 걷는다(A-728 의 `image/*` 덫).
@@ -69,6 +78,37 @@ INFRA = [
      '법인명은 Resend 기업 약관에서 확인(「Plus Five Five, Inc.」, Resend 는 서비스 이름). '
      '메일 발송처를 바꾸면 **이 줄과 방침 양쪽을 같이** 고쳐야 한다'),
 ]
+
+# 방침 표에 적혀 있어도 **코드 호출이 없는 것이 맞는** 항목. 까닭을 함께 적는다.
+POLICY_EXEMPT = {
+    'ARCHINODE 입점 브랜드 및 제조사(유럽 등 해외 소재)':
+        '업체가 아니라 **입점 브랜드 전체**를 가리키는 항목이다(A-724). 호스트가 있을 수 없다',
+    'Brands and manufacturers listed on ARCHINODE (located in Europe and elsewhere)':
+        '위 항목의 영문판',
+    'Google LLC':
+        '국외이전 표의 **총괄 항목** — Firebase(인증·보관·Cloud Functions)가 사이트의 바탕이다. '
+        '세부 서비스는 같은 표에 따로 적혀 있고, 호스트는 www.gstatic.com 으로 잡힌다',
+    'Stripe, Inc.':
+        '⚠️ **승리님 확인 대기(2026-11-27, A-731)**. 코드에 Stripe 로 나가는 경로가 **0곳**이고, '
+        'archi-diary/2026-05-14.md 는 「한국 사업자는 Stripe 정식 계정 불가」를 적고 결제를 '
+        '페이팔+Toss 로 바꿨다고 기록한다. 그런데 `admin/consultations.html:485` 가 '
+        'Stripe 링크 없이는 「결제+미팅 잡기」를 **막는다** — 가질 수 없는 값을 요구하는 화면이다. '
+        '**계정이 없다면 방침 네 줄과 어드민 칸을 함께 걷어야 하고, 그때 이 줄도 지운다.** '
+        '변호사 묶음 10번 참고',
+    'Netlify, Inc.':
+        '호스팅. 사이트 자체가 그 위에서 돌므로 코드에 호출이 없는 것이 맞다 — 근거: netlify.toml',
+    'PayPal Holdings, Inc.':
+        '디지털 상품 결제. 결제 주소는 상품 데이터(`DP_PRODUCTS[].payUrl`)에 들어가고 '
+        '지금 상품이 0개라 코드에 호스트가 없다. `digital-products.html` 의 `dpPayUrl()` 이 '
+        'paypal.com 만 허용하는 것이 쓰는 증거다',
+}
+
+# 방침의 수탁·국외이전 구역 (이 안의 <strong>이름:</strong> 만 본다)
+POLICY_SECTIONS = {
+    'privacy.html':    ('제6조의2 (개인정보 처리업무의 위탁)', '제7조 (이용자의 권리)'),
+    'privacy-en.html': ('6A. Entrustment', '7. Rights of Data Subjects'),
+}
+NAME_IN_TABLE = re.compile(r'<strong>([^<]{2,70}?):\s*</strong>')
 
 CALL = re.compile(
     r'(?:src|action)\s*=\s*["\']https?://([A-Za-z0-9.-]+)'
@@ -159,6 +199,26 @@ def main() -> int:
         else:
             print('  · %-26s 꺼짐 — 켜는 날 방침 %s 에 「%s」를 먼저 올려야 한다'
                   % (label, '둘 다' if len(miss) == 2 else '쪽', owner))
+
+    # ③ 역방향 — 방침에 적힌 이름이 실제로 쓰이는가
+    known_names = set(POLICY_EXEMPT) | {o for o in HOST_OWNER.values() if o} | {o for o, _ in INFRA} \
+                  | {o for _, _, o, _ in SWITCHES}
+    for pol_file, (start, end) in POLICY_SECTIONS.items():
+        try:
+            raw = io.open(os.path.join(ROOT, pol_file), encoding='utf-8').read()
+            body = re.sub(r'<!--[\s\S]*?-->', ' ', raw)
+            i, j = body.index(start), body.index(end, body.index(start))
+        except (OSError, ValueError):
+            continue
+        for name in dict.fromkeys(NAME_IN_TABLE.findall(body[i:j])):
+            if name in POLICY_EXEMPT:
+                continue
+            if any(k in name for k in known_names):
+                continue
+            bad.append(('방침에만 있고 쓰지 않음', '%s (%s)' % (name, pol_file),
+                        '코드에도 인프라 목록에도 근거가 없다. **안 가는 곳에 거부권을 알리면 '
+                        '손님은 거부권의 대상을 틀리게 안다**(제28조의8). 안 쓰면 방침에서 빼고, '
+                        '쓰는데 코드에 안 보이면 `POLICY_EXEMPT` 에 **까닭과 함께** 적어라'))
 
     if bad:
         print('')

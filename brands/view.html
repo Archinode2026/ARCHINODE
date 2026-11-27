@@ -533,7 +533,7 @@
 <script src="../lang.js?v=20261106a"></script>
 <script src="../a11y-nav.js?v=20261113a"></script>
 <!-- A-347(2026-11-06): 브랜드 아티클 카드도 보는 사람 언어로. artSide() 는 articles-lang.js. -->
-<script src="../articles-lang.js?v=20261105a"></script>
+<script src="../articles-lang.js?v=20261127"></script>
 <script src="../auth-ui.js"></script>
 <script>
 // XSS 방어: 사용자(브랜드)가 입력한 텍스트를 화면에 넣기 전 이스케이프 (A-003)
@@ -826,7 +826,11 @@ function renderBrand(brand, products, articles) {
             const aTitle = escapeHtml(aSide.title || 'Untitled');
             const aExcerpt = escapeHtml((aSide.excerpt || '').substring(0, 140));
             const aImg = escapeHtml(a.coverImage || '../assets/photos/photo-1618221195710-dd6b41faaea6-600.jpg');
-            const aTag = a.tag ? `<span class="article-card-tag">${escapeHtml(a.tag)}</span>` : '';
+            /* A-731: 태그 두 말은 articles-lang.js 한 곳에서 (브론즈 61차 ④ⓐ) */
+            const aTagL = (typeof artTagLabel === 'function') ? artTagLabel(a.tag) : { en: a.tag || '', ko: a.tag || '' };
+            const aTag = a.tag
+                ? `<span class="article-card-tag" data-en="${escapeHtml(aTagL.en)}" data-ko="${escapeHtml(aTagL.ko)}">${escapeHtml(document.documentElement.lang === 'ko' ? aTagL.ko : aTagL.en)}</span>`
+                : '';
             // A-347: 날짜도 보는 언어를 따른다 (A-252 와 같은 결).
             const aDate = (a.publishedAt && a.publishedAt.toDate)
                         ? a.publishedAt.toDate().toLocaleDateString(aViewLang === 'ko' ? 'ko-KR' : 'en-US') : '';
